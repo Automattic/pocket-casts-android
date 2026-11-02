@@ -4,58 +4,42 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.Toolbar
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.Alignment
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.core.view.isNotEmpty
-import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
-import androidx.core.view.updatePadding
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
-import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
-import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
-import au.com.shiftyjelly.pocketcasts.profile.R
-import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentCloudFilesBinding
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
+import au.com.shiftyjelly.pocketcasts.views.compose.EpisodeRowTrailing
+import au.com.shiftyjelly.pocketcasts.views.compose.MultiSelectController
+import au.com.shiftyjelly.pocketcasts.views.compose.MultiSelectTopBar
+import au.com.shiftyjelly.pocketcasts.views.compose.ToolbarCastButton
+import au.com.shiftyjelly.pocketcasts.views.compose.UserEpisodeRow
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
-import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
-import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
-import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
@@ -74,15 +58,12 @@ import com.automattic.eventhorizon.UploadedFilesSelectAllTappedEvent
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
-import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class CloudFilesFragment :
-    BaseFragment(),
-    Toolbar.OnMenuItemClickListener {
+class CloudFilesFragment : BaseFragment() {
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
 
     @Inject lateinit var settings: Settings
@@ -106,20 +87,73 @@ class CloudFilesFragment :
         },
     )
 
-    private var binding: FragmentCloudFilesBinding? = null
+    private var wasMultiSelecting = false
 
-    val adapter by lazy {
-        EpisodeListAdapter(
+    private val onRowClick = { episode: BaseEpisode ->
+        CloudFileBottomSheetFragment
+            .newInstance(episode.uuid, source = EpisodeViewSource.FILES)
+            .show(parentFragmentManager, "cloud_bottom_sheet")
+    }
+
+    private val pageListener = CloudFilesListener(
+        onNavigationClick = { activity?.onBackPressedDispatcher?.onBackPressed() },
+        onOptionsClick = {
+            eventHorizon.track(UploadedFilesOptionsButtonTappedEvent)
+            showOptionsDialog()
+        },
+        onAddFileClick = {
+            eventHorizon.track(UploadedFilesAddFileTappedEvent)
+            startActivity(AddFileActivity.newFileChooser(requireContext()))
+        },
+        onRefresh = { viewModel.refreshFiles(userInitiated = true) },
+    )
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
+        val uiState by remember { viewModel.uiState.asFlow() }.collectAsStateWithLifecycle(null)
+        val accountUsage by remember { viewModel.accountUsage.asFlow() }.collectAsStateWithLifecycle(null)
+        val signInState by remember { viewModel.signInState.asFlow() }.collectAsStateWithLifecycle(null)
+        val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(0)
+        val controller = remember { MultiSelectController(multiSelectHelper, viewLifecycleOwner.lifecycleScope, SourceView.FILES) }
+        val isMultiSelecting by controller.isMultiSelecting.collectAsStateWithLifecycle()
+        AppTheme(theme.activeTheme) {
+            CloudFilesPage(
+                episodes = uiState?.userEpisodes,
+                account = accountUsage?.get(),
+                isRefreshEnabled = (signInState as? SignInState.SignedIn)?.subscription != null,
+                bottomInsetPx = bottomInset,
+                listener = pageListener,
+                multiSelectTopBar = if (isMultiSelecting) {
+                    { MultiSelectTopBar(controller, eventHorizon) }
+                } else {
+                    null
+                },
+                episodeRow = { episode -> FileRow(episode, controller, isMultiSelecting) },
+                castButton = { tint -> ToolbarCastButton(tint, onClick = { chromeCastAnalytics.trackChromeCastViewShown() }) },
+                toolbarModifier = Modifier.pointerInput(Unit) {
+                    detectTapGestures(onLongPress = { theme.toggleDarkLightThemeActivity(requireActivity() as AppCompatActivity) })
+                },
+            )
+        }
+    }
+
+    @Composable
+    private fun FileRow(episode: UserEpisode, controller: MultiSelectController<BaseEpisode>, isMultiSelecting: Boolean) {
+        val selected by controller.selected.collectAsStateWithLifecycle()
+        UserEpisodeRow(
+            episode = episode,
             rowDataProvider = rowDataProvider,
-            settings = settings,
-            onRowClick = onRowClick,
-            playButtonListener = playButtonListener,
             imageRequestFactory = imageRequestFactory,
-            swipeRowActionsFactory = swipeRowActionsFactory,
-            multiSelectHelper = multiSelectHelper,
-            fragmentManager = childFragmentManager,
-            artworkContext = Element.Files,
-            onSwipeAction = { episode, swipeAction ->
+            swipeActions = { swipeRowActionsFactory.userEpisode(episode) },
+            trailing = EpisodeRowTrailing.PlayButton(playButtonListener, eventHorizon),
+            onClick = {
+                if (multiSelectHelper.isMultiSelecting) {
+                    multiSelectHelper.toggle(episode)
+                } else {
+                    onRowClick(episode)
+                }
+            },
+            onLongClick = { multiSelectHelper.defaultLongPress(multiSelectable = episode, fragmentManager = childFragmentManager) },
+            onSwipeAction = { swipeAction ->
                 viewLifecycleOwner.lifecycleScope.launch {
                     swipeActionViewModel.handleAction(
                         action = swipeAction,
@@ -129,25 +163,17 @@ class CloudFilesFragment :
                     )
                 }
             },
+            useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Files),
+            streamByDefault = settings.streamingMode.value,
+            isMultiSelecting = isMultiSelecting,
+            isSelected = selected.any { it.uuid == episode.uuid },
+            animateMultiSelection = true,
         )
     }
 
-    private val onRowClick = { episode: BaseEpisode ->
-        CloudFileBottomSheetFragment
-            .newInstance(episode.uuid, source = EpisodeViewSource.FILES)
-            .show(parentFragmentManager, "cloud_bottom_sheet")
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentCloudFilesBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
-
     override fun onDestroyView() {
-        binding?.recyclerView?.adapter = null
         multiSelectHelper.cleanup()
         super.onDestroyView()
-        binding = null
     }
 
     override fun onResume() {
@@ -173,128 +199,13 @@ class CloudFilesFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.emptyLayout?.isVisible = false
-        binding?.emptyLayout?.setContentWithViewCompositionStrategy {
-            AppTheme(theme.activeTheme) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState()),
-                ) {
-                    NoContentBanner(
-                        title = stringResource(LR.string.profile_files_empty_title),
-                        body = stringResource(LR.string.profile_files_empty_summary),
-                        iconResourceId = IR.drawable.ic_file,
-                        modifier = Modifier.padding(vertical = 24.dp),
-                    )
-                }
-            }
-        }
-
-        binding?.toolbar?.setup(
-            title = getString(LR.string.profile_navigation_files),
-            navigationIcon = BackArrow,
-            activity = activity,
-            theme = theme,
-            chromeCastButton = Shown(chromeCastAnalytics),
-            menu = R.menu.menu_cloudfiles,
-        )
-        binding?.toolbar?.setOnMenuItemClickListener(this)
-
-        binding?.recyclerView?.let {
-            it.layoutManager = LinearLayoutManager(it.context, RecyclerView.VERTICAL, false)
-            it.adapter = adapter
-            (it.itemAnimator as SimpleItemAnimator).changeDuration = 0
-        }
-
-        viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
-            val binding = binding ?: return@observe
-            val recyclerView = binding.recyclerView
-            // a row inserted at the top leaves the list anchored below it, so re-pin to 0 to keep the new file on screen
-            val isLaidOutAtTop = recyclerView.isNotEmpty() && !recyclerView.canScrollVertically(-1)
-            binding.emptyLayout.isVisible = uiState.userEpisodes.isEmpty()
-            val previousFirstUuid = adapter.currentList.firstOrNull()?.uuid
-            adapter.submitList(uiState.userEpisodes) {
-                if (isLaidOutAtTop && uiState.userEpisodes.firstOrNull()?.uuid != previousFirstUuid) {
-                    recyclerView.scrollToPosition(0)
-                }
-            }
-        }
-
-        binding?.layoutUsage?.isVisible = false
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settings.bottomInset.collect { bottomInset ->
-                    binding?.recyclerView?.updatePadding(
-                        bottom = bottomInset + resources.getDimensionPixelSize(R.dimen.files_list_padding_bottom),
-                    )
-                    binding?.fab?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                        bottomMargin = bottomInset + resources.getDimensionPixelSize(R.dimen.files_fab_margin_bottom)
-                    }
-                }
-            }
-        }
-
-        viewModel.accountUsage.observe(
-            viewLifecycleOwner,
-            Observer { accountOptional ->
-                val binding = binding ?: return@Observer
-
-                accountOptional.get()?.let {
-                    binding.lblFilecount.text = getString(LR.string.profile_cloud_count_files, it.totalFiles)
-
-                    val context = context ?: return@let
-                    val used = Util.formattedBytes(it.usedSize, context = context, minimumBytes = 0)
-                    val total = Util.formattedBytes(it.totalSize, context = context, minimumBytes = 0)
-                    val percentage = ((it.usedSize.toDouble() / it.totalSize.toDouble()) * 100f).roundToInt()
-
-                    if (percentage in 0..100) {
-                        binding.lblPercentage.text = getString(LR.string.profile_cloud_percentage_full, percentage)
-
-                        val color = when (percentage) {
-                            in 80..95 -> ThemeColor.support08(theme.activeTheme)
-                            in 95..101 -> ThemeColor.support05(theme.activeTheme)
-                            else -> ThemeColor.primaryText01(theme.activeTheme)
-                        }
-                        binding.lblPercentage.setTextColor(color)
-                    }
-
-                    binding.lblUsage.text = "$used / $total"
-                }
-
-                binding.layoutUsage.isVisible = accountOptional.isPresent()
-                binding.layoutUsageLocked.isVisible = !binding.layoutUsage.isVisible
-            },
-        )
-
         viewModel.refreshFiles(userInitiated = false)
 
-        binding?.swipeRefreshLayout?.let {
-            it.setOnRefreshListener {
-                viewModel.refreshFiles(userInitiated = true)
-                it.isRefreshing = false
-            }
-        }
-        viewModel.signInState.observe(viewLifecycleOwner) {
-            binding?.swipeRefreshLayout?.isEnabled = it is SignInState.SignedIn && it.subscription != null
-        }
-
-        binding?.fab?.setOnClickListener {
-            eventHorizon.track(UploadedFilesAddFileTappedEvent)
-            val intent = AddFileActivity.newFileChooser(it.context)
-            startActivity(intent)
-        }
-
         multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
-            val wasMultiSelecting = binding?.multiSelectToolbar?.isVisible ?: false
             if (wasMultiSelecting == isMultiSelecting) {
                 return@observe
             }
-            binding?.multiSelectToolbar?.isVisible = isMultiSelecting
-            binding?.toolbar?.isVisible = !isMultiSelecting
-            binding?.multiSelectToolbar?.setNavigationIcon(IR.drawable.ic_arrow_back)
+            wasMultiSelecting = isMultiSelecting
 
             val event = if (isMultiSelecting) {
                 UploadedFilesMultiSelectEnteredEvent
@@ -302,15 +213,12 @@ class CloudFilesFragment :
                 UploadedFilesMultiSelectExitedEvent
             }
             eventHorizon.track(event)
-
-            adapter.notifyItemRangeChanged(0, adapter.itemCount, MULTI_SELECT_TOGGLE_PAYLOAD)
         }
         multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {
                 val episodes = viewModel.uiState.value?.userEpisodes
                 if (episodes != null) {
                     multiSelectHelper.selectAllInList(episodes)
-                    adapter.notifyDataSetChanged()
                     eventHorizon.track(
                         UploadedFilesSelectAllTappedEvent(
                             selectAll = true,
@@ -323,7 +231,6 @@ class CloudFilesFragment :
                 val episodes = viewModel.uiState.value?.userEpisodes
                 if (episodes != null) {
                     multiSelectHelper.deselectAllInList(episodes)
-                    adapter.notifyDataSetChanged()
                     eventHorizon.track(
                         UploadedFilesSelectAllTappedEvent(
                             selectAll = false,
@@ -340,7 +247,6 @@ class CloudFilesFragment :
                         multiSelectHelper.selectAllInList(episodes.subList(0, startIndex + 1))
                     }
 
-                    adapter.notifyDataSetChanged()
                     eventHorizon.track(UploadedFilesSelectAllAboveTappedEvent)
                 }
             }
@@ -353,7 +259,6 @@ class CloudFilesFragment :
                         multiSelectHelper.selectAllInList(episodes.subList(startIndex, episodes.size))
                     }
 
-                    adapter.notifyDataSetChanged()
                     eventHorizon.track(UploadedFilesSelectAllBelowTappedEvent)
                 }
             }
@@ -365,7 +270,6 @@ class CloudFilesFragment :
                     if (startIndex > -1) {
                         val episodesBelow = cloudFiles.subList(startIndex, cloudFiles.size)
                         multiSelectHelper.deselectAllInList(episodesBelow)
-                        adapter.notifyDataSetChanged()
                     }
                 }
             }
@@ -377,26 +281,12 @@ class CloudFilesFragment :
                     if (startIndex > -1) {
                         val episodesAbove = cloudFiles.subList(0, startIndex + 1)
                         multiSelectHelper.deselectAllInList(episodesAbove)
-                        adapter.notifyDataSetChanged()
                     }
                 }
             }
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         multiSelectHelper.source = SourceView.FILES
-        binding?.multiSelectToolbar?.setup(viewLifecycleOwner, multiSelectHelper, menuRes = null, activity = requireActivity())
-    }
-
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_options -> {
-                eventHorizon.track(UploadedFilesOptionsButtonTappedEvent)
-                showOptionsDialog()
-                true
-            }
-
-            else -> false
-        }
     }
 
     private fun showOptionsDialog() {
