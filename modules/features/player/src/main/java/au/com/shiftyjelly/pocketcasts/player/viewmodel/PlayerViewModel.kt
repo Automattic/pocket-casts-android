@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.GeneratedChapterSeeker
+import au.com.shiftyjelly.pocketcasts.repositories.playback.ChapterSeek
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackNoticeManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -75,6 +76,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -766,12 +768,20 @@ class PlayerViewModel @Inject constructor(
 
     fun onNextChapterClick() {
         eventHorizon.track(PlayerNextChapterTappedEvent(origin = currentChapterOrigin()))
-        playbackManager.skipToNextSelectedOrLastChapter()
+        notifyChapterStartNotFound(playbackManager.skipToNextSelectedOrLastChapter())
     }
 
     fun onPreviousChapterClick() {
         eventHorizon.track(PlayerPreviousChapterTappedEvent(origin = currentChapterOrigin()))
-        playbackManager.skipToPreviousSelectedOrLastChapter()
+        notifyChapterStartNotFound(playbackManager.skipToPreviousSelectedOrLastChapter())
+    }
+
+    private fun notifyChapterStartNotFound(pendingSeek: Deferred<ChapterSeek?>) {
+        viewModelScope.launch {
+            if (pendingSeek.await()?.isGeneratedFallback == true) {
+                _snackbarMessages.emit(SnackbarMessage.ChapterStartNotFound)
+            }
+        }
     }
 
     private fun currentChapterOrigin() = listDataLive.value?.podcastHeader?.chapters?.origin?.toChapterOriginType()
@@ -836,6 +846,7 @@ class PlayerViewModel @Inject constructor(
 
     sealed interface SnackbarMessage {
         data object ShowBatteryWarningIfAppropriate : SnackbarMessage
+        data object ChapterStartNotFound : SnackbarMessage
     }
 
     enum class PlaybackEffectsSettingsTab(

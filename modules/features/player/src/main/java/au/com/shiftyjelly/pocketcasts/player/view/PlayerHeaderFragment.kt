@@ -494,8 +494,14 @@ class PlayerHeaderFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.snackbarMessages.collect { message ->
-                    if (message == PlayerViewModel.SnackbarMessage.ShowBatteryWarningIfAppropriate) {
-                        warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
+                    when (message) {
+                        PlayerViewModel.SnackbarMessage.ShowBatteryWarningIfAppropriate -> {
+                            warningsHelper.showBatteryWarningSnackbarIfAppropriate(snackbarParentView = view)
+                        }
+
+                        PlayerViewModel.SnackbarMessage.ChapterStartNotFound -> {
+                            showSnackBar(text = getString(LR.string.chapters_generated_start_not_found), duration = Snackbar.LENGTH_LONG)
+                        }
                     }
                 }
             }
@@ -603,9 +609,9 @@ class PlayerHeaderFragment :
             .show()
     }
 
-    private fun showSnackBar(text: CharSequence, isLight: Boolean = false) {
+    private fun showSnackBar(text: CharSequence, isLight: Boolean = false, duration: Int = Snackbar.LENGTH_SHORT) {
         parentFragment?.view?.let {
-            Snackbar.make(it, text, Snackbar.LENGTH_SHORT)
+            Snackbar.make(it, text, duration)
                 .apply { if (isLight) applyLightToastStyle() }
                 .show()
         }
