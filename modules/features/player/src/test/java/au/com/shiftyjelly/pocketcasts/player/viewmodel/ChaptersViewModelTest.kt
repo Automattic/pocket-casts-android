@@ -32,6 +32,8 @@ import com.automattic.eventhorizon.ChapterOriginType
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersPromptShownEvent
+import com.automattic.eventhorizon.GeneratedChaptersPromptType
 import com.automattic.eventhorizon.GeneratedChaptersToggleSourceType
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
@@ -422,6 +424,76 @@ class ChaptersViewModelTest {
                 episodeUuid = "id",
                 podcastUuid = episode.podcastOrSubstituteUuid,
                 origin = ChapterOriginType.Generated,
+                source = ChaptersShownSource.FullscreenPlayer,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `prompt shown reports the upsell to free users`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            assertTrue(awaitItem().showUpsell)
+            chaptersViewModel.trackChaptersShown(ChaptersShownSource.EpisodeDetails)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertEquals(
+            GeneratedChaptersPromptShownEvent(
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                prompt = GeneratedChaptersPromptType.PlusUpsell,
+                source = ChaptersShownSource.EpisodeDetails,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `prompt shown reports no chapters yet to subscribers who have not opted in`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            assertEquals(EmptyState.NoChaptersYet, awaitItem().emptyState)
+            chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertEquals(
+            GeneratedChaptersPromptShownEvent(
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                prompt = GeneratedChaptersPromptType.NoChaptersYet,
+                source = ChaptersShownSource.FullscreenPlayer,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `prompt shown reports the off state`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters(hasHiddenGeneratedChapters = true)
+
+        chaptersViewModel.uiState.test {
+            assertEquals(EmptyState.GeneratedChaptersOff, awaitItem().emptyState)
+            chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertEquals(
+            GeneratedChaptersPromptShownEvent(
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                prompt = GeneratedChaptersPromptType.GeneratedChaptersOff,
                 source = ChaptersShownSource.FullscreenPlayer,
             ),
             eventSink.pollEvent(),
