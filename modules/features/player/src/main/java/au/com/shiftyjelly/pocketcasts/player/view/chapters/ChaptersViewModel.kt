@@ -90,7 +90,7 @@ class ChaptersViewModel @AssistedInject constructor(
         generatedChaptersLoad.value = load
         if (!load.isEnabled) return
         var isLoaded = transcriptManager.loadGeneratedChapters(load.episodeId)
-        if (!isLoaded || !load.isEnabled || !awaitSavedChapters(load.episodeId)) {
+        if (!isLoaded || !awaitSavedChapters(load.episodeId)) {
             generatedChaptersLoad.value = load.copy(isFinished = true)
         }
         var retryDelay = 5.seconds
