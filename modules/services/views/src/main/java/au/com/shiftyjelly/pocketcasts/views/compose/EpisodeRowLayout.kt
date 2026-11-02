@@ -55,6 +55,7 @@ internal fun EpisodeRowContainer(
         leadingActions = leadingActions,
         trailingActions = trailingActions,
         isSwipeEnabled = !isMultiSelecting,
+        passTapsWhenOpen = true,
         actionIcon = { action -> SwipeActionIcon(action) },
         modifier = modifier,
     ) {
@@ -67,7 +68,18 @@ internal fun EpisodeRowContainer(
                         this.contentDescription = contentDescription
                     }
                 }
-                .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+                .combinedClickable(
+                    onClick = {
+                        onClick()
+                        swipeRowState.settle()
+                    },
+                    onLongClick = onLongClick?.let { longClick ->
+                        {
+                            longClick()
+                            swipeRowState.settle()
+                        }
+                    },
+                )
                 .drawWithContent {
                     drawContent()
                     val dividerStart = 16.dp.roundToPx().toFloat()

@@ -183,6 +183,7 @@ fun SwipeRow(
     trailingActions: List<SwipeRowAction>,
     modifier: Modifier = Modifier,
     isSwipeEnabled: Boolean = true,
+    passTapsWhenOpen: Boolean = false,
     actionIcon: @Composable (SwipeRowAction) -> Unit = { action -> SwipeRowActionIcon(action) },
     content: @Composable () -> Unit,
 ) {
@@ -343,7 +344,7 @@ fun SwipeRow(
                 },
         ) {
             content()
-            if (state.isOpen) {
+            if (state.isOpen && !passTapsWhenOpen) {
                 Box(
                     modifier = Modifier
                         .matchParentSize()
