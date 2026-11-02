@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllResponse
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeDrawable
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
@@ -161,7 +162,13 @@ class PlaylistFragment :
                     bottomInsetPx = bottomInset,
                     listener = pageListener,
                     multiSelectTopBar = if (isMultiSelecting) {
-                        { MultiSelectTopBar(controller, eventHorizon) }
+                        {
+                            MultiSelectTopBar(
+                                controller = controller,
+                                eventHorizon = eventHorizon,
+                                navigationIconId = requireContext().getThemeDrawable(androidx.appcompat.R.attr.homeAsUpIndicator),
+                            )
+                        }
                     } else {
                         null
                     },
