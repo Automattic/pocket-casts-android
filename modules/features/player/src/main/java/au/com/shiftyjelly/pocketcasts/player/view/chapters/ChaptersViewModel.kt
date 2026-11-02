@@ -133,12 +133,16 @@ class ChaptersViewModel @AssistedInject constructor(
     private val _showPlayer = MutableSharedFlow<Unit>()
     val showPlayer = _showPlayer.asSharedFlow()
 
-    private val _chapterStartNotFound = Channel<Unit>(Channel.CONFLATED)
+    private val _chapterStartNotFound = Channel<Unit>()
     val chapterStartNotFound = _chapterStartNotFound.receiveAsFlow()
 
     fun playChapter(chapter: Chapter) {
         val tappedAt = timeSource.markNow()
-        val selection = ChapterSelection(chapter.origin.toChapterOriginType(), mode.chaptersShownSource)
+        val selection = ChapterSelection(
+            origin = chapter.origin.toChapterOriginType(),
+            source = mode.chaptersShownSource,
+            episodeUuid = (mode as? Mode.Episode)?.episodeId,
+        )
         playChapterJob?.cancel()
         playChapterJob = viewModelScope.launch(ioDispatcher) {
             val playbackState = playbackManager.playbackStateFlow.first()
@@ -146,8 +150,9 @@ class ChaptersViewModel @AssistedInject constructor(
                 is Mode.Episode -> mode.episodeId
                 is Mode.Player -> playbackState.episodeUuid
             }
+            selection.episodeUuid = episodeId.takeIf { it.isNotEmpty() }
             val episode = episodeManager.findEpisodeByUuid(episodeId)
-            selection.episode = episode
+            selection.podcastUuid = episode?.podcastOrSubstituteUuid
 
             when {
                 playbackState.episodeUuid == episodeId && playbackState.positionMs.milliseconds in chapter -> _showPlayer.emit(Unit)
@@ -160,7 +165,7 @@ class ChaptersViewModel @AssistedInject constructor(
                     val seek = pendingSeek.await() ?: return@launch
                     selection.generatedSeek = seek.generated
                     if (seek.isGeneratedFallback) {
-                        _chapterStartNotFound.send(Unit)
+                        _chapterStartNotFound.trySend(Unit)
                     }
                     selection.playbackStartLatency = awaitPlaybackStart(episodeId, seek.position, tappedAt)
                         ?.minus(seek.generated?.resolveDuration ?: Duration.ZERO)
@@ -183,7 +188,11 @@ class ChaptersViewModel @AssistedInject constructor(
     private suspend fun awaitPlaybackStart(episodeId: String, position: Duration, tappedAt: TimeMark) = withTimeoutOrNull(PLAYBACK_START_TIMEOUT) {
         val window = position - PLAYBACK_START_TOLERANCE..position + PLAYBACK_START_WINDOW
         playbackManager.playbackStateFlow.first { state ->
-            state.episodeUuid == episodeId && state.isPlaying && state.positionMs.milliseconds in window
+            state.episodeUuid == episodeId &&
+                state.isPlaying &&
+                !state.isBuffering &&
+                state.lastChangeFrom != PlaybackManager.LastChangeFrom.OnUserSeeking.value &&
+                state.positionMs.milliseconds in window
         }
         tappedAt.elapsedNow()
     }
@@ -196,8 +205,9 @@ class ChaptersViewModel @AssistedInject constructor(
     private class ChapterSelection(
         val origin: ChapterOriginType,
         val source: ChaptersShownSource,
+        var episodeUuid: String?,
     ) {
-        var episode: BaseEpisode? = null
+        var podcastUuid: String? = null
         var generatedSeek: GeneratedChapterSeek? = null
         var playbackStartLatency: Duration? = null
 
@@ -205,8 +215,8 @@ class ChaptersViewModel @AssistedInject constructor(
             origin = origin,
             source = source,
             playbackStartLatencyMs = playbackStartLatency?.inWholeMilliseconds,
-            episodeUuid = episode?.uuid,
-            podcastUuid = episode?.podcastOrSubstituteUuid,
+            episodeUuid = episodeUuid,
+            podcastUuid = podcastUuid,
         )
     }
 

@@ -469,6 +469,24 @@ class ChaptersViewModelTest {
     }
 
     @Test
+    fun `play chapter does not count the seek itself or buffering as playback start`() = runTest {
+        playbackStateFlow.update { it.copy(state = PlaybackState.State.PLAYING) }
+
+        chaptersViewModel.playChapter(generatedChapter)
+        playbackStateFlow.update {
+            it.copy(positionMs = 12_000, lastChangeFrom = PlaybackManager.LastChangeFrom.OnUserSeeking.value)
+        }
+        pendingSeek.complete(ChapterSeek(generatedChapter, 12.seconds, generated = null))
+        advanceTimeBy(1.seconds)
+        playbackStateFlow.update { it.copy(isBuffering = true, lastChangeFrom = PlaybackManager.LastChangeFrom.OnBufferingStateChanged.value) }
+        advanceTimeBy(1.seconds)
+        assertTrue(eventSink.isEmpty())
+        playbackStateFlow.update { it.copy(isBuffering = false, positionMs = 12_100) }
+
+        assertEquals(2_000L, (eventSink.pollEvent() as PlayerChapterSelectedEvent).playbackStartLatencyMs)
+    }
+
+    @Test
     fun `play chapter omits the latency when playback does not start in time`() = runTest {
         chaptersViewModel.playChapter(generatedChapter)
         pendingSeek.complete(ChapterSeek(generatedChapter, 12.seconds, generated = null))
