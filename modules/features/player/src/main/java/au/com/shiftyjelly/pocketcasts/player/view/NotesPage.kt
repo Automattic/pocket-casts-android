@@ -99,7 +99,7 @@ internal fun NotesPage(
                 .padding(top = 8.dp, start = 16.dp, end = 16.dp),
         )
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = FloorCenterVertically,
             modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp),
         ) {
             DrawableImage(
@@ -173,6 +173,8 @@ internal fun NotesPage(
         Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
     }
 }
+
+private val FloorCenterVertically = Alignment.Vertical { size, space -> (space - size) / 2 }
 
 @Suppress("ktlint:compose:modifier-composed-check")
 private fun Modifier.platformVerticalScrollbar(scrollState: ScrollState) = composed {
