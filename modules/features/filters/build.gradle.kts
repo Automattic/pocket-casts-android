@@ -10,7 +10,6 @@ android {
     namespace = "au.com.shiftyjelly.pocketcasts.filters"
     buildFeatures {
         buildConfig = true
-        viewBinding = true
         compose = true
     }
 }
@@ -20,8 +19,6 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     api(libs.androidx.appcompat)
-    api(libs.androidx.cardview)
-    api(libs.androidx.recyclerview)
     api(libs.androidx.viewpager)
     api(libs.dagger.hilt.android)
     api(libs.flexbox)
@@ -40,7 +37,6 @@ dependencies {
 
     implementation(platform(libs.compose.bom))
 
-    implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.compose.material)

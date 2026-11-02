@@ -14,5 +14,4 @@
     <item name="menu_remove_listening_history" type="id" />
     <item name="menu_add_to_playlist" type="id" />
     <item name="podcast_view_header_tag" type="id" />
-    <item name="playlist_view_header_tag" type="id" />
 </resources>
