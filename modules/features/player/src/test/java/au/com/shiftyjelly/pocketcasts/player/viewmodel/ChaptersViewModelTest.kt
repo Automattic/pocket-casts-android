@@ -28,6 +28,7 @@ import com.automattic.eventhorizon.ChapterOriginType
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersToggleSourceType
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
 import java.time.Instant
@@ -435,7 +436,18 @@ class ChaptersViewModelTest {
         chaptersViewModel.turnOffGeneratedChapters()
 
         verify(showGeneratedChapters).set(false, updateModifiedAt = true)
-        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = false), eventSink.pollEvent())
+        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = false, source = GeneratedChaptersToggleSourceType.ChaptersMenu), eventSink.pollEvent())
+    }
+
+    @Test
+    fun `undo turn off enables the setting and tracks it as undo`() = runTest {
+        chaptersViewModel.turnOffGeneratedChapters()
+        eventSink.pollEvent()
+
+        chaptersViewModel.undoTurnOffGeneratedChapters()
+
+        verify(showGeneratedChapters).set(true, updateModifiedAt = true)
+        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = true, source = GeneratedChaptersToggleSourceType.Undo), eventSink.pollEvent())
     }
 
     @Test
@@ -446,7 +458,7 @@ class ChaptersViewModelTest {
         chaptersViewModel.turnOnGeneratedChapters()
 
         verify(showGeneratedChapters).set(true, updateModifiedAt = true)
-        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = true), eventSink.pollEvent())
+        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = true, source = GeneratedChaptersToggleSourceType.ChaptersOffState), eventSink.pollEvent())
     }
 
     @Test

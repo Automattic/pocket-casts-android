@@ -26,6 +26,7 @@ import com.automattic.eventhorizon.DeselectChaptersChapterSelectedEvent
 import com.automattic.eventhorizon.DeselectChaptersToggledOffEvent
 import com.automattic.eventhorizon.DeselectChaptersToggledOnEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersToggleSourceType
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
 import dagger.assisted.Assisted
@@ -165,15 +166,19 @@ class ChaptersViewModel @AssistedInject constructor(
     }
 
     fun turnOffGeneratedChapters() {
-        setShowGeneratedChapters(false)
+        setShowGeneratedChapters(false, GeneratedChaptersToggleSourceType.ChaptersMenu)
     }
 
     fun turnOnGeneratedChapters() {
-        setShowGeneratedChapters(true)
+        setShowGeneratedChapters(true, GeneratedChaptersToggleSourceType.ChaptersOffState)
     }
 
-    private fun setShowGeneratedChapters(show: Boolean) {
-        eventHorizon.track(SettingsGeneralGeneratedChaptersToggledEvent(enabled = show))
+    fun undoTurnOffGeneratedChapters() {
+        setShowGeneratedChapters(true, GeneratedChaptersToggleSourceType.Undo)
+    }
+
+    private fun setShowGeneratedChapters(show: Boolean, source: GeneratedChaptersToggleSourceType) {
+        eventHorizon.track(SettingsGeneralGeneratedChaptersToggledEvent(enabled = show, source = source))
         settings.showGeneratedChapters.set(show, updateModifiedAt = true)
     }
 
