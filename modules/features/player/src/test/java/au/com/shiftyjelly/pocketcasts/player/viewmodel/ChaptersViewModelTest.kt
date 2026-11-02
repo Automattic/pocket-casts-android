@@ -707,7 +707,7 @@ class ChaptersViewModelTest {
         chaptersViewModel.generateChapters()
 
         verify(showGeneratedChapters).set(true, updateModifiedAt = true)
-        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = true), eventSink.pollEvent())
+        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = true, source = GeneratedChaptersToggleSourceType.ChaptersGenerateButton), eventSink.pollEvent())
     }
 
     @Test

@@ -206,10 +206,10 @@ class ChaptersViewModel @AssistedInject constructor(
     }
 
     fun generateChapters() {
-        setShowGeneratedChapters(true, source = null)
+        setShowGeneratedChapters(true, GeneratedChaptersToggleSourceType.ChaptersGenerateButton)
     }
 
-    private fun setShowGeneratedChapters(show: Boolean, source: GeneratedChaptersToggleSourceType?) {
+    private fun setShowGeneratedChapters(show: Boolean, source: GeneratedChaptersToggleSourceType) {
         eventHorizon.track(SettingsGeneralGeneratedChaptersToggledEvent(enabled = show, source = source))
         settings.showGeneratedChapters.set(show, updateModifiedAt = true)
     }
