@@ -77,6 +77,9 @@ enum class OnboardingUpgradeSource(
     UP_NEXT_SHUFFLE(
         analyticsValue = OnboardingSourceType.UpNextShuffle,
     ),
+    GENERATED_CHAPTERS(
+        analyticsValue = OnboardingSourceType.GeneratedChapters,
+    ),
     GENERATED_TRANSCRIPTS(
         analyticsValue = OnboardingSourceType.GeneratedTranscripts,
     ),

@@ -23,11 +23,15 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.ChapterOriginType
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersToggleSourceType
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
 import java.time.Instant
@@ -65,6 +69,9 @@ class ChaptersViewModelTest {
 
     @get:Rule
     val coroutineRule = MainCoroutineRule(testDispatcher)
+
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val chapterManager = mock<ChapterManager>()
     private val playbackManager = mock<PlaybackManager>()
@@ -435,7 +442,18 @@ class ChaptersViewModelTest {
         chaptersViewModel.turnOffGeneratedChapters()
 
         verify(showGeneratedChapters).set(false, updateModifiedAt = true)
-        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = false), eventSink.pollEvent())
+        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = false, source = GeneratedChaptersToggleSourceType.ChaptersMenu), eventSink.pollEvent())
+    }
+
+    @Test
+    fun `undo turn off enables the setting and tracks it as undo`() = runTest {
+        chaptersViewModel.turnOffGeneratedChapters()
+        eventSink.pollEvent()
+
+        chaptersViewModel.undoTurnOffGeneratedChapters()
+
+        verify(showGeneratedChapters).set(true, updateModifiedAt = true)
+        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = true, source = GeneratedChaptersToggleSourceType.Undo), eventSink.pollEvent())
     }
 
     @Test
@@ -446,7 +464,7 @@ class ChaptersViewModelTest {
         chaptersViewModel.turnOnGeneratedChapters()
 
         verify(showGeneratedChapters).set(true, updateModifiedAt = true)
-        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = true), eventSink.pollEvent())
+        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = true, source = GeneratedChaptersToggleSourceType.ChaptersOffState), eventSink.pollEvent())
     }
 
     @Test
@@ -482,6 +500,76 @@ class ChaptersViewModelTest {
             val state = awaitItem()
             assertFalse(state.showOffState)
             assertTrue(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `show upsell for free users on a podcast episode without chapters`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(state.showUpsell)
+            assertTrue(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `do not show upsell to subscribers`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            assertFalse(awaitItem().showUpsell)
+        }
+    }
+
+    @Test
+    fun `do not show upsell when the episode has chapters`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        subscriptionFlow.value = null
+
+        chaptersViewModel.uiState.test {
+            assertFalse(awaitItem().showUpsell)
+        }
+    }
+
+    @Test
+    fun `show upsell on podcast episodes without a generated transcript`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+        episodeFlow.value = episode.copy(hasGeneratedTranscript = false)
+
+        chaptersViewModel.uiState.test {
+            assertTrue(awaitItem().showUpsell)
+        }
+    }
+
+    @Test
+    fun `do not show upsell for user files`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+        episodeFlow.value = UserEpisode(uuid = "id", publishedDate = Date())
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse(state.showUpsell)
+            assertFalse(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `do not show upsell while the feature is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            assertFalse(awaitItem().showUpsell)
         }
     }
 

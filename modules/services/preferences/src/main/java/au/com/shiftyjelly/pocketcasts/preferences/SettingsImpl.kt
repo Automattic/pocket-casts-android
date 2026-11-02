@@ -691,8 +691,8 @@ class SettingsImpl @Inject constructor(
     )
 
     override val showGeneratedChapters: UserSetting<Boolean> = UserSetting.BoolPref(
-        sharedPrefKey = "showGeneratedChapters",
-        defaultValue = true,
+        sharedPrefKey = "autoGenerateChapters",
+        defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
 
@@ -826,6 +826,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
         fromInt = { PodcastGridLayoutType.fromLayoutId(it) },
         toInt = { it.id },
+    )
+
+    override val hidePlayedPodcasts = UserSetting.BoolPref(
+        sharedPrefKey = "hide_played_podcasts",
+        defaultValue = false,
+        sharedPrefs = sharedPreferences,
     )
 
     override fun getNotificationLastSeen(): Date? {

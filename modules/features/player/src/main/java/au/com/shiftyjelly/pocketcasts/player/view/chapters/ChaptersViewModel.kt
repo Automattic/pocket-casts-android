@@ -18,6 +18,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.ChapterLinkClickedEvent
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
@@ -26,6 +28,7 @@ import com.automattic.eventhorizon.DeselectChaptersChapterSelectedEvent
 import com.automattic.eventhorizon.DeselectChaptersToggledOffEvent
 import com.automattic.eventhorizon.DeselectChaptersToggledOnEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersToggleSourceType
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
 import dagger.assisted.Assisted
@@ -165,15 +168,19 @@ class ChaptersViewModel @AssistedInject constructor(
     }
 
     fun turnOffGeneratedChapters() {
-        setShowGeneratedChapters(false)
+        setShowGeneratedChapters(false, GeneratedChaptersToggleSourceType.ChaptersMenu)
     }
 
     fun turnOnGeneratedChapters() {
-        setShowGeneratedChapters(true)
+        setShowGeneratedChapters(true, GeneratedChaptersToggleSourceType.ChaptersOffState)
     }
 
-    private fun setShowGeneratedChapters(show: Boolean) {
-        eventHorizon.track(SettingsGeneralGeneratedChaptersToggledEvent(enabled = show))
+    fun undoTurnOffGeneratedChapters() {
+        setShowGeneratedChapters(true, GeneratedChaptersToggleSourceType.Undo)
+    }
+
+    private fun setShowGeneratedChapters(show: Boolean, source: GeneratedChaptersToggleSourceType) {
+        eventHorizon.track(SettingsGeneralGeneratedChaptersToggledEvent(enabled = show, source = source))
         settings.showGeneratedChapters.set(show, updateModifiedAt = true)
     }
 
@@ -252,6 +259,10 @@ class ChaptersViewModel @AssistedInject constructor(
         canSkipChapters = subscription != null,
         showHeader = episode is PodcastEpisode,
         isGeneratedChaptersOff = chapters.hasHiddenGeneratedChapters,
+        showUpsell = subscription == null &&
+            chapters.isEmpty() &&
+            episode is PodcastEpisode &&
+            FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS),
     )
 
     private fun playbackPosition(playbackState: PlaybackState, episode: BaseEpisode) = when (mode) {
@@ -310,10 +321,11 @@ class ChaptersViewModel @AssistedInject constructor(
         val canSkipChapters: Boolean = false,
         val showHeader: Boolean = false,
         val isGeneratedChaptersOff: Boolean = false,
+        val showUpsell: Boolean = false,
     ) {
         val chaptersCount = allChapters.size
         val showOffState get() = chaptersCount == 0 && isGeneratedChaptersOff
-        val showChaptersTab get() = chaptersCount > 0 || isGeneratedChaptersOff
+        val showChaptersTab get() = chaptersCount > 0 || isGeneratedChaptersOff || showUpsell
         val deselectedChaptersCount get() = allChapters.count { !it.chapter.selected }
         val chapters get() = if (isTogglingChapters) allChapters else allChapters.filter { it.chapter.selected }
         val showSubscriptionIcon get() = !isTogglingChapters && !canSkipChapters

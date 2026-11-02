@@ -42,6 +42,7 @@ fun OptionsDialogComponent(
     @ColorInt iconColor: Int?,
     options: List<OptionsDialogOption>,
     modifier: Modifier = Modifier,
+    description: String? = null,
     dividerColor: Color? = null,
 ) {
     Column(
@@ -50,6 +51,7 @@ fun OptionsDialogComponent(
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
     ) {
         OptionsDialogHeader(title)
+        OptionsDialogDescription(description)
         options.forEachIndexed { index, option ->
             Column {
                 OptionsDialogRow(option = option, iconColor = option.imageColor ?: iconColor, index = index)
@@ -73,6 +75,19 @@ private fun OptionsDialogHeader(title: String?, modifier: Modifier = Modifier) {
         fontWeight = FontWeight.Medium,
         color = MaterialTheme.theme.colors.support01,
         modifier = modifier.padding(start = 20.dp, top = 16.dp, end = 16.dp, bottom = 8.dp),
+    )
+}
+
+@Composable
+private fun OptionsDialogDescription(description: String?, modifier: Modifier = Modifier) {
+    if (description == null) {
+        return
+    }
+    Text(
+        text = description,
+        fontSize = 14.sp,
+        color = MaterialTheme.theme.colors.primaryText02,
+        modifier = modifier.padding(start = 20.dp, end = 16.dp, bottom = 8.dp),
     )
 }
 
