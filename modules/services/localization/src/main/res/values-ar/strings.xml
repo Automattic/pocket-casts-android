@@ -254,7 +254,6 @@ Language: ar
     <string name="blogs_found_headline">قراءة مدونتك بصوت عالٍ</string>
     <string name="blogs_found_followed_badge">تمت متابعة البث الصوتي</string>
     <string name="blogs_found_feed_detected">تم العثور على تلقيم</string>
-    <string name="chapters_generated_disclaimer">يجري إنشاء هذه الفصول تلقائيًا، وقد لا تكون دقيقة بالكامل.</string>
     <string name="chat_play_quote">تشغيل اقتباس</string>
     <string name="chat_clear">مسح المحادثة</string>
     <string name="chat_send">إرسال</string>

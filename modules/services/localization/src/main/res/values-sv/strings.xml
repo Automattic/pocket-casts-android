@@ -254,7 +254,6 @@ Language: sv_SE
     <string name="blogs_found_headline">Högläsning av din blogg</string>
     <string name="blogs_found_followed_badge">FÖLJD PODCAST</string>
     <string name="blogs_found_feed_detected">Flöde hittades</string>
-    <string name="chapters_generated_disclaimer">Dessa kapitel genereras automatiskt och är kanske inte helt korrekta.</string>
     <string name="chat_play_quote">Spela upp citat</string>
     <string name="chat_clear">Rensa chatt</string>
     <string name="chat_send">Skicka</string>

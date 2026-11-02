@@ -254,7 +254,6 @@ Language: fr
     <string name="blogs_found_headline">Lire votre blog à haute voix</string>
     <string name="blogs_found_followed_badge">PODCAST SUIVI</string>
     <string name="blogs_found_feed_detected">Flux trouvé</string>
-    <string name="chapters_generated_disclaimer">Ces chapitres sont générés automatiquement et peuvent ne pas être parfaitement exacts.</string>
     <string name="chat_play_quote">Lire la citation</string>
     <string name="chat_clear">Effacer la discussion</string>
     <string name="chat_send">Envoyer</string>
