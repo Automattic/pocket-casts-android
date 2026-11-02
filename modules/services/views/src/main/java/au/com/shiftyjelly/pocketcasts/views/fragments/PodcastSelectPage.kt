@@ -30,6 +30,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
@@ -167,14 +169,15 @@ private fun PodcastSelectRow(
             .fillMaxWidth()
             .background(colors.primaryUi01)
             .clickable { onToggle(!isSelected) }
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clipToBounds(),
     ) {
         AsyncImage(
             model = request,
             contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier = Modifier
-                .clip(RoundedCornerShape(4.dp))
+                .shadow(2.dp, RoundedCornerShape(4.dp))
                 .background(cardBackground)
                 .size(56.dp),
         )
