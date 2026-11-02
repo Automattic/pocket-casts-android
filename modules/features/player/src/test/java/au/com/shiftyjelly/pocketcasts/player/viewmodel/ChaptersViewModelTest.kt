@@ -16,7 +16,10 @@ import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.GeneratedChapterSeek
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.GeneratedChapterSeeker
+import au.com.shiftyjelly.pocketcasts.repositories.playback.ChapterSeek
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
@@ -39,6 +42,7 @@ import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -48,6 +52,7 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -98,6 +103,15 @@ class ChaptersViewModelTest {
     )
 
     private val playbackStateFlow = MutableStateFlow(PlaybackState(episodeUuid = "id"))
+    private val pendingSeek = CompletableDeferred<ChapterSeek?>()
+    private val generatedChapter = Chapter(
+        "Generated",
+        startTime = 10.seconds,
+        endTime = 20.seconds,
+        index = 3,
+        uiIndex = 4,
+        origin = ChapterOrigin.Generated,
+    )
     private val episodeFlow = MutableStateFlow<BaseEpisode>(episode)
     private val chaptersFlow = MutableStateFlow(chapters)
     private val plusSubscription = Subscription(
@@ -124,6 +138,8 @@ class ChaptersViewModelTest {
         whenever(userSetting.flow).thenReturn(subscriptionFlow)
         whenever(settings.cachedSubscription).thenReturn(userSetting)
         whenever(settings.showGeneratedChapters).thenReturn(showGeneratedChapters)
+        whenever { episodeManager.findEpisodeByUuid("id") }.thenReturn(episode)
+        whenever(playbackManager.skipToChapter(any<Chapter>())).thenReturn(pendingSeek)
 
         chaptersViewModel = ChaptersViewModel(
             mode = Mode.Episode(episode.uuid),
@@ -135,6 +151,7 @@ class ChaptersViewModelTest {
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
             generatedChaptersAvailability = generatedChaptersAvailability,
+            timeSource = testDispatcher.scheduler.timeSource,
             ioDispatcher = testDispatcher,
         )
     }
@@ -179,6 +196,7 @@ class ChaptersViewModelTest {
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
             generatedChaptersAvailability = generatedChaptersAvailability,
+            timeSource = testDispatcher.scheduler.timeSource,
             ioDispatcher = testDispatcher,
         )
 
@@ -205,6 +223,7 @@ class ChaptersViewModelTest {
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
             generatedChaptersAvailability = generatedChaptersAvailability,
+            timeSource = testDispatcher.scheduler.timeSource,
             ioDispatcher = testDispatcher,
         )
         verifyBlocking(transcriptManager, times(1)) { loadGeneratedChapters("id") }
@@ -372,6 +391,7 @@ class ChaptersViewModelTest {
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
             generatedChaptersAvailability = generatedChaptersAvailability,
+            timeSource = testDispatcher.scheduler.timeSource,
             ioDispatcher = testDispatcher,
         )
 
@@ -386,12 +406,131 @@ class ChaptersViewModelTest {
     }
 
     @Test
-    fun `play chapter reports chapter origin`() = runTest {
+    fun `play chapter reports the chapter and where it was selected`() = runTest {
         val chapter = Chapter("Chapter", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1, origin = ChapterOrigin.Generated)
 
         chaptersViewModel.playChapter(chapter)
 
-        assertEquals(PlayerChapterSelectedEvent(origin = ChapterOriginType.Generated), eventSink.pollEvent())
+        assertEquals(
+            PlayerChapterSelectedEvent(
+                origin = ChapterOriginType.Generated,
+                source = ChaptersShownSource.EpisodeDetails,
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `play chapter from the player reports the fullscreen player source`() = runTest {
+        chaptersViewModel = createViewModel(Mode.Player)
+        val chapter = Chapter("Chapter", 0.milliseconds, 100.milliseconds, index = 0, uiIndex = 1)
+
+        chaptersViewModel.playChapter(chapter)
+
+        assertEquals(ChaptersShownSource.FullscreenPlayer, (eventSink.pollEvent() as PlayerChapterSelectedEvent).source)
+    }
+
+    @Test
+    fun `play chapter reports the playback start latency without the resolve time`() = runTest {
+        playbackStateFlow.update { it.copy(state = PlaybackState.State.PLAYING) }
+
+        chaptersViewModel.playChapter(generatedChapter)
+        advanceTimeBy(3.seconds)
+        pendingSeek.complete(ChapterSeek(generatedChapter, 12.seconds, GeneratedChapterSeek.Resolved(12.seconds, isCached = false, resolveDuration = 2.seconds)))
+        advanceTimeBy(1.seconds)
+        assertTrue(eventSink.isEmpty())
+        playbackStateFlow.update { it.copy(positionMs = 12_000) }
+
+        assertEquals(
+            PlayerChapterSelectedEvent(
+                origin = ChapterOriginType.Generated,
+                source = ChaptersShownSource.EpisodeDetails,
+                playbackStartLatencyMs = 2_000,
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `play chapter waits for playback at the seek position`() = runTest {
+        playbackStateFlow.update { it.copy(state = PlaybackState.State.PLAYING) }
+
+        chaptersViewModel.playChapter(generatedChapter)
+        pendingSeek.complete(ChapterSeek(generatedChapter, 12.seconds, generated = null))
+        playbackStateFlow.update { it.copy(positionMs = 1_000) }
+        advanceTimeBy(1.seconds)
+        playbackStateFlow.update { it.copy(positionMs = 12_500) }
+
+        assertEquals(1_000L, (eventSink.pollEvent() as PlayerChapterSelectedEvent).playbackStartLatencyMs)
+    }
+
+    @Test
+    fun `play chapter omits the latency when playback does not start in time`() = runTest {
+        chaptersViewModel.playChapter(generatedChapter)
+        pendingSeek.complete(ChapterSeek(generatedChapter, 12.seconds, generated = null))
+        advanceTimeBy(31.seconds)
+
+        val event = eventSink.pollEvent() as PlayerChapterSelectedEvent
+        assertNull(event.playbackStartLatencyMs)
+        assertEquals("id", event.episodeUuid)
+    }
+
+    @Test
+    fun `superseded chapter tap still reports what is known`() = runTest {
+        val nextChapter = generatedChapter.copy(index = 4, startTime = 30.seconds, endTime = 40.seconds)
+        whenever(playbackManager.skipToChapter(nextChapter)).thenReturn(CompletableDeferred())
+        chaptersViewModel.playChapter(generatedChapter)
+
+        chaptersViewModel.playChapter(nextChapter)
+
+        assertEquals(
+            PlayerChapterSelectedEvent(
+                origin = ChapterOriginType.Generated,
+                source = ChaptersShownSource.EpisodeDetails,
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `play chapter tells the user when the generated chapter start was not found`() = runTest {
+        chaptersViewModel.chapterStartNotFound.test {
+            chaptersViewModel.playChapter(generatedChapter)
+            pendingSeek.complete(
+                ChapterSeek(generatedChapter, 10.seconds, GeneratedChapterSeek.Unresolved(ChapterSeekResult.REASON_TIMEOUT, isAttempted = true)),
+            )
+
+            assertEquals(Unit, awaitItem())
+        }
+    }
+
+    @Test
+    fun `play chapter does not tell the user about a remembered failure`() = runTest {
+        chaptersViewModel.chapterStartNotFound.test {
+            chaptersViewModel.playChapter(generatedChapter)
+            pendingSeek.complete(
+                ChapterSeek(generatedChapter, 10.seconds, GeneratedChapterSeek.Unresolved(ChapterSeekResult.REASON_NO_MATCH, isAttempted = false)),
+            )
+
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `play chapter does not tell the user when the chapter resolved`() = runTest {
+        chaptersViewModel.chapterStartNotFound.test {
+            chaptersViewModel.playChapter(generatedChapter)
+            pendingSeek.complete(ChapterSeek(generatedChapter, 12.seconds, GeneratedChapterSeek.Resolved(12.seconds, isCached = false)))
+
+            expectNoEvents()
+        }
     }
 
     @Test
@@ -573,16 +712,17 @@ class ChaptersViewModelTest {
         }
     }
 
-    private fun createViewModel() = ChaptersViewModel(
-        mode = Mode.Episode("id"),
+    private fun createViewModel(mode: Mode = Mode.Episode("id")) = ChaptersViewModel(
+        mode = mode,
         chapterManager = chapterManager,
         playbackManager = playbackManager,
         episodeManager = episodeManager,
         settings = settings,
-        eventHorizon = EventHorizon(TestEventSink()),
+        eventHorizon = EventHorizon(eventSink),
         generatedChapterSeeker = generatedChapterSeeker,
         transcriptManager = transcriptManager,
         generatedChaptersAvailability = generatedChaptersAvailability,
+        timeSource = testDispatcher.scheduler.timeSource,
         ioDispatcher = testDispatcher,
     )
 }
