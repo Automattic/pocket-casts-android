@@ -18,8 +18,6 @@ Language: it
     <string name="chat_answering">Risposta</string>
     <string name="chat_error_server_on_our_end">Si è verificato un problema da parte nostra.</string>
     <string name="chat_not_sent_tap_to_retry">Non inviato. Tocca per provare di nuovo.</string>
-    <string name="chat_feedback_send_failed">Impossibile inviare il tuo feedback. Controlla la connessione.</string>
-    <string name="chat_feedback_sending">Invio del feedback in corso</string>
     <string name="chat_feedback_what_went_wrong">Cosa è andato storto</string>
     <string name="chat_beta_sheet_sign_in">Accedi per provarlo</string>
     <string name="episode_chat_needs_transcript_message">Chiedi informazioni su questo episodio richiede una trascrizione. Questo episodio non ne ha una.</string>

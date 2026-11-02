@@ -18,8 +18,6 @@ Language: ca
     <string name="chat_answering">S\'està responent</string>
     <string name="chat_error_server_on_our_end">Alguna cosa ha fallat per part nostra.</string>
     <string name="chat_not_sent_tap_to_retry">No s\'ha enviat. Toca per tornar-ho a provar.</string>
-    <string name="chat_feedback_send_failed">No s\'han pogut enviar els teus comentaris. Comprova la connexió.</string>
-    <string name="chat_feedback_sending">S\'estan enviant els comentaris</string>
     <string name="chat_feedback_what_went_wrong">Què ha fallat</string>
     <string name="chat_beta_sheet_sign_in">Inicia la sessió per provar-ho</string>
     <string name="episode_chat_needs_transcript_message">«Pregunta sobre aquest episodi» necessita una transcripció, i aquest episodi no en té.</string>

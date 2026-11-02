@@ -1,27 +1,34 @@
 package au.com.shiftyjelly.pocketcasts.search
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
-import android.util.TypedValue
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import androidx.appcompat.widget.SearchView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
@@ -36,16 +44,12 @@ import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.search.SearchViewModel.SearchResultType
-import au.com.shiftyjelly.pocketcasts.search.databinding.FragmentSearchBinding
+import au.com.shiftyjelly.pocketcasts.search.component.SearchToolbar
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryClearAllConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
-import au.com.shiftyjelly.pocketcasts.views.extensions.hide
-import au.com.shiftyjelly.pocketcasts.views.extensions.show
-import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -59,11 +63,11 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val ARG_FLOATING = "arg_floating"
 private const val ARG_ONLY_SEARCH_REMOTE = "arg_only_search_remote"
 private const val ARG_SOURCE = "arg_source"
+private const val STATE_QUERY = "state_query"
 private const val SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG = "search_history_clear_all_confirmation_dialog"
 
 @AndroidEntryPoint
@@ -103,7 +107,9 @@ class SearchFragment : BaseFragment() {
     private val viewModel: SearchViewModel by viewModels()
     private val searchHistoryViewModel: SearchHistoryViewModel by viewModels()
     private var listener: Listener? = null
-    private var binding: FragmentSearchBinding? = null
+    private var query by mutableStateOf("")
+    private var isHistoryVisible by mutableStateOf(true)
+    private var isKeyboardRequested = false
 
     val floating: Boolean
         get() = arguments?.getBoolean(ARG_FLOATING) ?: false
@@ -125,38 +131,41 @@ class SearchFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        query = savedInstanceState?.getString(STATE_QUERY).orEmpty()
 
         viewModel.trackSearchShown(source)
         playButtonListener.source = source
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val binding = FragmentSearchBinding.inflate(inflater, container, false)
         viewModel.setOnlySearchRemote(onlySearchRemote)
         searchHistoryViewModel.setOnlySearchRemote(onlySearchRemote)
         searchHistoryViewModel.setSource(source)
-        binding.floatingLayout.updatePadding(
-            top = if (floating) {
-                binding.floatingLayout.context.resources.getDimensionPixelSize(
-                    R.dimen.search_box_floating_top,
-                )
-            } else {
-                0
-            },
-        )
+        return ComposeView(requireContext()).apply {
+            setContentWithViewCompositionStrategy {
+                AppTheme(theme.activeTheme) {
+                    SearchContent()
+                }
+            }
+        }
+    }
 
-        this.binding = binding
-
-        return binding.root
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(STATE_QUERY, query)
     }
 
     override fun onPause() {
         super.onPause()
-        binding?.let {
-            UiUtil.hideKeyboard(it.searchView)
-            it.searchView.clearFocus()
+        view?.let {
+            UiUtil.hideKeyboard(it)
+            it.clearFocus()
         }
         viewModel.onFragmentPause(activity?.isChangingConfigurations)
+    }
+
+    private fun hideKeyboard() {
+        view?.let(UiUtil::hideKeyboard)
     }
 
     private fun navigateFromSearchHistoryEntry(entry: SearchHistoryEntry) {
@@ -173,12 +182,11 @@ class SearchFragment : BaseFragment() {
             is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid, SourceView.SEARCH)
 
             is SearchHistoryEntry.SearchTerm -> {
-                binding?.let {
-                    viewModel.runSearchOnTerm(entry.term)
-                    it.searchView.setQuery(entry.term, true)
-                    it.searchHistoryPanel.hide()
-                    UiUtil.hideKeyboard(it.searchView)
-                }
+                viewModel.runSearchOnTerm(entry.term)
+                onQueryTextChange(entry.term)
+                onQueryTextSubmit(entry.term)
+                isHistoryVisible = false
+                hideKeyboard()
             }
         }
     }
@@ -186,59 +194,11 @@ class SearchFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val binding = binding ?: return
-
-        view.setOnClickListener {
-            activity?.onBackPressedDispatcher?.onBackPressed()
-        }
-
-        binding.backButton.setOnClickListener {
-            activity?.onBackPressedDispatcher?.onBackPressed()
-        }
         viewModel.setSource(source)
-
-        // hack as Search View ignores text size
-        val searchView = binding.searchView
-        searchView.findViewById<SearchView.SearchAutoComplete>(androidx.appcompat.R.id.search_src_text)?.apply {
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-            setTextColor(context.getThemeColor(UR.attr.secondary_text_01))
-            val hintColor = UR.attr.secondary_text_02
-            setHintTextColor(context.getThemeColor(hintColor))
-            setOnEditorActionListener { _, actionId, event ->
-                if (searchView.query.toString().isNotBlank() && (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || (event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER))) {
-                    viewModel.runSearchOnTerm(searchView.query.toString())
-                    binding.searchHistoryPanel.hide()
-                    UiUtil.hideKeyboard(searchView)
-                    true
-                } else {
-                    false
-                }
-            }
-        }
-
-        val searchManager = view.context.getSystemService(Activity.SEARCH_SERVICE) as SearchManager
-        activity?.let { searchView.setSearchableInfo(searchManager.getSearchableInfo(it.componentName)) }
-        searchView.queryHint = getString(LR.string.search_podcasts_or_add_url)
-        searchView.imeOptions = searchView.imeOptions or EditorInfo.IME_ACTION_SEARCH or EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_FULLSCREEN
-        searchView.setIconifiedByDefault(false)
-        // seems like a more reliable focus using a post
-        if (viewModel.state.value.searchTerm.isNullOrBlank()) {
-            searchView.post {
-                searchView.showKeyboard()
-            }
-        }
-        searchView.setOnCloseListener {
-            UiUtil.hideKeyboard(searchView)
-            true
-        }
-
-        searchView.findViewById<View>(androidx.appcompat.R.id.search_close_btn)?.setOnClickListener {
-            eventHorizon.track(
-                SearchClearedEvent(
-                    source = source.analyticsValue,
-                ),
-            )
-            searchView.setQuery("", false)
+        isKeyboardRequested = viewModel.state.value.searchTerm.isNullOrBlank()
+        isHistoryVisible = true
+        if (query.isNotEmpty()) {
+            onQueryTextChange(query)
         }
 
         lifecycleScope.launch {
@@ -249,66 +209,99 @@ class SearchFragment : BaseFragment() {
                 .filter { (previous, next) -> previous is SearchUiState.Suggestions && next is SearchUiState.Results }
                 .mapNotNull { (_, next) -> next?.searchTerm }
                 .collect {
-                    if (it != searchView.query) {
-                        searchView.setQuery(it, false)
+                    if (it != query) {
+                        onQueryTextChange(it)
                     }
                 }
         }
+    }
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                viewModel.updateSearchQuery(query)
-                binding.searchHistoryPanel.hide()
-                UiUtil.hideKeyboard(searchView)
-                return true
-            }
+    private fun onSearchAction() {
+        if (query.isNotBlank()) {
+            viewModel.runSearchOnTerm(query)
+            isHistoryVisible = false
+            hideKeyboard()
+        }
+    }
 
-            override fun onQueryTextChange(query: String): Boolean {
-                // don't auto search for feed URLs
-                val characterCount = query.length
-                val lowerCaseSearch = query.lowercase()
-                if ((characterCount == 1 && lowerCaseSearch.startsWith("h")) || (characterCount == 2 && lowerCaseSearch.startsWith("ht")) || (characterCount == 3 && lowerCaseSearch.startsWith("htt")) || lowerCaseSearch.startsWith("http")) {
-                    return true
-                }
-                viewModel.updateSearchQuery(query)
-                if (characterCount > 0) {
-                    binding.searchHistoryPanel.hide()
-                } else {
-                    binding.searchHistoryPanel.show()
-                }
-                return true
-            }
-        })
-        binding.searchHistoryPanel.apply {
-            setContentWithViewCompositionStrategy {
-                val state = viewModel.state.collectAsState()
-                if (state.value is SearchUiState.Suggestions && state.value.searchTerm.isNullOrBlank()) {
-                    searchHistoryViewModel.start()
-                }
+    private fun onClearClick() {
+        eventHorizon.track(
+            SearchClearedEvent(
+                source = source.analyticsValue,
+            ),
+        )
+        onQueryTextChange("")
+    }
 
-                AppTheme(theme.activeTheme) {
-                    SearchHistoryPage(
-                        viewModel = searchHistoryViewModel,
-                        onClick = ::navigateFromSearchHistoryEntry,
-                        onShowClearAllConfirmation = {
-                            SearchHistoryClearAllConfirmationDialog(
-                                context = this@SearchFragment.requireContext(),
-                                onConfirm = { searchHistoryViewModel.clearAll() },
-                            ).show(parentFragmentManager, SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG)
-                        },
-                        onScroll = { UiUtil.hideKeyboard(searchView) },
-                    )
-                    if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
-                        binding.searchHistoryPanel.show()
-                    }
-                }
+    private fun onQueryTextSubmit(query: String) {
+        viewModel.updateSearchQuery(query)
+        isHistoryVisible = false
+        hideKeyboard()
+    }
+
+    private fun onQueryTextChange(query: String) {
+        this.query = query
+        // don't auto search for feed URLs
+        val characterCount = query.length
+        val lowerCaseSearch = query.lowercase()
+        if ((characterCount == 1 && lowerCaseSearch.startsWith("h")) || (characterCount == 2 && lowerCaseSearch.startsWith("ht")) || (characterCount == 3 && lowerCaseSearch.startsWith("htt")) || lowerCaseSearch.startsWith("http")) {
+            return
+        }
+        viewModel.updateSearchQuery(query)
+        isHistoryVisible = characterCount == 0
+    }
+
+    @Composable
+    private fun SearchContent() {
+        val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+        val state by viewModel.state.collectAsState()
+        val focusRequester = remember { FocusRequester() }
+
+        LaunchedEffect(Unit) {
+            if (isKeyboardRequested) {
+                focusRequester.requestFocus()
             }
         }
 
-        binding.searchSuggestions.apply {
-            setContentWithViewCompositionStrategy {
-                val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
-                val state by viewModel.state.collectAsState()
+        LaunchedEffect(state) {
+            if (state is SearchUiState.Suggestions && state.searchTerm.isNullOrBlank()) {
+                searchHistoryViewModel.start()
+            }
+            if (viewModel.isFragmentChangingConfigurations && viewModel.showSearchHistory) {
+                isHistoryVisible = true
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.theme.colors.primaryUi01),
+        ) {
+            SearchToolbar(
+                query = query,
+                isFloating = floating,
+                focusRequester = focusRequester,
+                onQueryChange = ::onQueryTextChange,
+                onSearch = ::onSearchAction,
+                onClear = ::onClearClick,
+                onBack = { activity?.onBackPressedDispatcher?.onBackPressed() },
+            )
+
+            Box(modifier = Modifier.gone(!isHistoryVisible)) {
+                SearchHistoryPage(
+                    viewModel = searchHistoryViewModel,
+                    onClick = ::navigateFromSearchHistoryEntry,
+                    onShowClearAllConfirmation = {
+                        SearchHistoryClearAllConfirmationDialog(
+                            context = this@SearchFragment.requireContext(),
+                            onConfirm = { searchHistoryViewModel.clearAll() },
+                        ).show(parentFragmentManager, SEARCH_HISTORY_CLEAR_ALL_CONFIRMATION_DIALOG_TAG)
+                    },
+                    onScroll = ::hideKeyboard,
+                )
+            }
+
+            Box(modifier = Modifier.gone(state !is SearchUiState.Suggestions || state.searchTerm.isNullOrBlank())) {
                 (state as? SearchUiState.Suggestions)?.let { suggestions ->
                     AppThemeWithBackground(theme.activeTheme) {
                         SearchAutoCompleteResultsPage(
@@ -322,7 +315,7 @@ class SearchFragment : BaseFragment() {
                             onFolderClick = { onFolderClick(SearchHistoryEntry.fromAutoCompleteFolder(it)) },
                             onEpisodeClick = {},
                             playButtonListener = playButtonListener,
-                            onScroll = { UiUtil.hideKeyboard(searchView) },
+                            onScroll = ::hideKeyboard,
                             bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                             isLoading = suggestions.operation is SearchUiState.SearchOperation.Loading,
                             isError = suggestions.operation is SearchUiState.SearchOperation.Error,
@@ -331,14 +324,9 @@ class SearchFragment : BaseFragment() {
                         )
                     }
                 }
-                binding.searchSuggestions.isVisible = state is SearchUiState.Suggestions && !state.searchTerm.isNullOrBlank()
             }
-        }
 
-        binding.searchInlineResults.apply {
-            setContentWithViewCompositionStrategy {
-                val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
-                val state by viewModel.state.collectAsState()
+            Box(modifier = Modifier.gone(state !is SearchUiState.Results || state.searchTerm.isNullOrBlank())) {
                 AppThemeWithBackground(theme.activeTheme) {
                     when (val state = state) {
                         is SearchUiState.Results ->
@@ -351,7 +339,7 @@ class SearchFragment : BaseFragment() {
                                 onNetworkClick = ::onNetworkClick,
                                 onFollowPodcast = { viewModel.onSubscribeToPodcast(it.uuid) },
                                 playButtonListener = playButtonListener,
-                                onScroll = { UiUtil.hideKeyboard(searchView) },
+                                onScroll = ::hideKeyboard,
                                 bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                                 onFilterSelect = viewModel::selectFilter,
                                 onResultsShow = viewModel::reportResultsShown,
@@ -362,8 +350,16 @@ class SearchFragment : BaseFragment() {
                         else -> Spacer(modifier = Modifier.size(0.dp))
                     }
                 }
-                binding.searchInlineResults.isVisible = state is SearchUiState.Results && !state.searchTerm.isNullOrBlank()
             }
+
+            Spacer(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .pointerInput(Unit) {
+                        detectTapGestures { activity?.onBackPressedDispatcher?.onBackPressed() }
+                    },
+            )
         }
     }
 
@@ -379,7 +375,7 @@ class SearchFragment : BaseFragment() {
             podcastUuid = episode.podcastUuid,
             source = EpisodeViewSource.SEARCH,
         )
-        binding?.searchView?.let { UiUtil.hideKeyboard(it) }
+        hideKeyboard()
     }
 
     private fun onPodcastClick(podcast: SearchHistoryEntry.Podcast, isSubscribed: Boolean) {
@@ -394,7 +390,7 @@ class SearchFragment : BaseFragment() {
         )
         searchHistoryViewModel.add(podcast)
         listener?.onSearchPodcastClick(podcast.uuid, SourceView.SEARCH)
-        binding?.searchView?.let { UiUtil.hideKeyboard(it) }
+        hideKeyboard()
     }
 
     private fun onFolderClick(folder: Folder, podcasts: List<Podcast>) {
@@ -409,7 +405,7 @@ class SearchFragment : BaseFragment() {
         )
         searchHistoryViewModel.add(folder)
         listener?.onSearchFolderClick(folder.uuid)
-        binding?.searchView?.let { UiUtil.hideKeyboard(it) }
+        hideKeyboard()
     }
 
     private fun onNetworkClick(network: ImprovedSearchResultItem.NetworkItem) {
@@ -423,7 +419,7 @@ class SearchFragment : BaseFragment() {
             title = network.title,
             sourceView = SourceView.SEARCH_RESULTS,
         )
-        binding?.searchView?.let { UiUtil.hideKeyboard(it) }
+        hideKeyboard()
     }
 
     override fun onBackPressed(): Boolean {
@@ -431,3 +427,5 @@ class SearchFragment : BaseFragment() {
         return super.onBackPressed()
     }
 }
+
+private fun Modifier.gone(isGone: Boolean) = if (isGone) layout { _, _ -> layout(0, 0) {} } else this

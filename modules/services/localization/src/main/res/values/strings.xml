@@ -634,6 +634,9 @@
     <string name="chapters_generated_off_title">Generated chapters are off</string>
     <string name="chapters_generated_off_message">Turn them back on to jump straight to the part you came&#160;for.</string>
     <string name="chapters_generated_turn_on">Turn on</string>
+    <string name="chapters_generated_upsell_title">Chapters automatically generated</string>
+    <string name="chapters_generated_upsell_message">With Pocket Casts Plus, no more scrubbing. Jump straight to the part you came&#160;for.</string>
+    <string name="chapters_generated_upsell_button">Get generated chapters</string>
     <string name="chapters_generated_disclaimer">These chapters are automatically generated and may not be perfectly accurate.</string>
     <!-- %1$d is the current selected chapter. %2$d is the total number of chapters. -->
     <string name="chapter_count_summary">%1$d of %2$d</string>
@@ -673,10 +676,14 @@
     <string name="podcasts_menu_layout_list">List view</string>
     <string name="podcasts_menu_layout_small_grid">Small grid</string>
     <string name="podcasts_menu_more_options">More options</string>
+    <string name="podcasts_menu_played_podcasts">Played podcasts</string>
     <string name="podcasts_menu_search_podcasts">Search podcasts</string>
     <string name="podcasts_menu_share_podcasts">Share podcasts</string>
     <string name="podcasts_menu_sort_by">Sort by</string>
     <string name="podcasts_no_subscriptions">No podcasts found</string>
+    <string name="podcasts_played_podcasts_description">Hides podcasts you\'ve fully listened to. They reappear when a new episode arrives.</string>
+    <string name="podcasts_played_podcasts_hide">Hide</string>
+    <string name="podcasts_played_podcasts_show">Show</string>
     <string name="podcasts_plural">%d Podcasts</string>
     <string name="podcasts_share">Share podcasts</string>
     <string name="podcasts_share_0_selected">0 selected</string>
@@ -1686,8 +1693,8 @@
     <string name="settings_fix_downloads_started_message">Downloads fix will start shortly. Check notifications for progress.</string>
     <string name="settings_fix_downloads_complete_title">Fixing downloads complete</string>
     <string name="settings_fix_downloads_complete_message">Fixed %d downloads</string>
-    <string name="settings_generated_chapters">Generated chapters</string>
-    <string name="settings_generated_chapters_summary">Show automatically generated chapters when available.</string>
+    <string name="settings_generated_chapters">Auto generate chapters</string>
+    <string name="settings_generated_chapters_summary">When an episode has no chapters of its own, Pocket Casts will automatically generate them for you.</string>
     <string name="settings_inactive_episodes">Inactive episodes</string>
     <string name="settings_instagram">instagram link</string>
     <string name="settings_keep_screen_awake">Keep screen awake</string>
@@ -2579,8 +2586,6 @@
     <string name="chat_feedback_reason_offensive">It’s offensive</string>
     <string name="chat_feedback_reason_other">Other</string>
     <string name="chat_feedback_details_hint">Share details (optional)</string>
-    <string name="chat_feedback_sending">Sending feedback</string>
-    <string name="chat_feedback_send_failed">Couldn’t send your feedback. Check your connection.</string>
     <string name="chat_feedback_submit">Submit feedback</string>
     <string name="chat_feedback_legal">Submitting shares this conversation with us to help improve chat.</string>
     <string name="chat_feedback_learn_more">Learn more</string>

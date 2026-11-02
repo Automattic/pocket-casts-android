@@ -15,12 +15,10 @@ Language: nl
     <string name="chat_history_previous_7_days">Afgelopen 7 dagen</string>
     <string name="chat_history">Chatgeschiedenis</string>
     <string name="chat_offline_note">Je bent offline. Maak verbinding om een vraag te stellen.</string>
-    <string name="chat_feedback_send_failed">Je feedback kon niet verzonden worden. Controleer de verbinding</string>
     <string name="chat_answering">Beantwoorden</string>
     <string name="chat_error_server_on_our_end">Er is iets fout gegaan aan onze kant.</string>
     <string name="chat_not_sent_tap_to_retry">Niet verzonden. Tik om het opnieuw te proberen.</string>
     <string name="chat_beta_sheet_sign_in">Log in om het te proberen</string>
-    <string name="chat_feedback_sending">Feedback wordt verstuurd</string>
     <string name="chat_feedback_what_went_wrong">Wat is er misgegaan</string>
     <string name="episode_chat_needs_transcript_message">Vraag over deze aflevering die een transcriptie nodig heeft. Deze aflevering heeft geen transcript.</string>
     <string name="onboarding_episode_chat_answer">Deze aflevering gaat over AI, gezondheid en productiviteit.</string>
