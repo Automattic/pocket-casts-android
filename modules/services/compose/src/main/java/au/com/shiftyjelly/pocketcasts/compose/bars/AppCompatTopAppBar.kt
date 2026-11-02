@@ -34,6 +34,7 @@ fun AppCompatTopAppBar(
     titleColor: Color,
     backgroundColor: Color,
     modifier: Modifier = Modifier,
+    navigationButtonModifier: Modifier = Modifier,
     bottomShadow: Boolean = true,
     windowInsets: WindowInsets = WindowInsets.systemBars.union(WindowInsets.displayCutout).only(WindowInsetsSides.Top),
     actions: @Composable RowScope.(Color) -> Unit = {},
@@ -62,6 +63,7 @@ fun AppCompatTopAppBar(
         backgroundColor = backgroundColor,
         bottomShadow = bottomShadow,
         windowInsets = windowInsets,
+        navigationButtonModifier = navigationButtonModifier,
         actions = actions,
         modifier = modifier,
     )

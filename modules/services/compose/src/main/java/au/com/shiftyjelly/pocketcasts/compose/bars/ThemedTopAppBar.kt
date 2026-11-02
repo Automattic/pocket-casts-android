@@ -96,6 +96,7 @@ object ThemedTopAppBar {
 @Composable
 fun ThemedTopAppBar(
     modifier: Modifier = Modifier,
+    navigationButtonModifier: Modifier = Modifier,
     title: @Composable () -> Unit = {},
     navigationButton: NavigationButton? = NavigationButton.Back,
     onNavigationClick: (() -> Unit)? = null,
@@ -122,6 +123,7 @@ fun ThemedTopAppBar(
                         onClick = onNavigationClick ?: {},
                         navigationButton = navigationButton,
                         tint = iconColor,
+                        modifier = navigationButtonModifier,
                     )
                 }
             } else {
