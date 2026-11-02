@@ -12,6 +12,11 @@ android {
         buildConfig = true
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -60,10 +65,14 @@ dependencies {
 
     implementation(libs.compose.ui.tooling.preview)
 
+    debugImplementation(libs.compose.ui.test.manifest)
+
+    testImplementation(libs.compose.ui.test.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.robolectric)
     testImplementation(libs.turbine)
 
     testImplementation(projects.modules.services.sharedtest)
