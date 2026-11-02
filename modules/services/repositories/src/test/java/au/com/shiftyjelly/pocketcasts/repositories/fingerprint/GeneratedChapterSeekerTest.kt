@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
@@ -23,6 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -74,25 +76,26 @@ class GeneratedChapterSeekerTest {
         appPlatform = appPlatform,
         decodePolicy = mock { on { current() } doReturn policy },
         generatedChaptersAvailability = generatedChapters.availability,
+        timeSource = TimeSource.Monotonic,
     )
 
     @Test
     fun `tap only policy resolves from the dense map without an on-demand decode`() = runTest {
         timingManager = mock { on { densePlaybackTime(eq("episode-uuid"), eq(100.seconds)) } doReturn 131.5.seconds }
-        assertEquals(131.5.seconds, seeker(policy = FingerprintPolicy.TAP_ONLY).resolveSeekTime(episode, generatedChapter))
+        assertEquals(131.5.seconds, seeker(policy = FingerprintPolicy.TAP_ONLY).resolveSeek(episode, generatedChapter)?.playbackTime)
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
     fun `tap only policy returns null when the dense map misses without resolving`() = runTest {
         timingManager = mock { on { densePlaybackTime(any(), any()) } doReturn null }
-        assertNull(seeker(policy = FingerprintPolicy.TAP_ONLY).resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker(policy = FingerprintPolicy.TAP_ONLY).resolveSeek(episode, generatedChapter))
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
     @Test
     fun `disabled policy returns null without touching the timing manager`() = runTest {
-        assertNull(seeker(policy = FingerprintPolicy.DISABLED).resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker(policy = FingerprintPolicy.DISABLED).resolveSeek(episode, generatedChapter))
         verify(timingManager, never()).densePlaybackTime(any(), any())
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
@@ -101,7 +104,7 @@ class GeneratedChapterSeekerTest {
     fun `returns null for non-generated chapters`() = runTest {
         val chapter = generatedChapter.copy(origin = ChapterOrigin.ShowNotes)
 
-        assertNull(seeker().resolveSeekTime(episode, chapter))
+        assertNull(seeker().resolveSeek(episode, chapter))
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -109,7 +112,7 @@ class GeneratedChapterSeekerTest {
     fun `returns null when synced transcripts flag is off`() = runTest {
         FeatureFlag.setEnabled(Feature.SYNCED_TRANSCRIPTS, false)
 
-        assertNull(seeker().resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker().resolveSeek(episode, generatedChapter))
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -117,7 +120,7 @@ class GeneratedChapterSeekerTest {
     fun `returns null for free users`() = runTest {
         generatedChapters.subscriptionFlow.value = null
 
-        assertNull(seeker().resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker().resolveSeek(episode, generatedChapter))
         verify(timingManager, never()).densePlaybackTime(any(), any())
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
@@ -126,7 +129,7 @@ class GeneratedChapterSeekerTest {
     fun `returns null when generated chapters flag is off`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
 
-        assertNull(seeker().resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker().resolveSeek(episode, generatedChapter))
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -135,23 +138,23 @@ class GeneratedChapterSeekerTest {
         generatedChapters.subscriptionFlow.value = testSubscription(SubscriptionTier.Patron)
         timingManager = mock { on { densePlaybackTime(eq("episode-uuid"), eq(100.seconds)) } doReturn 131.5.seconds }
 
-        assertEquals(131.5.seconds, seeker().resolveSeekTime(episode, generatedChapter))
+        assertEquals(131.5.seconds, seeker().resolveSeek(episode, generatedChapter)?.playbackTime)
     }
 
     @Test
     fun `stops resolving after Plus lapses`() = runTest {
         timingManager = mock { on { densePlaybackTime(eq("episode-uuid"), eq(100.seconds)) } doReturn 131.5.seconds }
         val seeker = seeker()
-        assertEquals(131.5.seconds, seeker.resolveSeekTime(episode, generatedChapter))
+        assertEquals(131.5.seconds, seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
 
         generatedChapters.subscriptionFlow.value = null
 
-        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker.resolveSeek(episode, generatedChapter))
     }
 
     @Test
     fun `returns null on non-phone platforms`() = runTest {
-        assertNull(seeker(AppPlatform.Automotive).resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker(AppPlatform.Automotive).resolveSeek(episode, generatedChapter))
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -159,7 +162,7 @@ class GeneratedChapterSeekerTest {
     fun `returns null without a reference start time`() = runTest {
         val chapter = generatedChapter.copy(referenceStartTime = null)
 
-        assertNull(seeker().resolveSeekTime(episode, chapter))
+        assertNull(seeker().resolveSeek(episode, chapter))
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -169,7 +172,7 @@ class GeneratedChapterSeekerTest {
             on { densePlaybackTime(eq("episode-uuid"), eq(100.seconds)) } doReturn 131.5.seconds
         }
 
-        assertEquals(131.5.seconds, seeker().resolveSeekTime(episode, generatedChapter))
+        assertEquals(131.5.seconds, seeker().resolveSeek(episode, generatedChapter)?.playbackTime)
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -181,8 +184,8 @@ class GeneratedChapterSeekerTest {
         }
         val seeker = seeker()
 
-        assertEquals(131.seconds, seeker.resolveSeekTime(episode, generatedChapter))
-        assertEquals(131.seconds, seeker.resolveSeekTime(episode, generatedChapter))
+        assertEquals(131.seconds, seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
+        assertEquals(131.seconds, seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
         verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -193,7 +196,7 @@ class GeneratedChapterSeekerTest {
                 ChapterSeekResult.Resolved(playbackTime = 120.2.seconds, usedPrior = false)
         }
 
-        assertEquals(121.seconds, seeker().resolveSeekTime(episode, generatedChapter))
+        assertEquals(121.seconds, seeker().resolveSeek(episode, generatedChapter)?.playbackTime)
     }
 
     @Test
@@ -204,8 +207,8 @@ class GeneratedChapterSeekerTest {
         }
         val seeker = seeker()
 
-        assertEquals(121.seconds, seeker.resolveSeekTime(episode, generatedChapter))
-        assertEquals(130.seconds, seeker.resolveSeekTime(episode, generatedChapter))
+        assertEquals(121.seconds, seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
+        assertEquals(130.seconds, seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
         verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -215,7 +218,7 @@ class GeneratedChapterSeekerTest {
             on { densePlaybackTime(eq("episode-uuid"), eq(100.seconds)) } doReturn 129.5.seconds
         }
 
-        assertEquals(130.seconds, seeker().resolveSeekTime(episode, generatedChapter))
+        assertEquals(130.seconds, seeker().resolveSeek(episode, generatedChapter)?.playbackTime)
     }
 
     @Test
@@ -226,8 +229,8 @@ class GeneratedChapterSeekerTest {
         }
         val seeker = seeker()
 
-        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
-        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
+        assertNull(seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
         verifyBlocking(timingManager, times(2)) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -239,8 +242,8 @@ class GeneratedChapterSeekerTest {
         }
         val seeker = seeker()
 
-        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
-        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
+        assertNull(seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
         verifyBlocking(timingManager, times(2)) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -252,8 +255,8 @@ class GeneratedChapterSeekerTest {
         }
         val seeker = seeker()
 
-        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
-        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
+        assertNull(seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
         verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -266,8 +269,8 @@ class GeneratedChapterSeekerTest {
         val seeker = seeker()
         val otherChapter = generatedChapter.copy(index = 3, referenceStartTime = 300.seconds)
 
-        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
-        assertNull(seeker.resolveSeekTime(episode, otherChapter))
+        assertNull(seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
+        assertNull(seeker.resolveSeek(episode, otherChapter)?.playbackTime)
         verifyBlocking(timingManager, times(2)) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -280,8 +283,8 @@ class GeneratedChapterSeekerTest {
         val seeker = seeker()
         val otherChapter = generatedChapter.copy(index = 3, referenceStartTime = 300.seconds)
 
-        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
-        assertNull(seeker.resolveSeekTime(episode, otherChapter))
+        assertNull(seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
+        assertNull(seeker.resolveSeek(episode, otherChapter)?.playbackTime)
         verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -294,8 +297,8 @@ class GeneratedChapterSeekerTest {
         }
         val seeker = seeker()
 
-        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
-        assertEquals(131.5.seconds, seeker.resolveSeekTime(episode, generatedChapter))
+        assertNull(seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
+        assertEquals(131.5.seconds, seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
         verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -308,8 +311,8 @@ class GeneratedChapterSeekerTest {
         val seeker = seeker()
         val otherEpisode = PodcastEpisode(uuid = "other-uuid", publishedDate = Date())
 
-        assertNull(seeker.resolveSeekTime(episode, generatedChapter))
-        assertNull(seeker.resolveSeekTime(otherEpisode, generatedChapter))
+        assertNull(seeker.resolveSeek(episode, generatedChapter)?.playbackTime)
+        assertNull(seeker.resolveSeek(otherEpisode, generatedChapter)?.playbackTime)
         verifyBlocking(timingManager, times(2)) { resolvePlaybackTime(any(), any()) }
     }
 
@@ -322,9 +325,9 @@ class GeneratedChapterSeekerTest {
         val seeker = seeker()
         val otherEpisode = PodcastEpisode(uuid = "other-uuid", publishedDate = Date())
 
-        seeker.resolveSeekTime(episode, generatedChapter)
-        seeker.resolveSeekTime(otherEpisode, generatedChapter)
-        seeker.resolveSeekTime(episode, generatedChapter)
+        seeker.resolveSeek(episode, generatedChapter)
+        seeker.resolveSeek(otherEpisode, generatedChapter)
+        seeker.resolveSeek(episode, generatedChapter)
 
         verifyBlocking(timingManager, times(3)) { resolvePlaybackTime(any(), any()) }
     }
@@ -338,10 +341,58 @@ class GeneratedChapterSeekerTest {
         val seeker = seeker()
         val downloadedEpisode = episode.copy(downloadedFilePath = "/audio.mp3")
 
-        seeker.resolveSeekTime(episode, generatedChapter)
-        seeker.resolveSeekTime(downloadedEpisode, generatedChapter)
+        seeker.resolveSeek(episode, generatedChapter)
+        seeker.resolveSeek(downloadedEpisode, generatedChapter)
 
         verifyBlocking(timingManager, times(2)) { resolvePlaybackTime(any(), any()) }
+    }
+
+    @Test
+    fun `reports a fresh resolve and then a cached one`() = runTest {
+        timingManager = mock {
+            on { resolvePlaybackTime(any(), eq(100.seconds)) } doReturn
+                ChapterSeekResult.Resolved(playbackTime = 130.2.seconds, usedPrior = false)
+        }
+        val seeker = seeker()
+
+        val fresh = seeker.resolveSeek(episode, generatedChapter) as GeneratedChapterSeek.Resolved
+        assertFalse(fresh.isCached)
+        assertEquals(GeneratedChapterSeek.Resolved(131.seconds, isCached = true), seeker.resolveSeek(episode, generatedChapter))
+    }
+
+    @Test
+    fun `reports a dense mapping hit as cached`() = runTest {
+        timingManager = mock { on { densePlaybackTime(eq("episode-uuid"), eq(100.seconds)) } doReturn 131.5.seconds }
+
+        assertEquals(GeneratedChapterSeek.Resolved(131.5.seconds, isCached = true), seeker().resolveSeek(episode, generatedChapter))
+    }
+
+    @Test
+    fun `reports an attempted resolve that ended unresolved`() = runTest {
+        timingManager = mock {
+            on { resolvePlaybackTime(any(), any()) } doReturn
+                ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_TIMEOUT)
+        }
+
+        val seek = seeker().resolveSeek(episode, generatedChapter) as GeneratedChapterSeek.Unresolved
+
+        assertEquals(ChapterSeekResult.REASON_TIMEOUT, seek.reason)
+        assertTrue(seek.isAttempted)
+    }
+
+    @Test
+    fun `reports a remembered failure as unresolved without an attempt`() = runTest {
+        timingManager = mock {
+            on { resolvePlaybackTime(any(), any()) } doReturn
+                ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE)
+        }
+        val seeker = seeker()
+        seeker.resolveSeek(episode, generatedChapter)
+
+        assertEquals(
+            GeneratedChapterSeek.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE, isAttempted = false),
+            seeker.resolveSeek(episode, generatedChapter),
+        )
     }
 
     @Test
@@ -352,7 +403,7 @@ class GeneratedChapterSeekerTest {
         }
         val seeker = seeker()
 
-        seeker.resolveSeekTime(episode, generatedChapter)
+        seeker.resolveSeek(episode, generatedChapter)
 
         assertNull(seeker.resolvingChapter.value)
         verify(timingManager).densePlaybackTime("episode-uuid", 100.seconds)
@@ -365,9 +416,9 @@ class GeneratedChapterSeekerTest {
             on { resolvePlaybackTime(any(), any()) } doSuspendableAnswer { awaitCancellation() }
         }
         val seeker = seeker()
-        launch { seeker.resolveSeekTime(episode, generatedChapter) }
+        launch { seeker.resolveSeek(episode, generatedChapter) }
         runCurrent()
-        val secondTap = launch { seeker.resolveSeekTime(episode, generatedChapter) }
+        val secondTap = launch { seeker.resolveSeek(episode, generatedChapter) }
         runCurrent()
 
         assertEquals(GeneratedChapterSeeker.ResolvingChapter("episode-uuid", 2), seeker.resolvingChapter.value)
@@ -384,7 +435,7 @@ class GeneratedChapterSeekerTest {
             on { resolvePlaybackTime(any(), any()) } doSuspendableAnswer { awaitCancellation() }
         }
         val seeker = seeker()
-        val job = launch { seeker.resolveSeekTime(episode, generatedChapter) }
+        val job = launch { seeker.resolveSeek(episode, generatedChapter) }
         runCurrent()
         assertEquals(GeneratedChapterSeeker.ResolvingChapter("episode-uuid", 2), seeker.resolvingChapter.value)
 
@@ -407,7 +458,7 @@ class GeneratedChapterSeekerTest {
             on { resolvePlaybackTime(any(), any()) } doSuspendableAnswer { awaitCancellation() }
         }
         val seeker = seeker()
-        val job = launch { seeker.resolveSeekTime(episode, generatedChapter) }
+        val job = launch { seeker.resolveSeek(episode, generatedChapter) }
         runCurrent()
 
         assertEquals(2, seeker.resolvingChapterIndex(flowOf("episode-uuid")).first())
