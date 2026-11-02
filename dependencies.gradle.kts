@@ -4,7 +4,7 @@ val versionCodeDifferenceBetweenAppAndAutomotive = 50000
 val versionCodeDifferenceBetweenAppAndWear = 50000 + versionCodeDifferenceBetweenAppAndAutomotive
 val versionCodeDifferenceBetweenAppAndTv = 50000 + versionCodeDifferenceBetweenAppAndWear
 
-val secretProperties = loadPropertiesFromFile(file("secret.properties"))
+val secretProperties = loadPropertiesFromFile(File(gradle.extra["decryptedSecretsDir"] as File, "secret.properties"))
 val versionProperties = loadPropertiesFromFile(file("version.properties"))
 
 fun loadPropertiesFromFile(file: File): Properties {
@@ -78,30 +78,19 @@ project.apply {
         set("testInstrumentationRunner", "androidx.test.runner.AndroidJUnitRunner")
 
         // App Signing
-        var canSignRelease = false
-        // Check secret.properties for signing information
-        val storeFilePath = secretProperties.getProperty("signingKeyStoreFile", null)
-        if (!storeFilePath.isNullOrBlank()) {
-            val storeFile = file(storeFilePath)
-            canSignRelease = storeFile.exists()
-            set("storeFile", storeFile)
-            set("storePassword", secretProperties.getProperty("signingKeyStorePassword", null))
-            set("keyAlias", secretProperties.getProperty("signingKeyAlias", null))
-            set("keyPassword", secretProperties.getProperty("signingKeyPassword", null))
-        }
-        // Next check Gradle properties such as local.properties or ~/.gradle/gradle.properties
-        if (!canSignRelease && project.hasProperty("signingKeyStoreFile")) {
-            val signingKeyStoreFile = project.property("signingKeyStoreFile").toString()
-            if (!signingKeyStoreFile.isNullOrBlank()) {
-                val storeFile = file(signingKeyStoreFile)
-                canSignRelease = storeFile.exists()
-                set("storeFile", storeFile)
-                set("storePassword", project.property("signingKeyStorePassword").toString())
-                set("keyAlias", project.property("signingKeyAlias").toString())
-                set("keyPassword", project.property("signingKeyPassword").toString())
-            }
-        }
+        val uploadKeystore = File(gradle.extra["decryptedSecretsDir"] as File, "upload.jks")
+        val uploadStorePassword = secretProperties.getProperty("signingKeyStorePassword")
+        val uploadKeyAlias = secretProperties.getProperty("signingKeyAlias")
+        val uploadKeyPassword = secretProperties.getProperty("signingKeyPassword")
+        val canSignRelease = uploadKeystore.exists() &&
+            listOf(uploadStorePassword, uploadKeyAlias, uploadKeyPassword).none { it.isNullOrBlank() }
         set("canSignRelease", canSignRelease)
+        if (canSignRelease) {
+            set("storeFile", uploadKeystore)
+            set("storePassword", uploadStorePassword)
+            set("keyAlias", uploadKeyAlias)
+            set("keyPassword", uploadKeyPassword)
+        }
 
         // Secrets
         set("settingsEncryptSecret", secretProperties.getProperty("pocketcastsSettingsEncryptSecret", ""))

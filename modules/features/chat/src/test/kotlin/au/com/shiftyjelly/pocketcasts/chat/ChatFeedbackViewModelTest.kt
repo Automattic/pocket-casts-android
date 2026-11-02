@@ -321,9 +321,12 @@ class ChatFeedbackViewModelTest {
 
         override suspend fun sendMessage(
             episodeUuid: String,
+            podcastUuid: String,
             message: ChatMessage.User,
             allMessages: List<ChatMessage>,
         ) = Unit
+
+        override suspend fun getStarterQuestions(episodeUuid: String, podcastUuid: String) = emptyList<String>()
 
         override suspend fun clearMessages(episodeUuid: String) = object : ClearedChat {
             override val messages = emptyList<ChatMessage>()

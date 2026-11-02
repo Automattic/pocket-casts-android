@@ -2,9 +2,12 @@ package au.com.shiftyjelly.pocketcasts.views.dialog
 
 import android.os.Looper
 import android.view.View
-import au.com.shiftyjelly.pocketcasts.views.R
+import androidx.compose.ui.test.junit4.v2.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -15,6 +18,9 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltShimApplication::class)
 class ConfirmationDialogTest {
+    @get:Rule
+    val composeRule = createEmptyComposeRule()
+
     private val controller = Robolectric.buildActivity(HiltShimActivity::class.java).setup()
     private val fragmentManager get() = controller.get().supportFragmentManager
 
@@ -23,9 +29,9 @@ class ConfirmationDialogTest {
 
     @Test
     fun `confirm button runs the confirm action exactly once`() {
-        val dialog = showDialog()
+        showDialog()
 
-        dialog.requireView().findViewById<View>(R.id.btnConfirm).performClick()
+        composeRule.onNodeWithText("Delete everywhere").performClick()
         idle()
 
         assertEquals(1, confirmCount)
@@ -72,9 +78,9 @@ class ConfirmationDialogTest {
     @Test
     fun `secondary button does not run the confirm action`() {
         var secondaryCount = 0
-        val dialog = showDialog { setSecondaryButtonType(ConfirmationDialog.ButtonType.Normal("Keep")).setOnSecondary { secondaryCount++ } }
+        showDialog { setSecondaryButtonType(ConfirmationDialog.ButtonType.Normal("Keep")).setOnSecondary { secondaryCount++ } }
 
-        dialog.requireView().findViewById<View>(R.id.btnSecondary).performClick()
+        composeRule.onNodeWithText("Keep").performClick()
         idle()
 
         assertEquals(0, confirmCount)

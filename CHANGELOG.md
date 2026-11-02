@@ -9,6 +9,8 @@
         ([#6217](https://github.com/Automattic/pocket-casts-android/pull/6217))
     *   Fix a crash on Android 8 devices when the full-screen player loaded show notes containing remote images
         ([#5847](https://github.com/Automattic/pocket-casts-android/pull/5847))
+    *   Fix the Settings menu showing through Subscription, Privacy policy and Terms of use in the TV app
+        ([#6284](https://github.com/Automattic/pocket-casts-android/pull/6284))
 
 
 8.24

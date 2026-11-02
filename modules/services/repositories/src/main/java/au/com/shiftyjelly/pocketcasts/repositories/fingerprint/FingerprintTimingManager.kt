@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.ExoPlayerDataSourceF
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.shouldCacheEntireEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -77,6 +78,7 @@ class FingerprintTimingManager @Inject constructor(
     private val dataSourceFactory: Lazy<ExoPlayerDataSourceFactory>,
     private val pcmTap: FingerprintPcmTap,
     private val decodePolicy: FingerprintDecodePolicy,
+    private val generatedChaptersAvailability: GeneratedChaptersAvailability,
 ) {
 
     /** Who asked for preparation; decides whether streaming over a metered network is acceptable. */
@@ -738,6 +740,7 @@ class FingerprintTimingManager @Inject constructor(
         if (Util.getAppPlatform(context) != AppPlatform.Phone) return false
         if (decodePolicy.current() != FingerprintPolicy.PLATFORM) return false
         return computeEager(
+            isGeneratedChaptersAllowed = generatedChaptersAvailability.isAllowed(),
             hasGeneratedChapters = chapterManager.get().hasGeneratedChapters(episodeUuid),
             isDownloaded = isDownloaded,
         )
@@ -1573,9 +1576,10 @@ class FingerprintTimingManager @Inject constructor(
     companion object {
         /** Core eager-pass gate (assumes the platform check already passed). */
         internal fun computeEager(
+            isGeneratedChaptersAllowed: Boolean,
             hasGeneratedChapters: Boolean,
             isDownloaded: Boolean,
-        ): Boolean = hasGeneratedChapters && isDownloaded
+        ): Boolean = isGeneratedChaptersAllowed && hasGeneratedChapters && isDownloaded
 
         /** A chapter tap is user-initiated, so metered data is allowed unless the user asked to be warned. */
         internal fun shouldBlockOnDemandResolve(

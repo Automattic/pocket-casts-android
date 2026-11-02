@@ -17,9 +17,15 @@ interface ChatManager {
 
     suspend fun sendMessage(
         episodeUuid: String,
+        podcastUuid: String,
         message: ChatMessage.User,
         allMessages: List<ChatMessage>,
     )
+
+    suspend fun getStarterQuestions(
+        episodeUuid: String,
+        podcastUuid: String,
+    ): List<String>
 
     suspend fun discardMessage(uuid: String)
 

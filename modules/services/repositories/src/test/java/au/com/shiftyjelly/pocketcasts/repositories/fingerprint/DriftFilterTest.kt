@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.ExoPlayerDataSourceF
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import com.automattic.eventhorizon.EventHorizon
@@ -50,6 +51,7 @@ class DriftFilterTest {
             dataSourceFactory = Lazy { mock(ExoPlayerDataSourceFactory::class.java) },
             pcmTap = FingerprintPcmTap(),
             decodePolicy = decodePolicy,
+            generatedChaptersAvailability = mock(GeneratedChaptersAvailability::class.java),
         )
     }
 

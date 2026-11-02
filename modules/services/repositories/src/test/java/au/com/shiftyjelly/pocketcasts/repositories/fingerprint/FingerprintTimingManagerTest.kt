@@ -109,6 +109,7 @@ class FingerprintTimingManagerTest {
     @Test
     fun `computeEager runs for downloaded episode with generated chapters`() {
         val eager = FingerprintTimingManager.computeEager(
+            isGeneratedChaptersAllowed = true,
             hasGeneratedChapters = true,
             isDownloaded = true,
         )
@@ -120,6 +121,7 @@ class FingerprintTimingManagerTest {
         // Streaming episodes never eager-decode the whole file; the PCM tap plus the bounded
         // on-demand resolver cover them without pulling the whole file.
         val eager = FingerprintTimingManager.computeEager(
+            isGeneratedChaptersAllowed = true,
             hasGeneratedChapters = true,
             isDownloaded = false,
         )
@@ -129,7 +131,18 @@ class FingerprintTimingManagerTest {
     @Test
     fun `computeEager skips episode without generated chapters`() {
         val eager = FingerprintTimingManager.computeEager(
+            isGeneratedChaptersAllowed = true,
             hasGeneratedChapters = false,
+            isDownloaded = true,
+        )
+        assertFalse(eager)
+    }
+
+    @Test
+    fun `computeEager skips episode when generated chapters are not allowed`() {
+        val eager = FingerprintTimingManager.computeEager(
+            isGeneratedChaptersAllowed = false,
+            hasGeneratedChapters = true,
             isDownloaded = true,
         )
         assertFalse(eager)

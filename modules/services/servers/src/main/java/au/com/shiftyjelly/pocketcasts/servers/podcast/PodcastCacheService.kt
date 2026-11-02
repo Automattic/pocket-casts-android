@@ -132,6 +132,12 @@ interface PodcastCacheService {
         @Body request: EpisodeChatRequest,
     ): EpisodeChatResponse
 
+    @POST("mobile/episode/chat/starter_questions")
+    suspend fun episodeChatStarterQuestions(
+        @Header("Authorization") authorization: String,
+        @Body request: EpisodeChatStarterQuestionsRequest,
+    ): EpisodeChatStarterQuestionsResponse
+
     @POST("/mobile/bookmark/enrich")
     suspend fun enrichBookmark(
         @Header("Authorization") authorization: String,

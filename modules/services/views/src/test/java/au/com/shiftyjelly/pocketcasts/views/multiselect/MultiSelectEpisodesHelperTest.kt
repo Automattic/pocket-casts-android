@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.views.multiselect
 
 import android.os.Looper
-import android.view.View
+import androidx.compose.ui.test.junit4.v2.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -26,6 +28,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -38,10 +41,14 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = HiltShimApplication::class)
 class MultiSelectEpisodesHelperTest {
+    @get:Rule
+    val composeRule = createEmptyComposeRule()
+
     private val activity = Robolectric.buildActivity(HiltShimActivity::class.java).setup().get()
     private val fragmentManager = activity.supportFragmentManager
     private val resources = activity.resources
@@ -86,13 +93,13 @@ class MultiSelectEpisodesHelperTest {
         val episodes = selectPodcastEpisodes(4)
 
         helper.archive(resources = resources, fragmentManager = fragmentManager)
-        val dialog = awaitDialog("confirm_archive_all_")
+        awaitDialog("confirm_archive_all_")
 
         verifyBlocking(episodeManager, never()) { archiveAllInList(any(), any()) }
         assertTrue(eventSink.isEmpty())
         assertTrue(helper.isMultiSelecting)
 
-        dialog.requireView().findViewById<View>(R.id.btnConfirm).performClick()
+        composeRule.onNodeWithText(resources.getString(LR.string.archive_episodes_plural, 4)).performClick()
         awaitMultiSelectClosed()
 
         verifyBlocking(episodeManager) { archiveAllInList(episodes, playbackManager) }
@@ -116,12 +123,12 @@ class MultiSelectEpisodesHelperTest {
         val episodes = selectPodcastEpisodes(3) + selectUserEpisodes(1)
 
         helper.markAsPlayed(resources = resources, fragmentManager = fragmentManager)
-        val dialog = awaitDialog("confirm_played_all_")
+        awaitDialog("confirm_played_all_")
 
         verifyBlocking(episodeManager, never()) { markAllAsPlayed(any(), any(), any()) }
         assertTrue(eventSink.isEmpty())
 
-        dialog.requireView().findViewById<View>(R.id.btnConfirm).performClick()
+        composeRule.onNodeWithText(resources.getString(LR.string.mark_as_played_plural, 4)).performClick()
         awaitMultiSelectClosed()
 
         verifyBlocking(episodeManager) { markAllAsPlayed(episodes, playbackManager, helper.podcastManager) }
@@ -145,10 +152,10 @@ class MultiSelectEpisodesHelperTest {
         val episodes = selectPodcastEpisodes(Settings.MAX_DOWNLOAD + 1)
 
         helper.download(resources, fragmentManager)
-        val dialog = awaitDialog("multiselect_download")
+        awaitDialog("multiselect_download")
         verify(downloadQueue, never()).enqueueAll(any(), any(), any())
 
-        dialog.requireView().findViewById<View>(R.id.btnConfirm).performClick()
+        composeRule.onNodeWithText(resources.getString(LR.string.download_warning_button, Settings.MAX_DOWNLOAD)).performClick()
         idle()
 
         val expected = episodes.take(Settings.MAX_DOWNLOAD).map { it.uuid }

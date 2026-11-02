@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.ChapterOriginType
@@ -28,6 +29,7 @@ import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
+import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
 import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
@@ -47,6 +49,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -69,6 +72,10 @@ class ChaptersViewModelTest {
     private val settings = mock<Settings>()
     private val transcriptManager = mock<TranscriptManager> {
         on { loadGeneratedChapters(any()) } doReturn true
+    }
+    private val isGeneratedChaptersAllowed = MutableStateFlow(true)
+    private val generatedChaptersAvailability = mock<GeneratedChaptersAvailability> {
+        on { isAllowedFlow } doReturn isGeneratedChaptersAllowed
     }
     private val generatedChapterSeeker = mock<GeneratedChapterSeeker> {
         on { resolvingChapterIndex(any()) } doReturn MutableStateFlow<Int?>(null)
@@ -97,6 +104,7 @@ class ChaptersViewModelTest {
     private val subscriptionFlow = MutableStateFlow<Subscription?>(plusSubscription)
 
     private val eventSink = TestEventSink()
+    private val showGeneratedChapters = mock<UserSetting<Boolean>>()
 
     private lateinit var chaptersViewModel: ChaptersViewModel
 
@@ -108,6 +116,7 @@ class ChaptersViewModelTest {
         val userSetting = mock<UserSetting<Subscription?>>()
         whenever(userSetting.flow).thenReturn(subscriptionFlow)
         whenever(settings.cachedSubscription).thenReturn(userSetting)
+        whenever(settings.showGeneratedChapters).thenReturn(showGeneratedChapters)
 
         chaptersViewModel = ChaptersViewModel(
             mode = Mode.Episode(episode.uuid),
@@ -118,6 +127,7 @@ class ChaptersViewModelTest {
             eventHorizon = EventHorizon(eventSink),
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
+            generatedChaptersAvailability = generatedChaptersAvailability,
             ioDispatcher = testDispatcher,
         )
     }
@@ -125,6 +135,27 @@ class ChaptersViewModelTest {
     @Test
     fun `episode mode loads generated chapters for its episode`() = runTest {
         verifyBlocking(transcriptManager) { loadGeneratedChapters("id") }
+    }
+
+    @Test
+    fun `does not load generated chapters while they are not allowed`() = runTest {
+        clearInvocations(transcriptManager)
+        isGeneratedChaptersAllowed.value = false
+        createViewModel()
+
+        verifyBlocking(transcriptManager, never()) { loadGeneratedChapters(any()) }
+    }
+
+    @Test
+    fun `loads generated chapters when they become allowed`() = runTest {
+        clearInvocations(transcriptManager)
+        isGeneratedChaptersAllowed.value = false
+        createViewModel()
+        verifyBlocking(transcriptManager, never()) { loadGeneratedChapters(any()) }
+
+        isGeneratedChaptersAllowed.value = true
+
+        verifyBlocking(transcriptManager, atLeastOnce()) { loadGeneratedChapters("id") }
     }
 
     @Test
@@ -140,6 +171,7 @@ class ChaptersViewModelTest {
             eventHorizon = EventHorizon(TestEventSink()),
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
+            generatedChaptersAvailability = generatedChaptersAvailability,
             ioDispatcher = testDispatcher,
         )
 
@@ -165,6 +197,7 @@ class ChaptersViewModelTest {
             eventHorizon = EventHorizon(TestEventSink()),
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
+            generatedChaptersAvailability = generatedChaptersAvailability,
             ioDispatcher = testDispatcher,
         )
         verifyBlocking(transcriptManager, times(1)) { loadGeneratedChapters("id") }
@@ -331,6 +364,7 @@ class ChaptersViewModelTest {
             eventHorizon = EventHorizon(TestEventSink()),
             generatedChapterSeeker = generatedChapterSeeker,
             transcriptManager = transcriptManager,
+            generatedChaptersAvailability = generatedChaptersAvailability,
             ioDispatcher = testDispatcher,
         )
 
@@ -395,4 +429,72 @@ class ChaptersViewModelTest {
             assertEquals(Unit, awaitItem())
         }
     }
+
+    @Test
+    fun `turn off generated chapters disables the setting and tracks it`() = runTest {
+        chaptersViewModel.turnOffGeneratedChapters()
+
+        verify(showGeneratedChapters).set(false, updateModifiedAt = true)
+        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = false), eventSink.pollEvent())
+    }
+
+    @Test
+    fun `turn on generated chapters enables the setting and tracks it`() = runTest {
+        chaptersViewModel.turnOffGeneratedChapters()
+        eventSink.pollEvent()
+
+        chaptersViewModel.turnOnGeneratedChapters()
+
+        verify(showGeneratedChapters).set(true, updateModifiedAt = true)
+        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = true), eventSink.pollEvent())
+    }
+
+    @Test
+    fun `show off state when generated chapters are turned off`() = runTest {
+        chaptersViewModel.uiState.test {
+            val visible = awaitItem()
+            assertFalse(visible.showOffState)
+            assertTrue(visible.showChaptersTab)
+
+            chaptersFlow.value = Chapters(hasHiddenGeneratedChapters = true)
+            val off = awaitItem()
+            assertTrue(off.showOffState)
+            assertTrue(off.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `hide chapters tab when there are no chapters and generated chapters are not turned off`() = runTest {
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse(state.showOffState)
+            assertFalse(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `do not show off state while other chapters are visible`() = runTest {
+        chaptersFlow.value = Chapters(chapters.toList(), hasHiddenGeneratedChapters = true)
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse(state.showOffState)
+            assertTrue(state.showChaptersTab)
+        }
+    }
+
+    private fun createViewModel() = ChaptersViewModel(
+        mode = Mode.Episode("id"),
+        chapterManager = chapterManager,
+        playbackManager = playbackManager,
+        episodeManager = episodeManager,
+        settings = settings,
+        eventHorizon = EventHorizon(TestEventSink()),
+        generatedChapterSeeker = generatedChapterSeeker,
+        transcriptManager = transcriptManager,
+        generatedChaptersAvailability = generatedChaptersAvailability,
+        ioDispatcher = testDispatcher,
+    )
 }

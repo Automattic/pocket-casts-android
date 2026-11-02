@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notification.MediaActionsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -96,6 +97,8 @@ class PlaybackSettingsFragment : BaseFragment() {
     @Inject lateinit var podcastManager: PodcastManager
 
     @Inject lateinit var eventHorizon: EventHorizon
+
+    @Inject lateinit var generatedChaptersAvailability: GeneratedChaptersAvailability
 
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
@@ -311,7 +314,9 @@ class PlaybackSettingsFragment : BaseFragment() {
                         }
 
                         SettingsItems.SETTINGS_GENERATED_CHAPTERS -> {
-                            if (FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) {
+                            val isGeneratedChaptersAvailable by generatedChaptersAvailability.isAvailableFlow
+                                .collectAsStateWithLifecycle(initialValue = generatedChaptersAvailability.isAvailable())
+                            if (isGeneratedChaptersAvailable) {
                                 GeneratedChapters(
                                     saved = settings.showGeneratedChapters.flow.collectAsState().value,
                                     onSave = { isGeneratedChaptersEnabled ->
