@@ -18,8 +18,6 @@ Language: es
     <string name="chat_answering">Respondiendo</string>
     <string name="chat_error_server_on_our_end">Se ha producido un error por nuestra parte.</string>
     <string name="chat_not_sent_tap_to_retry">No se ha enviado. Toca para intentarlo de nuevo.</string>
-    <string name="chat_feedback_send_failed">No hemos podido enviar tus comentarios. Comprueba tu conexión.</string>
-    <string name="chat_feedback_sending">Enviando comentarios</string>
     <string name="chat_feedback_what_went_wrong">Qué ha salido mal</string>
     <string name="chat_beta_sheet_sign_in">Accede para probarlo</string>
     <string name="episode_chat_needs_transcript_message">La función Preguntar sobre este episodio requiere una transcripción. Este episodio no tiene.</string>

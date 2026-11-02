@@ -18,8 +18,6 @@ Language: fr
     <string name="chat_answering">Réponse en cours</string>
     <string name="chat_error_server_on_our_end">Un problème est survenu de notre côté.</string>
     <string name="chat_not_sent_tap_to_retry">Non envoyé. Touchez pour réessayer.</string>
-    <string name="chat_feedback_send_failed">Impossible d’envoyer vos commentaires. Vérifiez votre connexion.</string>
-    <string name="chat_feedback_sending">Envoi des commentaires</string>
     <string name="chat_feedback_what_went_wrong">Ce qui s’est passé</string>
     <string name="chat_beta_sheet_sign_in">Se connecter pour essayer</string>
     <string name="episode_chat_needs_transcript_message">La fonctionnalité Poser une question sur cet épisode nécessite une transcription. Cet épisode n’en a pas.</string>

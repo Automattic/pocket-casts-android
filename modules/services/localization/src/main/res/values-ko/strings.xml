@@ -18,8 +18,6 @@ Language: ko_KR
     <string name="chat_answering">답변하기</string>
     <string name="chat_error_server_on_our_end">시스템에서 문제가 발생했습니다.</string>
     <string name="chat_not_sent_tap_to_retry">발송되지 않았습니다. 눌러서 다시 시도하세요!</string>
-    <string name="chat_feedback_send_failed">피드백을 보낼 수 없습니다. 연결 상태를 확인하세요.</string>
-    <string name="chat_feedback_sending">피드백 보내기</string>
     <string name="chat_feedback_what_went_wrong">문제 발생</string>
     <string name="chat_beta_sheet_sign_in">로그인하여 시도하기</string>
     <string name="episode_chat_needs_transcript_message">이 에피소드에 대본이 필요한지 물어보세요. 이 에피소드는 대본이 없습니다.</string>

@@ -18,8 +18,6 @@ Language: ja_JP
     <string name="chat_answering">回答中</string>
     <string name="chat_error_server_on_our_end">当社側でエラーが発生しました。</string>
     <string name="chat_not_sent_tap_to_retry">送信されませんでした。 タップしてもう一度お試しください。</string>
-    <string name="chat_feedback_send_failed">フィードバックを送信できませんでした。 接続を確認してください。</string>
-    <string name="chat_feedback_sending">フィードバックを送信中</string>
     <string name="chat_feedback_what_went_wrong">何が良くなかったか</string>
     <string name="chat_beta_sheet_sign_in">ログインして試す</string>
     <string name="episode_chat_needs_transcript_message">「このエピソードについて尋ねる」には、トランスクリプトが必要です。 このエピソードにはトランスクリプトがありません。</string>
