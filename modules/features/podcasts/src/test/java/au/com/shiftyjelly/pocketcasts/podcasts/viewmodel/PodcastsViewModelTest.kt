@@ -124,7 +124,7 @@ class PodcastsViewModelTest {
         val viewModel = createViewModel(hidePlayedPodcasts = true, subscription = null)
         val secondUnplayedPodcast = Podcast(uuid = "unplayed-2")
         podcastsFlow.value = listOf(unplayedPodcast, playedPodcast, secondUnplayedPodcast)
-        viewModel.loadedItems()
+        viewModel.uiState.first { state -> state.unfilteredItems.any { it.uuid == secondUnplayedPodcast.uuid } }
 
         backgroundScope.launch(coroutineRule.testDispatcher) {
             viewModel.reorderItems(listOf(FolderItem.Podcast(secondUnplayedPodcast), FolderItem.Podcast(unplayedPodcast)))
