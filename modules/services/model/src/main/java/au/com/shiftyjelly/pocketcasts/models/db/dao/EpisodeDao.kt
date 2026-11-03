@@ -402,6 +402,16 @@ abstract class EpisodeDao {
         }
     }
 
+    @Query("UPDATE podcast_episodes SET has_generated_transcript = 1 WHERE uuid IN (:uuids) AND has_generated_transcript = 0")
+    protected abstract suspend fun markHasGeneratedTranscriptUnsafe(uuids: Collection<String>)
+
+    @Transaction
+    open suspend fun markHasGeneratedTranscript(uuids: Collection<String>) {
+        uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
+            markHasGeneratedTranscriptUnsafe(chunk)
+        }
+    }
+
     @Query("UPDATE podcast_episodes SET play_error_details = :playErrorDetails WHERE uuid = :uuid")
     abstract fun updatePlayErrorDetailsBlocking(playErrorDetails: String?, uuid: String)
 
