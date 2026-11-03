@@ -28,7 +28,6 @@ import androidx.core.content.res.use
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
-import au.com.shiftyjelly.pocketcasts.compose.text.rememberTextAppearanceColor
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -145,7 +144,7 @@ private fun PreferenceRow(
         TextViewText(
             text = title,
             fontSize = 16.sp,
-            color = rememberTextAppearanceColor(android.R.attr.textAppearanceListItem),
+            color = MaterialTheme.theme.colors.primaryText01,
         )
         TextViewText(
             text = summary,

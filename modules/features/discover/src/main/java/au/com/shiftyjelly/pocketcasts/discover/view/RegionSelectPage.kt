@@ -32,7 +32,6 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
-import au.com.shiftyjelly.pocketcasts.compose.text.rememberTextAppearanceColor
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
@@ -41,7 +40,6 @@ import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 internal fun RegionSelectPage(
@@ -63,7 +61,7 @@ internal fun RegionSelectPage(
             backgroundColor = MaterialTheme.theme.colors.secondaryUi01,
             modifier = toolbarModifier,
         )
-        val titleColor = rememberTextAppearanceColor(UR.attr.textSubtitle1)
+        val titleColor = MaterialTheme.theme.colors.primaryText01
         LazyColumn(
             contentPadding = bottomInset,
             modifier = Modifier.fillMaxWidth().weight(1f),

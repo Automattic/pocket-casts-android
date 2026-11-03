@@ -26,13 +26,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.compose.text.rememberThemeAttributeColor
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.PlaybackSettingsFragment.Companion.SCROLL_TO_SLEEP_TIMER
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.EventHorizon
@@ -52,7 +52,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
@@ -116,8 +115,8 @@ class SleepFragment :
             SleepPage(
                 state = state,
                 colors = SleepColors(
-                    contrast01 = rememberThemeAttributeColor(UR.attr.player_contrast_01),
-                    contrast05 = rememberThemeAttributeColor(UR.attr.player_contrast_05),
+                    contrast01 = Color(ThemeColor.playerContrast01(theme.activeTheme)),
+                    contrast05 = Color(ThemeColor.playerContrast05(theme.activeTheme)),
                     highlight = remember(playingEpisode) { Color(theme.playerHighlightColor(viewModel.podcast)) },
                 ),
                 listener = this,
