@@ -28,8 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
-import au.com.shiftyjelly.pocketcasts.compose.text.rememberTextAppearanceColor
-import au.com.shiftyjelly.pocketcasts.compose.text.rememberThemeAttributeColor
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -38,7 +36,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import coil3.compose.AsyncImage
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 internal fun ShareListIncomingHeader(
@@ -49,7 +46,7 @@ internal fun ShareListIncomingHeader(
         TextViewText(
             text = title.orEmpty(),
             fontSize = 20.sp,
-            color = rememberThemeAttributeColor(android.R.attr.textColorPrimary),
+            color = MaterialTheme.theme.colors.primaryText01,
             fontWeight = FontWeight.Medium,
             includeFontPadding = false,
             modifier = Modifier
@@ -60,7 +57,7 @@ internal fun ShareListIncomingHeader(
             TextViewText(
                 text = description,
                 fontSize = 16.sp,
-                color = rememberThemeAttributeColor(android.R.attr.textColorSecondary),
+                color = MaterialTheme.theme.colors.primaryText01,
                 includeFontPadding = false,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -120,7 +117,7 @@ internal fun ShareListIncomingPodcastRow(
             TextViewText(
                 text = podcast.title,
                 fontSize = 16.sp,
-                color = rememberTextAppearanceColor(UR.attr.textSubtitle1),
+                color = MaterialTheme.theme.colors.primaryText01,
                 maxLines = 1,
                 includeFontPadding = false,
                 modifier = Modifier.fillMaxWidth().padding(bottom = 2.dp),
@@ -128,7 +125,7 @@ internal fun ShareListIncomingPodcastRow(
             TextViewText(
                 text = podcast.author,
                 fontSize = 15.sp,
-                color = rememberTextAppearanceColor(UR.attr.textSubtitle2),
+                color = MaterialTheme.theme.colors.primaryText02,
                 letterSpacing = (-0.01).em,
                 maxLines = 1,
                 includeFontPadding = false,
@@ -178,7 +175,7 @@ internal fun ShareListIncomingFooter(
             TextViewText(
                 text = LocalResources.current.getStringPluralPodcasts(podcasts.size),
                 fontSize = 14.sp,
-                color = rememberThemeAttributeColor(android.R.attr.textColorSecondary),
+                color = MaterialTheme.theme.colors.primaryText01,
                 modifier = Modifier.padding(16.dp),
             )
             if (!isSubscribedToAll) {

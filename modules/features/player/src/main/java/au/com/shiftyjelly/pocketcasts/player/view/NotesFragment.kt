@@ -17,7 +17,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.compose.text.rememberThemeAttributeColor
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.NotesViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -39,7 +38,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class NotesFragment : BaseFragment() {
@@ -109,9 +107,9 @@ class NotesFragment : BaseFragment() {
                 header = header,
                 colors = NotesColors(
                     background = backgroundColor,
-                    contrast01 = rememberThemeAttributeColor(UR.attr.player_contrast_01),
-                    contrast02 = rememberThemeAttributeColor(UR.attr.player_contrast_02),
-                    contrast05 = rememberThemeAttributeColor(UR.attr.player_contrast_05),
+                    contrast01 = Color(ThemeColor.playerContrast01(activeTheme)),
+                    contrast02 = Color(ThemeColor.playerContrast02(activeTheme)),
+                    contrast05 = Color(ThemeColor.playerContrast05(activeTheme)),
                     progressIndicator = Color(ThemeColor.playerContrast03(activeTheme)),
                     progressTrack = Color(ThemeColor.playerContrast05(activeTheme)),
                 ),

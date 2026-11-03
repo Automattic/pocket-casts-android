@@ -39,7 +39,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBarDefaults
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.compose.text.rememberThemeAttributeColor
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -72,7 +71,6 @@ import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class EffectsFragment : BaseDialogFragment() {
@@ -129,9 +127,9 @@ class EffectsFragment : BaseDialogFragment() {
                     isVolumeBoosted = isVolumeBoosted,
                     colors = EffectsColors(
                         background = backgroundColor,
-                        contrast01 = rememberThemeAttributeColor(UR.attr.player_contrast_01),
-                        contrast02 = rememberThemeAttributeColor(UR.attr.player_contrast_02),
-                        contrast05 = rememberThemeAttributeColor(UR.attr.player_contrast_05),
+                        contrast01 = Color(ThemeColor.playerContrast01(theme.activeTheme)),
+                        contrast02 = Color(ThemeColor.playerContrast02(theme.activeTheme)),
+                        contrast05 = Color(ThemeColor.playerContrast05(theme.activeTheme)),
                         switchTint = Color(theme.playerHighlightColor(viewModel.podcast)),
                         switchOff = Color(ThemeColor.playerContrast01(theme.activeTheme)),
                     ),
