@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.settings
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -45,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
+import androidx.core.graphics.drawable.toDrawable
 import au.com.shiftyjelly.pocketcasts.compose.bars.AppCompatTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
@@ -261,7 +261,7 @@ private fun SwitchRow(
             AndroidView(
                 factory = { context ->
                     FrameLayout(context).apply {
-                        background = ColorDrawable(Color.TRANSPARENT)
+                        background = Color.TRANSPARENT.toDrawable()
                         setPadding(haloPadding, haloPadding, haloPadding, haloPadding)
                         addView(
                             Switch(context).apply {
