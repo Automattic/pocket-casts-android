@@ -343,17 +343,6 @@
     </issue>
 
     <issue
-        id="DiffUtilEquals"
-        message="Suspicious equality check: `equals()` is not implemented in List"
-        errorLine1="                oldItem.podcasts.map { it.uuid } == newItem.podcasts.map { it.uuid }"
-        errorLine2="                                                 ~~">
-        <location
-            file="src/main/java/au/com/shiftyjelly/pocketcasts/views/adapter/FolderItemDiffCallback.kt"
-            line="23"
-            column="50"/>
-    </issue>
-
-    <issue
         id="LocalContextGetResourceValueCall"
         message="Querying resource values using LocalContext.current"
         errorLine1="                    is BookmarkMessage.BookmarkEpisodeNotFound -> context.getString(LR.string.episode_not_found)"
