@@ -2227,9 +2227,7 @@ open class PlaybackManager @Inject constructor(
         val sameEpisode = currentPlayer != null && episode.uuid == currentPlayer.episodeUuid
 
         // completed episodes should play from the start
-        if (episode.isFinished) {
-            episodeManager.markAsNotPlayedBlocking(episode)
-        }
+        prepareFinishedEpisodeForLoad(episode, play, episodeManager)
 
         // make sure we have the latest episode url
         when (episode) {
@@ -2586,6 +2584,11 @@ open class PlaybackManager @Inject constructor(
         if (!hasAudioFocus) {
             return
         }
+
+        // a finished episode that was loaded without playing is marked as not played once it starts
+        episodeManager.findEpisodeByUuid(episode.uuid)
+            ?.takeIf { it.isFinished }
+            ?.let { episodeManager.markAsNotPlayedBlocking(it) }
 
         // Set before the relay emits playing
         lastPlaybackSource = sourceView
@@ -3173,6 +3176,27 @@ internal enum class CastSessionFailureAction {
     Ignore,
     ShowToast,
     ShowToastAndError,
+}
+
+/**
+ * Only starting playback marks a finished episode as not played. Loading it paused, for example when a sync
+ * removes the current Up Next episode and a finished one becomes current, just starts the player from the
+ * beginning, so the device doesn't sync a not played status over a completion from another device. If the
+ * user then plays it, play() marks it as not played.
+ */
+internal fun prepareFinishedEpisodeForLoad(
+    episode: BaseEpisode,
+    play: Boolean,
+    episodeManager: EpisodeManager,
+) {
+    if (!episode.isFinished) {
+        return
+    }
+    if (play) {
+        episodeManager.markAsNotPlayedBlocking(episode)
+    } else {
+        episode.playedUpTo = 0.0
+    }
 }
 
 internal fun castPlayerSwitchRequired(
