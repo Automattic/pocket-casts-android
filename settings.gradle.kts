@@ -149,7 +149,7 @@ private fun assertSecretsApplied() {
 private fun assertJava21Amazon() {
     val version = System.getProperty("java.version")
     val vendor = System.getProperty("java.vendor")
-    val expectedJdkVersion = "21.0.6"
+    val expectedJdkVersion = "21.0.13"
 
     if (!(version.contains(expectedJdkVersion) && vendor.contains("amazon", ignoreCase = true))) {
         logger.error("Java version: $version, vendor: $vendor")
