@@ -637,7 +637,6 @@
     <string name="chapters_generated_upsell_title">Chapters automatically generated</string>
     <string name="chapters_generated_upsell_message">With Pocket Casts Plus, no more scrubbing. Jump straight to the part you came&#160;for.</string>
     <string name="chapters_generated_upsell_button">Get generated chapters</string>
-    <string name="chapters_generated_disclaimer">These chapters are automatically generated and may not be perfectly accurate.</string>
     <string name="chapters_generated_none_yet_title">No chapters yet</string>
     <string name="chapters_generated_none_yet_message">Generate chapters and skip straight to the part you&#160;want.</string>
     <string name="chapters_generated_generate">Generate chapters</string>

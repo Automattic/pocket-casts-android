@@ -254,7 +254,6 @@ Language: pt_BR
     <string name="blogs_found_headline">Lendo seu blog em voz alta</string>
     <string name="blogs_found_followed_badge">PODCAST SEGUIDO</string>
     <string name="blogs_found_feed_detected">Feed encontrado</string>
-    <string name="chapters_generated_disclaimer">Esses capítulos são gerados automaticamente e podem não ser perfeitamente precisos.</string>
     <string name="chat_play_quote">Reproduzir citação</string>
     <string name="chat_clear">Apagar conversa</string>
     <string name="chat_send">Enviar</string>

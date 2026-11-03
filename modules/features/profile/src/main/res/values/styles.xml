@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AddFileNameInput" parent="">
+        <item name="textInputStyle">@style/AddFileNameInputLayout</item>
+    </style>
+
+    <style name="AddFileNameInputLayout" parent="PCTextInputLayout">
+        <item name="android:textColorHint">?attr/primary_text_01</item>
+    </style>
+</resources>

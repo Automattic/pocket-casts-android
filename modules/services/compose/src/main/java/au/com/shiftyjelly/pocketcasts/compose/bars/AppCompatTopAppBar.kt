@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.compose.bars
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
@@ -35,6 +36,7 @@ fun AppCompatTopAppBar(
     modifier: Modifier = Modifier,
     bottomShadow: Boolean = true,
     windowInsets: WindowInsets = WindowInsets.systemBars.union(WindowInsets.displayCutout).only(WindowInsetsSides.Top),
+    actions: @Composable RowScope.(Color) -> Unit = {},
 ) {
     ThemedTopAppBar(
         title = {
@@ -60,6 +62,7 @@ fun AppCompatTopAppBar(
         backgroundColor = backgroundColor,
         bottomShadow = bottomShadow,
         windowInsets = windowInsets,
+        actions = actions,
         modifier = modifier,
     )
 }
