@@ -57,12 +57,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun ChaptersGenerating(
+    episodeUuid: String?,
     onTurnOffGeneratedClick: () -> Unit,
     modifier: Modifier = Modifier,
     showSlowNote: Boolean = false,
 ) {
-    var isSlowNoteVisible by rememberSaveable { mutableStateOf(showSlowNote) }
-    LaunchedEffect(Unit) {
+    var isSlowNoteVisible by rememberSaveable(episodeUuid) { mutableStateOf(showSlowNote) }
+    LaunchedEffect(episodeUuid) {
         delay(SLOW_NOTE_DELAY)
         isSlowNoteVisible = true
     }
@@ -255,6 +256,7 @@ private fun ChaptersGeneratingPreview(theme: Theme.ThemeType) {
     AppThemeWithBackground(theme) {
         ChaptersTheme {
             ChaptersGenerating(
+                episodeUuid = null,
                 onTurnOffGeneratedClick = {},
                 showSlowNote = true,
             )

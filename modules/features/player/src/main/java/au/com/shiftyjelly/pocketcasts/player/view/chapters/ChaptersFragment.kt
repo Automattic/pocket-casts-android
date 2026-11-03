@@ -82,6 +82,7 @@ class ChaptersFragment : BaseFragment() {
                         onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
                         onTurnOffGeneratedClick = ::turnOffGeneratedChapters,
                         emptyState = state.emptyState,
+                        episodeUuid = state.episodeUuid,
                         onTurnOnGeneratedClick = viewModel::turnOnGeneratedChapters,
                         onGenerateClick = viewModel::generateChapters,
                         onSelectionChange = viewModel::selectChapter,

@@ -314,6 +314,7 @@ class ChaptersViewModel @AssistedInject constructor(
         val (subscription, generatedChaptersStatus) = subscriptionAndStatus
         val isGeneratedChaptersEpisode = episode is PodcastEpisode && FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
         return UiState(
+            episodeUuid = episode.uuid,
             podcast = playbackState.podcast,
             allChapters = chapters.toChapterStates(playbackPosition(playbackState, episode)),
             hasGeneratedChapters = chapters.hasGeneratedChapters,
@@ -376,6 +377,7 @@ class ChaptersViewModel @AssistedInject constructor(
     }
 
     data class UiState(
+        val episodeUuid: String? = null,
         val podcast: Podcast? = null,
         private val allChapters: List<ChapterState> = emptyList(),
         val hasGeneratedChapters: Boolean = false,

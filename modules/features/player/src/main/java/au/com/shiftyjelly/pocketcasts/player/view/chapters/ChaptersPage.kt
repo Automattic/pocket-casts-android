@@ -33,6 +33,7 @@ fun ChaptersPage(
     onSkipChaptersClick: (Boolean) -> Unit,
     onTurnOffGeneratedClick: () -> Unit,
     emptyState: ChaptersViewModel.EmptyState?,
+    episodeUuid: String?,
     onTurnOnGeneratedClick: () -> Unit,
     onGenerateClick: () -> Unit,
     isTogglingChapters: Boolean,
@@ -56,6 +57,7 @@ fun ChaptersPage(
             )
 
             ChaptersViewModel.EmptyState.GeneratingChapters -> ChaptersGenerating(
+                episodeUuid = episodeUuid,
                 onTurnOffGeneratedClick = onTurnOffGeneratedClick,
                 modifier = modifier,
             )
