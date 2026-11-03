@@ -189,6 +189,50 @@ class FingerprintTimingManagerTest {
     }
 
     @Test
+    fun `shouldPrepareOnPlayback prepares when generated chapters are allowed and present`() {
+        val prepare = FingerprintTimingManager.shouldPrepareOnPlayback(
+            isGeneratedChaptersAllowed = true,
+            hasGeneratedChapters = true,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { false },
+        )
+        assertTrue(prepare)
+    }
+
+    @Test
+    fun `shouldPrepareOnPlayback skips when generated chapters are not allowed`() {
+        val prepare = FingerprintTimingManager.shouldPrepareOnPlayback(
+            isGeneratedChaptersAllowed = false,
+            hasGeneratedChapters = true,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { true },
+        )
+        assertFalse(prepare)
+    }
+
+    @Test
+    fun `shouldPrepareOnPlayback skips episodes without generated chapters`() {
+        val prepare = FingerprintTimingManager.shouldPrepareOnPlayback(
+            isGeneratedChaptersAllowed = true,
+            hasGeneratedChapters = false,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { true },
+        )
+        assertFalse(prepare)
+    }
+
+    @Test
+    fun `shouldPrepareOnPlayback skips metered network when user warns on data use`() {
+        val prepare = FingerprintTimingManager.shouldPrepareOnPlayback(
+            isGeneratedChaptersAllowed = true,
+            hasGeneratedChapters = true,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { false },
+        )
+        assertFalse(prepare)
+    }
+
+    @Test
     fun `failed preparation retries when the transcript or a chat quote is shown`() {
         assertTrue(FingerprintTimingManager.canRetryFailedPreparation(FingerprintTimingManager.PrepareTrigger.TRANSCRIPT_VIEW))
         assertTrue(FingerprintTimingManager.canRetryFailedPreparation(FingerprintTimingManager.PrepareTrigger.CHAT))
