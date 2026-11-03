@@ -16,12 +16,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBannerColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -98,34 +96,24 @@ private fun chaptersBannerColors(): NoContentBannerColors {
 
 @Preview(name = "Light")
 @Composable
-private fun ChaptersNoChaptersYetLightPreview() = ChaptersNoChaptersYetPreview(Theme.ThemeType.LIGHT)
+private fun ChaptersNoChaptersYetLightPreview() = ChaptersPreview(ChaptersPreviewTheme.Light) { ChaptersNoChaptersYet(onGenerateClick = {}) }
 
 @Preview(name = "Dark")
 @Composable
-private fun ChaptersNoChaptersYetDarkPreview() = ChaptersNoChaptersYetPreview(Theme.ThemeType.DARK)
+private fun ChaptersNoChaptersYetDarkPreview() = ChaptersPreview(ChaptersPreviewTheme.Dark) { ChaptersNoChaptersYet(onGenerateClick = {}) }
 
+@Preview(name = "Player")
 @Composable
-private fun ChaptersNoChaptersYetPreview(theme: Theme.ThemeType) {
-    AppThemeWithBackground(theme) {
-        ChaptersTheme {
-            ChaptersNoChaptersYet(onGenerateClick = {})
-        }
-    }
-}
+private fun ChaptersNoChaptersYetPlayerPreview() = ChaptersPreview(ChaptersPreviewTheme.Player) { ChaptersNoChaptersYet(onGenerateClick = {}) }
 
 @Preview(name = "Light")
 @Composable
-private fun ChaptersNoGeneratedChaptersLightPreview() = ChaptersNoGeneratedChaptersPreview(Theme.ThemeType.LIGHT)
+private fun ChaptersNoGeneratedChaptersLightPreview() = ChaptersPreview(ChaptersPreviewTheme.Light) { ChaptersNoGeneratedChapters() }
 
 @Preview(name = "Dark")
 @Composable
-private fun ChaptersNoGeneratedChaptersDarkPreview() = ChaptersNoGeneratedChaptersPreview(Theme.ThemeType.DARK)
+private fun ChaptersNoGeneratedChaptersDarkPreview() = ChaptersPreview(ChaptersPreviewTheme.Dark) { ChaptersNoGeneratedChapters() }
 
+@Preview(name = "Player")
 @Composable
-private fun ChaptersNoGeneratedChaptersPreview(theme: Theme.ThemeType) {
-    AppThemeWithBackground(theme) {
-        ChaptersTheme {
-            ChaptersNoGeneratedChapters()
-        }
-    }
-}
+private fun ChaptersNoGeneratedChaptersPlayerPreview() = ChaptersPreview(ChaptersPreviewTheme.Player) { ChaptersNoGeneratedChapters() }

@@ -7,9 +7,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 
 val LocalChaptersTheme = staticCompositionLocalOf<ChaptersTheme> { error("No default chapters theme") }
 
@@ -44,8 +46,16 @@ fun ChaptersThemeForPlayer(
     podcast: Podcast?,
     content: @Composable () -> Unit,
 ) {
+    ChaptersThemeForPlayer(Color(theme.playerBackgroundColor(podcast)), content)
+}
+
+@Composable
+private fun ChaptersThemeForPlayer(
+    background: Color,
+    content: @Composable () -> Unit,
+) {
     val chaptersTheme = ChaptersTheme(
-        background = Color(theme.playerBackgroundColor(podcast)),
+        background = background,
         divider = MaterialTheme.theme.colors.playerContrast06,
         headerTitle = MaterialTheme.theme.colors.playerContrast02,
         headerToggle = MaterialTheme.theme.colors.playerContrast01,
@@ -89,3 +99,27 @@ data class ChaptersTheme(
     val progressBackground: Color,
     val linkIconBackground: Color,
 )
+
+internal enum class ChaptersPreviewTheme {
+    Light,
+    Dark,
+    Player,
+}
+
+@Composable
+internal fun ChaptersPreview(
+    theme: ChaptersPreviewTheme,
+    content: @Composable () -> Unit,
+) {
+    when (theme) {
+        ChaptersPreviewTheme.Light -> AppThemeWithBackground(Theme.ThemeType.LIGHT) { ChaptersTheme(content) }
+
+        ChaptersPreviewTheme.Dark -> AppThemeWithBackground(Theme.ThemeType.DARK) { ChaptersTheme(content) }
+
+        ChaptersPreviewTheme.Player -> AppThemeWithBackground(Theme.ThemeType.DARK) {
+            ChaptersThemeForPlayer(Color(ThemeColor.playerBackground01(Theme.ThemeType.DARK, PREVIEW_PODCAST_COLOR)), content)
+        }
+    }
+}
+
+private const val PREVIEW_PODCAST_COLOR = 0xFF1F5C99.toInt()

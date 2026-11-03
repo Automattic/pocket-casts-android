@@ -50,10 +50,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -254,21 +252,21 @@ private const val SHIMMER_GAP_MS = 100
 
 @Preview(name = "Light")
 @Composable
-private fun ChaptersGeneratingLightPreview() = ChaptersGeneratingPreview(Theme.ThemeType.LIGHT)
+private fun ChaptersGeneratingLightPreview() = ChaptersPreview(ChaptersPreviewTheme.Light) { ChaptersGeneratingPreview() }
 
 @Preview(name = "Dark")
 @Composable
-private fun ChaptersGeneratingDarkPreview() = ChaptersGeneratingPreview(Theme.ThemeType.DARK)
+private fun ChaptersGeneratingDarkPreview() = ChaptersPreview(ChaptersPreviewTheme.Dark) { ChaptersGeneratingPreview() }
+
+@Preview(name = "Player")
+@Composable
+private fun ChaptersGeneratingPlayerPreview() = ChaptersPreview(ChaptersPreviewTheme.Player) { ChaptersGeneratingPreview() }
 
 @Composable
-private fun ChaptersGeneratingPreview(theme: Theme.ThemeType) {
-    AppThemeWithBackground(theme) {
-        ChaptersTheme {
-            ChaptersGenerating(
-                episodeUuid = null,
-                onTurnOffGeneratedClick = {},
-                showSlowNote = true,
-            )
-        }
-    }
+private fun ChaptersGeneratingPreview() {
+    ChaptersGenerating(
+        episodeUuid = null,
+        onTurnOffGeneratedClick = {},
+        showSlowNote = true,
+    )
 }
