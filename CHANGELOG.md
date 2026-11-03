@@ -14,6 +14,8 @@
         ([#5847](https://github.com/Automattic/pocket-casts-android/pull/5847))
     *   Fix the Settings menu showing through Subscription, Privacy policy and Terms of use in the TV app
         ([#6284](https://github.com/Automattic/pocket-casts-android/pull/6284))
+    *   Fix a played episode coming back as unplayed after marking several Up Next episodes as played
+        ([#6330](https://github.com/Automattic/pocket-casts-android/pull/6330))
 
 
 8.24
