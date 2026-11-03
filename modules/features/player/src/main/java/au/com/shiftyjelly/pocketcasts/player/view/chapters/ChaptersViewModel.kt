@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.GeneratedChaptersResult
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -81,25 +82,35 @@ class ChaptersViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch(ioDispatcher) {
             combine(
-                mode.episodeIdFlow().filter { it.isNotEmpty() },
+                mode.hasGeneratedTranscriptFlow(),
                 generatedChaptersAvailability.isAllowedFlow,
-                ::GeneratedChaptersLoad,
-            ).collectLatest(::loadGeneratedChapters)
+            ) { (episodeId, hasGeneratedTranscript), isEnabled ->
+                GeneratedChaptersLoad(episodeId, isEnabled, hasGeneratedTranscript)
+            }.collectLatest(::loadGeneratedChapters)
         }
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun Mode.hasGeneratedTranscriptFlow() = episodeIdFlow()
+        .filter { it.isNotEmpty() }
+        .flatMapLatest { episodeId ->
+            episodeManager.findEpisodeByUuidFlow(episodeId)
+                .map { episode -> episodeId to ((episode as? PodcastEpisode)?.hasGeneratedTranscript == true) }
+                .distinctUntilChanged()
+        }
 
     private suspend fun loadGeneratedChapters(load: GeneratedChaptersLoad) {
         generatedChaptersLoad.value = load
         if (!load.isEnabled) return
-        var isLoaded = transcriptManager.loadGeneratedChapters(load.episodeId)
-        if (!isLoaded || !awaitSavedChapters(load.episodeId)) {
-            generatedChaptersLoad.value = load.copy(isFinished = true)
-        }
+        var result = transcriptManager.loadGeneratedChapters(load.episodeId)
         var retryDelay = 5.seconds
-        while (!isLoaded && retryDelay <= 2.minutes) {
+        while (result == GeneratedChaptersResult.Failed && retryDelay <= 2.minutes) {
             delay(retryDelay)
             retryDelay *= 2
-            isLoaded = transcriptManager.loadGeneratedChapters(load.episodeId)
+            result = transcriptManager.loadGeneratedChapters(load.episodeId)
+        }
+        if (result != GeneratedChaptersResult.Loaded || !awaitSavedChapters(load.episodeId)) {
+            generatedChaptersLoad.value = load.copy(isFinished = true)
         }
     }
 
@@ -143,7 +154,7 @@ class ChaptersViewModel @AssistedInject constructor(
     ) { isEnabled, load ->
         when {
             !isEnabled -> GeneratedChaptersStatus.NotEnabled
-            load == GeneratedChaptersLoad(episodeId, isEnabled = true, isFinished = true) -> GeneratedChaptersStatus.Loaded
+            load?.episodeId == episodeId && load.isEnabled && load.isFinished -> GeneratedChaptersStatus.Loaded
             else -> GeneratedChaptersStatus.Loading
         }
     }
@@ -414,6 +425,7 @@ class ChaptersViewModel @AssistedInject constructor(
     private data class GeneratedChaptersLoad(
         val episodeId: String,
         val isEnabled: Boolean,
+        val hasGeneratedTranscript: Boolean,
         val isFinished: Boolean = false,
     )
 

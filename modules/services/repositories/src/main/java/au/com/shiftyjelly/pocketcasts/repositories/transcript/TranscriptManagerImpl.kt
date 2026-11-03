@@ -6,12 +6,15 @@ import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
+import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.generatedTranscriptUrl
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.squareup.moshi.Moshi
+import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -27,6 +30,8 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.CacheControl
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import retrofit2.HttpException
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript as DbTranscript
 
@@ -156,31 +161,42 @@ class TranscriptManagerImpl @Inject constructor(
             .getOrNull()
     }
 
-    override suspend fun loadGeneratedChapters(episodeUuid: String): Boolean {
-        if (!generatedChaptersAvailability.isAllowed()) return true
+    override suspend fun loadGeneratedChapters(episodeUuid: String): GeneratedChaptersResult {
+        if (!generatedChaptersAvailability.isAllowed()) return GeneratedChaptersResult.Unavailable
 
         return try {
-            if (chapterManager.hasChapters(episodeUuid)) return true
+            if (chapterManager.hasChapters(episodeUuid)) return GeneratedChaptersResult.Loaded
 
-            val generatedTranscript = loadLocalTranscripts(episodeUuid)
-                .firstOrNull { it.isGenerated } ?: return true
+            val episode = episodeManager.findByUuid(episodeUuid)
+            if (episode == null || !episode.hasGeneratedTranscript) return GeneratedChaptersResult.Unavailable
 
-            val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
+            val transcriptUrl = generatedTranscriptUrl(BuildConfig.SERVER_SHOW_NOTES_URLS.toHttpUrl(), episode.podcastUuid, episodeUuid)
+            val metaUrl = transcriptUrl.removeSuffix(".vtt") + "-meta.json"
             val meta = transcriptService.getTranscriptOrThrow(metaUrl).use { body ->
                 metaAdapter.fromJson(body.source())
-            } ?: return true
-            saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
-            true
+            }
+            if (saveAiChapters(episodeUuid, meta?.chapters)) {
+                GeneratedChaptersResult.Loaded
+            } else {
+                GeneratedChaptersResult.Unavailable
+            }
         } catch (e: CancellationException) {
             throw e
+        } catch (e: HttpException) {
+            if (e.code() == HTTP_NOT_FOUND) {
+                GeneratedChaptersResult.Unavailable
+            } else {
+                Timber.tag("GeneratedChapters").e(e, "Failed to load generated chapters for episode $episodeUuid")
+                GeneratedChaptersResult.Failed
+            }
         } catch (e: Exception) {
             Timber.tag("GeneratedChapters").e(e, "Failed to load generated chapters for episode $episodeUuid")
-            false
+            GeneratedChaptersResult.Failed
         }
     }
 
-    private suspend fun saveAiChaptersIfNeeded(episodeUuid: String, chapters: List<EpisodeMetaResponse.MetaChapter>?) {
-        if (chapters.isNullOrEmpty()) return
+    private suspend fun saveAiChapters(episodeUuid: String, chapters: List<EpisodeMetaResponse.MetaChapter>?): Boolean {
+        if (chapters.isNullOrEmpty()) return false
 
         val dbChapters = chapters
             .mapNotNull { chapter ->
@@ -195,10 +211,10 @@ class TranscriptManagerImpl @Inject constructor(
                 )
             }
             .mapIndexed { index, chapter -> chapter.copy(index = index) }
-        if (dbChapters.isNotEmpty()) {
-            chapterManager.updateChapters(episodeUuid, dbChapters)
-            Timber.tag("GeneratedChapters").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")
-        }
+        if (dbChapters.isEmpty()) return false
+        chapterManager.updateChapters(episodeUuid, dbChapters)
+        Timber.tag("GeneratedChapters").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")
+        return true
     }
 
     override fun resetInvalidTranscripts(

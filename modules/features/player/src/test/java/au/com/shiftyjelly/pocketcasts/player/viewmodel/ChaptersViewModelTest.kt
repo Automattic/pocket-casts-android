@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.GeneratedChaptersResult
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -46,6 +47,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
@@ -86,7 +88,7 @@ class ChaptersViewModelTest {
     private val episodeManager = mock<EpisodeManager>()
     private val settings = mock<Settings>()
     private val transcriptManager = mock<TranscriptManager> {
-        on { loadGeneratedChapters(any()) } doReturn true
+        on { loadGeneratedChapters(any()) } doReturn GeneratedChaptersResult.Loaded
     }
     private val isGeneratedChaptersAllowed = MutableStateFlow(true)
     private val generatedChaptersAvailability = mock<GeneratedChaptersAvailability> {
@@ -129,6 +131,7 @@ class ChaptersViewModelTest {
     @Before
     fun setup() {
         whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
+        whenever(episodeManager.findEpisodeByUuidFlow(any())).thenReturn(emptyFlow())
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(episodeFlow)
         whenever(chapterManager.observerChaptersForEpisode("id")).thenReturn(chaptersFlow)
         val userSetting = mock<UserSetting<Subscription?>>()
@@ -182,6 +185,7 @@ class ChaptersViewModelTest {
     fun `player mode loads generated chapters for each new playing episode`() = runTest {
         showGeneratedChaptersFlow.value = true
         whenever(chapterManager.observerChaptersForEpisode("id2")).thenReturn(chaptersFlow)
+        whenever(episodeManager.findEpisodeByUuidFlow("id2")).thenReturn(MutableStateFlow(episode.copy(uuid = "id2")))
         clearInvocations(transcriptManager)
         playbackStateFlow.value = PlaybackState(episodeUuid = "")
         ChaptersViewModel(
@@ -210,7 +214,7 @@ class ChaptersViewModelTest {
     fun `retries generated chapters with backoff while loading fails`() = runTest {
         showGeneratedChaptersFlow.value = true
         clearInvocations(transcriptManager)
-        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(false, false, true)
+        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(GeneratedChaptersResult.Failed, GeneratedChaptersResult.Failed, GeneratedChaptersResult.Loaded)
         ChaptersViewModel(
             mode = Mode.Episode("id"),
             chapterManager = chapterManager,
@@ -690,7 +694,7 @@ class ChaptersViewModelTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         chaptersFlow.value = Chapters()
         showGeneratedChaptersFlow.value = true
-        val load = CompletableDeferred<Boolean>()
+        val load = CompletableDeferred<GeneratedChaptersResult>()
         whenever(transcriptManager.loadGeneratedChapters("id")).doSuspendableAnswer { load.await() }
         val viewModel = createViewModel()
 
@@ -699,7 +703,7 @@ class ChaptersViewModelTest {
             assertEquals(EmptyState.GeneratingChapters, loading.emptyState)
             assertTrue(loading.showChaptersTab)
 
-            load.complete(true)
+            load.complete(GeneratedChaptersResult.Unavailable)
             assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
         }
     }
@@ -720,11 +724,11 @@ class ChaptersViewModelTest {
     }
 
     @Test
-    fun `show no chapters for this episode when loading fails`() = runTest {
+    fun `show no chapters for this episode right away when none are available`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         chaptersFlow.value = Chapters()
         showGeneratedChaptersFlow.value = true
-        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(false)
+        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(GeneratedChaptersResult.Unavailable)
 
         createViewModel().uiState.test {
             val state = awaitItem()
@@ -772,6 +776,48 @@ class ChaptersViewModelTest {
             assertNull(state.emptyState)
             assertFalse(state.showChaptersTab)
         }
+        assertEquals(0, testScheduler.currentTime)
+    }
+
+    @Test
+    fun `keep generating while loading fails and show no chapters once retries run out`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(GeneratedChaptersResult.Failed)
+
+        createViewModel().uiState.test {
+            assertEquals(EmptyState.GeneratingChapters, awaitItem().emptyState)
+
+            advanceTimeBy(2.minutes)
+            runCurrent()
+            expectNoEvents()
+
+            advanceTimeBy(1.minutes)
+            runCurrent()
+            assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
+        }
+    }
+
+    @Test
+    fun `reload generated chapters when the episode gets a generated transcript`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+        val load = CompletableDeferred<GeneratedChaptersResult>()
+        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(GeneratedChaptersResult.Unavailable)
+
+        createViewModel().uiState.test {
+            assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
+
+            whenever(transcriptManager.loadGeneratedChapters("id")).doSuspendableAnswer { load.await() }
+            episodeFlow.value = episode.copy(hasGeneratedTranscript = true)
+            assertEquals(EmptyState.GeneratingChapters, awaitItem().emptyState)
+
+            chaptersFlow.value = chapters
+            load.complete(GeneratedChaptersResult.Loaded)
+            assertNull(expectMostRecentItem().emptyState)
+        }
     }
 
     @Test
@@ -793,14 +839,14 @@ class ChaptersViewModelTest {
             assertEquals(EmptyState.NoChaptersYet, awaitItem().emptyState)
             verifyBlocking(transcriptManager, never()) { loadGeneratedChapters(any()) }
 
-            val load = CompletableDeferred<Boolean>()
+            val load = CompletableDeferred<GeneratedChaptersResult>()
             whenever(transcriptManager.loadGeneratedChapters("id")).doSuspendableAnswer { load.await() }
             showGeneratedChaptersFlow.value = true
             isGeneratedChaptersAllowed.value = true
             assertEquals(EmptyState.GeneratingChapters, expectMostRecentItem().emptyState)
             verifyBlocking(transcriptManager, atLeastOnce()) { loadGeneratedChapters("id") }
 
-            load.complete(true)
+            load.complete(GeneratedChaptersResult.Unavailable)
             assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
         }
     }

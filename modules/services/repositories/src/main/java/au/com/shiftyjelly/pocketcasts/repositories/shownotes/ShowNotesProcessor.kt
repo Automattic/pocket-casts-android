@@ -143,12 +143,7 @@ internal fun ShowNotesResponse.findTranscripts(
             add(
                 Transcript(
                     episodeUuid = episodeUuid,
-                    url = showNotesBaseUrl.newBuilder()
-                        .addPathSegment("generated_transcripts")
-                        .addPathSegment(podcastUuid)
-                        .addPathSegment("$episodeUuid.vtt")
-                        .build()
-                        .toString(),
+                    url = generatedTranscriptUrl(showNotesBaseUrl, podcastUuid, episodeUuid),
                     type = "text/vtt",
                     isGenerated = true,
                 ),
@@ -156,6 +151,17 @@ internal fun ShowNotesResponse.findTranscripts(
         }
     }
 }
+
+internal fun generatedTranscriptUrl(
+    showNotesBaseUrl: HttpUrl,
+    podcastUuid: String,
+    episodeUuid: String,
+) = showNotesBaseUrl.newBuilder()
+    .addPathSegment("generated_transcripts")
+    .addPathSegment(podcastUuid)
+    .addPathSegment("$episodeUuid.vtt")
+    .build()
+    .toString()
 
 private fun ShowNotesTranscript.toTranscript(
     episodeUuid: String,

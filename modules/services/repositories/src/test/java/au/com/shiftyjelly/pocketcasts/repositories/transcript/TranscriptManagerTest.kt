@@ -40,11 +40,14 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import retrofit2.HttpException
+import retrofit2.Response
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript as DbTranscript
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -67,17 +70,20 @@ class TranscriptManagerTest {
     private val htmlDbTranscript = createDbTranscript("text/html")
     private val generatedVttTranscript = createDbTranscript("text/vtt", isGenerated = true, url = "transcript-url.vtt")
 
+    private val podcastEpisode = PodcastEpisode(
+        uuid = "episode-id",
+        podcastUuid = "podcast-id",
+        publishedDate = Date(),
+        hasGeneratedTranscript = true,
+    )
+
     private val transcriptManager = TranscriptManagerImpl(
         transcriptDao = mock {
             on { observeTranscripts(any()) } doReturn localTranscriptsFlow
         },
         transcriptService = service,
         episodeManager = mock {
-            on { findByUuid(any()) } doReturn PodcastEpisode(
-                uuid = "episode-id",
-                podcastUuid = "podcast-id",
-                publishedDate = Date(),
-            )
+            on { findByUuid(any()) } doAnswer { podcastEpisode }
         },
         chapterManager = chapterManager,
         generatedChaptersAvailability = generatedChapters.availability,
@@ -411,7 +417,7 @@ class TranscriptManagerTest {
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_WITH_CHAPTERS
 
-        assertTrue(transcriptManager.loadGeneratedChapters("episode-id"))
+        assertEquals(GeneratedChaptersResult.Loaded, transcriptManager.loadGeneratedChapters("episode-id"))
 
         verify(chapterManager).updateChapters(
             "episode-id",
@@ -443,7 +449,7 @@ class TranscriptManagerTest {
             transcriptDao = mock { on { observeTranscripts(any()) } doReturn localTranscriptsFlow },
             transcriptService = service,
             episodeManager = mock {
-                on { findByUuid(any()) } doReturn PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date())
+                on { findByUuid(any()) } doReturn podcastEpisode
             },
             chapterManager = chapterManagerWithExisting,
             generatedChaptersAvailability = generatedChapters.availability,
@@ -451,7 +457,7 @@ class TranscriptManagerTest {
             parsers = parsers,
         )
 
-        assertTrue(managerWithChapters.loadGeneratedChapters("episode-id"))
+        assertEquals(GeneratedChaptersResult.Loaded, managerWithChapters.loadGeneratedChapters("episode-id"))
 
         assertEquals(0, service.metaRequestCount)
         verify(chapterManagerWithExisting, never()).updateChapters(any(), any())
@@ -463,7 +469,7 @@ class TranscriptManagerTest {
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_NO_CHAPTERS
 
-        transcriptManager.loadGeneratedChapters("episode-id")
+        assertEquals(GeneratedChaptersResult.Unavailable, transcriptManager.loadGeneratedChapters("episode-id"))
 
         verify(chapterManager, never()).updateChapters(any(), any())
     }
@@ -487,7 +493,7 @@ class TranscriptManagerTest {
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_WITH_CHAPTERS
 
-        assertTrue(transcriptManager.loadGeneratedChapters("episode-id"))
+        assertEquals(GeneratedChaptersResult.Unavailable, transcriptManager.loadGeneratedChapters("episode-id"))
 
         assertEquals(0, service.metaRequestCount)
         verify(chapterManager, never()).updateChapters(any(), any())
@@ -500,7 +506,7 @@ class TranscriptManagerTest {
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_WITH_CHAPTERS
 
-        assertTrue(transcriptManager.loadGeneratedChapters("episode-id"))
+        assertEquals(GeneratedChaptersResult.Unavailable, transcriptManager.loadGeneratedChapters("episode-id"))
 
         assertEquals(0, service.metaRequestCount)
     }
@@ -512,7 +518,7 @@ class TranscriptManagerTest {
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_WITH_CHAPTERS
 
-        assertTrue(transcriptManager.loadGeneratedChapters("episode-id"))
+        assertEquals(GeneratedChaptersResult.Loaded, transcriptManager.loadGeneratedChapters("episode-id"))
 
         assertEquals(1, service.metaRequestCount)
     }
@@ -531,22 +537,52 @@ class TranscriptManagerTest {
     }
 
     @Test
-    fun `do not fetch meta without a generated transcript`() = runTest {
+    fun `report no generated chapters right away when the episode has no generated transcript`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-        localTranscriptsFlow.value = listOf(generatedVttTranscript.copy(isGenerated = false))
+        podcastEpisode.hasGeneratedTranscript = false
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
 
-        transcriptManager.loadGeneratedChapters("episode-id")
+        val result = transcriptManager.loadGeneratedChapters("episode-id")
 
+        assertEquals(GeneratedChaptersResult.Unavailable, result)
         assertEquals(0, service.metaRequestCount)
+        assertEquals(0, testScheduler.currentTime)
     }
 
     @Test
-    fun `ignore a failing meta request`() = runTest {
+    fun `fetch meta without waiting for the generated transcript row`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        val result = transcriptManager.loadGeneratedChapters("episode-id")
+
+        assertEquals(GeneratedChaptersResult.Loaded, result)
+        assertTrue(service.metaRequestUrls.single().endsWith("/generated_transcripts/podcast-id/episode-id-meta.json"))
+        assertEquals(0, testScheduler.currentTime)
+    }
+
+    @Test
+    fun `report no generated chapters when the meta is missing`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaErrorCode = 404
+
+        assertEquals(GeneratedChaptersResult.Unavailable, transcriptManager.loadGeneratedChapters("episode-id"))
+    }
+
+    @Test
+    fun `report a failure when the meta request fails with a server error`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaErrorCode = 503
+
+        assertEquals(GeneratedChaptersResult.Failed, transcriptManager.loadGeneratedChapters("episode-id"))
+    }
+
+    @Test
+    fun `report a failure when the meta request fails`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         service.shouldThrow = true
-        localTranscriptsFlow.value = listOf(generatedVttTranscript)
 
-        assertFalse(transcriptManager.loadGeneratedChapters("episode-id"))
+        assertEquals(GeneratedChaptersResult.Failed, transcriptManager.loadGeneratedChapters("episode-id"))
 
         verify(chapterManager, never()).updateChapters(any(), any())
     }
@@ -589,12 +625,18 @@ private class TestTranscriptService : TranscriptService {
     var responseBody: String = "Ok"
     var metaJsonResponse: String? = null
     var metaRequestCount = 0
+    var metaErrorCode: Int? = null
+    val metaRequestUrls = mutableListOf<String>()
 
     override suspend fun getTranscriptOrThrow(url: String, cacheControl: CacheControl?): ResponseBody {
+        val errorCode = metaErrorCode
         return if (shouldThrow) {
             error("Test exception")
+        } else if (url.endsWith("-meta.json") && errorCode != null) {
+            throw HttpException(Response.error<Unit>(errorCode, "".toResponseBody()))
         } else if (url.endsWith("-meta.json") && metaJsonResponse != null) {
             metaRequestCount++
+            metaRequestUrls += url
             metaJsonResponse!!.toResponseBody()
         } else {
             responseBody.toResponseBody()
