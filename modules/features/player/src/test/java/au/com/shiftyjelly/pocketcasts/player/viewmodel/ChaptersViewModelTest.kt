@@ -505,7 +505,57 @@ class ChaptersViewModelTest {
     }
 
     @Test
+    fun `prompt shown reports the loaded prompt before the ui state is collected`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+
+        assertEquals(
+            GeneratedChaptersPromptShownEvent(
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                prompt = GeneratedChaptersPromptType.NoChaptersYet,
+                source = ChaptersShownSource.FullscreenPlayer,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `prompt shown is reported once per episode and prompt`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+        chaptersFlow.value = Chapters(hasHiddenGeneratedChapters = true)
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+
+        assertEquals(GeneratedChaptersPromptType.NoChaptersYet, (eventSink.pollEvent() as GeneratedChaptersPromptShownEvent).prompt)
+        assertEquals(GeneratedChaptersPromptType.GeneratedChaptersOff, (eventSink.pollEvent() as GeneratedChaptersPromptShownEvent).prompt)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `prompt shown is not reported while generating`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+        whenever(transcriptManager.loadGeneratedChapters("id")).doSuspendableAnswer { CompletableDeferred<GeneratedChaptersResult>().await() }
+        val viewModel = createViewModel()
+
+        viewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
     fun `chapters shown is not reported when there are no chapters`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
         whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
         chaptersFlow.value = Chapters()
 
@@ -735,47 +785,6 @@ class ChaptersViewModelTest {
             assertEquals(EmptyState.NoGeneratedChapters, state.emptyState)
             assertTrue(state.showChaptersTab)
         }
-    }
-
-    @Test
-    fun `show the chapters list when generated chapters arrive`() = runTest {
-        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-        chaptersFlow.value = Chapters()
-        showGeneratedChaptersFlow.value = true
-
-        chaptersViewModel.uiState.test {
-            assertEquals(EmptyState.GeneratingChapters, awaitItem().emptyState)
-            assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
-
-            chaptersFlow.value = chapters
-            val state = awaitItem()
-            assertNull(state.emptyState)
-            assertEquals(3, state.chaptersCount)
-        }
-    }
-
-    @Test
-    fun `show the creator chapters list to subscribers`() = runTest {
-        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-
-        chaptersViewModel.uiState.test {
-            val state = awaitItem()
-            assertNull(state.emptyState)
-            assertTrue(state.showChaptersTab)
-        }
-    }
-
-    @Test
-    fun `do not offer generated chapters for user files`() = runTest {
-        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-        chaptersFlow.value = Chapters()
-        episodeFlow.value = UserEpisode(uuid = "id", publishedDate = Date())
-
-        chaptersViewModel.uiState.test {
-            val state = awaitItem()
-            assertNull(state.emptyState)
-            assertFalse(state.showChaptersTab)
-        }
         assertEquals(0, testScheduler.currentTime)
     }
 
@@ -817,6 +826,47 @@ class ChaptersViewModelTest {
             chaptersFlow.value = chapters
             load.complete(GeneratedChaptersResult.Loaded)
             assertNull(expectMostRecentItem().emptyState)
+        }
+    }
+
+    @Test
+    fun `show the chapters list when generated chapters arrive`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+
+        chaptersViewModel.uiState.test {
+            assertEquals(EmptyState.GeneratingChapters, awaitItem().emptyState)
+            assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
+
+            chaptersFlow.value = chapters
+            val state = awaitItem()
+            assertNull(state.emptyState)
+            assertEquals(3, state.chaptersCount)
+        }
+    }
+
+    @Test
+    fun `show the creator chapters list to subscribers`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertNull(state.emptyState)
+            assertTrue(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `do not offer generated chapters for user files`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        episodeFlow.value = UserEpisode(uuid = "id", publishedDate = Date())
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertNull(state.emptyState)
+            assertFalse(state.showChaptersTab)
         }
     }
 

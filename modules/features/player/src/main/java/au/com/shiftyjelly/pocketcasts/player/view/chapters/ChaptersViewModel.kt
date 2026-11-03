@@ -38,6 +38,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -247,6 +248,8 @@ class ChaptersViewModel @AssistedInject constructor(
         viewModelScope.launch { _scrollToChapter.emit(chapter) }
     }
 
+    private val trackedPrompts = ConcurrentHashMap.newKeySet<Pair<String, GeneratedChaptersPromptType>>()
+
     fun trackChaptersShown(source: ChaptersShownSource) {
         viewModelScope.launch(ioDispatcher) {
             val episodeId = when (mode) {
@@ -257,7 +260,8 @@ class ChaptersViewModel @AssistedInject constructor(
             val episode = episodeManager.findEpisodeByUuid(episodeId) ?: return@launch
             val chapters = chapterManager.observerChaptersForEpisode(episodeId).first()
             if (chapters.isEmpty()) {
-                uiState.value.generatedChaptersPrompt?.let { prompt ->
+                val prompt = createUiStateFlow(episodeId).first().generatedChaptersPrompt
+                if (prompt != null && trackedPrompts.add(episodeId to prompt)) {
                     eventHorizon.track(
                         GeneratedChaptersPromptShownEvent(
                             episodeUuid = episodeId,
