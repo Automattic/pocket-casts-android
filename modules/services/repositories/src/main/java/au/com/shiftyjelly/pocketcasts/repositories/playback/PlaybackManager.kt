@@ -2586,9 +2586,7 @@ open class PlaybackManager @Inject constructor(
         }
 
         // a finished episode that was loaded without playing is marked as not played once it starts
-        episodeManager.findEpisodeByUuid(episode.uuid)
-            ?.takeIf { it.isFinished }
-            ?.let { episodeManager.markAsNotPlayedBlocking(it) }
+        resetFinishedEpisodeOnPlay(episode, episodeManager)
 
         // Set before the relay emits playing
         lastPlaybackSource = sourceView
@@ -3182,7 +3180,7 @@ internal enum class CastSessionFailureAction {
  * Only starting playback marks a finished episode as not played. Loading it paused, for example when a sync
  * removes the current Up Next episode and a finished one becomes current, just starts the player from the
  * beginning, so the device doesn't sync a not played status over a completion from another device. If the
- * user then plays it, play() marks it as not played.
+ * user then plays it, [resetFinishedEpisodeOnPlay] marks it as not played.
  */
 internal fun prepareFinishedEpisodeForLoad(
     episode: BaseEpisode,
@@ -3197,6 +3195,24 @@ internal fun prepareFinishedEpisodeForLoad(
     } else {
         episode.playedUpTo = 0.0
     }
+}
+
+/**
+ * Marks a finished episode as not played when playback starts. The database copy is reset, so unarchiving goes by
+ * its current archived state, and [episode], the Up Next copy play() takes the start position from, is moved to the
+ * beginning too. A Cast player loads at the position it is given, so a stale end position would complete it at once.
+ */
+internal suspend fun resetFinishedEpisodeOnPlay(
+    episode: BaseEpisode,
+    episodeManager: EpisodeManager,
+) {
+    val latestEpisode = episodeManager.findEpisodeByUuid(episode.uuid) ?: return
+    if (!latestEpisode.isFinished) {
+        return
+    }
+    episodeManager.markAsNotPlayedBlocking(latestEpisode)
+    episode.playedUpTo = 0.0
+    episode.playingStatus = EpisodePlayingStatus.NOT_PLAYED
 }
 
 internal fun castPlayerSwitchRequired(
