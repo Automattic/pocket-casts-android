@@ -50,7 +50,7 @@ internal fun EpisodeRowArtwork(
 }
 
 @Composable
-internal fun EpisodeRowArtwork(
+fun EpisodeRowArtwork(
     request: ImageRequest,
     alpha: Float,
     elevation: Float,
