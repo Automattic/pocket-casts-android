@@ -183,7 +183,7 @@ internal class RearrangeDragState(
     private fun top(info: LazyListItemInfo) = info.offset - listState.layoutInfo.viewportStartOffset
 }
 
-internal val AccelerateDecelerate = Easing { (cos((it + 1) * PI) / 2 + 0.5).toFloat() }
+val AccelerateDecelerate = Easing { (cos((it + 1) * PI) / 2 + 0.5).toFloat() }
 
 internal fun Modifier.rearrangeDragGestures(state: RearrangeDragState) = pointerInput(state) {
     awaitEachGesture {
