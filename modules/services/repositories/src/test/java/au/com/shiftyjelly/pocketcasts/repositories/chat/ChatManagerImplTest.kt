@@ -335,13 +335,13 @@ class ChatManagerImplTest {
         val response = CompletableDeferred<EpisodeChatStarterQuestionsResponse>()
         whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())) doSuspendableAnswer { response.await() }
 
-        val prefetch = async { manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID) }
-        val open = async { manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID) }
+        val first = async { manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID) }
+        val reopened = async { manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID) }
         testScheduler.runCurrent()
         response.complete(EpisodeChatStarterQuestionsResponse(suggestedQuestions = listOf("Who is the guest?")))
 
-        assertEquals(listOf("Who is the guest?"), prefetch.await())
-        assertEquals(listOf("Who is the guest?"), open.await())
+        assertEquals(listOf("Who is the guest?"), first.await())
+        assertEquals(listOf("Who is the guest?"), reopened.await())
         verify(podcastCacheServiceManager, times(1)).episodeChatStarterQuestions(any(), any())
     }
 
