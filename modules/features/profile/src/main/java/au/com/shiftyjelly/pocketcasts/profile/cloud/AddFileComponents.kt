@@ -135,7 +135,7 @@ internal fun AddFileColourPicker(
     ) {
         val items = listOf<AddFileColour?>(null) + colours
         items.forEachIndexed { index, colour ->
-            val isLocked = colour != null && colour.lockable && isLocked
+            val isColourLocked = colour != null && colour.lockable && isLocked
             val isHidden = colour == null && imageItem == null
             Box(
                 modifier = Modifier
@@ -145,7 +145,7 @@ internal fun AddFileColourPicker(
                     .then(
                         when {
                             isHidden -> Modifier
-                            isLocked -> Modifier.clickable(interactionSource = null, indication = null, onClick = onLockedColourClick)
+                            isColourLocked -> Modifier.clickable(interactionSource = null, indication = null, onClick = onLockedColourClick)
                             else -> Modifier.clickable(interactionSource = null, indication = null) { onColourClick(index) }
                         },
                     ),
@@ -155,7 +155,7 @@ internal fun AddFileColourPicker(
                     if (colour == null && imageItem != null) {
                         BitmapImage(imageItem, crop = true, modifier = Modifier.fillMaxSize())
                     }
-                    if (isLocked) {
+                    if (isColourLocked) {
                         DrawableImage(IR.drawable.ic_locked, contentDescription = null, tint = MaterialTheme.theme.colors.contrast01, modifier = Modifier.fillMaxSize())
                     }
                     if (index == selectedIndex) {
@@ -229,7 +229,7 @@ internal fun AddFileUpgradeCallout(onClick: () -> Unit, onCloseClick: () -> Unit
                 .align(Alignment.TopEnd)
                 .layout { measurable, constraints ->
                     val logoWidth = with(density) { 232.dp.roundToPx() }
-                    val width = constraints.maxWidth - (constraints.maxWidth - logoWidth + 1) / 2 - logoWidth - with(density) { 8.dp.roundToPx() }
+                    val width = (constraints.maxWidth - (constraints.maxWidth - logoWidth + 1) / 2 - logoWidth - with(density) { 8.dp.roundToPx() }).coerceAtLeast(0)
                     val height = with(density) { 1.dp.roundToPx() + 16.dp.roundToPx() + 32.dp.roundToPx() + 16.dp.roundToPx() - 8.dp.roundToPx() }
                     val placeable = measurable.measure(constraints.copy(minWidth = width, maxWidth = width, minHeight = height, maxHeight = height))
                     layout(width, height) { placeable.place(0, 0) }
