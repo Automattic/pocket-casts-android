@@ -171,6 +171,7 @@ class FingerprintTimingManager @Inject constructor(
 
     @Volatile
     private var currentEpisodeUuid: String? = null
+    private var preparingEpisodeUuid: String? = null
     private var currentAudioFilePath: String? = null
     private var currentSharedCacheKey: String? = null
     private var currentDurationSec: Double = 0.0
@@ -238,8 +239,9 @@ class FingerprintTimingManager @Inject constructor(
         Timber.d("FingerprintTimingManager: skipping playback preparation for $episodeUuid")
         scope.launch {
             mutex.withLock {
-                val isOtherEpisode = currentEpisodeUuid != null && currentEpisodeUuid != episodeUuid
-                val isPlaybackOnly = currentEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.PLAYBACK
+                val ownerEpisodeUuid = currentEpisodeUuid ?: preparingEpisodeUuid
+                val isOtherEpisode = ownerEpisodeUuid != null && ownerEpisodeUuid != episodeUuid
+                val isPlaybackOnly = ownerEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.PLAYBACK
                 if (isOtherEpisode || isPlaybackOnly) {
                     resetToIdle()
                 }
@@ -275,7 +277,7 @@ class FingerprintTimingManager @Inject constructor(
                 // retry when the user opens the transcript or a chat quote, since the failure could be transient.
                 val retryableFailure = canRetryFailedPreparation(trigger) && state is State.Failed
                 if (currentEpisodeUuid == episodeUuid && state !is State.Idle && !retryableFailure) {
-                    if (trigger == PrepareTrigger.TRANSCRIPT_VIEW) {
+                    if (trigger != PrepareTrigger.PLAYBACK) {
                         currentTrigger = trigger
                     }
                     return@launch
@@ -285,6 +287,8 @@ class FingerprintTimingManager @Inject constructor(
                 resetState()
                 generation++
                 gen = generation
+                preparingEpisodeUuid = episodeUuid
+                currentTrigger = trigger
             }
             // Abort if a newer stop()/prepare() has started since we acquired the lock.
             if (gen != generation) return@launch
@@ -752,6 +756,7 @@ class FingerprintTimingManager @Inject constructor(
         catchUpJob?.cancel()
         catchUpJob = null
         currentEpisodeUuid = null
+        preparingEpisodeUuid = null
         currentAudioFilePath = null
         currentSharedCacheKey = null
         currentDurationSec = 0.0

@@ -193,6 +193,21 @@ class FingerprintTimingManagerPlaybackTest {
         assertTrue(manager.state is FingerprintTimingManager.State.Unavailable)
     }
 
+    @Test
+    fun `hiding generated chapters mid-episode keeps the chat quote preparation`() {
+        val manager = createManager(GeneratedChaptersFixture())
+        play(generatedChapters)
+        awaitState(manager) { it is FingerprintTimingManager.State.Unavailable }
+        manager.onChatQuoteShown(episode.uuid)
+        Thread.sleep(NO_FETCH_WAIT_MS)
+
+        fixture.showGeneratedChaptersFlow.value = false
+        play(generatedChapters)
+        Thread.sleep(NO_FETCH_WAIT_MS)
+
+        assertTrue(manager.state is FingerprintTimingManager.State.Unavailable)
+    }
+
     private fun createManager(fixture: GeneratedChaptersFixture): FingerprintTimingManager {
         this.fixture = fixture
         val playbackManager = mock<PlaybackManager> {
