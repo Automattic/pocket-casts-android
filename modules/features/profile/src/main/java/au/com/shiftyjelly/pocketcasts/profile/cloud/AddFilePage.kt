@@ -42,15 +42,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.widget.doAfterTextChanged
-import au.com.shiftyjelly.pocketcasts.compose.bars.AppCompatTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.profile.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal data class AddFilePageState(
@@ -92,14 +91,13 @@ internal fun AddFilePage(
             .background(colors.primaryUi01)
             .windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.displayCutout).only(WindowInsetsSides.Horizontal)),
     ) {
-        AppCompatTopAppBar(
+        ThemedTopAppBar(
             title = state.titleRes?.let { stringResource(it) }.orEmpty(),
-            navigationButton = NavigationButton.Drawable(IR.drawable.ic_arrow_back, LR.string.back),
+            navigationButton = NavigationButton.Back,
             onNavigationClick = onNavigationClick,
             iconColor = colors.secondaryIcon01,
-            titleColor = colors.secondaryText01,
+            textColor = colors.secondaryText01,
             backgroundColor = colors.secondaryUi01,
-            bottomShadow = false,
             modifier = toolbarModifier,
             actions = {
                 if (state.titleRes != null) {
