@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.shownotes
 
+import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
@@ -9,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ImageUrlUpdate
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheService
+import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.RawChaptersResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesChapter
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesEpisode
@@ -16,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesPodcast
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesTranscript
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import java.time.Clock
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -29,6 +32,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
+import retrofit2.Response
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ShowNotesProcessTest {
@@ -39,12 +43,19 @@ class ShowNotesProcessTest {
     private val chapterManager = mock<ChapterManager>()
     private val transcriptDao = mock<TranscriptDao>()
     private val service = mock<PodcastCacheService>()
+    private val cacheServiceManager = mock<PodcastCacheServiceManager>()
+    private val episodeDao = mock<EpisodeDao>()
 
     private val processor = ShowNotesProcessor(
         episodeManager = episodeManager,
         chapterManager = chapterManager,
         transcriptDao = transcriptDao,
         service = service,
+        generatedTranscriptFlagRefresher = GeneratedTranscriptFlagRefresher(
+            cacheServiceManager = cacheServiceManager,
+            episodeDao = episodeDao,
+            clock = Clock.systemUTC(),
+        ),
         showNotesBaseUrl = "https://test.com".toHttpUrl(),
     )
 
@@ -530,6 +541,41 @@ class ShowNotesProcessTest {
             ),
         )
         verify(transcriptDao).replaceAll(expected1)
+    }
+
+    @Test
+    fun `add generated transcript after refreshing a stale flag`() = runTest(coroutineRule.testDispatcher) {
+        val showNotes = ShowNotesResponse(
+            podcast = ShowNotesPodcast(
+                uuid = "podcast-id",
+                episodes = listOf(ShowNotesEpisode(uuid = "episode-id")),
+            ),
+        )
+        val episode = PodcastEpisode(
+            uuid = "episode-id",
+            podcastUuid = "podcast-id",
+            hasGeneratedTranscript = false,
+            publishedDate = Date(),
+        )
+        whenever { episodeManager.findEpisodeByUuid("episode-id") } doReturn episode
+        whenever { cacheServiceManager.getPodcastResponse("podcast-id") } doReturn Response.success(null)
+        whenever { episodeDao.findByUuid("episode-id") } doReturn episode.copy(hasGeneratedTranscript = true)
+
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id",
+            showNotes = showNotes,
+        )
+
+        val expected = listOf(
+            Transcript(
+                episodeUuid = "episode-id",
+                url = "https://test.com/generated_transcripts/podcast-id/episode-id.vtt",
+                type = "text/vtt",
+                isGenerated = true,
+            ),
+        )
+        verify(transcriptDao).replaceAll(expected)
     }
 
     @Test

@@ -25,6 +25,7 @@ class ShowNotesProcessor @AssistedInject constructor(
     private val chapterManager: ChapterManager,
     private val transcriptDao: TranscriptDao,
     private val service: PodcastCacheService,
+    private val generatedTranscriptFlagRefresher: GeneratedTranscriptFlagRefresher,
     @Assisted private val showNotesBaseUrl: HttpUrl,
 ) {
     @AssistedFactory
@@ -106,7 +107,7 @@ class ShowNotesProcessor @AssistedInject constructor(
         val transcripts = showNotes.findTranscripts(
             podcastUuid = podcastUuid,
             episodeUuid = episodeUuid,
-            hasGeneratedTranscript = episode?.hasGeneratedTranscript == true,
+            hasGeneratedTranscript = episode != null && generatedTranscriptFlagRefresher.hasGeneratedTranscript(episode),
             showNotesBaseUrl = showNotesBaseUrl,
         )
         if (transcripts != null) {
