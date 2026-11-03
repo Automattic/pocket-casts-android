@@ -2,6 +2,11 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.servers.di.NoCache
+import au.com.shiftyjelly.pocketcasts.utils.Network
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
+import com.automattic.eventhorizon.GeneratedChaptersFileDownloadedEvent
+import com.automattic.eventhorizon.GeneratedChaptersFileType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -30,9 +35,10 @@ import timber.log.Timber
 class FingerprintReferenceRetriever @Inject constructor(
     @NoCache private val okHttpClient: OkHttpClient,
     @ApplicationContext private val context: Context,
+    private val eventHorizon: EventHorizon,
 ) {
     sealed interface FetchResult {
-        class Success(val data: ByteArray) : FetchResult
+        class Success(val data: ByteArray, val bytesReceived: Long = data.size.toLong()) : FetchResult
         data object NotFound : FetchResult
         data object Error : FetchResult
     }
@@ -47,6 +53,7 @@ class FingerprintReferenceRetriever @Inject constructor(
         baseUrl: String,
         podcastUuid: String,
         episodeUuid: String,
+        trigger: GeneratedChaptersDownloadTriggerType,
     ): FetchResult {
         val key = "$podcastUuid/$episodeUuid"
 
@@ -58,6 +65,7 @@ class FingerprintReferenceRetriever @Inject constructor(
                 fetchScope.async {
                     try {
                         performFetch(baseUrl, podcastUuid, episodeUuid)
+                            .also { trackDownload(it, podcastUuid, episodeUuid, trigger) }
                     } finally {
                         withContext(NonCancellable) { requestMutex.withLock { inFlightRequests.remove(key) } }
                     }
@@ -105,7 +113,8 @@ class FingerprintReferenceRetriever @Inject constructor(
                     val jsonData = decompressGzipIfNeeded(body)
 
                     Timber.d("FingerprintReferenceRetriever: reference fetched for $episodeUuid (${jsonData.size} bytes)")
-                    return@withContext FetchResult.Success(jsonData)
+                    val bytesReceived = response.networkResponse?.header("Content-Length")?.toLongOrNull() ?: body.size.toLong()
+                    return@withContext FetchResult.Success(jsonData, bytesReceived)
                 }
             } catch (e: CancellationException) {
                 throw e
@@ -117,6 +126,25 @@ class FingerprintReferenceRetriever @Inject constructor(
 
         Timber.w("FingerprintReferenceRetriever: exhausted retries for $episodeUuid")
         FetchResult.Error
+    }
+
+    private fun trackDownload(
+        result: FetchResult,
+        podcastUuid: String,
+        episodeUuid: String,
+        trigger: GeneratedChaptersDownloadTriggerType,
+    ) {
+        eventHorizon.track(
+            GeneratedChaptersFileDownloadedEvent(
+                file = GeneratedChaptersFileType.Fingerprints,
+                bytes = (result as? FetchResult.Success)?.bytesReceived ?: 0L,
+                isMetered = Network.isActiveNetworkMetered(context),
+                trigger = trigger,
+                success = result is FetchResult.Success,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+            ),
+        )
     }
 
     suspend fun saveReferenceData(data: ByteArray, audioFilePath: String) = withContext(Dispatchers.IO) {

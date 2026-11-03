@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
 import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -108,7 +109,7 @@ class GeneratedChapterSeeker @Inject constructor(
             _resolvingChapter.value = resolving
         }
         try {
-            return when (val result = manager.resolvePlaybackTime(episode, referenceTime)) {
+            return when (val result = manager.resolvePlaybackTime(episode, referenceTime, GeneratedChaptersDownloadTriggerType.ChapterTap)) {
                 is ChapterSeekResult.Resolved -> {
                     val playbackTime = ceil(result.playbackTime.toDouble(DurationUnit.SECONDS)).seconds
                     mutex.withLock {
