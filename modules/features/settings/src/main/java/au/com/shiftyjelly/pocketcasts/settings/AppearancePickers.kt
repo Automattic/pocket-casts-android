@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.settings
 import android.graphics.drawable.GradientDrawable
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +33,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Constraints
@@ -38,7 +41,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.res.use
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import kotlin.math.min
@@ -132,14 +134,14 @@ private fun AppearanceCell(
                     .shadow(4.dp, RoundedCornerShape(8.dp))
                     .background(cardBackground),
             ) {
-                DrawableImage(
-                    drawableId = option.imageResId,
+                Image(
+                    painter = painterResource(option.imageResId),
                     contentDescription = option.imageContentDescription,
                     modifier = Modifier.fillMaxSize(),
                 )
                 if (option.badgeResId != null) {
-                    DrawableImage(
-                        drawableId = option.badgeResId,
+                    Image(
+                        painter = painterResource(option.badgeResId),
                         contentDescription = stringResource(if (option.isSelected) LR.string.on else LR.string.off),
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
@@ -149,8 +151,8 @@ private fun AppearanceCell(
                 }
             }
             if (option.isLocked) {
-                DrawableImage(
-                    drawableId = IR.drawable.ic_locked,
+                Icon(
+                    painter = painterResource(IR.drawable.ic_locked),
                     contentDescription = stringResource(LR.string.settings_lock_image),
                     tint = colors.primaryText02,
                     modifier = Modifier.size(16.dp),

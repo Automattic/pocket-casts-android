@@ -9,6 +9,7 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.Shader
 import android.graphics.drawable.Drawable
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
@@ -35,6 +37,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +50,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.res.use
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.cartheme.R as CR
@@ -119,15 +121,15 @@ private fun AccountHeader(onCloseClick: () -> Unit) {
                 .size(48.dp)
                 .clickable(interactionSource = null, indication = ripple(bounded = false), role = Role.Button, onClick = onCloseClick),
         ) {
-            DrawableImage(
-                drawableId = IR.drawable.ic_cancel,
+            Icon(
+                painter = painterResource(IR.drawable.ic_cancel),
                 contentDescription = stringResource(LR.string.cancel),
                 tint = MaterialTheme.theme.colors.primaryIcon01,
             )
         }
         if (logo != 0) {
-            DrawableImage(
-                drawableId = logo,
+            Image(
+                painter = painterResource(logo),
                 contentDescription = null,
                 modifier = Modifier
                     .align(FloorCenter)

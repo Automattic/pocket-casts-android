@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.Icon
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +36,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -46,7 +48,6 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
@@ -223,8 +224,8 @@ private fun EffectSection(
 
 @Composable
 private fun EffectIcon(@DrawableRes iconId: Int, tint: Color) {
-    DrawableImage(
-        drawableId = iconId,
+    Icon(
+        painter = painterResource(iconId),
         contentDescription = null,
         tint = tint,
         modifier = Modifier
@@ -242,7 +243,7 @@ private fun IconButton(@DrawableRes iconId: Int, contentDescription: String, tin
             .clickable(interactionSource = null, indication = ripple(bounded = false), role = Role.Button, onClick = onClick)
             .semantics { this.contentDescription = contentDescription },
     ) {
-        DrawableImage(drawableId = iconId, contentDescription = null, tint = tint)
+        Icon(painter = painterResource(iconId), contentDescription = null, tint = tint)
     }
 }
 

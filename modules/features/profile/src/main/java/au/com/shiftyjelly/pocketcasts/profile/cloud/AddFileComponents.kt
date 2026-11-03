@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -53,7 +54,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
 import androidx.core.graphics.withMatrix
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -102,7 +102,7 @@ internal fun AddFileImageButton(text: String, isLockVisible: Boolean, onClick: (
                 )
             }
             if (isLockVisible) {
-                DrawableImage(R.drawable.ic_locked_small, contentDescription = stringResource(LR.string.profile_file_locked))
+                Image(painter = painterResource(R.drawable.ic_locked_small), contentDescription = stringResource(LR.string.profile_file_locked))
             }
         },
     ) { measurables, constraints ->
@@ -156,7 +156,7 @@ internal fun AddFileColourPicker(
                         BitmapImage(imageItem, crop = true, modifier = Modifier.fillMaxSize())
                     }
                     if (isColourLocked) {
-                        DrawableImage(IR.drawable.ic_locked, contentDescription = null, tint = MaterialTheme.theme.colors.contrast01, modifier = Modifier.fillMaxSize())
+                        Icon(painter = painterResource(IR.drawable.ic_locked), contentDescription = null, tint = MaterialTheme.theme.colors.contrast01, modifier = Modifier.fillMaxSize())
                     }
                     if (index == selectedIndex) {
                         Box(
@@ -215,8 +215,8 @@ internal fun AddFileUpgradeCallout(onClick: () -> Unit, onCloseClick: () -> Unit
                     .fillMaxWidth(),
             )
         }
-        DrawableImage(
-            drawableId = IR.drawable.ic_close,
+        Icon(
+            painter = painterResource(IR.drawable.ic_close),
             contentDescription = null,
             tint = colors.primaryText02,
             modifier = Modifier
@@ -273,10 +273,10 @@ internal fun AddFileImage(
 ) {
     val description = stringResource(LR.string.profile_file)
     Box(contentAlignment = TextViewAlignment.Center, modifier = modifier.size(160.dp)) {
-        DrawableImage(
-            drawableId = IR.drawable.ic_uploadedfile,
+        Icon(
+            painter = painterResource(IR.drawable.ic_uploadedfile),
             contentDescription = description,
-            tint = fileTint?.let(::Color),
+            tint = fileTint?.let(::Color) ?: Color.Unspecified,
             modifier = Modifier
                 .size(160.dp)
                 .then(if (onImageClick != null) Modifier.clickable(interactionSource = null, indication = null, onClick = onImageClick) else Modifier),
@@ -285,7 +285,7 @@ internal fun AddFileImage(
             if (artwork != null) {
                 BitmapImage(artwork, crop = false, modifier = Modifier.size(160.dp).semantics { contentDescription = description })
             } else {
-                DrawableImage(IR.drawable.defaultartwork, contentDescription = description, modifier = Modifier.size(160.dp))
+                Image(painter = painterResource(IR.drawable.defaultartwork), contentDescription = description, modifier = Modifier.size(160.dp))
             }
         }
         if (isLoading) {
