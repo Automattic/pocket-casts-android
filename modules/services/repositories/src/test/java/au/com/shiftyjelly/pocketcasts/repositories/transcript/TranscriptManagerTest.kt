@@ -20,13 +20,18 @@ import com.squareup.moshi.Moshi
 import java.util.Date
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import okhttp3.CacheControl
 import okhttp3.ResponseBody
@@ -62,6 +67,7 @@ class TranscriptManagerTest {
         on { observerChaptersForEpisode(any()) } doReturn flowOf(Chapters(emptyList()))
     }.also { runBlocking { whenever(it.hasChapters(any())).thenReturn(false) } }
     private val generatedChapters = GeneratedChaptersFixture()
+    private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val vttDbTranscript = createDbTranscript("text/vtt")
     private val srtDbTranscript = createDbTranscript("application/srt")
@@ -86,6 +92,7 @@ class TranscriptManagerTest {
             on { findByUuid(any()) } doAnswer { podcastEpisode }
         },
         chapterManager = chapterManager,
+        applicationScope = applicationScope,
         generatedChaptersAvailability = generatedChapters.availability,
         moshi = Moshi.Builder().build(),
         parsers = parsers,
@@ -452,6 +459,7 @@ class TranscriptManagerTest {
                 on { findByUuid(any()) } doReturn podcastEpisode
             },
             chapterManager = chapterManagerWithExisting,
+            applicationScope = applicationScope,
             generatedChaptersAvailability = generatedChapters.availability,
             moshi = Moshi.Builder().build(),
             parsers = parsers,
@@ -588,6 +596,49 @@ class TranscriptManagerTest {
     }
 
     @Test
+    fun `share one meta request between concurrent loads of the same episode`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+        service.metaGate = CompletableDeferred()
+
+        val loads = List(3) { async { transcriptManager.loadGeneratedChapters("episode-id") } }
+        runCurrent()
+        service.metaGate?.complete(Unit)
+
+        assertEquals(List(3) { GeneratedChaptersResult.Loaded }, loads.awaitAll())
+        assertEquals(1, service.metaRequestCount)
+    }
+
+    @Test
+    fun `fetch meta again after a failed load`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaErrorCode = 503
+
+        assertEquals(GeneratedChaptersResult.Failed, transcriptManager.loadGeneratedChapters("episode-id"))
+        service.metaErrorCode = null
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        assertEquals(GeneratedChaptersResult.Loaded, transcriptManager.loadGeneratedChapters("episode-id"))
+        assertEquals(1, service.metaRequestCount)
+    }
+
+    @Test
+    fun `keep a shared meta request running when one caller is cancelled`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+        service.metaGate = CompletableDeferred()
+
+        val cancelled = async { transcriptManager.loadGeneratedChapters("episode-id") }
+        val kept = async { transcriptManager.loadGeneratedChapters("episode-id") }
+        runCurrent()
+        cancelled.cancel()
+        service.metaGate?.complete(Unit)
+
+        assertEquals(GeneratedChaptersResult.Loaded, kept.await())
+        assertEquals(1, service.metaRequestCount)
+    }
+
+    @Test
     fun `skip chapters with missing title`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
@@ -626,9 +677,11 @@ private class TestTranscriptService : TranscriptService {
     var metaJsonResponse: String? = null
     var metaRequestCount = 0
     var metaErrorCode: Int? = null
+    var metaGate: CompletableDeferred<Unit>? = null
     val metaRequestUrls = mutableListOf<String>()
 
     override suspend fun getTranscriptOrThrow(url: String, cacheControl: CacheControl?): ResponseBody {
+        if (url.endsWith("-meta.json")) metaGate?.await()
         val errorCode = metaErrorCode
         return if (shouldThrow) {
             error("Test exception")

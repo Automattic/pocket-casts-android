@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
 import androidx.collection.LruCache
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
@@ -20,7 +21,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
@@ -41,6 +46,7 @@ class TranscriptManagerImpl @Inject constructor(
     private val transcriptService: TranscriptService,
     private val episodeManager: EpisodeManager,
     private val chapterManager: ChapterManager,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     private val generatedChaptersAvailability: GeneratedChaptersAvailability,
     private val moshi: Moshi,
     private val parsers: Map<TranscriptType, @JvmSuppressWildcards TranscriptParser>,
@@ -49,6 +55,7 @@ class TranscriptManagerImpl @Inject constructor(
     private val lruCache = LruCache<String, Transcript>(maxSize = 20)
     private val generatedLruCache = LruCache<String, Transcript.Text>(maxSize = 5)
     private val metaAdapter = moshi.adapter(EpisodeMetaResponse::class.java)
+    private val generatedChaptersLoads = ConcurrentHashMap<String, Deferred<GeneratedChaptersResult>>()
 
     override fun observeIsTranscriptAvailable(episodeUuid: String): Flow<Boolean> {
         return transcriptDao.observeTranscripts(episodeUuid).map { it.isNotEmpty() }
@@ -164,6 +171,16 @@ class TranscriptManagerImpl @Inject constructor(
     override suspend fun loadGeneratedChapters(episodeUuid: String): GeneratedChaptersResult {
         if (!generatedChaptersAvailability.isAllowed()) return GeneratedChaptersResult.Unavailable
 
+        val load = generatedChaptersLoads.computeIfAbsent(episodeUuid) {
+            applicationScope.async(start = CoroutineStart.LAZY) { fetchGeneratedChapters(episodeUuid) }.also { load ->
+                load.invokeOnCompletion { generatedChaptersLoads.remove(episodeUuid, load) }
+            }
+        }
+        load.start()
+        return load.await()
+    }
+
+    private suspend fun fetchGeneratedChapters(episodeUuid: String): GeneratedChaptersResult {
         return try {
             if (chapterManager.hasChapters(episodeUuid)) return GeneratedChaptersResult.Loaded
 
