@@ -72,28 +72,24 @@ fun ChaptersPage(
         targetState = emptyState,
         transitionSpec = { chaptersContentTransform(density) },
         label = "chaptersContent",
+        modifier = modifier.background(LocalChaptersTheme.current.background),
     ) { state ->
         when (state) {
             ChaptersViewModel.EmptyState.GeneratedChaptersOff -> ChaptersOffState(
                 onTurnOnClick = onTurnOnGeneratedClick,
-                modifier = modifier,
             )
 
             ChaptersViewModel.EmptyState.NoChaptersYet -> ChaptersNoChaptersYet(
                 onGenerateClick = onGenerateClick,
-                modifier = modifier,
             )
 
             ChaptersViewModel.EmptyState.GeneratingChapters -> ChaptersGenerating(
                 episodeUuid = episodeUuid,
                 onTurnOffGeneratedClick = onTurnOffGeneratedClick,
-                modifier = modifier,
                 skeletonModifier = Modifier.animateEnterExit(enter = stateRise(density), exit = ExitTransition.None),
             )
 
-            ChaptersViewModel.EmptyState.NoGeneratedChapters -> ChaptersNoGeneratedChapters(
-                modifier = modifier,
-            )
+            ChaptersViewModel.EmptyState.NoGeneratedChapters -> ChaptersNoGeneratedChapters()
 
             null -> ChaptersList(
                 lazyListState = lazyListState,
@@ -110,7 +106,6 @@ fun ChaptersPage(
                 showSubscriptionIcon = showSubscriptionIcon,
                 resolvingChapterIndex = resolvingChapterIndex,
                 reveal = reveal,
-                modifier = modifier,
             )
         }
     }
