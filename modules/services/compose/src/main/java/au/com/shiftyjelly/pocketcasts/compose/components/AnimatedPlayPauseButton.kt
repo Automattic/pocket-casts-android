@@ -116,6 +116,7 @@ fun AnimatedPlayButton(
     iconTint: Color,
     modifier: Modifier = Modifier,
     circleColor: Color = Color.White,
+    animate: Boolean = true,
 ) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(UR.raw.large_play_button))
     val lottieAnimatable = rememberLottieAnimatable()
@@ -151,7 +152,7 @@ fun AnimatedPlayButton(
         val loadedComposition = composition ?: return@LaunchedEffect
         val previousIsPlaying = displayedIsPlaying
         displayedIsPlaying = isPlaying
-        if (previousIsPlaying == null || previousIsPlaying == isPlaying) {
+        if (!animate || previousIsPlaying == null || previousIsPlaying == isPlaying) {
             val frame = if (isPlaying) PLAY_BUTTON_FRAME_PLAYING else PLAY_BUTTON_FRAME_PAUSED
             lottieAnimatable.snapTo(loadedComposition, progress = loadedComposition.getProgressForFrame(frame.toFloat()))
         } else {

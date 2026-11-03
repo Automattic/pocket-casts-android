@@ -10,33 +10,40 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.core.view.doOnLayout
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.profile.databinding.BottomSheetCloudFileBinding
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
-import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
 import com.automattic.eventhorizon.EventHorizon
@@ -48,16 +55,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.profile.R as PR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
+class CloudFileBottomSheetFragment :
+    BottomSheetDialogFragment(),
+    CloudFileListener {
     companion object {
         private const val NEW_INSTANCE_ARG = "CloudFileBottomSheetArg"
 
@@ -94,8 +100,6 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
     private var pocketCastsImageRequestFactory: PocketCastsImageRequestFactory? = null
     private val viewModel: CloudBottomSheetViewModel by viewModels()
-    private var binding: BottomSheetCloudFileBinding? = null
-    private var rowDataJob: Job? = null
 
     private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARG)
 
@@ -118,21 +122,35 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
         return BottomSheetDialog(context, UR.style.BottomSheetDialogThemeDark)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = BottomSheetCloudFileBinding.inflate(inflater, container, false)
-        return binding?.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        viewModel.setup(args.episodeId)
+        return contentWithoutConsumedInsets {
+            val state by remember { viewModel.state.asFlow() }.collectAsStateWithLifecycle(null)
+            val signInState by remember { viewModel.signInState.asFlow() }.collectAsStateWithLifecycle(null)
+            val currentState = state ?: return@contentWithoutConsumedInsets
+            val episode = currentState.episode
+            val rowData by remember(episode.uuid) { rowDataProvider.userEpisodeRowDataFlow(episode.uuid) }.collectAsStateWithLifecycle(null)
+            val artwork = remember(episode) { pocketCastsImageRequestFactory?.create(episode, useEpisodeArtwork = false) } ?: return@contentWithoutConsumedInsets
+            AppTheme(if (args.forceDark) Theme.ThemeType.DARK else theme.activeTheme) {
+                CloudFilePage(
+                    state = currentState,
+                    rowData = rowData,
+                    artwork = artwork,
+                    cloudRowVisibility = when (val signIn = signInState) {
+                        null -> CloudRowVisibility.Unknown
+                        is SignInState.SignedIn -> if (signIn.subscription != null) CloudRowVisibility.Cloud else CloudRowVisibility.Locked
+                        else -> CloudRowVisibility.Locked
+                    },
+                    listener = this,
+                    modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.displayCutout).only(WindowInsetsSides.Bottom)),
+                )
+            }
+        }
     }
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         eventHorizon.track(UserFileDetailDismissedEvent)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        rowDataJob?.cancel()
-        rowDataJob = null
-        binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -146,227 +164,103 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
             behavior.peekHeight = 0
             behavior.skipCollapsed = true
         }
+    }
 
-        binding?.root?.setSystemWindowInsetToPadding(bottom = true)
+    override fun onPlayClick(episode: UserEpisode) {
+        viewModel.playNow(episode, false)
+        dialog?.dismiss()
+    }
 
-        viewModel.setup(args.episodeId)
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            Observer { state ->
-                val binding = binding ?: return@Observer
+    override fun onPauseClick() {
+        viewModel.pause()
+    }
 
-                val episode = state.episode
-                val inUpNext = state.inUpNext
-                val isPlaying = state.isPlaying
-
-                binding.lblTitle.text = episode.title
-                val btnPlay = binding.btnPlay
-                val tintColor = view.context.getThemeColor(UR.attr.primary_icon_01)
-                btnPlay.setCircleTintColor(tintColor)
-                btnPlay.setPlaying(isPlaying, false)
-                btnPlay.setOnPlayClicked {
-                    if (!isPlaying) {
-                        viewModel.playNow(episode, false)
-                        dialog?.dismiss()
-                    } else {
-                        viewModel.pause()
-                        btnPlay.setPlaying(false, animate = true)
-                    }
-                }
-
-                val imgIconUpNext = binding.imgIconUpNext
-                val lblUpNext = binding.lblUpNext
-                val layoutUpNext = binding.layoutUpNext
-                if (inUpNext) {
-                    imgIconUpNext.setImageResource(IR.drawable.ic_upnext_remove)
-                    lblUpNext.setText(LR.string.profile_cloud_remove_from_up_next)
-                    layoutUpNext.setOnClickListener {
-                        viewModel.removeFromUpNext(episode)
-                        dialog?.dismiss()
-                    }
-                } else {
-                    imgIconUpNext.setImageResource(IR.drawable.ic_upnext_playnext)
-                    lblUpNext.setText(LR.string.profile_cloud_add_to_up_next)
-                    layoutUpNext.setOnClickListener {
-                        val upNextDialog = OptionsDialog()
-                            .setIconColor(ThemeColor.primaryIcon01(theme.activeTheme))
-                            .addCheckedOption(
-                                LR.string.play_next,
-                                imageId = IR.drawable.ic_upnext_playnext,
-                                click = {
-                                    viewModel.playNext(episode)
-                                },
-                            )
-                            .addCheckedOption(
-                                LR.string.play_last,
-                                imageId = IR.drawable.ic_upnext_playlast,
-                                click = {
-                                    viewModel.playLast(episode)
-                                },
-                            )
-                        activity?.supportFragmentManager?.let {
-                            upNextDialog.show(it, "upnext")
-                        }
-
-                        dialog?.dismiss()
-                    }
-                }
-
-                val imgIconPlayed = binding.imgIconPlayed
-                val lblPlayed = binding.lblPlayed
-                val layoutPlayed = binding.layoutPlayed
-                if (episode.isFinished) {
-                    imgIconPlayed.setImageResource(IR.drawable.ic_markasunplayed)
-                    lblPlayed.setText(LR.string.mark_as_unplayed)
-                    layoutPlayed.setOnClickListener {
-                        viewModel.markAsUnplayed(episode)
-                        dialog?.dismiss()
-                    }
-                } else {
-                    imgIconPlayed.setImageResource(IR.drawable.ic_markasplayed)
-                    lblPlayed.setText(LR.string.mark_as_played)
-                    layoutPlayed.setOnClickListener {
-                        viewModel.markAsPlayed(episode)
-                        dialog?.dismiss()
-                    }
-                }
-
-                val layoutBookmark = binding.layoutBookmark
-                layoutBookmark.setOnClickListener {
-                    dialog?.dismiss()
-                    viewModel.trackOptionTapped(UploadedFileDetailModalOptionType.Bookmarks)
-                    BookmarksContainerFragment.newInstance(
-                        episodeUuid = args.episodeId,
-                        sourceView = SourceView.FILES,
-                    ).show(parentFragmentManager, "bookmarks_container")
-                }
-
-                val errorLayout = binding.errorLayout
-                val lblError = binding.lblError
-                val lblErrorDetail = binding.lblErrorDetail
-                if (episode.downloadErrorDetails != null) {
-                    errorLayout.visibility = View.VISIBLE
-                    lblError.setText(LR.string.profile_cloud_download_failed)
-                    lblErrorDetail.text = episode.downloadErrorDetails
-                } else if (episode.uploadErrorDetails != null) {
-                    errorLayout.visibility = View.VISIBLE
-                    lblError.setText(LR.string.profile_cloud_upload_failed)
-                    lblErrorDetail.text = episode.uploadErrorDetails
-                } else if (episode.playErrorDetails != null) {
-                    errorLayout.visibility = View.VISIBLE
-                    lblError.setText(LR.string.profile_cloud_playback_failed)
-                    lblErrorDetail.text = episode.playErrorDetails
-                } else {
-                    errorLayout.visibility = View.GONE
-                }
-                binding.fileStatusIconsView.setup(
-                    episode = episode,
-                    tintColor = tintColor,
-                    hideErrorDetails = true,
+    override fun onUpNextClick(episode: UserEpisode, inUpNext: Boolean) {
+        if (inUpNext) {
+            viewModel.removeFromUpNext(episode)
+        } else {
+            val upNextDialog = OptionsDialog()
+                .setIconColor(ThemeColor.primaryIcon01(theme.activeTheme))
+                .addCheckedOption(
+                    LR.string.play_next,
+                    imageId = IR.drawable.ic_upnext_playnext,
+                    click = {
+                        viewModel.playNext(episode)
+                    },
                 )
+                .addCheckedOption(
+                    LR.string.play_last,
+                    imageId = IR.drawable.ic_upnext_playlast,
+                    click = {
+                        viewModel.playLast(episode)
+                    },
+                )
+            activity?.supportFragmentManager?.let {
+                upNextDialog.show(it, "upnext")
+            }
+        }
+        dialog?.dismiss()
+    }
 
-                rowDataJob?.cancel()
-                rowDataJob = viewLifecycleOwner.lifecycleScope.launch {
-                    rowDataProvider.userEpisodeRowDataFlow(episode.uuid).collect { data ->
-                        binding.fileStatusIconsView.update(data)
-                    }
-                }
+    override fun onPlayedClick(episode: UserEpisode) {
+        if (episode.isFinished) {
+            viewModel.markAsUnplayed(episode)
+        } else {
+            viewModel.markAsPlayed(episode)
+        }
+        dialog?.dismiss()
+    }
 
-                binding.lblCloud.text = when (episode.serverStatus) {
-                    UserEpisodeServerStatus.LOCAL -> getString(LR.string.profile_cloud_upload)
+    override fun onBookmarksClick() {
+        dialog?.dismiss()
+        viewModel.trackOptionTapped(UploadedFileDetailModalOptionType.Bookmarks)
+        BookmarksContainerFragment.newInstance(
+            episodeUuid = args.episodeId,
+            sourceView = SourceView.FILES,
+        ).show(parentFragmentManager, "bookmarks_container")
+    }
 
-                    UserEpisodeServerStatus.UPLOADING, UserEpisodeServerStatus.WAITING_FOR_WIFI, UserEpisodeServerStatus.QUEUED -> getString(LR.string.profile_cloud_cancel_upload)
+    override fun onEditClick(episode: UserEpisode) {
+        activity?.let { activity ->
+            viewModel.trackOptionTapped(UploadedFileDetailModalOptionType.Edit)
+            val intent = AddFileActivity.newEditInstance(activity, episode.uuid)
+            activity.startActivity(intent)
 
-                    UserEpisodeServerStatus.UPLOADED -> getString(
-                        if (episode.isDownloaded) {
-                            LR.string.profile_cloud_remove
-                        } else if (episode.isDownloading) {
-                            LR.string.cancel_download
-                        } else {
-                            LR.string.download
-                        },
-                    )
+            dialog?.dismiss()
+        }
+    }
 
-                    UserEpisodeServerStatus.MISSING -> ""
-                }
+    override fun onCloudClick(episode: UserEpisode) {
+        when (episode.serverStatus) {
+            UserEpisodeServerStatus.LOCAL, UserEpisodeServerStatus.MISSING -> upload(episode, Network.isUnmeteredConnection(requireContext()))
 
-                val cloudRes = when (episode.serverStatus) {
-                    UserEpisodeServerStatus.LOCAL, UserEpisodeServerStatus.MISSING -> PR.drawable.ic_upload_file
-                    UserEpisodeServerStatus.UPLOADING, UserEpisodeServerStatus.WAITING_FOR_WIFI, UserEpisodeServerStatus.QUEUED -> IR.drawable.ic_downloading
-                    UserEpisodeServerStatus.UPLOADED -> if (episode.isDownloaded) IR.drawable.ic_remove_from_cloud else IR.drawable.ic_download
-                }
-                binding.imgIconCloud.setImageResource(cloudRes)
+            UserEpisodeServerStatus.UPLOADING, UserEpisodeServerStatus.WAITING_FOR_WIFI, UserEpisodeServerStatus.QUEUED -> viewModel.cancelUpload(episode)
 
-                binding.layoutCloud.setOnClickListener {
-                    when (episode.serverStatus) {
-                        UserEpisodeServerStatus.LOCAL, UserEpisodeServerStatus.MISSING -> upload(episode, Network.isUnmeteredConnection(binding.layoutCloud.context))
+            UserEpisodeServerStatus.UPLOADED -> if (episode.isDownloaded) {
+                viewModel.removeEpisode(episode)
+            } else if (episode.isDownloading) {
+                viewModel.cancelDownload(episode)
+            } else {
+                download(episode, Network.isUnmeteredConnection(requireContext()))
+            }
+        }
 
-                        UserEpisodeServerStatus.UPLOADING, UserEpisodeServerStatus.WAITING_FOR_WIFI, UserEpisodeServerStatus.QUEUED -> viewModel.cancelUpload(episode)
+        dialog?.dismiss()
+    }
 
-                        UserEpisodeServerStatus.UPLOADED -> if (episode.isDownloaded) {
-                            viewModel.removeEpisode(episode)
-                        } else if (episode.isDownloading) {
-                            viewModel.cancelDownload(episode)
-                        } else {
-                            download(episode, Network.isUnmeteredConnection(binding.layoutCloud.context))
-                        }
-                    }
-
-                    dialog?.dismiss()
-                }
-
-                binding.layoutLockedCloud.setOnClickListener {
-                    viewModel.trackOptionTapped(UploadedFileDetailModalOptionType.UploadUpgradeRequired)
-                    OnboardingLauncher.openOnboardingFlow(
-                        requireActivity(),
-                        OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES),
-                    )
-                }
-
-                binding.layoutDelete.setOnClickListener {
-                    val deleteState = viewModel.getDeleteStateOnDeleteClick(episode)
-                    val confirmationDialog = CloudDeleteHelper.getDeleteDialog(episode, deleteState, viewModel::deleteEpisode, resources)
-                    confirmationDialog.show(parentFragmentManager, "delete_confirm")
-                    dialog?.dismiss()
-                }
-
-                binding.layoutEdit.setOnClickListener {
-                    activity?.let { activity ->
-                        viewModel.trackOptionTapped(UploadedFileDetailModalOptionType.Edit)
-                        val intent = AddFileActivity.newEditInstance(activity, episode.uuid)
-                        activity.startActivity(intent)
-
-                        dialog?.dismiss()
-                    }
-                }
-                pocketCastsImageRequestFactory?.create(episode, useEpisodeArtwork = false)?.loadInto(binding.imgFile)
-            },
+    override fun onLockedCloudClick() {
+        viewModel.trackOptionTapped(UploadedFileDetailModalOptionType.UploadUpgradeRequired)
+        OnboardingLauncher.openOnboardingFlow(
+            requireActivity(),
+            OnboardingFlow.Upsell(OnboardingUpgradeSource.FILES),
         )
+    }
 
-        viewModel.signInState.observe(
-            viewLifecycleOwner,
-            Observer { signInState ->
-                val binding = binding ?: return@Observer
-                val layoutCloud = binding.layoutCloud
-                val layoutLockedCloud = binding.layoutLockedCloud
-                when (signInState) {
-                    is SignInState.SignedIn -> {
-                        if (signInState.subscription != null) {
-                            layoutCloud.isVisible = true
-                            layoutLockedCloud.isVisible = false
-                        } else {
-                            layoutCloud.isVisible = false
-                            layoutLockedCloud.isVisible = true
-                        }
-                    }
-
-                    else -> {
-                        layoutCloud.isVisible = false
-                        layoutLockedCloud.isVisible = true
-                    }
-                }
-            },
-        )
+    override fun onDeleteClick(episode: UserEpisode) {
+        val deleteState = viewModel.getDeleteStateOnDeleteClick(episode)
+        val confirmationDialog = CloudDeleteHelper.getDeleteDialog(episode, deleteState, viewModel::deleteEpisode, resources)
+        confirmationDialog.show(parentFragmentManager, "delete_confirm")
+        dialog?.dismiss()
     }
 
     override fun onAttach(context: Context) {
