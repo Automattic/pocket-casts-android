@@ -210,7 +210,7 @@ class ChatFragment : BaseDialogFragment() {
                     onClickPlayPause = viewModel::onPlayPauseClick,
                     onInputTextChange = viewModel::onInputTextChange,
                     onSend = viewModel::onSend,
-                    onClickSuggestion = viewModel::onSummarizeClick,
+                    onClickSuggestion = viewModel::onSuggestionClick,
                     onRetry = viewModel::retry,
                     onPlayQuote = viewModel::playQuote,
                     onRateAnswer = ::rateAnswer,
@@ -234,6 +234,7 @@ class ChatFragment : BaseDialogFragment() {
             podcastColors = viewModel.uiState.value.podcastColors,
             trigger = ChatFeedbackFragment.Trigger.ResponseRating,
             messageIndex = viewModel.answerMessageIndex(answerUuid),
+            answerUuid = answerUuid,
         )
     }
 

@@ -8,9 +8,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.squareup.moshi.Moshi
 import java.util.concurrent.ConcurrentHashMap
@@ -37,6 +36,7 @@ class TranscriptManagerImpl @Inject constructor(
     private val transcriptService: TranscriptService,
     private val episodeManager: EpisodeManager,
     private val chapterManager: ChapterManager,
+    private val generatedChaptersAvailability: GeneratedChaptersAvailability,
     private val moshi: Moshi,
     private val parsers: Map<TranscriptType, @JvmSuppressWildcards TranscriptParser>,
 ) : TranscriptManager {
@@ -47,6 +47,10 @@ class TranscriptManagerImpl @Inject constructor(
 
     override fun observeIsTranscriptAvailable(episodeUuid: String): Flow<Boolean> {
         return transcriptDao.observeTranscripts(episodeUuid).map { it.isNotEmpty() }
+    }
+
+    override fun observeIsGeneratedTranscriptAvailable(episodeUuid: String): Flow<Boolean> {
+        return transcriptDao.observeTranscripts(episodeUuid).map { transcripts -> transcripts.any { it.isGenerated } }
     }
 
     override suspend fun loadTranscript(
@@ -153,9 +157,11 @@ class TranscriptManagerImpl @Inject constructor(
     }
 
     override suspend fun loadGeneratedChapters(episodeUuid: String): Boolean {
-        if (!FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) return true
+        if (!generatedChaptersAvailability.isAllowed()) return true
 
         return try {
+            if (chapterManager.hasChapters(episodeUuid)) return true
+
             val generatedTranscript = loadLocalTranscripts(episodeUuid)
                 .firstOrNull { it.isGenerated } ?: return true
 
@@ -175,8 +181,6 @@ class TranscriptManagerImpl @Inject constructor(
 
     private suspend fun saveAiChaptersIfNeeded(episodeUuid: String, chapters: List<EpisodeMetaResponse.MetaChapter>?) {
         if (chapters.isNullOrEmpty()) return
-
-        if (chapterManager.hasChapters(episodeUuid)) return
 
         val dbChapters = chapters
             .mapNotNull { chapter ->

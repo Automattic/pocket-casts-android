@@ -2,5 +2,4 @@
 <resources>
     <color name="row_title_color">#1E1F1E</color>
     <color name="row_divider">?attr/primary_ui_05</color>
-    <color name="select_categories_tittle_color">#03A9F4</color>
 </resources>

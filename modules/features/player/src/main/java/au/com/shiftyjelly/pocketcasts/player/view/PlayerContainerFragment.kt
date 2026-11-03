@@ -263,7 +263,7 @@ class PlayerContainerFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 chaptersViewModel.uiState.collect {
-                    adapter.updateChapters(addChapters = it.chaptersCount > 0)
+                    adapter.updateChapters(addChapters = it.showChaptersTab)
                 }
             }
         }

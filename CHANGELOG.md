@@ -1,5 +1,8 @@
 8.25
 -----
+*   New Features
+    *   Add an option to hide played podcasts from the Podcasts tab, in the "…" menu
+        ([#6203](https://github.com/Automattic/pocket-casts-android/pull/6203))
 *   Bug Fixes
     *   Fix Wear OS episode downloads not switching to WiFi
         ([#6100](https://github.com/Automattic/pocket-casts-android/pull/6100))
@@ -11,6 +14,8 @@
         ([#5847](https://github.com/Automattic/pocket-casts-android/pull/5847))
     *   Wait for the car's connection and a sync before the first play on Android Automotive, so the car picks up where your other devices left off
         ([#6264](https://github.com/Automattic/pocket-casts-android/pull/6264))
+    *   Fix the Settings menu showing through Subscription, Privacy policy and Terms of use in the TV app
+        ([#6284](https://github.com/Automattic/pocket-casts-android/pull/6284))
 
 
 8.24

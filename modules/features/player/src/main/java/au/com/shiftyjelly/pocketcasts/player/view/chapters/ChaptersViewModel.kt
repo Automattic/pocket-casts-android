@@ -16,7 +16,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.ChapterLinkClickedEvent
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
@@ -25,7 +28,9 @@ import com.automattic.eventhorizon.DeselectChaptersChapterSelectedEvent
 import com.automattic.eventhorizon.DeselectChaptersToggledOffEvent
 import com.automattic.eventhorizon.DeselectChaptersToggledOnEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersToggleSourceType
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
+import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -63,21 +68,25 @@ class ChaptersViewModel @AssistedInject constructor(
     private val eventHorizon: EventHorizon,
     private val generatedChapterSeeker: GeneratedChapterSeeker,
     private val transcriptManager: TranscriptManager,
+    private val generatedChaptersAvailability: GeneratedChaptersAvailability,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val isTogglingChapters = MutableStateFlow(false)
 
     init {
         viewModelScope.launch(ioDispatcher) {
-            mode.episodeIdFlow()
-                .filter { it.isNotEmpty() }
-                .collectLatest { episodeId ->
-                    var retryDelay = 5.seconds
-                    while (!transcriptManager.loadGeneratedChapters(episodeId) && retryDelay <= 2.minutes) {
-                        delay(retryDelay)
-                        retryDelay *= 2
-                    }
+            combine(
+                mode.episodeIdFlow().filter { it.isNotEmpty() },
+                generatedChaptersAvailability.isAllowedFlow,
+                ::Pair,
+            ).collectLatest { (episodeId, isAllowed) ->
+                if (!isAllowed) return@collectLatest
+                var retryDelay = 5.seconds
+                while (!transcriptManager.loadGeneratedChapters(episodeId) && retryDelay <= 2.minutes) {
+                    delay(retryDelay)
+                    retryDelay *= 2
                 }
+            }
         }
     }
 
@@ -158,6 +167,23 @@ class ChaptersViewModel @AssistedInject constructor(
         }
     }
 
+    fun turnOffGeneratedChapters() {
+        setShowGeneratedChapters(false, GeneratedChaptersToggleSourceType.ChaptersMenu)
+    }
+
+    fun turnOnGeneratedChapters() {
+        setShowGeneratedChapters(true, GeneratedChaptersToggleSourceType.ChaptersOffState)
+    }
+
+    fun undoTurnOffGeneratedChapters() {
+        setShowGeneratedChapters(true, GeneratedChaptersToggleSourceType.Undo)
+    }
+
+    private fun setShowGeneratedChapters(show: Boolean, source: GeneratedChaptersToggleSourceType) {
+        eventHorizon.track(SettingsGeneralGeneratedChaptersToggledEvent(enabled = show, source = source))
+        settings.showGeneratedChapters.set(show, updateModifiedAt = true)
+    }
+
     fun selectChapter(select: Boolean, chapter: Chapter) {
         viewModelScope.launch(ioDispatcher) {
             val episodeId = when (mode) {
@@ -232,6 +258,11 @@ class ChaptersViewModel @AssistedInject constructor(
         isTogglingChapters = isToggling,
         canSkipChapters = subscription != null,
         showHeader = episode is PodcastEpisode,
+        isGeneratedChaptersOff = chapters.hasHiddenGeneratedChapters,
+        showUpsell = subscription == null &&
+            chapters.isEmpty() &&
+            episode is PodcastEpisode &&
+            FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS),
     )
 
     private fun playbackPosition(playbackState: PlaybackState, episode: BaseEpisode) = when (mode) {
@@ -289,8 +320,12 @@ class ChaptersViewModel @AssistedInject constructor(
         val isTogglingChapters: Boolean = false,
         val canSkipChapters: Boolean = false,
         val showHeader: Boolean = false,
+        val isGeneratedChaptersOff: Boolean = false,
+        val showUpsell: Boolean = false,
     ) {
         val chaptersCount = allChapters.size
+        val showOffState get() = chaptersCount == 0 && isGeneratedChaptersOff
+        val showChaptersTab get() = chaptersCount > 0 || isGeneratedChaptersOff || showUpsell
         val deselectedChaptersCount get() = allChapters.count { !it.chapter.selected }
         val chapters get() = if (isTogglingChapters) allChapters else allChapters.filter { it.chapter.selected }
         val showSubscriptionIcon get() = !isTogglingChapters && !canSkipChapters

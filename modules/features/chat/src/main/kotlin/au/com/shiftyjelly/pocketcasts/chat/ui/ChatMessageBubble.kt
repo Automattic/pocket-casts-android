@@ -33,14 +33,20 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.inset
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,7 +54,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.Placeholder
@@ -64,13 +69,19 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.offset
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import kotlin.math.ceil
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -87,38 +98,46 @@ internal fun AiMessageBubble(
     val bulletIndent = remember(textMeasurer, density) {
         with(density) { textMeasurer.measure(BULLET_PREFIX, AiMessageTextStyle).size.width.toSp() }
     }
-    val (styledText, words) = remember(text, bulletIndent) { text.withHangingBullets(bulletIndent) }
-    val chunks = remember(words) { revealChunks(words.size) }
-    val shownText = revealProgress?.let { progress -> styledText.revealed(words, chunks, progress(), theme.aiBubbleText) } ?: styledText
+    val styledText = remember(text, bulletIndent) { text.withHangingBullets(bulletIndent) }
+    val wipe = remember { TextWipe() }
     Text(
-        text = shownText,
+        text = styledText,
         color = theme.aiBubbleText,
         style = AiMessageTextStyle,
+        onTextLayout = wipe::onTextLayout,
         modifier = modifier
             .fillMaxWidth()
-            .withFullTextSemantics(shownText, styledText),
+            .revealedBy(wipe, styledText, revealProgress),
     )
 }
 
-internal fun String.withHangingBullets(indent: TextUnit): Pair<AnnotatedString, List<IntRange>> {
+@Composable
+private fun Modifier.revealedBy(
+    wipe: TextWipe,
+    text: AnnotatedString,
+    revealProgress: (() -> Float)?,
+): Modifier {
+    if (revealProgress == null) return this
+    val timeline = remember(text) { TextRevealTimeline(text) }
+    return textWipe(wipe) { timeline.revealedLength(revealProgress()) }
+}
+
+internal fun String.withHangingBullets(indent: TextUnit): AnnotatedString {
     val lines = lines()
-    val words = mutableListOf<IntRange>()
-    val text = buildAnnotatedString {
+    return buildAnnotatedString {
         lines.forEachIndexed { index, line ->
             val isBullet = line.startsWith(BULLET_PREFIX)
             if (isBullet && lines.getOrNull(index - 1)?.startsWith(BULLET_PREFIX) == true) {
                 withStyle(ParagraphStyle()) { append(ZERO_WIDTH_SPACE) }
             }
             val paragraphStyle = if (isBullet) ParagraphStyle(textIndent = TextIndent(restLine = indent)) else ParagraphStyle()
-            words += wordRanges(line, startOffset = length)
             withStyle(paragraphStyle) { append(line.ifEmpty { ZERO_WIDTH_SPACE }) }
         }
     }
-    return text to words
 }
 
 private const val BULLET_PREFIX = "•  "
-private const val ZERO_WIDTH_SPACE = "\u200B"
+internal const val ZERO_WIDTH_SPACE = "\u200B"
 
 private val AiMessageTextStyle = TextStyle(fontSize = 15.sp, lineHeight = 20.sp)
 
@@ -136,21 +155,7 @@ internal fun AiQuoteBubble(
     val timestampColor = if (isPlayable) theme.quoteTimestamp else theme.secondaryText
     val quoteColor = if (isLoading) theme.aiBubbleText.copy(alpha = LOADING_QUOTE_ALPHA) else theme.aiBubbleText
     val text = remember(quote, timestampLabel, timestampColor, quoteColor, isLoading) {
-        buildAnnotatedString {
-            withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = quoteColor)) {
-                append(quote)
-            }
-            if (timestampLabel.isNotEmpty()) {
-                append(" ")
-                withStyle(SpanStyle(color = timestampColor)) {
-                    append(quoteTimestampText(timestampLabel))
-                }
-            }
-            if (isLoading) {
-                append(" ")
-                appendInlineContent(QUOTE_SPINNER_ID, alternateText = " ")
-            }
-        }
+        quoteText(quote, timestampLabel, quoteColor, timestampColor, isLoading)
     }
     val spinnerSize = with(LocalDensity.current) { QuoteSpinnerSize.toSp() }
     val inlineContent = remember(timestampColor, spinnerSize) {
@@ -162,19 +167,20 @@ internal fun AiQuoteBubble(
             },
         )
     }
-    val words = remember(text) { wordRanges(text.text) }
-    val chunks = remember(words) { revealChunks(words.size) }
-    val progress = revealProgress?.invoke()
-    val isRevealed = progress == null || progress >= revealedChunkTarget(chunks.size)
-    val shownText = progress?.let { text.revealed(words, chunks, it, theme.aiBubbleText) } ?: text
+    val wipe = remember { TextWipe() }
+    val revealTicks = remember(text) { TextRevealTimeline(text).ticks }
+    val isRevealed by remember(revealProgress, revealTicks) {
+        derivedStateOf { revealProgress == null || revealProgress() >= revealTicks }
+    }
     val loadingDescription = stringResource(LR.string.chat_quote_finding_moment)
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier.fillMaxWidth(),
     ) {
         Text(
-            text = shownText,
+            text = text,
             inlineContent = inlineContent,
+            onTextLayout = wipe::onTextLayout,
             color = theme.aiBubbleText,
             fontSize = 15.sp,
             lineHeight = 20.sp,
@@ -191,7 +197,7 @@ internal fun AiQuoteBubble(
                         Modifier
                     },
                 )
-                .withFullTextSemantics(shownText, text)
+                .revealedBy(wipe, text, revealProgress)
                 .then(
                     if (isLoading) {
                         Modifier.semantics { stateDescription = loadingDescription }
@@ -209,10 +215,26 @@ internal fun AiQuoteBubble(
 
 internal fun quoteTimestampText(timestampLabel: String) = if (timestampLabel.isEmpty()) "" else "($timestampLabel)"
 
-private fun Modifier.withFullTextSemantics(shownText: AnnotatedString, fullText: AnnotatedString) = if (shownText === fullText) {
-    this
-} else {
-    clearAndSetSemantics { text = fullText }
+internal fun quoteText(
+    quote: String,
+    timestampLabel: String,
+    quoteColor: Color = Color.Unspecified,
+    timestampColor: Color = Color.Unspecified,
+    isLoading: Boolean = false,
+) = buildAnnotatedString {
+    withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = quoteColor)) {
+        append(quote)
+    }
+    if (timestampLabel.isNotEmpty()) {
+        append(" ")
+        withStyle(SpanStyle(color = timestampColor)) {
+            append(quoteTimestampText(timestampLabel))
+        }
+    }
+    if (isLoading) {
+        append(" ")
+        appendInlineContent(QUOTE_SPINNER_ID, alternateText = " ")
+    }
 }
 
 @Composable
@@ -275,7 +297,9 @@ internal fun UserMessageBubble(
     isNotSent: Boolean = false,
     isRetryEnabled: Boolean = true,
     onRetry: () -> Unit = {},
+    chipMorph: () -> Float = { 0f },
 ) {
+    val isChipWidth by remember(chipMorph) { derivedStateOf { chipMorph() >= CHIP_WIDTH_MORPH_POINT } }
     Column(
         horizontalAlignment = Alignment.End,
         modifier = modifier.fillMaxWidth(),
@@ -300,10 +324,10 @@ internal fun UserMessageBubble(
                 fontSize = 15.sp,
                 lineHeight = 20.sp,
                 modifier = Modifier
-                    .widthIn(max = 250.dp)
-                    .clip(UserBubbleShape)
-                    .background(theme.userBubble)
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                    .widthIn(max = if (isChipWidth) Dp.Unspecified else UserBubbleMaxWidth)
+                    .drawBehind { drawUserBubble(chipMorph(), theme) }
+                    .padding(horizontal = 16.dp)
+                    .verticalPadding { lerp(10.dp, 12.dp, chipMorph()) },
             )
             if (isNotSent) {
                 ChatNotSentLabel(theme = theme)
@@ -382,12 +406,50 @@ internal fun ThinkingBubble(
 }
 
 private val LoadingLineHeight = 20.dp
-private val LoadingPhaseEnter = fadeIn(tween(durationMillis = 200, delayMillis = 100)) +
-    slideInVertically(tween(durationMillis = 300, easing = EaseOut)) { height -> height / 3 }
-private val LoadingPhaseExit = fadeOut(tween(durationMillis = 130)) +
-    slideOutVertically(tween(durationMillis = 300, easing = EaseOut)) { height -> -height / 3 }
+private val LoadingPhaseEnter = fadeIn(tween(durationMillis = 250, delayMillis = 150)) +
+    slideInVertically(tween(durationMillis = 250, delayMillis = 150, easing = EaseOut)) { height -> height / 4 }
+private val LoadingPhaseExit = fadeOut(tween(durationMillis = 150)) +
+    slideOutVertically(tween(durationMillis = 150, easing = EaseOut)) { height -> -height * 3 / 20 }
 
 private val UserBubbleShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomEnd = 4.dp, bottomStart = 16.dp)
+
+private fun DrawScope.drawUserBubble(chipMorph: Float, theme: ChatTheme) {
+    val shape = if (chipMorph == 0f) UserBubbleShape else chipMorphShape(chipMorph)
+    drawOutline(
+        outline = shape.createOutline(size, layoutDirection, this),
+        color = theme.userBubble.copy(alpha = theme.userBubble.alpha * (1f - chipMorph)),
+    )
+    if (chipMorph > 0f) {
+        val strokeWidth = ceil(ChipBorderWidth.toPx())
+        inset(strokeWidth / 2) {
+            drawOutline(
+                outline = shape.createOutline(size, layoutDirection, this),
+                color = theme.chipBorder.copy(alpha = theme.chipBorder.alpha * chipMorph),
+                style = Stroke(strokeWidth),
+            )
+        }
+    }
+}
+
+private fun Modifier.verticalPadding(padding: Density.() -> Dp) = layout { measurable, constraints ->
+    val vertical = padding().roundToPx()
+    val placeable = measurable.measure(constraints.offset(vertical = -vertical * 2))
+    layout(placeable.width, constraints.constrainHeight(placeable.height + vertical * 2)) {
+        placeable.place(0, vertical)
+    }
+}
+
+private fun chipMorphShape(chipMorph: Float) = RoundedCornerShape(
+    topStart = lerp(16.dp, ChipCornerRadius, chipMorph),
+    topEnd = lerp(16.dp, ChipCornerRadius, chipMorph),
+    bottomEnd = lerp(4.dp, ChipCornerRadius, chipMorph),
+    bottomStart = lerp(16.dp, ChipCornerRadius, chipMorph),
+)
+
+private val ChipCornerRadius = 22.dp
+private val ChipBorderWidth = 1.dp
+private val UserBubbleMaxWidth = 250.dp
+private const val CHIP_WIDTH_MORPH_POINT = 0.5f
 
 @Preview
 @Composable

@@ -20,6 +20,7 @@ sealed interface ChatMessage {
     data class Assistant(
         val text: String,
         val rating: ChatAnswerRating? = null,
+        val followUps: List<String> = emptyList(),
         override val uuid: String = UUID.randomUUID().toString(),
     ) : ChatMessage {
         override val role: ChatRole get() = ChatRole.Assistant
@@ -78,10 +79,15 @@ internal fun ChatMessage.toEntity(
     episodeUuid: String,
     quoteMetadataAdapter: JsonAdapter<QuoteMetadata>,
     userMetadataAdapter: JsonAdapter<UserMessageMetadata>,
+    assistantMetadataAdapter: JsonAdapter<AssistantMessageMetadata>,
 ): EpisodeChatMessage {
     val (text, metadata) = when (this) {
         is ChatMessage.User -> text to userMetadataAdapter.toJsonOrNull(this)
-        is ChatMessage.Assistant -> text to null
+
+        is ChatMessage.Assistant -> text to followUps.takeIf { it.isNotEmpty() }?.let {
+            assistantMetadataAdapter.toJson(AssistantMessageMetadata(followUps = it))
+        }
+
         is ChatMessage.Quote -> text to quoteMetadataAdapter.toJson(QuoteMetadata(start, end, isFromGeneratedTranscript))
     }
     return EpisodeChatMessage(
@@ -103,6 +109,7 @@ private fun JsonAdapter<UserMessageMetadata>.toJsonOrNull(message: ChatMessage.U
 internal fun List<EpisodeChatMessage>.toChatMessages(
     quoteMetadataAdapter: JsonAdapter<QuoteMetadata>,
     userMetadataAdapter: JsonAdapter<UserMessageMetadata>,
+    assistantMetadataAdapter: JsonAdapter<AssistantMessageMetadata>,
 ) = mapNotNull { entity ->
     when (entity.role) {
         ChatRole.User.value -> {
@@ -120,6 +127,10 @@ internal fun List<EpisodeChatMessage>.toChatMessages(
         else -> ChatMessage.Assistant(
             text = entity.text,
             rating = ChatAnswerRating.fromValue(entity.rating),
+            followUps = entity.metadata
+                ?.let { raw -> runCatching { assistantMetadataAdapter.fromJson(raw) }.getOrNull() }
+                ?.followUps
+                .orEmpty(),
             uuid = entity.uuid,
         )
     }

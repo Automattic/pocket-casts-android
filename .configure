@@ -1,11 +1,11 @@
 {
   "project_name": "pocketcasts-android",
   "branch": "trunk",
-  "pinned_hash": "1e17440ffb52c59087b22337fccfcfcdb8b4aa8f",
+  "pinned_hash": "12c7a2c1ffc0b6d593a0dcc32c41383755b2662e",
   "files_to_copy": [
     {
       "file": "android/pocket-casts/secret.properties",
-      "destination": "secret.properties",
+      "destination": "~/.configure/pocket-casts-android/secrets/secret.properties",
       "encrypt": true
     },
     {
@@ -40,7 +40,7 @@
     },
     {
       "file": "android/pocket-casts/android.keystore",
-      "destination": "release.keystore",
+      "destination": "~/.configure/pocket-casts-android/secrets/upload.jks",
       "encrypt": true
     }
   ],

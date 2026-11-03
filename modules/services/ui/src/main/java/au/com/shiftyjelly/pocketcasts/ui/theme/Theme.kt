@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.ui.theme
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.TypedValue
 import android.view.Window
@@ -13,7 +12,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.WindowInsetsControllerCompat
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -479,13 +477,6 @@ class Theme @Inject constructor(private val settings: Settings) {
 
     private fun useLightStatusBarIcons(window: Window) {
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
-    }
-
-    fun verticalPlusLogo(context: Context?): Drawable? {
-        return context?.let {
-            val resId = verticalPlusLogoRes()
-            AppCompatResources.getDrawable(context, resId)
-        }
     }
 
     @DrawableRes

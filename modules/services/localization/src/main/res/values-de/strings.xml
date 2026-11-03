@@ -18,8 +18,6 @@ Language: de
     <string name="chat_answering">Antworten</string>
     <string name="chat_error_server_on_our_end">Bei dir ist ein Fehler aufgetreten.</string>
     <string name="chat_not_sent_tap_to_retry">Nicht gesendet. Tippe, um es erneut zu versuchen.</string>
-    <string name="chat_feedback_send_failed">Dein Feedback konnte nicht gesendet werden. Überprüfe deine Verbindung.</string>
-    <string name="chat_feedback_sending">Feedback wird gesendet</string>
     <string name="chat_feedback_what_went_wrong">Was ist schiefgelaufen?</string>
     <string name="chat_beta_sheet_sign_in">Melde dich an, um es auszuprobieren</string>
     <string name="episode_chat_needs_transcript_message">Für \"Fragen zu dieser Folge\" ist ein Transkript erforderlich. Diese Folge hat keins.</string>
@@ -256,7 +254,6 @@ Language: de
     <string name="blogs_found_headline">Dein Blog wird laut gelesen</string>
     <string name="blogs_found_followed_badge">PODCAST ABONNIERT</string>
     <string name="blogs_found_feed_detected">Feed gefunden</string>
-    <string name="chapters_generated_disclaimer">Diese Kapitel werden automatisch generiert und sind möglicherweise nicht ganz korrekt.</string>
     <string name="chat_play_quote">Zitat abspielen</string>
     <string name="chat_clear">Chat löschen</string>
     <string name="chat_send">Senden</string>

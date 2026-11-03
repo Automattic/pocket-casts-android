@@ -4,43 +4,40 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.updatePadding
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentShareIncomingBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
-import au.com.shiftyjelly.pocketcasts.views.extensions.hide
-import au.com.shiftyjelly.pocketcasts.views.extensions.setup
-import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class ShareListIncomingFragment :
     BaseFragment(),
-    ShareListIncomingAdapter.ClickListener {
+    ShareListIncomingListener {
 
     @Inject lateinit var podcastManager: PodcastManager
 
     @Inject lateinit var settings: Settings
 
-    private lateinit var adapter: ShareListIncomingAdapter
     private val viewModel: ShareListIncomingViewModel by viewModels()
-    private var binding: FragmentShareIncomingBinding? = null
 
     companion object {
         const val EXTRA_URL = "EXTRA_URL"
@@ -69,66 +66,33 @@ class ShareListIncomingFragment :
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentShareIncomingBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
-
-    override fun onDestroyView() {
-        binding?.recyclerView?.adapter = null
-        super.onDestroyView()
-        binding = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
+        val share by viewModel.share.asFlow().collectAsStateWithLifecycle(viewModel.share.value)
+        val subscribedUuids by viewModel.subscribedUuids.asFlow().collectAsStateWithLifecycle(viewModel.subscribedUuids.value)
+        val bottomInsetPx by settings.bottomInset.collectAsStateWithLifecycle(0)
+        val bottomInset = with(LocalDensity.current) { bottomInsetPx.toDp() }
+        AppTheme(theme.activeTheme) {
+            ShareListIncomingPage(
+                share = share,
+                subscribedUuids = subscribedUuids?.toHashSet().orEmpty(),
+                bottomInset = PaddingValues(bottom = bottomInset),
+                listener = this,
+                toolbarModifier = Modifier.pointerInput(Unit) {
+                    detectTapGestures(onLongPress = { theme.toggleDarkLightThemeActivity(requireActivity() as AppCompatActivity) })
+                },
+            )
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val context = view.context
-
-        adapter = ShareListIncomingAdapter(this, context)
-
-        val binding = binding ?: return
-
-        val recyclerView = binding.recyclerView
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-
-        binding.toolbar.setup(navigationIcon = NavigationIcon.Close, activity = activity, theme = theme, includeStatusBarPadding = false)
-
-        viewModel.share.observe(viewLifecycleOwner) { share ->
-            when (share) {
-                is ShareState.Loaded -> {
-                    this.binding?.progressCircle?.hide()
-                    adapter.load(share.title, share.description, share.podcasts)
-                    adapter.notifyDataSetChanged()
-                }
-
-                is ShareState.Loading -> {
-                    this.binding?.progressCircle?.show()
-                }
-
-                else -> {
-                    this.binding?.progressCircle?.hide()
-                }
-            }
-        }
-
-        viewModel.subscribedUuids.observe(viewLifecycleOwner) { uuids ->
-            adapter.subscribedUuids = uuids.toHashSet()
-        }
-
         if (!viewModel.isFragmentChangingConfigurations) {
             viewModel.trackIncomingShareListShown(source)
         }
+    }
 
-        // add bottom padding to make sure the content isn't hidden by the mini player
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settings.bottomInset.collect {
-                    binding.recyclerView.updatePadding(bottom = it)
-                }
-            }
-        }
+    override fun onCloseClick() {
+        requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
     override fun onPodcastClick(podcast: Podcast) {
