@@ -65,6 +65,7 @@ fun ChaptersGenerating(
     episodeUuid: String?,
     onTurnOffGeneratedClick: () -> Unit,
     modifier: Modifier = Modifier,
+    skeletonModifier: Modifier = Modifier,
     showSlowNote: Boolean = false,
 ) {
     var isSlowNoteVisible by rememberSaveable(episodeUuid) { mutableStateOf(showSlowNote) }
@@ -80,7 +81,7 @@ fun ChaptersGenerating(
             .verticalScroll(rememberScrollState()),
     ) {
         GeneratingHeader(onTurnOffGeneratedClick = onTurnOffGeneratedClick)
-        SkeletonChapters()
+        SkeletonChapters(modifier = skeletonModifier)
         AnimatedVisibility(
             visible = isSlowNoteVisible,
             enter = fadeIn(tween(durationMillis = SLOW_NOTE_ENTER_MS, easing = EaseOut)) +
@@ -149,7 +150,9 @@ private fun GeneratingHeader(
 }
 
 @Composable
-private fun SkeletonChapters() {
+private fun SkeletonChapters(
+    modifier: Modifier = Modifier,
+) {
     val chaptersTheme = LocalChaptersTheme.current
     val barColor = chaptersTheme.headerToggle.copy(alpha = 0.12f).compositeOver(chaptersTheme.background)
     val highlight = chaptersTheme.headerToggle.copy(alpha = 0.22f)
@@ -163,7 +166,7 @@ private fun SkeletonChapters() {
     )
     val loadingDescription = stringResource(LR.string.chapters_generated_generating)
     Column(
-        modifier = Modifier
+        modifier = modifier
             .clearAndSetSemantics {
                 contentDescription = loadingDescription
                 progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate

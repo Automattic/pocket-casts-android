@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.EaseIn
@@ -87,6 +88,7 @@ fun ChaptersPage(
                 episodeUuid = episodeUuid,
                 onTurnOffGeneratedClick = onTurnOffGeneratedClick,
                 modifier = modifier,
+                skeletonModifier = Modifier.animateEnterExit(enter = stateRise(density), exit = ExitTransition.None),
             )
 
             ChaptersViewModel.EmptyState.NoGeneratedChapters -> ChaptersNoGeneratedChapters(
@@ -198,12 +200,17 @@ private fun AnimatedContentTransitionScope<ChaptersViewModel.EmptyState?>.chapte
         val exit = fadeOut(tween(durationMillis = GENERATING_EXIT_MS, easing = EaseIn))
         (EnterTransition.None togetherWith exit using null).apply { targetContentZIndex = -1f }
     } else {
-        val enter = fadeIn(tween(durationMillis = STATE_ENTER_MS, delayMillis = STATE_ENTER_DELAY_MS, easing = EaseOut)) +
-            slideInVertically(tween(durationMillis = STATE_ENTER_MS, delayMillis = STATE_ENTER_DELAY_MS, easing = EaseOut)) { shift }
+        val fade = fadeIn(tween(durationMillis = STATE_ENTER_MS, delayMillis = STATE_ENTER_DELAY_MS, easing = EaseOut))
+        val enter = if (targetState == ChaptersViewModel.EmptyState.GeneratingChapters) fade else fade + stateRise(density)
         val exit = fadeOut(tween(durationMillis = STATE_EXIT_MS, easing = EaseIn)) +
             slideOutVertically(tween(durationMillis = STATE_EXIT_MS, easing = EaseIn)) { -shift }
         enter togetherWith exit using null
     }
+}
+
+private fun stateRise(density: Density): EnterTransition {
+    val shift = with(density) { STATE_SHIFT.roundToPx() }
+    return slideInVertically(tween(durationMillis = STATE_ENTER_MS, delayMillis = STATE_ENTER_DELAY_MS, easing = EaseOut)) { shift }
 }
 
 @Composable
