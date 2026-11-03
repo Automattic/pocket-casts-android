@@ -32,6 +32,7 @@ class ShowNotesManager @Inject constructor(
                     podcastUuid = podcastUuid,
                     episodeUuid = episodeUuid,
                     showNotes = showNotes,
+                    refreshGeneratedTranscriptFlag = true,
                 )
             }
         },
@@ -65,6 +66,7 @@ class ShowNotesManager @Inject constructor(
                     podcastUuid = podcastUuid,
                     episodeUuid = episodeUuid,
                     showNotes = showNotes,
+                    refreshGeneratedTranscriptFlag = true,
                 )
             }
         },

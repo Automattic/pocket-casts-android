@@ -25,6 +25,7 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
@@ -565,6 +566,7 @@ class ShowNotesProcessTest {
             podcastUuid = "podcast-id",
             episodeUuid = "episode-id",
             showNotes = showNotes,
+            refreshGeneratedTranscriptFlag = true,
         )
 
         val expected = listOf(
@@ -576,6 +578,31 @@ class ShowNotesProcessTest {
             ),
         )
         verify(transcriptDao).replaceAll(expected)
+    }
+
+    @Test
+    fun `do not refresh a stale generated transcript flag when not requested`() = runTest(coroutineRule.testDispatcher) {
+        val showNotes = ShowNotesResponse(
+            podcast = ShowNotesPodcast(
+                uuid = "podcast-id",
+                episodes = listOf(ShowNotesEpisode(uuid = "episode-id")),
+            ),
+        )
+        whenever { episodeManager.findEpisodeByUuid("episode-id") } doReturn PodcastEpisode(
+            uuid = "episode-id",
+            podcastUuid = "podcast-id",
+            hasGeneratedTranscript = false,
+            publishedDate = Date(),
+        )
+
+        processor.process(
+            podcastUuid = "podcast-id",
+            episodeUuid = "episode-id",
+            showNotes = showNotes,
+        )
+
+        verifyBlocking(cacheServiceManager, never()) { getPodcastResponse(any()) }
+        verify(transcriptDao).replaceAll(emptyList())
     }
 
     @Test

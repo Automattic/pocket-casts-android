@@ -37,6 +37,7 @@ class ShowNotesProcessor @AssistedInject constructor(
         podcastUuid: String,
         episodeUuid: String,
         showNotes: ShowNotesResponse,
+        refreshGeneratedTranscriptFlag: Boolean = false,
     ) = coroutineScope {
         updateImageUrls(
             showNotes = showNotes,
@@ -53,6 +54,7 @@ class ShowNotesProcessor @AssistedInject constructor(
             podcastUuid = podcastUuid,
             episodeUuid = episodeUuid,
             showNotes = showNotes,
+            refreshGeneratedTranscriptFlag = refreshGeneratedTranscriptFlag,
         )
     }
 
@@ -102,12 +104,18 @@ class ShowNotesProcessor @AssistedInject constructor(
         podcastUuid: String,
         episodeUuid: String,
         showNotes: ShowNotesResponse,
+        refreshGeneratedTranscriptFlag: Boolean,
     ) {
         val episode = episodeManager.findEpisodeByUuid(episodeUuid) as? PodcastEpisode
+        val hasGeneratedTranscript = when {
+            episode == null -> false
+            refreshGeneratedTranscriptFlag -> generatedTranscriptFlagRefresher.hasGeneratedTranscript(episode)
+            else -> episode.hasGeneratedTranscript
+        }
         val transcripts = showNotes.findTranscripts(
             podcastUuid = podcastUuid,
             episodeUuid = episodeUuid,
-            hasGeneratedTranscript = episode != null && generatedTranscriptFlagRefresher.hasGeneratedTranscript(episode),
+            hasGeneratedTranscript = hasGeneratedTranscript,
             showNotesBaseUrl = showNotesBaseUrl,
         )
         if (transcripts != null) {
