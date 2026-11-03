@@ -25,12 +25,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.res.use
-import au.com.shiftyjelly.pocketcasts.compose.bars.AppCompatTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.text.rememberTextAppearanceColor
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -49,14 +48,13 @@ internal fun ExportSettingsPage(
             .fillMaxSize()
             .padding(bottom = bottomInset),
     ) {
-        AppCompatTopAppBar(
+        ThemedTopAppBar(
             title = stringResource(LR.string.settings_title_import_export),
-            navigationButton = NavigationButton.Drawable(IR.drawable.ic_arrow_back, LR.string.back),
+            navigationButton = NavigationButton.Back,
             onNavigationClick = onNavigationClick,
             iconColor = MaterialTheme.theme.colors.secondaryIcon01,
-            titleColor = MaterialTheme.theme.colors.secondaryText01,
+            textColor = MaterialTheme.theme.colors.secondaryText01,
             backgroundColor = MaterialTheme.theme.colors.secondaryUi01,
-            bottomShadow = false,
             modifier = toolbarModifier,
         )
         Column(

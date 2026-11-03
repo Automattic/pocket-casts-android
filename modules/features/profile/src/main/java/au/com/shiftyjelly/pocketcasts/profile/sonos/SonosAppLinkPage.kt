@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.bars.AppCompatTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
@@ -48,13 +48,14 @@ internal fun SonosAppLinkPage(
     toolbarModifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-        AppCompatTopAppBar(
+        ThemedTopAppBar(
             title = stringResource(LR.string.profile_sonos_connect_to),
-            navigationButton = NavigationButton.Drawable(IR.drawable.ic_cancel, LR.string.close),
+            navigationButton = NavigationButton.Close,
             onNavigationClick = onCloseClick,
             iconColor = MaterialTheme.theme.colors.secondaryIcon01,
-            titleColor = MaterialTheme.theme.colors.secondaryText01,
+            textColor = MaterialTheme.theme.colors.secondaryText01,
             backgroundColor = MaterialTheme.theme.colors.secondaryUi01,
+            bottomShadow = true,
             modifier = toolbarModifier,
         )
         DrawableImage(

@@ -35,7 +35,7 @@ class WebViewPageTest {
         }
 
         composeTestRule.onNodeWithText("Clip").assertExists()
-        composeTestRule.onNodeWithContentDescription("Navigate up").performClick()
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
 
         assertNotNull(webView)
         assertEquals(1, upClicks)

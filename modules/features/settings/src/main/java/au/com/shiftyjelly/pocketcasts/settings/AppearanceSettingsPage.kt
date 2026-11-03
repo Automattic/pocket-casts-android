@@ -45,8 +45,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
 import androidx.core.graphics.drawable.toDrawable
-import au.com.shiftyjelly.pocketcasts.compose.bars.AppCompatTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -90,14 +90,13 @@ internal fun AppearanceSettingsPage(
 ) {
     val colors = MaterialTheme.theme.colors
     Column(modifier = modifier.fillMaxSize()) {
-        AppCompatTopAppBar(
+        ThemedTopAppBar(
             title = stringResource(LR.string.settings_title_appearance),
-            navigationButton = NavigationButton.Drawable(IR.drawable.ic_arrow_back, LR.string.back),
+            navigationButton = NavigationButton.Back,
             onNavigationClick = listener::onNavigationClick,
             iconColor = colors.secondaryIcon01,
-            titleColor = colors.secondaryText01,
+            textColor = colors.secondaryText01,
             backgroundColor = colors.secondaryUi01,
-            bottomShadow = false,
             modifier = toolbarModifier,
         )
         Column(

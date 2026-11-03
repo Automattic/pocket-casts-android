@@ -26,8 +26,8 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.compose.bars.AppCompatTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
@@ -53,14 +53,13 @@ internal fun RegionSelectPage(
     toolbarModifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
-        AppCompatTopAppBar(
+        ThemedTopAppBar(
             title = stringResource(LR.string.discover_select_a_region),
-            navigationButton = NavigationButton.Drawable(IR.drawable.ic_arrow_back, LR.string.back),
+            navigationButton = NavigationButton.Back,
             onNavigationClick = onNavigationClick,
             iconColor = MaterialTheme.theme.colors.secondaryIcon01,
-            titleColor = MaterialTheme.theme.colors.secondaryText01,
+            textColor = MaterialTheme.theme.colors.secondaryText01,
             backgroundColor = MaterialTheme.theme.colors.secondaryUi01,
-            bottomShadow = false,
             modifier = toolbarModifier,
         )
         val titleColor = rememberTextAppearanceColor(UR.attr.textSubtitle1)

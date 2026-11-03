@@ -32,12 +32,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import au.com.shiftyjelly.pocketcasts.compose.bars.AppCompatTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import kotlin.math.roundToInt
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -63,13 +62,14 @@ internal fun ShareListIncomingPage(
         Box(modifier = Modifier.fillMaxWidth().weight(1f).clipToBounds()) {
             EnterAlwaysToolbarLayout(
                 toolbar = {
-                    AppCompatTopAppBar(
+                    ThemedTopAppBar(
                         title = stringResource(LR.string.podcasts_share_list),
-                        navigationButton = NavigationButton.Drawable(IR.drawable.ic_cancel, LR.string.close),
+                        navigationButton = NavigationButton.Close,
                         onNavigationClick = listener::onCloseClick,
                         iconColor = MaterialTheme.theme.colors.secondaryIcon01,
-                        titleColor = MaterialTheme.theme.colors.secondaryText01,
+                        textColor = MaterialTheme.theme.colors.secondaryText01,
                         backgroundColor = MaterialTheme.theme.colors.secondaryUi01,
+                        bottomShadow = true,
                         windowInsets = WindowInsets(0, 0, 0, 0),
                         modifier = toolbarModifier,
                     )

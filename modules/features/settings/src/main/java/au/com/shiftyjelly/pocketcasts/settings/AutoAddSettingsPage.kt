@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.core.content.res.use
-import au.com.shiftyjelly.pocketcasts.compose.bars.AppCompatTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
@@ -45,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import coil3.compose.AsyncImage
 import kotlin.math.ceil
 import kotlin.math.cos
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal data class AutoAddOption(
@@ -72,14 +71,13 @@ internal fun AutoAddSettingsPage(
             .fillMaxSize()
             .background(colors.primaryUi02),
     ) {
-        AppCompatTopAppBar(
+        ThemedTopAppBar(
             title = stringResource(LR.string.settings_auto_up_next_title),
-            navigationButton = NavigationButton.Drawable(IR.drawable.ic_arrow_back, LR.string.back),
+            navigationButton = NavigationButton.Back,
             onNavigationClick = onNavigationClick,
             iconColor = colors.secondaryIcon01,
-            titleColor = colors.secondaryText01,
+            textColor = colors.secondaryText01,
             backgroundColor = colors.secondaryUi01,
-            bottomShadow = false,
             modifier = toolbarModifier,
         )
         LazyColumn(

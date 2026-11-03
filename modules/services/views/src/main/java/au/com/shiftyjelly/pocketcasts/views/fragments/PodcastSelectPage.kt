@@ -46,8 +46,8 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
-import au.com.shiftyjelly.pocketcasts.compose.bars.AppCompatTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -57,7 +57,6 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import coil3.compose.AsyncImage
 import com.google.android.material.checkbox.MaterialCheckBox
 import kotlin.math.ceil
-import androidx.appcompat.R as AppCompatR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -81,14 +80,13 @@ internal fun PodcastSelectPage(
             .windowInsetsPadding(WindowInsets.statusBars),
     ) {
         if (showToolbar) {
-            AppCompatTopAppBar(
+            ThemedTopAppBar(
                 title = stringResource(LR.string.settings_choose_podcasts),
-                navigationButton = NavigationButton.Drawable(AppCompatR.drawable.abc_ic_ab_back_material, AppCompatR.string.abc_action_bar_up_description),
+                navigationButton = NavigationButton.Back,
                 onNavigationClick = onNavigationClick,
                 iconColor = colors.primaryInteractive01,
-                titleColor = colors.primaryText01,
+                textColor = colors.primaryText01,
                 backgroundColor = colors.secondaryUi01,
-                bottomShadow = false,
                 windowInsets = WindowInsets(0, 0, 0, 0),
             )
         }
