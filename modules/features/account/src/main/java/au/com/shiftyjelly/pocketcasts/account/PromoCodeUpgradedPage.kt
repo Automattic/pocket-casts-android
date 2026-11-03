@@ -12,17 +12,15 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.buttons.ViewMaterialButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
@@ -41,8 +39,7 @@ internal fun PromoCodeUpgradedPage(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .padding(horizontal = 16.dp)
-            .clipToBounds(),
+            .padding(horizontal = 16.dp),
     ) {
         Box(
             modifier = Modifier
@@ -77,18 +74,11 @@ internal fun PromoCodeUpgradedPage(
                 .padding(top = 10.dp)
                 .fillMaxWidth(),
         )
-        ViewMaterialButton(
+        RowButton(
             text = stringResource(LR.string.done),
             onClick = onDoneClick,
-            backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
-            textColor = MaterialTheme.theme.colors.primaryInteractive02,
-            fontSize = 18.sp,
-            letterSpacing = 0.02.em,
-            cornerRadius = 12.dp,
-            verticalPadding = 16.dp,
-            modifier = Modifier
-                .padding(top = 40.dp, bottom = 8.dp)
-                .fillMaxWidth(),
+            includePadding = false,
+            modifier = Modifier.padding(top = 40.dp, bottom = 8.dp),
         )
     }
 }
