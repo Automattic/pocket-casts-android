@@ -20,18 +20,21 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.CacheControl
@@ -172,12 +175,23 @@ class TranscriptManagerImpl @Inject constructor(
         if (!generatedChaptersAvailability.isAllowed()) return GeneratedChaptersResult.Unavailable
 
         val load = generatedChaptersLoads.computeIfAbsent(episodeUuid) {
-            applicationScope.async(start = CoroutineStart.LAZY) { fetchGeneratedChapters(episodeUuid) }.also { load ->
-                load.invokeOnCompletion { generatedChaptersLoads.remove(episodeUuid, load) }
+            applicationScope.async(start = CoroutineStart.LAZY) {
+                fetchGeneratedChapters(episodeUuid).also { result -> forgetGeneratedChaptersLoad(episodeUuid, result) }
             }
         }
         load.start()
         return load.await()
+    }
+
+    private fun forgetGeneratedChaptersLoad(episodeUuid: String, result: GeneratedChaptersResult) {
+        if (result == GeneratedChaptersResult.Failed) {
+            applicationScope.launch {
+                delay(FAILED_GENERATED_CHAPTERS_REUSE)
+                generatedChaptersLoads.remove(episodeUuid)
+            }
+        } else {
+            generatedChaptersLoads.remove(episodeUuid)
+        }
     }
 
     private suspend fun fetchGeneratedChapters(episodeUuid: String): GeneratedChaptersResult {
@@ -240,6 +254,8 @@ class TranscriptManagerImpl @Inject constructor(
         transcriptUrlBlacklist.remove(episodeUuid)
     }
 }
+
+private val FAILED_GENERATED_CHAPTERS_REUSE = 3.seconds
 
 internal val TranscriptsComparator = compareBy<DbTranscript>(
     { it.isGenerated },

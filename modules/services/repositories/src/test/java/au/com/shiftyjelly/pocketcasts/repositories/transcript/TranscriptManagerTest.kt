@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.testSubscription
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.HtmlParser.ScriptDetectedException
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
+import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.squareup.moshi.Moshi
@@ -29,7 +30,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -60,6 +60,9 @@ class TranscriptManagerTest {
     @get:Rule
     val featureFlagRule = InMemoryFeatureFlagRule()
 
+    @get:Rule
+    val coroutineRule = MainCoroutineRule()
+
     private val localTranscriptsFlow = MutableStateFlow(emptyList<DbTranscript>())
     private val service = TestTranscriptService()
     private val parsers = TranscriptType.entries.associateWith { TestParser(it) }
@@ -67,7 +70,7 @@ class TranscriptManagerTest {
         on { observerChaptersForEpisode(any()) } doReturn flowOf(Chapters(emptyList()))
     }.also { runBlocking { whenever(it.hasChapters(any())).thenReturn(false) } }
     private val generatedChapters = GeneratedChaptersFixture()
-    private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
+    private val applicationScope = CoroutineScope(coroutineRule.testDispatcher)
 
     private val vttDbTranscript = createDbTranscript("text/vtt")
     private val srtDbTranscript = createDbTranscript("application/srt")
@@ -610,7 +613,7 @@ class TranscriptManagerTest {
     }
 
     @Test
-    fun `fetch meta again after a failed load`() = runTest {
+    fun `reuse a failed load for a few seconds and fetch meta again after that`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         service.metaErrorCode = 503
 
@@ -618,8 +621,25 @@ class TranscriptManagerTest {
         service.metaErrorCode = null
         service.metaJsonResponse = META_JSON_WITH_CHAPTERS
 
+        advanceTimeBy(2.seconds)
+        assertEquals(GeneratedChaptersResult.Failed, transcriptManager.loadGeneratedChapters("episode-id"))
+        assertEquals(0, service.metaRequestCount)
+
+        advanceTimeBy(2.seconds)
         assertEquals(GeneratedChaptersResult.Loaded, transcriptManager.loadGeneratedChapters("episode-id"))
         assertEquals(1, service.metaRequestCount)
+    }
+
+    @Test
+    fun `do not reuse a successful load`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaJsonResponse = META_JSON_NO_CHAPTERS
+
+        assertEquals(GeneratedChaptersResult.Unavailable, transcriptManager.loadGeneratedChapters("episode-id"))
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        assertEquals(GeneratedChaptersResult.Loaded, transcriptManager.loadGeneratedChapters("episode-id"))
+        assertEquals(2, service.metaRequestCount)
     }
 
     @Test
