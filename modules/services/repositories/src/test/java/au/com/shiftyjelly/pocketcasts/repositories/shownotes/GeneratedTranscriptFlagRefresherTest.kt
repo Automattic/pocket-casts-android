@@ -114,6 +114,18 @@ class GeneratedTranscriptFlagRefresherTest {
         verify(episodeDao, never()).markHasGeneratedTranscript(any())
     }
 
+    @Test
+    fun `retry right away after a failed fetch`() = runTest {
+        val episode = createEpisode()
+        whenever(cacheServiceManager.getPodcastResponse("podcast")) doThrow RuntimeException("Network error")
+        whenever(episodeDao.findByUuid("episode")) doReturn episode
+
+        refresher.hasGeneratedTranscript(episode)
+        refresher.hasGeneratedTranscript(episode)
+
+        verify(cacheServiceManager, times(2)).getPodcastResponse("podcast")
+    }
+
     private fun createEpisode(
         uuid: String = "episode",
         podcastUuid: String = "podcast",

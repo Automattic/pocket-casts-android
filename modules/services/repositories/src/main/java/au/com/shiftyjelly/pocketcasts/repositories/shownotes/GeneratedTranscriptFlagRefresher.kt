@@ -49,9 +49,10 @@ class GeneratedTranscriptFlagRefresher @Inject constructor(
     }
 
     private suspend fun refresh(podcastUuid: String) {
-        lastRefreshes[podcastUuid] = clock.instant()
         try {
-            val episodes = cacheServiceManager.getPodcastResponse(podcastUuid).body()?.podcastInfo?.episodes.orEmpty()
+            val response = cacheServiceManager.getPodcastResponse(podcastUuid)
+            lastRefreshes[podcastUuid] = clock.instant()
+            val episodes = response.body()?.podcastInfo?.episodes.orEmpty()
             val uuids = episodes.filter { it.hasGeneratedTranscript == true }.map { it.uuid }
             episodeDao.markHasGeneratedTranscript(uuids)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refreshed generated transcript flags for podcast $podcastUuid, ${uuids.size} episodes have one")
