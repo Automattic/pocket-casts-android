@@ -199,15 +199,49 @@ class FingerprintTimingManager @Inject constructor(
     private fun observePlaybackForProactivePreparation() {
         scope.launch {
             var lastEpisodeUuid: String? = null
+            var lastHasGeneratedChapters = false
             playbackManager.playbackStateFlow.collect { state ->
                 if (!FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS)) return@collect
                 val uuid = state.episodeUuid
+                val hasGeneratedChapters = generatedChaptersAvailability.isAllowed() && state.chapters.hasGeneratedChapters
                 if (state.isPlaying && !uuid.isNullOrEmpty() && uuid != lastEpisodeUuid) {
                     lastEpisodeUuid = uuid
-                    prepareForCurrentEpisode(PrepareTrigger.PLAYBACK)
+                    lastHasGeneratedChapters = hasGeneratedChapters
+                    updatePlaybackPreparation(uuid, hasGeneratedChapters)
                 } else if (lastEpisodeUuid != null && (state.isEmpty || state.isStopped)) {
                     lastEpisodeUuid = null
+                    lastHasGeneratedChapters = false
                     stop()
+                } else if (uuid == lastEpisodeUuid && hasGeneratedChapters != lastHasGeneratedChapters) {
+                    lastHasGeneratedChapters = hasGeneratedChapters
+                    updatePlaybackPreparation(uuid, hasGeneratedChapters)
+                }
+            }
+        }
+    }
+
+    private fun updatePlaybackPreparation(episodeUuid: String, hasGeneratedChapters: Boolean) {
+        val shouldPrepare = shouldPrepareOnPlayback(
+            isGeneratedChaptersAllowed = generatedChaptersAvailability.isAllowed(),
+            hasGeneratedChapters = hasGeneratedChapters,
+            warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+            isUnmetered = { Network.isUnmeteredConnection(context) },
+        )
+        if (shouldPrepare) {
+            prepareForCurrentEpisode(PrepareTrigger.PLAYBACK)
+        } else {
+            releasePlaybackPreparation(episodeUuid)
+        }
+    }
+
+    private fun releasePlaybackPreparation(episodeUuid: String) {
+        Timber.d("FingerprintTimingManager: skipping playback preparation for $episodeUuid")
+        scope.launch {
+            mutex.withLock {
+                val isOtherEpisode = currentEpisodeUuid != null && currentEpisodeUuid != episodeUuid
+                val isPlaybackOnly = currentEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.PLAYBACK
+                if (isOtherEpisode || isPlaybackOnly) {
+                    resetToIdle()
                 }
             }
         }
@@ -291,13 +325,17 @@ class FingerprintTimingManager @Inject constructor(
     fun stop() {
         scope.launch {
             mutex.withLock {
-                generation++
-                persistMappingCacheIfFull()
-                resetState()
-                _stateFlow.value = State.Idle
+                resetToIdle()
             }
         }
         Timber.d("FingerprintTimingManager: stopped")
+    }
+
+    private fun resetToIdle() {
+        generation++
+        persistMappingCacheIfFull()
+        resetState()
+        _stateFlow.value = State.Idle
     }
 
     fun onTranscriptShown(episodeUuid: String) {
@@ -1587,6 +1625,15 @@ class FingerprintTimingManager @Inject constructor(
             warnOnMeteredNetwork: Boolean,
             isUnmetered: () -> Boolean,
         ): Boolean = !isDownloaded && warnOnMeteredNetwork && !isUnmetered()
+
+        internal fun shouldPrepareOnPlayback(
+            isGeneratedChaptersAllowed: Boolean,
+            hasGeneratedChapters: Boolean,
+            warnOnMeteredNetwork: Boolean,
+            isUnmetered: () -> Boolean,
+        ): Boolean = isGeneratedChaptersAllowed &&
+            hasGeneratedChapters &&
+            !shouldBlockOnDemandResolve(isDownloaded = false, warnOnMeteredNetwork = warnOnMeteredNetwork, isUnmetered = isUnmetered)
 
         internal fun canRetryFailedPreparation(trigger: PrepareTrigger): Boolean = trigger == PrepareTrigger.TRANSCRIPT_VIEW || trigger == PrepareTrigger.CHAT
 
