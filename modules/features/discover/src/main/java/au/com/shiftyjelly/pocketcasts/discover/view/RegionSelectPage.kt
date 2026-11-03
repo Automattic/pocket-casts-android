@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,12 +24,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.text.rememberTextAppearanceColor
@@ -116,8 +117,8 @@ private fun RegionRow(
             )
         }
         if (isSelected) {
-            DrawableImage(
-                drawableId = IR.drawable.ic_tick,
+            Icon(
+                painter = painterResource(IR.drawable.ic_tick),
                 contentDescription = null,
                 tint = MaterialTheme.theme.colors.primaryIcon01,
                 modifier = Modifier.size(24.dp),

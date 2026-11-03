@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.ripple
@@ -43,6 +44,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.PlatformTextStyle
@@ -51,7 +53,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.search.R
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -153,8 +154,8 @@ internal fun SearchToolbar(
                             )
                             .padding(horizontal = 8.dp),
                     ) {
-                        DrawableImage(
-                            drawableId = androidx.appcompat.R.drawable.abc_ic_clear_material,
+                        Icon(
+                            painter = painterResource(androidx.appcompat.R.drawable.abc_ic_clear_material),
                             contentDescription = stringResource(androidx.appcompat.R.string.abc_searchview_description_clear),
                             tint = colors.primaryInteractive01,
                             modifier = Modifier
@@ -176,8 +177,8 @@ internal fun SearchToolbar(
                         onClick = onBack,
                     ),
             ) {
-                DrawableImage(
-                    drawableId = IR.drawable.ic_arrow_back_24dp,
+                Icon(
+                    painter = painterResource(IR.drawable.ic_arrow_back_24dp),
                     contentDescription = stringResource(LR.string.back),
                     tint = colors.secondaryIcon01,
                 )

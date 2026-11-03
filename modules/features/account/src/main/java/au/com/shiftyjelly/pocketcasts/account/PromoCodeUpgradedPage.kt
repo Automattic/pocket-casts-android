@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -21,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -47,8 +48,8 @@ internal fun PromoCodeUpgradedPage(
                 .size(width = 48.dp, height = 4.dp)
                 .background(MaterialTheme.theme.colors.primaryIcon02, RoundedCornerShape(3.dp)),
         )
-        DrawableImage(
-            drawableId = logoRes,
+        Image(
+            painter = painterResource(logoRes),
             contentDescription = null,
             modifier = Modifier
                 .padding(top = 16.dp)

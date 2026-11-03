@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.profile
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,6 +27,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -34,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -63,8 +65,8 @@ internal fun SubCancelledPage(
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = 32.dp),
         ) {
-            DrawableImage(
-                drawableId = AR.drawable.ic_subscription_cancelled,
+            Image(
+                painter = painterResource(AR.drawable.ic_subscription_cancelled),
                 contentDescription = null,
                 modifier = Modifier
                     .padding(start = 16.dp, top = 32.dp, end = 16.dp)
@@ -136,7 +138,7 @@ private fun NotesPanel(
 private fun NoteRow(
     @DrawableRes iconRes: Int,
     text: String,
-    iconTint: Color? = null,
+    iconTint: Color = Color.Unspecified,
 ) {
     Box(modifier = Modifier.padding(start = 32.dp, top = 30.dp, end = 16.dp)) {
         TextViewText(
@@ -151,8 +153,8 @@ private fun NoteRow(
             contentAlignment = Alignment.CenterStart,
             modifier = Modifier.matchParentSize(),
         ) {
-            DrawableImage(
-                drawableId = iconRes,
+            Icon(
+                painter = painterResource(iconRes),
                 contentDescription = stringResource(LR.string.profile_plus),
                 tint = iconTint,
                 modifier = Modifier.requiredSize(24.dp),
