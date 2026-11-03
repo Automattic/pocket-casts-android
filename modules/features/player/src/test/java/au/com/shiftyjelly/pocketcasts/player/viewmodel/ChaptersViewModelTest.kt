@@ -789,22 +789,51 @@ class ChaptersViewModelTest {
     }
 
     @Test
-    fun `keep generating while loading fails and show no chapters once retries run out`() = runTest {
+    fun `show no chapters after loading fails for 30 seconds and keep retrying quietly`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         chaptersFlow.value = Chapters()
         showGeneratedChaptersFlow.value = true
         whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(GeneratedChaptersResult.Failed)
+        clearInvocations(transcriptManager)
 
         createViewModel().uiState.test {
             assertEquals(EmptyState.GeneratingChapters, awaitItem().emptyState)
 
-            advanceTimeBy(2.minutes)
+            advanceTimeBy(29.seconds)
             runCurrent()
             expectNoEvents()
 
-            advanceTimeBy(1.minutes)
+            advanceTimeBy(1.seconds)
             runCurrent()
             assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
+            verifyBlocking(transcriptManager, times(4)) { loadGeneratedChapters("id") }
+
+            whenever(transcriptManager.loadGeneratedChapters("id")).doSuspendableAnswer {
+                chaptersFlow.value = chapters
+                GeneratedChaptersResult.Loaded
+            }
+            advanceTimeBy(40.seconds)
+            runCurrent()
+            assertNull(awaitItem().emptyState)
+            verifyBlocking(transcriptManager, times(5)) { loadGeneratedChapters("id") }
+        }
+    }
+
+    @Test
+    fun `stop retrying generated chapters after the last backoff`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(GeneratedChaptersResult.Failed)
+        clearInvocations(transcriptManager)
+
+        createViewModel().uiState.test {
+            assertEquals(EmptyState.GeneratingChapters, awaitItem().emptyState)
+            assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
+
+            advanceTimeBy(10.minutes)
+            verifyBlocking(transcriptManager, times(6)) { loadGeneratedChapters("id") }
+            expectNoEvents()
         }
     }
 

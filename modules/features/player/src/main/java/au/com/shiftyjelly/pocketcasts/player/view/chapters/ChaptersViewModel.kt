@@ -41,7 +41,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -104,10 +103,12 @@ class ChaptersViewModel @AssistedInject constructor(
         generatedChaptersLoad.value = load
         if (!load.isEnabled) return
         var result = transcriptManager.loadGeneratedChapters(load.episodeId)
-        var retryDelay = 5.seconds
-        while (result == GeneratedChaptersResult.Failed && retryDelay <= 2.minutes) {
+        for ((retry, retryDelay) in RETRY_DELAYS.withIndex()) {
+            if (result != GeneratedChaptersResult.Failed) break
+            if (retry == QUIET_RETRIES_START) {
+                generatedChaptersLoad.value = load.copy(isFinished = true)
+            }
             delay(retryDelay)
-            retryDelay *= 2
             result = transcriptManager.loadGeneratedChapters(load.episodeId)
         }
         if (result != GeneratedChaptersResult.Loaded || !awaitSavedChapters(load.episodeId)) {
@@ -455,5 +456,7 @@ class ChaptersViewModel @AssistedInject constructor(
 
     private companion object {
         val SAVED_CHAPTERS_TIMEOUT = 1.seconds
+        val RETRY_DELAYS = listOf(5.seconds, 10.seconds, 15.seconds, 40.seconds, 80.seconds)
+        const val QUIET_RETRIES_START = 3
     }
 }
