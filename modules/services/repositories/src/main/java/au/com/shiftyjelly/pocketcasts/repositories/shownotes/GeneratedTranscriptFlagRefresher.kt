@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.time.Clock
 import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
@@ -21,8 +22,8 @@ class GeneratedTranscriptFlagRefresher @Inject constructor(
     private val episodeDao: EpisodeDao,
     private val clock: Clock,
 ) {
-    private val mutex = Mutex()
-    private val lastRefreshes = mutableMapOf<String, Instant>()
+    private val mutexes = ConcurrentHashMap<String, Mutex>()
+    private val lastRefreshes = ConcurrentHashMap<String, Instant>()
 
     suspend fun hasGeneratedTranscript(episode: PodcastEpisode): Boolean {
         if (episode.hasGeneratedTranscript) {
@@ -31,7 +32,7 @@ class GeneratedTranscriptFlagRefresher @Inject constructor(
         if (!episode.isWithinGenerationWindow()) {
             return false
         }
-        return mutex.withLock {
+        return mutexes.computeIfAbsent(episode.podcastUuid) { Mutex() }.withLock {
             if (shouldRefresh(episode.podcastUuid)) {
                 refresh(episode.podcastUuid)
             }
@@ -51,8 +52,13 @@ class GeneratedTranscriptFlagRefresher @Inject constructor(
     private suspend fun refresh(podcastUuid: String) {
         try {
             val response = cacheServiceManager.getPodcastResponse(podcastUuid)
+            val body = response.body()
+            if (!response.isSuccessful || body == null) {
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Failed to refresh generated transcript flags for podcast $podcastUuid, HTTP ${response.code()}")
+                return
+            }
             lastRefreshes[podcastUuid] = clock.instant()
-            val episodes = response.body()?.podcastInfo?.episodes.orEmpty()
+            val episodes = body.podcastInfo.episodes.orEmpty()
             val uuids = episodes.filter { it.hasGeneratedTranscript == true }.map { it.uuid }
             episodeDao.markHasGeneratedTranscript(uuids)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refreshed generated transcript flags for podcast $podcastUuid, ${uuids.size} episodes have one")

@@ -12,6 +12,7 @@ import java.util.Date
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -124,6 +125,19 @@ class GeneratedTranscriptFlagRefresherTest {
         refresher.hasGeneratedTranscript(episode)
 
         verify(cacheServiceManager, times(2)).getPodcastResponse("podcast")
+    }
+
+    @Test
+    fun `retry right away after an HTTP error`() = runTest {
+        val episode = createEpisode()
+        whenever(cacheServiceManager.getPodcastResponse("podcast")) doReturn Response.error(503, "".toResponseBody())
+        whenever(episodeDao.findByUuid("episode")) doReturn episode
+
+        refresher.hasGeneratedTranscript(episode)
+        refresher.hasGeneratedTranscript(episode)
+
+        verify(cacheServiceManager, times(2)).getPodcastResponse("podcast")
+        verify(episodeDao, never()).markHasGeneratedTranscript(any())
     }
 
     private fun createEpisode(
