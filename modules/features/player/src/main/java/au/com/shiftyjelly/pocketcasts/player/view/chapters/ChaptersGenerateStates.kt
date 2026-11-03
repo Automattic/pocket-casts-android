@@ -60,7 +60,7 @@ fun ChaptersNoGeneratedChapters(
     ChaptersBannerContainer(modifier) {
         NoContentBanner(
             title = stringResource(LR.string.chapters_generated_none_title),
-            body = "",
+            body = stringResource(LR.string.chapters_generated_none_message),
             iconResourceId = IR.drawable.ic_book_open,
             colors = chaptersBannerColors(),
         )
