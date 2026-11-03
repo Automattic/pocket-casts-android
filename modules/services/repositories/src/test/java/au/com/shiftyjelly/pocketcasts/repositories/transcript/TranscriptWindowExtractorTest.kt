@@ -45,6 +45,8 @@ class TranscriptWindowExtractorTest {
         },
         transcriptService = object : TranscriptService {
             override suspend fun getTranscriptOrThrow(url: String, cacheControl: CacheControl?) = vtt.toResponseBody()
+
+            override suspend fun getTranscriptResponse(url: String) = error("Not used")
         },
         fingerprintTimingManager = { fingerprintTimingManager },
         playbackManager = { playbackManager },
