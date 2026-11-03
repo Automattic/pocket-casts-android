@@ -108,7 +108,7 @@ private fun GeneratingHeader(
         Icon(
             painter = painterResource(IR.drawable.ic_ai),
             contentDescription = null,
-            tint = LocalChaptersTheme.current.headerToggle,
+            tint = LocalChaptersTheme.current.headerTitle,
             modifier = Modifier
                 .size(16.dp)
                 .graphicsLayer {
@@ -122,7 +122,7 @@ private fun GeneratingHeader(
         Spacer(Modifier.width(8.dp))
         TextH50(
             text = stringResource(LR.string.chapters_generated_generating),
-            color = LocalChaptersTheme.current.headerToggle,
+            color = LocalChaptersTheme.current.headerTitle,
             modifier = Modifier
                 .weight(1f)
                 .padding(vertical = 16.dp),
