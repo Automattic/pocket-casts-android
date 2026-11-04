@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.SocketPolicy
 import okio.Buffer
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
@@ -143,6 +144,19 @@ class FingerprintReferenceRetrieverTest {
                 ),
                 eventSink.pollEvent(),
             )
+        }
+    }
+
+    @Test
+    fun `fetchReferenceData does not track a download that never reached the server`() = runTest {
+        MockWebServer().use { server ->
+            repeat(3) { server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START)) }
+            server.start()
+
+            val result = retriever.fetchReferenceData(server.url("/").toString(), "podcast", "episode", GeneratedChaptersDownloadTriggerType.Playback)
+
+            assertEquals(FingerprintReferenceRetriever.FetchResult.Error(hasResponse = false), result)
+            assertTrue(eventSink.isEmpty())
         }
     }
 

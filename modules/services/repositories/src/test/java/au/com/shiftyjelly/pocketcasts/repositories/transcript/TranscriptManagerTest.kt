@@ -620,9 +620,9 @@ class TranscriptManagerTest {
     }
 
     @Test
-    fun `track a failed meta download`() = runTest {
+    fun `track a meta download the server answered with an error`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-        service.shouldThrow = true
+        service.metaErrorCode = 500
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
 
         transcriptManager.loadGeneratedChapters("episode-id")
@@ -639,6 +639,17 @@ class TranscriptManagerTest {
             ),
             eventSink.pollEvent(),
         )
+    }
+
+    @Test
+    fun `do not track a meta download that never reached the server`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.shouldThrow = true
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+
+        transcriptManager.loadGeneratedChapters("episode-id")
+
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
@@ -693,11 +704,22 @@ private class TestTranscriptService : TranscriptService {
     var metaRequestCount = 0
     var metaContentLength: Long? = null
     var metaFromCache = false
+    var metaErrorCode: Int? = null
 
     override suspend fun getTranscriptResponse(url: String): Response<ResponseBody> {
         if (shouldThrow) error("Test exception")
         val body = metaJsonResponse?.also { metaRequestCount++ } ?: responseBody
         val request = Request.Builder().url("https://example.com/$url").build()
+        metaErrorCode?.let { code ->
+            val errorResponse = okhttp3.Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(code)
+                .message("Error")
+                .build()
+            val rawErrorResponse = errorResponse.newBuilder().networkResponse(errorResponse).build()
+            return Response.error("".toResponseBody(), rawErrorResponse)
+        }
         val networkResponse = okhttp3.Response.Builder()
             .request(request)
             .protocol(Protocol.HTTP_1_1)

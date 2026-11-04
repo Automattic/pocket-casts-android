@@ -40,7 +40,7 @@ class FingerprintReferenceRetriever @Inject constructor(
     sealed interface FetchResult {
         class Success(val data: ByteArray, val bytesReceived: Long = data.size.toLong()) : FetchResult
         data object NotFound : FetchResult
-        data object Error : FetchResult
+        data class Error(val hasResponse: Boolean) : FetchResult
     }
 
     private val fetchScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -82,6 +82,7 @@ class FingerprintReferenceRetriever @Inject constructor(
     ): FetchResult = withContext(Dispatchers.IO) {
         val url = "${baseUrl}$podcastUuid/$episodeUuid-fingerprints.json.gz"
 
+        var hasResponse = false
         for (attempt in 0 until MAX_RETRIES) {
             coroutineContext.ensureActive()
 
@@ -94,6 +95,7 @@ class FingerprintReferenceRetriever @Inject constructor(
                 val request = Request.Builder().url(url).build()
                 okHttpClient.newCall(request).execute().use { response ->
                     val statusCode = response.code
+                    hasResponse = true
 
                     if (statusCode == 404 || statusCode == 403) {
                         Timber.d("FingerprintReferenceRetriever: no reference for $episodeUuid ($statusCode)")
@@ -106,7 +108,7 @@ class FingerprintReferenceRetriever @Inject constructor(
                             continue
                         }
                         Timber.w("FingerprintReferenceRetriever: unexpected status $statusCode for $episodeUuid")
-                        return@withContext FetchResult.Error
+                        return@withContext FetchResult.Error(hasResponse = true)
                     }
 
                     val body = response.body.bytes()
@@ -120,12 +122,12 @@ class FingerprintReferenceRetriever @Inject constructor(
                 throw e
             } catch (e: IOException) {
                 Timber.w("FingerprintReferenceRetriever: fetch failed for $episodeUuid, attempt ${attempt + 1}/$MAX_RETRIES — ${e.message}")
-                if (attempt == MAX_RETRIES - 1) return@withContext FetchResult.Error
+                if (attempt == MAX_RETRIES - 1) return@withContext FetchResult.Error(hasResponse)
             }
         }
 
         Timber.w("FingerprintReferenceRetriever: exhausted retries for $episodeUuid")
-        FetchResult.Error
+        FetchResult.Error(hasResponse)
     }
 
     private fun trackDownload(
@@ -134,6 +136,7 @@ class FingerprintReferenceRetriever @Inject constructor(
         episodeUuid: String,
         trigger: GeneratedChaptersDownloadTriggerType,
     ) {
+        if (result is FetchResult.Error && !result.hasResponse) return
         eventHorizon.track(
             GeneratedChaptersFileDownloadedEvent(
                 file = GeneratedChaptersFileType.Fingerprints,

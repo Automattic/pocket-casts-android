@@ -190,14 +190,7 @@ class TranscriptManagerImpl @Inject constructor(
     }
 
     private suspend fun downloadMeta(episodeUuid: String, metaUrl: String): ByteArray {
-        val response = try {
-            transcriptService.getTranscriptResponse(metaUrl)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            trackMetaDownload(episodeUuid, bytes = 0L, success = false)
-            throw e
-        }
+        val response = transcriptService.getTranscriptResponse(metaUrl)
         val networkResponse = response.raw().networkResponse?.takeIf { it.code != HTTP_NOT_MODIFIED }
         val body = response.body()
         if (!response.isSuccessful || body == null) {
