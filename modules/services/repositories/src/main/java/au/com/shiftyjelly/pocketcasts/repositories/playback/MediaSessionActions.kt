@@ -3,20 +3,15 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EpisodeArchivedEvent
 import com.automattic.eventhorizon.EpisodeMarkedAsPlayedEvent
 import com.automattic.eventhorizon.EventHorizon
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * Shared action methods used by both the legacy [MediaSessionManager.MediaSessionCallback]
@@ -34,6 +29,7 @@ internal class MediaSessionActions(
     private val source: SourceView = SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
     private val onSearchFailed: ((String) -> Unit)? = null,
 ) {
+    private val playFromSearchResolver = PlayFromSearchResolver(playbackManager, podcastManager, episodeManager, playlistManager)
 
     fun markAsPlayed() {
         scopeProvider().launch { markAsPlayedSuspend() }
@@ -137,69 +133,14 @@ internal class MediaSessionActions(
     }
 
     suspend fun performPlayFromSearchSuspend(searchTerm: String?) {
-        val query: String = searchTerm?.trim()?.lowercase() ?: return
-
-        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "performPlayFromSearch query: %s", query)
-
-        val sourceView = SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION
-
-        if (query.startsWith("up next")) {
-            playbackManager.playQueue(sourceView = sourceView)
-            return
+        if (searchTerm == null) return
+        val result = playFromSearchResolver.playFromSearch(searchTerm, SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION)
+        if (result == PlayFromSearchResult.NotFound) {
+            onSearchFailed?.invoke("No search results")
         }
-
-        if (query.startsWith("next episode") || query.startsWith("next podcast")) {
-            val queueEpisodes = playbackManager.upNextQueue.queueEpisodes
-            queueEpisodes.firstOrNull()?.let { episode ->
-                playbackManager.playNext(episode = episode, source = sourceView)
-                return
-            }
-        }
-
-        val options = MediaSessionManager.calculateSearchQueryOptions(query)
-        for (option in options) {
-            val matchingPodcast: Podcast? = podcastManager.searchPodcastByTitleBlocking(option)
-            if (matchingPodcast != null) {
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played podcast from search %s.", option)
-                playPodcast(podcast = matchingPodcast, sourceView = sourceView)
-                return
-            }
-        }
-
-        for (option in options) {
-            val matchingEpisode = episodeManager.findFirstBySearchQuery(option) ?: continue
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played episode from search %s.", option)
-            playbackManager.playNow(episode = matchingEpisode, sourceView = sourceView)
-            return
-        }
-
-        val playlistPreviews = playlistManager.playlistPreviewsFlow().first()
-        for (option in options) {
-            val playlistPreview = playlistPreviews.find { it.title.equals(option, ignoreCase = true) }
-                ?: continue
-            val playlist = playlistManager.smartPlaylistFlow(playlistPreview.uuid).first()
-                ?: playlistManager.manualPlaylistFlow(playlistPreview.uuid).first()
-                ?: continue
-            val episodes = playlist.episodes.toPodcastEpisodes()
-            if (episodes.isNotEmpty()) {
-                LogBuffer.i(LogBuffer.TAG_PLAYBACK, "User played playlist from search %s.", option)
-                playbackManager.playEpisodes(episodes = episodes, sourceView = sourceView)
-                return
-            }
-        }
-
-        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "No search results for: %s", query)
-        onSearchFailed?.invoke("No search results")
     }
 
     fun findPodcast(episode: PodcastEpisode): Podcast? {
         return podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)
-    }
-
-    private suspend fun playPodcast(podcast: Podcast, sourceView: SourceView) {
-        val latestEpisode = withContext(Dispatchers.Default) {
-            episodeManager.findLatestUnfinishedEpisodeByPodcastBlocking(podcast)
-        } ?: return
-        playbackManager.playNow(episode = latestEpisode, sourceView = sourceView)
     }
 }

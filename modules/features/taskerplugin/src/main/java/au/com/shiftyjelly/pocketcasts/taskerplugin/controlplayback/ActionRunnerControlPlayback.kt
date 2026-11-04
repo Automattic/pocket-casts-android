@@ -4,6 +4,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackEffectsUpdater
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.playbackManager
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.podcastManager
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.settings
@@ -82,20 +83,6 @@ class ActionRunnerControlPlayback : TaskerPluginRunnerActionNoOutput<InputContro
     }
 
     private fun Context.updateEffects(updater: PlaybackEffects.() -> Unit) {
-        val currentPodcast = playbackManager.getCurrentPodcast() ?: return
-
-        val overrideGlobalEffects = currentPodcast.overrideGlobalEffects
-        val playbackEffects: PlaybackEffects = if (overrideGlobalEffects) {
-            currentPodcast.playbackEffects
-        } else {
-            settings.globalPlaybackEffects.value
-        }
-        playbackEffects.updater()
-        if (overrideGlobalEffects) {
-            podcastManager.updateEffectsBlocking(currentPodcast, playbackEffects)
-        } else {
-            settings.globalPlaybackEffects.set(playbackEffects, updateModifiedAt = true)
-        }
-        playbackManager.updatePlayerEffects(playbackEffects)
+        PlaybackEffectsUpdater(playbackManager, podcastManager, settings).update(updater)
     }
 }
