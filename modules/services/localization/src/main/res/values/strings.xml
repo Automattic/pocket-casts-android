@@ -2605,6 +2605,7 @@
     <string name="chat_answering">Answering</string>
     <string name="chat_clear">Clear chat</string>
     <string name="chat_offline_note">You’re offline. Connect to ask a question.</string>
+    <string name="chat_playback_position">Playback position</string>
     <string name="chat_play_quote">Play quote</string>
     <string name="chat_quote_finding_moment">Finding the moment…</string>
     <string name="chat_loading_reading_transcript">Reading the transcript</string>

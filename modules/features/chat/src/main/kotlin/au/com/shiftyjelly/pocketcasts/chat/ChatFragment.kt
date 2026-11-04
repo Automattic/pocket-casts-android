@@ -208,6 +208,7 @@ class ChatFragment : BaseDialogFragment() {
                     onOpenHistoryChat = viewModel::openHistoryChat,
                     onDeleteHistoryChat = viewModel::deleteHistoryChat,
                     onClickPlayPause = viewModel::onPlayPauseClick,
+                    onSeek = viewModel::onSeek,
                     onInputTextChange = viewModel::onInputTextChange,
                     onSend = viewModel::onSend,
                     onClickSuggestion = viewModel::onSuggestionClick,

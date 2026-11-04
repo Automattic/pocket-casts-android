@@ -345,6 +345,7 @@ class ChatViewModel @Inject constructor(
                         isPlaying = playbackState.isPlaying,
                         positionMs = playbackState.positionMs,
                         durationMs = playbackState.durationMs.takeIf { it > 0 } ?: episode.durationMs,
+                        isSeekable = true,
                     )
 
                     else -> ChatPlayingEpisode(
@@ -356,6 +357,7 @@ class ChatViewModel @Inject constructor(
                         isPlaying = playbackState.isPlaying,
                         positionMs = playbackState.positionMs,
                         durationMs = playbackState.durationMs.coerceAtLeast(0),
+                        isSeekable = true,
                     )
                 }
             }.distinctUntilChanged().collect { (otherPlayingEpisode, playback) ->
@@ -402,6 +404,13 @@ class ChatViewModel @Inject constructor(
                 state.loadedEpisodeUuid != null -> playbackManager.playQueueSuspend(sourceView = sourceView)
                 else -> playbackManager.playNowSuspend(episodeUuid, sourceView = sourceView)
             }
+        }
+    }
+
+    fun onSeek(positionMs: Int) {
+        viewModelScope.launch(ioDispatcher) {
+            if (playbackManager.playbackStateFlow.first().loadedEpisodeUuid == null) return@launch
+            playbackManager.seekToTimeMsSuspend(positionMs = positionMs)
         }
     }
 
@@ -1215,6 +1224,7 @@ data class ChatPlayback(
     val isPlaying: Boolean = false,
     val positionMs: Int = 0,
     val durationMs: Int = 0,
+    val isSeekable: Boolean = false,
 ) {
     val progress: Float get() = if (durationMs > 0) (positionMs.toFloat() / durationMs).coerceIn(0f, 1f) else 0f
 }
