@@ -124,7 +124,9 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -1293,39 +1295,40 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun skipToNextSelectedOrLastChapter() {
-        launch {
-            val episode = getCurrentEpisode() ?: return@launch
-            // Base the jump on an in-flight chapter resolve so rapid taps advance instead of re-targeting it.
-            val baseTime = pendingChapterSeek?.startTime ?: getCurrentTimeMs(episode = episode).milliseconds
-            playbackStateRelay.blockingFirst().chapters.getNextSelectedChapter(baseTime)?.let { chapter ->
-                seekToChapterStart(episode, chapter)
-                trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
-                    PlaybackChapterSkippedEvent(
-                        source = source.analyticsValue,
-                        contentType = contentType,
-                        origin = chapter.origin.toChapterOriginType(),
-                    )
-                }
-            } ?: skipToEndOfLastChapter()
+    fun skipToNextSelectedOrLastChapter(): Deferred<ChapterSeek?> = launchChapterSeek {
+        val episode = getCurrentEpisode() ?: return@launchChapterSeek null
+        // Base the jump on an in-flight chapter resolve so rapid taps advance instead of re-targeting it.
+        val baseTime = pendingChapterSeek?.startTime ?: getCurrentTimeMs(episode = episode).milliseconds
+        val chapter = playbackStateRelay.blockingFirst().chapters.getNextSelectedChapter(baseTime)
+        if (chapter == null) {
+            skipToEndOfLastChapter()
+            return@launchChapterSeek null
+        }
+        seekToChapterStart(episode, chapter).also { trackChapterSkipped(chapter) }
+    }
+
+    fun skipToPreviousSelectedOrLastChapter(): Deferred<ChapterSeek?> = launchChapterSeek {
+        val episode = getCurrentEpisode() ?: return@launchChapterSeek null
+        val baseTime = pendingChapterSeek?.startTime ?: getCurrentTimeMs(episode).milliseconds
+        val chapter = playbackStateRelay.blockingFirst().chapters.getPreviousSelectedChapter(baseTime)
+            ?: return@launchChapterSeek null
+        seekToChapterStart(episode, chapter).also { trackChapterSkipped(chapter) }
+    }
+
+    private fun trackChapterSkipped(chapter: Chapter) {
+        trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
+            PlaybackChapterSkippedEvent(
+                source = source.analyticsValue,
+                contentType = contentType,
+                origin = chapter.origin.toChapterOriginType(),
+            )
         }
     }
 
-    fun skipToPreviousSelectedOrLastChapter() {
-        launch {
-            val episode = getCurrentEpisode() ?: return@launch
-            val baseTime = pendingChapterSeek?.startTime ?: getCurrentTimeMs(episode).milliseconds
-            playbackStateRelay.blockingFirst().chapters.getPreviousSelectedChapter(baseTime)?.let { chapter ->
-                seekToChapterStart(episode, chapter)
-                trackPlaybackEvent(SourceView.PLAYER) { source, contentType ->
-                    PlaybackChapterSkippedEvent(
-                        source = source.analyticsValue,
-                        contentType = contentType,
-                        origin = chapter.origin.toChapterOriginType(),
-                    )
-                }
-            }
-        }
+    private fun launchChapterSeek(seek: suspend () -> ChapterSeek?): Deferred<ChapterSeek?> {
+        val result = CompletableDeferred<ChapterSeek?>()
+        launch { result.complete(seek()) }.invokeOnCompletion { result.complete(null) }
+        return result
     }
 
     private fun skipToEndOfLastChapter() {
@@ -1343,13 +1346,11 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun skipToChapter(chapter: Chapter) {
-        launch {
-            if (chapter.selected) {
-                seekToChapterStart(getCurrentEpisode(), chapter)
-            } else {
-                skipToNextSelectedOrLastChapter()
-            }
+    fun skipToChapter(chapter: Chapter): Deferred<ChapterSeek?> = launchChapterSeek {
+        if (chapter.selected) {
+            seekToChapterStart(getCurrentEpisode(), chapter)
+        } else {
+            skipToNextSelectedOrLastChapter().await()
         }
     }
 
@@ -1376,13 +1377,16 @@ open class PlaybackManager @Inject constructor(
      * Generated chapter timestamps live on the reference timeline; resolve the real stream position
      * through the fingerprint map before seeking. Falls back to the chapter's own start time.
      */
-    private suspend fun seekToChapterStart(episode: BaseEpisode?, chapter: Chapter) {
+    private suspend fun seekToChapterStart(episode: BaseEpisode?, chapter: Chapter): ChapterSeek? {
         pendingChapterSeek = chapter
         try {
-            val resolved = episode?.let { generatedChapterSeeker.get().resolveSeekTime(it, chapter) }
+            val generated = episode?.let { generatedChapterSeeker.get().resolveSeek(it, chapter) }
             // Resolving can take seconds; drop the seek if the episode changed meanwhile.
-            if (episode != null && getCurrentEpisode()?.uuid != episode.uuid) return
-            seekToTimeMsInternal(resolved ?: chapter.startTime)
+            if (episode != null && getCurrentEpisode()?.uuid != episode.uuid) return null
+            if (pendingChapterSeek !== chapter) return null
+            val position = generated?.playbackTime ?: chapter.startTime
+            seekToTimeMsInternal(position)
+            return ChapterSeek(chapter, position, generated)
         } finally {
             // A superseding tap has already installed its own chapter; only the owner clears it.
             if (pendingChapterSeek === chapter) pendingChapterSeek = null

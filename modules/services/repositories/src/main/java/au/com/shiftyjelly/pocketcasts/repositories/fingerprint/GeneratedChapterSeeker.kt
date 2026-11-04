@@ -15,6 +15,7 @@ import kotlin.math.ceil
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
+import kotlin.time.TimeSource
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
@@ -32,7 +33,7 @@ import timber.log.Timber
 
 /**
  * Resolves generated chapter seeks to the real stream position via the fingerprint map.
- * Returns null whenever the caller should fall back to the chapter's own start time.
+ * Returns null when the chapter isn't resolved through fingerprinting at all.
  */
 @Singleton
 class GeneratedChapterSeeker @Inject constructor(
@@ -40,6 +41,7 @@ class GeneratedChapterSeeker @Inject constructor(
     private val appPlatform: AppPlatform,
     private val decodePolicy: FingerprintDecodePolicy,
     private val generatedChaptersAvailability: GeneratedChaptersAvailability,
+    private val timeSource: TimeSource,
 ) {
     data class ResolvingChapter(val episodeUuid: String, val chapterIndex: Int)
 
@@ -72,7 +74,7 @@ class GeneratedChapterSeeker @Inject constructor(
         activeCaller?.cancel()
     }
 
-    suspend fun resolveSeekTime(episode: BaseEpisode, chapter: Chapter): Duration? {
+    suspend fun resolveSeek(episode: BaseEpisode, chapter: Chapter): GeneratedChapterSeek? {
         if (!isEnabled(chapter)) return null
         val referenceTime = chapter.referenceStartTime ?: return null
 
@@ -89,15 +91,23 @@ class GeneratedChapterSeeker @Inject constructor(
                 referenceUnavailable = false
             }
             resolvedCache[chapter.index]
-        }?.let { return it.coerceAtLeast(chapter.startTime) }
+        }?.let { return GeneratedChapterSeek.Resolved(it.coerceAtLeast(chapter.startTime), isCached = true) }
 
         val manager = fingerprintTimingManager.get()
-        manager.densePlaybackTime(episode.uuid, referenceTime)?.let { return it.coerceAtLeast(chapter.startTime) }
+        manager.densePlaybackTime(episode.uuid, referenceTime)?.let {
+            return GeneratedChapterSeek.Resolved(it.coerceAtLeast(chapter.startTime), isCached = true)
+        }
 
         if (decodePolicy.current() != FingerprintPolicy.PLATFORM) return null
 
         // A remembered failure repeats deterministically, so fall back without re-resolving.
-        if (mutex.withLock { referenceUnavailable || chapter.index in failedChapters }) return null
+        mutex.withLock {
+            when {
+                referenceUnavailable -> ChapterSeekResult.REASON_NO_REFERENCE
+                chapter.index in failedChapters -> ChapterSeekResult.REASON_NO_MATCH
+                else -> null
+            }
+        }?.let { return GeneratedChapterSeek.Unresolved(it, isAttempted = false) }
 
         // Last tap wins: a new resolve cancels the previous caller, so a superseded tap never seeks.
         val myJob = currentCoroutineContext().job
@@ -107,15 +117,18 @@ class GeneratedChapterSeeker @Inject constructor(
             activeCaller = myJob
             _resolvingChapter.value = resolving
         }
+        val resolveStart = timeSource.markNow()
         try {
-            return when (val result = manager.resolvePlaybackTime(episode, referenceTime)) {
+            val result = manager.resolvePlaybackTime(episode, referenceTime)
+            val resolveDuration = resolveStart.elapsedNow()
+            return when (result) {
                 is ChapterSeekResult.Resolved -> {
                     val playbackTime = ceil(result.playbackTime.toDouble(DurationUnit.SECONDS)).seconds
                     mutex.withLock {
                         if (cacheSourceKey == sourceKey) resolvedCache[chapter.index] = playbackTime
                     }
                     Timber.d("GeneratedChapterSeeker: resolved chapter ${chapter.index} to $playbackTime (usedPrior=${result.usedPrior})")
-                    playbackTime
+                    GeneratedChapterSeek.Resolved(playbackTime, isCached = false, resolveDuration)
                 }
 
                 is ChapterSeekResult.Unresolved -> {
@@ -128,7 +141,7 @@ class GeneratedChapterSeeker @Inject constructor(
                         }
                     }
                     Timber.d("GeneratedChapterSeeker: unresolved chapter ${chapter.index} (${result.reason})")
-                    null
+                    GeneratedChapterSeek.Unresolved(result.reason, isAttempted = result.reason !in SKIPPED_REASONS, resolveDuration)
                 }
             }
         } finally {
@@ -150,3 +163,5 @@ class GeneratedChapterSeeker @Inject constructor(
         FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) &&
         generatedChaptersAvailability.isAllowed()
 }
+
+private val SKIPPED_REASONS = setOf(ChapterSeekResult.REASON_METERED_NETWORK, ChapterSeekResult.REASON_UNSUPPORTED_DEVICE)

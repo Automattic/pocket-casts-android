@@ -108,6 +108,12 @@ class ChaptersFragment : BaseFragment() {
                         showUpsell()
                     }
                 }
+
+                LaunchedEffect(Unit) {
+                    viewModel.chapterStartNotFound.collect {
+                        showChapterStartNotFound()
+                    }
+                }
             }
         }
     }
@@ -148,13 +154,20 @@ class ChaptersFragment : BaseFragment() {
     private fun turnOffGeneratedChapters() {
         val viewModel = viewModel
         viewModel.turnOffGeneratedChapters()
-        val snackBarView = when (val parent = parentFragment) {
-            is BaseDialogFragment -> parent.snackBarView()
-            else -> parent?.view
-        } ?: return
+        val snackBarView = snackBarView() ?: return
         Snackbar.make(snackBarView, getString(LR.string.chapters_generated_turned_off), Snackbar.LENGTH_LONG)
             .setAction(LR.string.chapters_generated_undo) { viewModel.undoTurnOffGeneratedChapters() }
             .show()
+    }
+
+    private fun showChapterStartNotFound() {
+        val snackBarView = snackBarView() ?: return
+        Snackbar.make(snackBarView, getString(LR.string.chapters_generated_start_not_found), Snackbar.LENGTH_LONG).show()
+    }
+
+    private fun snackBarView() = when (val parent = parentFragment) {
+        is BaseDialogFragment -> parent.snackBarView()
+        else -> parent?.view
     }
 
     private val ChaptersViewModel.Mode.themeType get() = when (this) {

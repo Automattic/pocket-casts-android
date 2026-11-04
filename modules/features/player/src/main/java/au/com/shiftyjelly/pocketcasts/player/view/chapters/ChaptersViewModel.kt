@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.toChapterOriginType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
+import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.GeneratedChapterSeek
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.GeneratedChapterSeeker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -21,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.ChapterLinkClickedEvent
+import com.automattic.eventhorizon.ChapterOriginType
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.DeselectChaptersChapterDeselectedEvent
@@ -39,9 +41,12 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,8 +60,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 @HiltViewModel(assistedFactory = ChaptersViewModel.Factory::class)
 class ChaptersViewModel @AssistedInject constructor(
@@ -69,6 +76,7 @@ class ChaptersViewModel @AssistedInject constructor(
     private val generatedChapterSeeker: GeneratedChapterSeeker,
     private val transcriptManager: TranscriptManager,
     private val generatedChaptersAvailability: GeneratedChaptersAvailability,
+    private val timeSource: TimeSource,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val isTogglingChapters = MutableStateFlow(false)
@@ -125,8 +133,16 @@ class ChaptersViewModel @AssistedInject constructor(
     private val _showPlayer = MutableSharedFlow<Unit>()
     val showPlayer = _showPlayer.asSharedFlow()
 
+    private val _chapterStartNotFound = Channel<Unit>()
+    val chapterStartNotFound = _chapterStartNotFound.receiveAsFlow()
+
     fun playChapter(chapter: Chapter) {
-        eventHorizon.track(PlayerChapterSelectedEvent(origin = chapter.origin.toChapterOriginType()))
+        val tappedAt = timeSource.markNow()
+        val selection = ChapterSelection(
+            origin = chapter.origin.toChapterOriginType(),
+            source = mode.chaptersShownSource,
+            episodeUuid = (mode as? Mode.Episode)?.episodeId,
+        )
         playChapterJob?.cancel()
         playChapterJob = viewModelScope.launch(ioDispatcher) {
             val playbackState = playbackManager.playbackStateFlow.first()
@@ -134,25 +150,74 @@ class ChaptersViewModel @AssistedInject constructor(
                 is Mode.Episode -> mode.episodeId
                 is Mode.Player -> playbackState.episodeUuid
             }
+            selection.episodeUuid = episodeId.takeIf { it.isNotEmpty() }
+            val episode = episodeManager.findEpisodeByUuid(episodeId)
+            selection.podcastUuid = episode?.podcastOrSubstituteUuid
 
             when {
                 playbackState.episodeUuid == episodeId && playbackState.positionMs.milliseconds in chapter -> _showPlayer.emit(Unit)
 
                 playbackState.episodeUuid == episodeId -> {
-                    playbackManager.skipToChapter(chapter)
+                    val pendingSeek = playbackManager.skipToChapter(chapter)
                     if (!playbackState.isPlaying) {
                         playbackManager.playNowSuspend(episodeId)
                     }
+                    val seek = pendingSeek.await() ?: return@launch
+                    selection.generatedSeek = seek.generated
+                    if (seek.isGeneratedFallback) {
+                        _chapterStartNotFound.trySend(Unit)
+                    }
+                    selection.playbackStartLatency = awaitPlaybackStart(episodeId, seek.position, tappedAt)
+                        ?.minus(seek.generated?.resolveDuration ?: Duration.ZERO)
+                        ?.coerceAtLeast(Duration.ZERO)
                 }
 
                 playbackState.episodeUuid != episodeId -> {
-                    val episode = episodeManager.findEpisodeByUuid(episodeId) ?: return@launch
+                    episode ?: return@launch
                     episode.playedUpToMs = chapter.startTime.inWholeMilliseconds.toInt()
                     episodeManager.updatePlayedUpToBlocking(episode, chapter.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
                     playbackManager.playNowSuspend(episode)
+                    selection.playbackStartLatency = awaitPlaybackStart(episodeId, chapter.startTime, tappedAt)
                 }
             }
+        }.apply {
+            invokeOnCompletion { eventHorizon.track(selection.toEvent()) }
         }
+    }
+
+    private suspend fun awaitPlaybackStart(episodeId: String, position: Duration, tappedAt: TimeMark) = withTimeoutOrNull(PLAYBACK_START_TIMEOUT) {
+        val window = position - PLAYBACK_START_TOLERANCE..position + PLAYBACK_START_WINDOW
+        playbackManager.playbackStateFlow.first { state ->
+            state.episodeUuid == episodeId &&
+                state.isPlaying &&
+                !state.isBuffering &&
+                state.lastChangeFrom != PlaybackManager.LastChangeFrom.OnUserSeeking.value &&
+                state.positionMs.milliseconds in window
+        }
+        tappedAt.elapsedNow()
+    }
+
+    private val Mode.chaptersShownSource get() = when (this) {
+        is Mode.Episode -> ChaptersShownSource.EpisodeDetails
+        is Mode.Player -> ChaptersShownSource.FullscreenPlayer
+    }
+
+    private class ChapterSelection(
+        val origin: ChapterOriginType,
+        val source: ChaptersShownSource,
+        var episodeUuid: String?,
+    ) {
+        var podcastUuid: String? = null
+        var generatedSeek: GeneratedChapterSeek? = null
+        var playbackStartLatency: Duration? = null
+
+        fun toEvent() = PlayerChapterSelectedEvent(
+            origin = origin,
+            source = source,
+            playbackStartLatencyMs = playbackStartLatency?.inWholeMilliseconds,
+            episodeUuid = episodeUuid,
+            podcastUuid = podcastUuid,
+        )
     }
 
     private val _showUpsell = MutableSharedFlow<Unit>()
@@ -342,6 +407,12 @@ class ChaptersViewModel @AssistedInject constructor(
     sealed interface Mode {
         data class Episode(val episodeId: String) : Mode
         data object Player : Mode
+    }
+
+    private companion object {
+        val PLAYBACK_START_TIMEOUT = 30.seconds
+        val PLAYBACK_START_TOLERANCE = 1.seconds
+        val PLAYBACK_START_WINDOW = 10.seconds
     }
 
     @AssistedFactory
