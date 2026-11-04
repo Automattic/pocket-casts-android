@@ -542,18 +542,6 @@ class ChaptersViewModelTest {
     }
 
     @Test
-    fun `play chapter does not tell the user when resolving was skipped on a metered network`() = runTest {
-        chaptersViewModel.chapterStartNotFound.test {
-            chaptersViewModel.playChapter(generatedChapter)
-            pendingSeek.complete(
-                ChapterSeek(generatedChapter, 10.seconds, GeneratedChapterSeek.Unresolved(ChapterSeekResult.REASON_METERED_NETWORK, isAttempted = true)),
-            )
-
-            expectNoEvents()
-        }
-    }
-
-    @Test
     fun `play chapter does not tell the user when the chapter resolved`() = runTest {
         chaptersViewModel.chapterStartNotFound.test {
             chaptersViewModel.playChapter(generatedChapter)

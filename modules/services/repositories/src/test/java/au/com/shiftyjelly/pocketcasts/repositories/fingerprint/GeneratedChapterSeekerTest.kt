@@ -381,6 +381,30 @@ class GeneratedChapterSeekerTest {
     }
 
     @Test
+    fun `reports a resolve skipped on a metered network as not attempted`() = runTest {
+        timingManager = mock {
+            on { resolvePlaybackTime(any(), any()) } doReturn
+                ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_METERED_NETWORK)
+        }
+
+        val seek = seeker().resolveSeek(episode, generatedChapter) as GeneratedChapterSeek.Unresolved
+
+        assertFalse(seek.isAttempted)
+    }
+
+    @Test
+    fun `reports a resolve skipped on an unsupported device as not attempted`() = runTest {
+        timingManager = mock {
+            on { resolvePlaybackTime(any(), any()) } doReturn
+                ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_UNSUPPORTED_DEVICE)
+        }
+
+        val seek = seeker().resolveSeek(episode, generatedChapter) as GeneratedChapterSeek.Unresolved
+
+        assertFalse(seek.isAttempted)
+    }
+
+    @Test
     fun `reports a remembered failure as unresolved without an attempt`() = runTest {
         timingManager = mock {
             on { resolvePlaybackTime(any(), any()) } doReturn

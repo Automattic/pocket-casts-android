@@ -141,7 +141,7 @@ class GeneratedChapterSeeker @Inject constructor(
                         }
                     }
                     Timber.d("GeneratedChapterSeeker: unresolved chapter ${chapter.index} (${result.reason})")
-                    GeneratedChapterSeek.Unresolved(result.reason, isAttempted = true, resolveDuration)
+                    GeneratedChapterSeek.Unresolved(result.reason, isAttempted = result.reason !in SKIPPED_REASONS, resolveDuration)
                 }
             }
         } finally {
@@ -163,3 +163,5 @@ class GeneratedChapterSeeker @Inject constructor(
         FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) &&
         generatedChaptersAvailability.isAllowed()
 }
+
+private val SKIPPED_REASONS = setOf(ChapterSeekResult.REASON_METERED_NETWORK, ChapterSeekResult.REASON_UNSUPPORTED_DEVICE)
