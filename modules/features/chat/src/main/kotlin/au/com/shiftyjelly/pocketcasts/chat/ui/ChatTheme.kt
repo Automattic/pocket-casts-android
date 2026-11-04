@@ -28,7 +28,7 @@ internal data class ChatTheme(
     val progress: Color,
     val progressTrack: Color,
     val chipBorder: Color,
-    val quoteTimestamp: Color,
+    val link: Color,
     val onWhiteText: Color,
     val sheetHandle: Color,
     val rating: Color,
@@ -56,7 +56,7 @@ internal data class ChatTheme(
             progress = colors.primaryInteractive01,
             progressTrack = colors.primaryText02,
             chipBorder = colors.primaryUi05,
-            quoteTimestamp = colors.primaryInteractive01,
+            link = colors.primaryInteractive01,
             onWhiteText = ThemeLightColors.primaryText01,
             sheetHandle = ThemeLightColors.primaryUi05,
             rating = colors.primaryIcon02,
@@ -84,7 +84,7 @@ internal data class ChatTheme(
             progress = colors.highlight01,
             progressTrack = colors.contrast02,
             chipBorder = colors.contrast05,
-            quoteTimestamp = QuoteTimestampBlue,
+            link = colors.contrast01,
             onWhiteText = ThemeLightColors.primaryText01,
             sheetHandle = ThemeLightColors.primaryUi05,
             rating = colors.contrast05,
@@ -109,6 +109,5 @@ internal fun rememberChatTheme(): ChatTheme {
     }
 }
 
-private val QuoteTimestampBlue = Color(0xFF2A67F9)
 private val ErrorRed = Color(0xFFF43E37)
 private const val OFFLINE_NOTE_MIN_ALPHA = 0.6f
