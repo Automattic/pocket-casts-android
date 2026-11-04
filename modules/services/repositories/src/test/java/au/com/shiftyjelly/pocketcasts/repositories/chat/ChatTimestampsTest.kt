@@ -34,8 +34,13 @@ class ChatTimestampsTest {
     }
 
     @Test
-    fun `a single time is bracketed`() {
-        assertEquals("It comes up at (5:04).", "It comes up at 05:04.".withChatTimestamps())
+    fun `a single time with hours is bracketed`() {
+        assertEquals("It comes up at (5:04).", "It comes up at 00:05:04.".withChatTimestamps())
+    }
+
+    @Test
+    fun `a bracketed single time without hours is kept`() {
+        assertEquals("It comes up at (5:04).", "It comes up at (05:04).".withChatTimestamps())
     }
 
     @Test
@@ -49,6 +54,8 @@ class ChatTimestampsTest {
             "Juniper was born at 23 weeks and 6 days.",
             "The meeting was at 9:30 am.",
             "Doors open at 7:15pm.",
+            "The show airs at 9:30.",
+            "John 3:16 is quoted.",
             "The ratio was 3:1.",
             "Seconds can't be 10:75.",
             "Version 1:02:03:04 is not a time.",
@@ -76,7 +83,7 @@ class ChatTimestampsTest {
 
     @Test
     fun `found timestamps keep milliseconds`() {
-        assertEquals(2_761_845, findChatTimestamps("46:01.845").single().startMs)
+        assertEquals(2_761_845, findChatTimestamps("(46:01.845)").single().startMs)
     }
 
     @Test
@@ -94,7 +101,7 @@ class ChatTimestampsTest {
 
     @Test
     fun `answers show canonical timestamps`() {
-        val answer = ChatMessage.Assistant(text = "- First at 00:10:32 to 00:10:39\n- Then 13:07")
+        val answer = ChatMessage.Assistant(text = "- First at 00:10:32 to 00:10:39\n- Then 00:13:07")
 
         assertEquals("•  First at (10:32 - 10:39)\n•  Then (13:07)", answer.displayText)
     }

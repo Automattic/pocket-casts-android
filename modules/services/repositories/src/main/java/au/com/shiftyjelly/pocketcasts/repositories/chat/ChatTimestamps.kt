@@ -29,7 +29,7 @@ internal fun String.withChatTimestamps(): String = TimestampPattern.replace(this
     }
 }
 
-private fun MatchResult.startClock() = (groups[1] ?: groups[3])?.value
+private fun MatchResult.startClock() = (groups[1] ?: groups[3] ?: groups[5])?.value
 
 private fun MatchResult.endClock() = (groups[2] ?: groups[4])?.value
 
@@ -46,5 +46,6 @@ private fun parseClockMs(value: String): Int? {
 }
 
 private const val CLOCK = """(?<![\d:.,])(?:\d{1,2}:)?\d{1,2}:\d{2}(?:[.,]\d{1,3})?(?![\d:])(?!\s?[aApP]\.?[mM]\b)"""
+private const val CLOCK_WITH_HOURS = """(?<![\d:.,])\d{1,2}:\d{2}:\d{2}(?:[.,]\d{1,3})?(?![\d:])"""
 private const val SEPARATOR = """(?:\s*[–—-]\s*|\s+to\s+)"""
-private val TimestampPattern = Regex("""\(\s*($CLOCK)(?:$SEPARATOR($CLOCK))?\s*\)|($CLOCK)(?:$SEPARATOR($CLOCK))?""")
+private val TimestampPattern = Regex("""\(\s*($CLOCK)(?:$SEPARATOR($CLOCK))?\s*\)|($CLOCK)$SEPARATOR($CLOCK)|($CLOCK_WITH_HOURS)""")
