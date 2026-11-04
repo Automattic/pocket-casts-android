@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.endofyear.playback2026.Playback2026Banner
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -79,6 +80,7 @@ internal fun ProfilePage(
     onDismissCreateFreeAccountBannerClick: () -> Unit,
     onEndOfYearCardShow: () -> Unit,
     onPlaybackClick: () -> Unit,
+    onPlayback2026Click: () -> Unit,
     onClaimReferralsClick: () -> Unit,
     onHideReferralsCardClick: () -> Unit,
     onReferralsCardShow: () -> Unit,
@@ -121,6 +123,17 @@ internal fun ProfilePage(
                 )
                 item {
                     VerticalSpacer()
+                }
+                if (state.isPlayback2026BannerVisible) {
+                    item {
+                        Playback2026Banner(
+                            onClick = onPlayback2026Click,
+                            modifier = Modifier.padding(horizontal = horizontalPadding),
+                        )
+                    }
+                    item {
+                        VerticalSpacer()
+                    }
                 }
                 if (state.isFreeAccountBannerVisible) {
                     item {
@@ -226,6 +239,7 @@ internal data class ProfilePageState(
     val isWhatsNewVisible: Boolean,
     val hasWhatsNewDot: Boolean,
     val isPlaybackEnabled: Boolean,
+    val isPlayback2026BannerVisible: Boolean,
     val isFreeAccountBannerVisible: Boolean,
     val isUpgradeBannerVisible: Boolean,
     val miniPlayerPadding: Dp,
@@ -418,6 +432,7 @@ private fun ProfilePageStub(
             isWhatsNewVisible = true,
             hasWhatsNewDot = true,
             isPlaybackEnabled = true,
+            isPlayback2026BannerVisible = true,
             isUpgradeBannerVisible = true,
             isFreeAccountBannerVisible = true,
             miniPlayerPadding = 64.dp,
@@ -454,6 +469,7 @@ private fun ProfilePageStub(
         onDismissCreateFreeAccountBannerClick = {},
         onEndOfYearCardShow = {},
         onPlaybackClick = {},
+        onPlayback2026Click = {},
         onSendReferralsClick = {},
         onHideReferralsCardClick = {},
         onReferralsCardShow = {},

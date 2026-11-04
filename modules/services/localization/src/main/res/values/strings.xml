@@ -2234,6 +2234,14 @@
     <string name="end_of_year_prompt_card_title">Playback is here!</string>
     <string name="end_of_year_prompt_card_summary">See your listening&#160;stats,\ntop&#160;podcasts, and&#160;more.</string>
     <string name="end_of_year_share_via" translatable="false">@string/podcasts_share_via</string>
+    <!-- Title of the Playback 2026 banner in the Profile tab. Playback 2026 is a proper noun and shouldn't be translated -->
+    <string name="playback_2026_banner_title">Playback&#160;2026 is here!</string>
+    <!-- Description of the Playback 2026 banner in the Profile tab -->
+    <string name="playback_2026_banner_description">Discover your listening stats, which kind of listener you are, and more.</string>
+    <!-- Description in the Playback 2026 announcement sheet -->
+    <string name="playback_2026_sheet_description">What you listened to. The podcasts you loved. And what sets you apart as a listener. Your year in Pocket Casts is here.</string>
+    <!-- Label of the call to action button in the Playback 2026 announcement sheet. Playback 2026 is a proper noun and shouldn't be translated -->
+    <string name="playback_2026_sheet_button">View My Playback&#160;2026</string>
     <string name="end_of_year_replay">Play again</string>
     <string name="end_of_year_listening_time_title">This was your total time listening to podcasts</string>
     <string name="end_of_year_listening_time_title_english_only" translatable="false">This was your total time\nlistening to podcasts</string>

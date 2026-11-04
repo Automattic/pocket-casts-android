@@ -34,6 +34,13 @@ dependencyResolutionManagement {
                 includeGroupByRegex("org.wordpress.*")
             }
         }
+        maven {
+            // Prebuilt Pocket Casts client libraries, such as Playback (https://github.com/Automattic/pocket-casts-client-dependencies)
+            setUrl("https://raw.githubusercontent.com/Automattic/pocket-casts-client-dependencies/trunk/android/maven")
+            content {
+                includeGroup("com.automattic.pocketcasts")
+            }
+        }
     }
 }
 

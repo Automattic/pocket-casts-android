@@ -125,6 +125,8 @@ import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridListFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastListFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
+import au.com.shiftyjelly.pocketcasts.endofyear.playback2026.Playback2026
+import au.com.shiftyjelly.pocketcasts.endofyear.playback2026.Playback2026LaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -591,6 +593,10 @@ class MainActivity :
                     }
                 }
             }
+        }
+
+        if (savedInstanceState == null) {
+            showPlayback2026SheetIfNeeded()
         }
 
         lifecycleScope.launch {
@@ -1128,6 +1134,29 @@ class MainActivity :
         )
     }
 
+    private fun showPlayback2026SheetIfNeeded() {
+        if (!Playback2026.isAvailable || settings.playback2026SheetShown.value) return
+        // Onboarding, What's New and the End of Year prompt go first. The sheet waits for them,
+        // or for the next launch after onboarding.
+        if (launchedInitialOnboarding || viewModel.state.value.shouldShowWhatsNew || viewModel.shouldShowStoriesModal.value) return
+
+        val viewGroup = binding.modalBottomSheet
+        if (viewGroup.childCount > 0) return
+        viewGroup.addView(
+            ComposeView(viewGroup.context).apply {
+                setContent {
+                    AppTheme(theme.activeTheme) {
+                        Playback2026LaunchBottomSheet(
+                            parent = viewGroup,
+                            onClick = { Playback2026.start(this@MainActivity) },
+                            onExpand = { settings.playback2026SheetShown.set(true, updateModifiedAt = false) },
+                        )
+                    }
+                }
+            },
+        )
+    }
+
     private fun showEndOfYearModal() {
         viewModel.updateStoriesModalShowState(true)
         launch(Dispatchers.Main) {
@@ -1355,6 +1384,7 @@ class MainActivity :
     override fun whatsNewDismissed(fromConfirmAction: Boolean) {
         if (fromConfirmAction) return
         if (settings.getEndOfYearShowModal()) showEndOfYearModal()
+        showPlayback2026SheetIfNeeded()
     }
 
     override fun getPlayerBottomSheetState(): Int {

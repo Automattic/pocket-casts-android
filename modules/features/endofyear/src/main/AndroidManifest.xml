@@ -8,5 +8,13 @@
             android:name=".StoriesActivity"
             android:exported="true"
             android:theme="@style/Theme.EndOfYear" />
+
+        <!-- configChanges: a rotation, font size or dark mode change would otherwise recreate
+             the activity, and with it the web view hosting the story. -->
+        <activity
+            android:name=".playback2026.Playback2026Activity"
+            android:exported="false"
+            android:theme="@style/Theme.Playback2026"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|uiMode|density|fontScale" />
     </application>
 </manifest>
