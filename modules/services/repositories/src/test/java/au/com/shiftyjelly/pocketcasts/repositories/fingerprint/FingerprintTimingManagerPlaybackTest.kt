@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
 import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
@@ -38,6 +39,7 @@ import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.timeout
@@ -84,7 +86,7 @@ class FingerprintTimingManagerPlaybackTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         referenceRetriever = mock {
             on { loadCachedReference(any()) } doReturn null
-            on { fetchReferenceData(any(), any(), any()) } doReturn FingerprintReferenceRetriever.FetchResult.NotFound
+            on { fetchReferenceData(any(), any(), any(), any()) } doReturn FingerprintReferenceRetriever.FetchResult.NotFound
         }
     }
 
@@ -163,7 +165,7 @@ class FingerprintTimingManagerPlaybackTest {
 
         manager.onTranscriptShown(episode.uuid)
 
-        verifyFetch()
+        verifyFetch(GeneratedChaptersDownloadTriggerType.TranscriptView)
     }
 
     @Test
@@ -248,6 +250,19 @@ class FingerprintTimingManagerPlaybackTest {
         assertTrue(manager.state is FingerprintTimingManager.State.Unavailable)
     }
 
+    @Test
+    fun `on-demand resolve fetches the reference with the caller's trigger`() {
+        val manager = createManager(GeneratedChaptersFixture())
+
+        runBlocking {
+            manager.resolvePlaybackTime(episode, 30.seconds, GeneratedChaptersDownloadTriggerType.ChapterTap)
+        }
+
+        verifyBlocking(referenceRetriever) {
+            fetchReferenceData(any(), eq("podcast-uuid"), eq(episode.uuid), eq(GeneratedChaptersDownloadTriggerType.ChapterTap))
+        }
+    }
+
     private fun createManager(fixture: GeneratedChaptersFixture): FingerprintTimingManager {
         this.fixture = fixture
         val playbackManager = mock<PlaybackManager> {
@@ -303,13 +318,15 @@ class FingerprintTimingManagerPlaybackTest {
         )
     }
 
-    private fun verifyFetch() {
-        verifyBlocking(referenceRetriever, timeout(VERIFY_TIMEOUT_MS)) { fetchReferenceData(any(), any(), any()) }
+    private fun verifyFetch(trigger: GeneratedChaptersDownloadTriggerType = GeneratedChaptersDownloadTriggerType.Playback) {
+        verifyBlocking(referenceRetriever, timeout(VERIFY_TIMEOUT_MS)) {
+            fetchReferenceData(any(), any(), any(), eq(trigger))
+        }
     }
 
     private fun verifyNoFetch() {
         Thread.sleep(NO_FETCH_WAIT_MS)
-        verifyBlocking(referenceRetriever, never()) { fetchReferenceData(any(), any(), any()) }
+        verifyBlocking(referenceRetriever, never()) { fetchReferenceData(any(), any(), any(), any()) }
     }
 
     private fun awaitState(manager: FingerprintTimingManager, predicate: (FingerprintTimingManager.State) -> Boolean) {

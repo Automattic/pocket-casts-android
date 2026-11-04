@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
 import com.automattic.eventhorizon.SyncedTranscriptsAutoScrollResumedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekFailedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekUsedEvent
@@ -574,7 +575,7 @@ class TranscriptViewModelTest {
     fun `track synced transcript seek failed event when preparing`() = runTest {
         setUpTapToSeek()
         whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"))
-        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any()))
+        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any(), eq(GeneratedChaptersDownloadTriggerType.TranscriptView)))
             .thenReturn(ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH))
         syncedStateFlow.value = FingerprintTimingManager.State.Preparing
 
@@ -604,7 +605,7 @@ class TranscriptViewModelTest {
     fun `resolve and seek follows a bounded resolve outside the dense mapping`() = runTest {
         setUpTapToSeek()
         whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"))
-        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any()))
+        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any(), any()))
             .thenReturn(ChapterSeekResult.Resolved(playbackTime = 45.seconds, usedPrior = false))
         syncedStateFlow.value = FingerprintTimingManager.State.Preparing
 
@@ -632,7 +633,7 @@ class TranscriptViewModelTest {
     fun `user seek cancels an active tap resolve`() = runTest {
         setUpTapToSeek()
         whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"))
-        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any())).doSuspendableAnswer { awaitCancellation() }
+        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any(), any())).doSuspendableAnswer { awaitCancellation() }
         syncedStateFlow.value = FingerprintTimingManager.State.Preparing
 
         awaitTapToSeekAvailable()
@@ -653,7 +654,7 @@ class TranscriptViewModelTest {
     fun `track synced transcript seek failed event when failed`() = runTest {
         setUpTapToSeek()
         whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"))
-        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any()))
+        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any(), any()))
             .thenReturn(ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH))
         syncedStateFlow.value = FingerprintTimingManager.State.Failed(
             RuntimeException("no match"),
@@ -685,7 +686,7 @@ class TranscriptViewModelTest {
     fun `track synced transcript seek failed event without message when unavailable`() = runTest {
         setUpTapToSeek()
         whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"))
-        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any()))
+        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any(), any()))
             .thenReturn(ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE))
         syncedStateFlow.value = FingerprintTimingManager.State.Unavailable(episodeUuid = "episode-uuid")
 
@@ -720,7 +721,7 @@ class TranscriptViewModelTest {
             downloadStatus = EpisodeDownloadStatus.Downloaded,
         )
         whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(episode)
-        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any()))
+        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any(), any()))
             .thenReturn(ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH))
         syncedStateFlow.value = FingerprintTimingManager.State.Preparing
 
