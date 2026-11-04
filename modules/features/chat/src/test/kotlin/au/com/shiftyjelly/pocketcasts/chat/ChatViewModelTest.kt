@@ -2504,7 +2504,7 @@ class ChatViewModelTest {
 
         val state = viewModel.uiState.value
         assertEquals(ChatPlayingEpisode("Other episode", "other-podcast-uuid", "Other podcast"), state.otherPlayingEpisode)
-        assertEquals(ChatPlayback(isPlaying = true, positionMs = 10_000, durationMs = 40_000), state.playback)
+        assertEquals(ChatPlayback(isPlaying = true, positionMs = 10_000, durationMs = 40_000, isSeekable = true), state.playback)
         assertEquals("Episode title", state.episodeTitle)
     }
 
@@ -2574,7 +2574,32 @@ class ChatViewModelTest {
         )
         advanceUntilIdle()
 
-        assertEquals(ChatPlayback(isPlaying = true, positionMs = 80_000, durationMs = 190_000), viewModel.uiState.value.playback)
+        assertEquals(ChatPlayback(isPlaying = true, positionMs = 80_000, durationMs = 190_000, isSeekable = true), viewModel.uiState.value.playback)
+    }
+
+    @Test
+    fun `seeking moves the loaded episode`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.onSeek(120_000)
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(120_000), anyOrNull())
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
+    }
+
+    @Test
+    fun `seeking does nothing when no episode is loaded`() = runTest {
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.onSeek(120_000)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.playback.isSeekable)
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
     }
 
     @Test

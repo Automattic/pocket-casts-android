@@ -80,6 +80,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import au.com.shiftyjelly.pocketcasts.chat.ChatError
 import au.com.shiftyjelly.pocketcasts.chat.ChatUiState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -111,6 +112,7 @@ fun ChatScreen(
     onOpenHistoryChat: (EpisodeChatHistoryItem) -> Unit,
     onDeleteHistoryChat: (EpisodeChatHistoryItem) -> Unit,
     onClickPlayPause: () -> Unit,
+    onSeek: (positionMs: Int) -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
     onClickSuggestion: (String, ChatInputType) -> Unit,
@@ -214,6 +216,7 @@ fun ChatScreen(
                         onClickClose = onClickClose,
                         onClickMore = onClickMore,
                         onClickPlayPause = onClickPlayPause,
+                        onSeek = onSeek,
                         onInputTextChange = onInputTextChange,
                         onSend = onSend,
                         onClickSuggestion = onClickSuggestion,
@@ -241,6 +244,7 @@ private fun ChatContent(
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
     onClickPlayPause: () -> Unit,
+    onSeek: (positionMs: Int) -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
     onClickSuggestion: (String, ChatInputType) -> Unit,
@@ -338,12 +342,14 @@ private fun ChatContent(
             playback = uiState.playback,
             onClickClose = onClickClose,
             onClickPlayPause = onClickPlayPause,
+            onSeek = onSeek,
             onClickMore = {
                 focusManager.clearFocus(force = true)
                 keyboardController?.hide()
                 onClickMore()
             },
             theme = theme,
+            modifier = Modifier.zIndex(1f),
         )
 
         Box(
@@ -858,6 +864,7 @@ private fun ChatScreenPreview(
                 onOpenHistoryChat = {},
                 onDeleteHistoryChat = {},
                 onClickPlayPause = {},
+                onSeek = {},
                 onInputTextChange = {},
                 onSend = {},
                 onClickSuggestion = { _, _ -> },
@@ -898,6 +905,7 @@ private fun ChatScreenEmptyPreview(
                 onOpenHistoryChat = {},
                 onDeleteHistoryChat = {},
                 onClickPlayPause = {},
+                onSeek = {},
                 onInputTextChange = {},
                 onSend = {},
                 onClickSuggestion = { _, _ -> },
@@ -939,6 +947,7 @@ private fun ChatScreenErrorPreview(
                 onOpenHistoryChat = {},
                 onDeleteHistoryChat = {},
                 onClickPlayPause = {},
+                onSeek = {},
                 onInputTextChange = {},
                 onSend = {},
                 onClickSuggestion = { _, _ -> },
