@@ -177,7 +177,7 @@ private fun ReasonRow(
             selected = isSelected,
             onClick = null,
             colors = RadioButtonDefaults.colors(
-                selectedColor = theme.quoteTimestamp,
+                selectedColor = theme.primaryText,
                 unselectedColor = theme.primaryText,
             ),
         )

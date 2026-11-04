@@ -539,7 +539,13 @@ private fun ChatContent(
                             ) {
                                 ChatAnswerRatingRow(
                                     rating = uiState.answerRatings[answerUuid],
-                                    onRate = { rating -> onRateAnswer(answerUuid, rating) },
+                                    onRate = { rating ->
+                                        if (rating == ChatAnswerRating.Negative) {
+                                            focusManager.clearFocus(force = true)
+                                            keyboardController?.hide()
+                                        }
+                                        onRateAnswer(answerUuid, rating)
+                                    },
                                     theme = theme,
                                     modifier = Modifier.padding(top = 8.dp),
                                 )
