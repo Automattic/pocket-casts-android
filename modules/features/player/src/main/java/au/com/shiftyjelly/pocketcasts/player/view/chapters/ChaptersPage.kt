@@ -192,7 +192,10 @@ private fun AnimatedContentTransitionScope<ChaptersViewModel.EmptyState?>.chapte
     hasGeneratedChapters: Boolean,
 ): ContentTransform {
     val shift = with(density) { STATE_SHIFT.roundToPx() }
-    return if (initialState == ChaptersViewModel.EmptyState.GeneratingChapters && targetState == null && hasGeneratedChapters) {
+    val isGeneratedChaptersReady = initialState == ChaptersViewModel.EmptyState.GeneratingChapters &&
+        targetState == null &&
+        hasGeneratedChapters
+    return if (isGeneratedChaptersReady) {
         val exit = fadeOut(tween(durationMillis = GENERATING_EXIT_MS, easing = EaseIn))
         (EnterTransition.None togetherWith exit using null).apply { targetContentZIndex = -1f }
     } else {
