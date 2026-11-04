@@ -708,6 +708,47 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `stopping just after the answer was saved does not track a stop`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+        chatManager.messages.value += ChatMessage.Assistant(text = "Answer", uuid = "answer-uuid")
+        while (!eventSink.isEmpty()) eventSink.skipEvent()
+
+        viewModel.onStopAnswer()
+        advanceUntilIdle()
+
+        assertTrue(eventSink.isEmpty())
+        assertFalse((chatManager.messages.value.first() as ChatMessage.User).isStopped)
+    }
+
+    @Test
+    fun `stopping right after clearing keeps the stopped question`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Old question"), ChatMessage.Assistant(text = "Old answer"))
+        setEpisodeInfo()
+        connectToInternet()
+        val clearGate = CompletableDeferred<Unit>()
+        chatManager.clearMessagesGate = clearGate
+        viewModel.clearChat()
+        runCurrent()
+        viewModel.onInputTextChange("New question")
+        viewModel.onSend()
+        runCurrent()
+
+        viewModel.onStopAnswer()
+        runCurrent()
+        clearGate.complete(Unit)
+        advanceUntilIdle()
+
+        val question = chatManager.messages.value.single() as ChatMessage.User
+        assertEquals("New question", question.text)
+        assertTrue(question.isStopped)
+    }
+
+    @Test
     fun `stop does nothing while no answer is loading`() = runTest {
         setEpisodeInfo()
         advanceUntilIdle()
@@ -3753,14 +3794,17 @@ class ChatViewModelTest {
             createdChats += CreateChat(episodeUuid, podcastUuid)
         }
 
-        override suspend fun stopMessage(episodeUuid: String, message: ChatMessage.User) {
+        override suspend fun stopMessage(episodeUuid: String, message: ChatMessage.User): Boolean {
             val episodeMessages = messagesFor(episodeUuid)
             val stopped = message.copy(isStopped = true)
-            episodeMessages.value = if (episodeMessages.value.any { it.uuid == message.uuid }) {
+            val isStored = episodeMessages.value.any { it.uuid == message.uuid }
+            if (isStored && episodeMessages.value.last().uuid != message.uuid) return false
+            episodeMessages.value = if (isStored) {
                 episodeMessages.value.map { if (it.uuid == message.uuid) stopped else it }
             } else {
                 episodeMessages.value + stopped
             }
+            return true
         }
 
         override suspend fun sendMessage(

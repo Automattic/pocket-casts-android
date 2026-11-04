@@ -93,7 +93,7 @@ class ChatManagerImpl @Inject constructor(
         message: ChatMessage.User,
         allMessages: List<ChatMessage>,
     ): EpisodeChatResponse {
-        val history = allMessages.mapNotNull { msg ->
+        val history = allMessages.filterNot { it is ChatMessage.User && it.isStopped }.mapNotNull { msg ->
             val content = msg.textOrNull() ?: return@mapNotNull null
             ConversationMessage(role = msg.role.apiRole, content = content)
         }
@@ -141,10 +141,8 @@ class ChatManagerImpl @Inject constructor(
         episodeChatDao.deleteMessage(uuid)
     }
 
-    override suspend fun stopMessage(episodeUuid: String, message: ChatMessage.User) {
-        val stopped = message.copy(failure = null, isStopped = true).toEntity(episodeUuid)
-        val createdAt = episodeChatDao.getMessage(message.uuid)?.createdAt ?: stopped.createdAt
-        episodeChatDao.insertMessage(stopped.copy(createdAt = createdAt))
+    override suspend fun stopMessage(episodeUuid: String, message: ChatMessage.User): Boolean {
+        return episodeChatDao.insertMessageIfNewest(message.copy(failure = null, isStopped = true).toEntity(episodeUuid))
     }
 
     private fun EpisodeChatQuote.toQuoteMessage(): ChatMessage.Quote? {

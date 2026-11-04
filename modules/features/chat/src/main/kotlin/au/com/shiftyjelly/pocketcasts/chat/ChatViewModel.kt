@@ -633,6 +633,8 @@ class ChatViewModel @Inject constructor(
         val question = transientUserMessage ?: return
         val pendingSend = sendJob ?: return
         val episodeUuid = episodeUuid
+        val podcastUuid = podcastUuid
+        val pendingClear = clearJob
         val durationMs = replyRequestedAt?.elapsedNow()?.inWholeMilliseconds ?: 0L
         transientUserMessage = null
         pendingSend.cancel()
@@ -646,16 +648,17 @@ class ChatViewModel @Inject constructor(
         }
         applicationScope.launch(ioDispatcher) {
             pendingSend.join()
-            chatManager.stopMessage(episodeUuid, question)
+            pendingClear?.join()
+            if (!chatManager.stopMessage(episodeUuid, question)) return@launch
+            eventHorizon.track(
+                EpisodeChatResponseStoppedEvent(
+                    source = sourceView.analyticsValue,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                    durationMs = durationMs,
+                ),
+            )
         }
-        eventHorizon.track(
-            EpisodeChatResponseStoppedEvent(
-                source = sourceView.analyticsValue,
-                episodeUuid = episodeUuid,
-                podcastUuid = podcastUuid,
-                durationMs = durationMs,
-            ),
-        )
     }
 
     fun retry() {

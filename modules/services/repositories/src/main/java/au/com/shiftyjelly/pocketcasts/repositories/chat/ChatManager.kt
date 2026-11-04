@@ -29,7 +29,7 @@ interface ChatManager {
 
     suspend fun discardMessage(uuid: String)
 
-    suspend fun stopMessage(episodeUuid: String, message: ChatMessage.User)
+    suspend fun stopMessage(episodeUuid: String, message: ChatMessage.User): Boolean
 
     suspend fun clearMessages(episodeUuid: String): ClearedChat
 
