@@ -27,7 +27,7 @@ sealed interface ChatMessage {
 
         // Replace `- ` / `* ` bullet markers from the model with a styled bullet glyph.
         val displayText: String by lazy {
-            Regex("""(?m)^[ \t]*[-*][ \t]+""").replace(text, "•  ")
+            Regex("""(?m)^[ \t]*[-*][ \t]+""").replace(text, "•  ").withChatTimestamps()
         }
     }
 
@@ -46,7 +46,11 @@ sealed interface ChatMessage {
 
         // Empty when there's nothing meaningful to display (both strings missing/blank).
         val timestampLabel: String
-            get() = if (start.isNotBlank() && end.isNotBlank()) "$start – $end" else ""
+            get() = when {
+                startMs >= 0 && endMs >= 0 -> formatChatTimestampRange(startMs, endMs)
+                start.isNotBlank() && end.isNotBlank() -> "$start - $end"
+                else -> ""
+            }
 
         // Strip any straight or smart quotes the model wrapped around the text and re-add curly quotes.
         val displayText: String by lazy {
