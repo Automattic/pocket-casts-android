@@ -221,35 +221,38 @@ class FingerprintTimingManager @Inject constructor(
         }
     }
 
-    private fun updatePlaybackPreparation(episodeUuid: String, hasGeneratedChapters: Boolean) {
-        val shouldPrepare = shouldPrepareOnPlayback(
-            isGeneratedChaptersAllowed = generatedChaptersAvailability.isAllowed(),
-            hasGeneratedChapters = hasGeneratedChapters,
-            warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
-            isUnmetered = { Network.isUnmeteredConnection(context) },
-        )
-        if (shouldPrepare) {
-            prepareForCurrentEpisode(PrepareTrigger.PLAYBACK)
+    private suspend fun updatePlaybackPreparation(episodeUuid: String, hasGeneratedChapters: Boolean) {
+        if (isPlaybackGateOpen(hasGeneratedChapters)) {
+            prepareCurrentEpisode(PrepareTrigger.PLAYBACK)
         } else {
             releasePlaybackPreparation(episodeUuid)
         }
     }
 
-    private fun releasePlaybackPreparation(episodeUuid: String) {
+    private fun isPlaybackGateOpen(hasGeneratedChapters: Boolean) = shouldPrepareOnPlayback(
+        isGeneratedChaptersAllowed = generatedChaptersAvailability.isAllowed(),
+        hasGeneratedChapters = hasGeneratedChapters,
+        warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+        isUnmetered = { Network.isUnmeteredConnection(context) },
+    )
+
+    private suspend fun releasePlaybackPreparation(episodeUuid: String) {
         Timber.d("FingerprintTimingManager: skipping playback preparation for $episodeUuid")
-        scope.launch {
-            mutex.withLock {
-                val ownerEpisodeUuid = currentEpisodeUuid ?: preparingEpisodeUuid
-                val isOtherEpisode = ownerEpisodeUuid != null && ownerEpisodeUuid != episodeUuid
-                val isPlaybackOnly = ownerEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.PLAYBACK
-                if (isOtherEpisode || isPlaybackOnly) {
-                    resetToIdle()
-                }
+        mutex.withLock {
+            val ownerEpisodeUuid = currentEpisodeUuid ?: preparingEpisodeUuid
+            val isOtherEpisode = ownerEpisodeUuid != null && ownerEpisodeUuid != episodeUuid
+            val isPlaybackOnly = ownerEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.PLAYBACK
+            if (isOtherEpisode || isPlaybackOnly) {
+                resetToIdle()
             }
         }
     }
 
     fun prepareForCurrentEpisode(trigger: PrepareTrigger) {
+        scope.launch { prepareCurrentEpisode(trigger) }
+    }
+
+    private suspend fun prepareCurrentEpisode(trigger: PrepareTrigger) {
         val episode = playbackManager.getCurrentEpisode() ?: run {
             // No episode is currently loaded, so there is no episode UUID to attribute this to.
             markUnavailable(reason = "no_episode", episodeUuid = null)
@@ -270,26 +273,26 @@ class FingerprintTimingManager @Inject constructor(
             )
         }
 
-        scope.launch {
-            val gen: Long
-            mutex.withLock {
-                // Already prepared for this episode — reuse existing state. A failed preparation may
-                // retry when the user opens the transcript or a chat quote, since the failure could be transient.
-                val retryableFailure = canRetryFailedPreparation(trigger) && state is State.Failed
-                if (currentEpisodeUuid == episodeUuid && state !is State.Idle && !retryableFailure) {
-                    if (trigger != PrepareTrigger.PLAYBACK) {
-                        currentTrigger = trigger
-                    }
-                    return@launch
+        val gen: Long
+        mutex.withLock {
+            // Already prepared for this episode — reuse existing state. A failed preparation may
+            // retry when the user opens the transcript or a chat quote, since the failure could be transient.
+            val retryableFailure = canRetryFailedPreparation(trigger) && state is State.Failed
+            if (currentEpisodeUuid == episodeUuid && state !is State.Idle && !retryableFailure) {
+                if (trigger != PrepareTrigger.PLAYBACK) {
+                    currentTrigger = trigger
                 }
-                // The tap builds the map progressively; keep whatever the last episode accumulated.
-                persistMappingCacheIfFull()
-                resetState()
-                generation++
-                gen = generation
-                preparingEpisodeUuid = episodeUuid
-                currentTrigger = trigger
+                return
             }
+            // The tap builds the map progressively; keep whatever the last episode accumulated.
+            persistMappingCacheIfFull()
+            resetState()
+            generation++
+            gen = generation
+            preparingEpisodeUuid = episodeUuid
+            currentTrigger = trigger
+        }
+        scope.launch {
             // Abort if a newer stop()/prepare() has started since we acquired the lock.
             if (gen != generation) return@launch
             startDownloadCompletionObserver(episodeUuid)
