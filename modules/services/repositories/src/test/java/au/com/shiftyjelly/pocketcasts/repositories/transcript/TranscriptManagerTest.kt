@@ -643,6 +643,21 @@ class TranscriptManagerTest {
     }
 
     @Test
+    fun `do not save generated chapters that finish loading after they were turned off`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+        service.metaGate = CompletableDeferred()
+
+        val load = async { transcriptManager.loadGeneratedChapters("episode-id") }
+        runCurrent()
+        generatedChapters.showGeneratedChaptersFlow.value = false
+        service.metaGate?.complete(Unit)
+
+        assertEquals(GeneratedChaptersResult.Unavailable, load.await())
+        verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
     fun `keep a shared meta request running when one caller is cancelled`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         service.metaJsonResponse = META_JSON_WITH_CHAPTERS

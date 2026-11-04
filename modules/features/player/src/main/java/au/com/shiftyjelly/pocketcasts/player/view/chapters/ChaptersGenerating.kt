@@ -47,8 +47,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -138,7 +138,8 @@ private fun GeneratingHeader(
             color = LocalChaptersTheme.current.headerTitle,
             modifier = Modifier
                 .weight(1f)
-                .padding(vertical = 16.dp),
+                .padding(vertical = 16.dp)
+                .semantics { progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate },
         )
         Spacer(Modifier.width(12.dp))
         GeneratedChaptersMenu(
@@ -164,13 +165,9 @@ private fun SkeletonChapters(
         ),
         label = "skeletonShimmerProgress",
     )
-    val loadingDescription = stringResource(LR.string.chapters_generated_generating)
     Column(
         modifier = modifier
-            .clearAndSetSemantics {
-                contentDescription = loadingDescription
-                progressBarRangeInfo = ProgressBarRangeInfo.Indeterminate
-            }
+            .clearAndSetSemantics {}
             .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
             .drawWithContent {
                 drawContent()
