@@ -841,7 +841,7 @@ private fun ChatScreenPreview(
                             text = "What was the main point?",
                         ),
                         ChatMessage.Assistant(
-                            text = "The hosts focused on making discovery feel personal without adding friction.",
+                            text = "The hosts focused on making discovery feel personal without adding friction (00:12:04 - 00:12:18).",
                             followUps = listOf(
                                 "How do recommendations work?",
                                 "Who is the guest?",
