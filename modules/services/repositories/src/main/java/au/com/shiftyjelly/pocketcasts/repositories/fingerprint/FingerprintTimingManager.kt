@@ -168,6 +168,7 @@ class FingerprintTimingManager @Inject constructor(
 
     // Context for current preparation
     private var currentTrigger = PrepareTrigger.PLAYBACK
+    private var retainedTrigger: PrepareTrigger? = null
 
     @Volatile
     private var currentEpisodeUuid: String? = null
@@ -208,7 +209,7 @@ class FingerprintTimingManager @Inject constructor(
                 if (!FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS)) return@collect
                 val uuid = state.episodeUuid
                 val hasGeneratedChapters = generatedChaptersAvailability.isAllowed() && state.chapters.hasGeneratedChapters
-                playbackHasGeneratedChapters = hasGeneratedChapters
+                playbackHasGeneratedChapters = state.chapters.hasGeneratedChapters
                 if (state.isPlaying && !uuid.isNullOrEmpty() && uuid != lastEpisodeUuid) {
                     lastEpisodeUuid = uuid
                     lastHasGeneratedChapters = hasGeneratedChapters
@@ -286,6 +287,7 @@ class FingerprintTimingManager @Inject constructor(
                 if (trigger != PrepareTrigger.PLAYBACK) {
                     currentTrigger = trigger
                 }
+                retainTrigger(trigger)
                 return
             }
             // The tap builds the map progressively; keep whatever the last episode accumulated.
@@ -295,6 +297,7 @@ class FingerprintTimingManager @Inject constructor(
             gen = generation
             preparingEpisodeUuid = episodeUuid
             currentTrigger = trigger
+            retainTrigger(trigger)
         }
         scope.launch {
             // Abort if a newer stop()/prepare() has started since we acquired the lock.
@@ -362,9 +365,10 @@ class FingerprintTimingManager @Inject constructor(
     fun onTranscriptDismissed(episodeUuid: String) {
         scope.launch {
             mutex.withLock {
-                if (currentEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.TRANSCRIPT_VIEW) {
-                    currentTrigger = PrepareTrigger.PLAYBACK
-                    if (!isPlaybackGateOpen(playbackHasGeneratedChapters)) {
+                val ownerEpisodeUuid = currentEpisodeUuid ?: preparingEpisodeUuid
+                if (ownerEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.TRANSCRIPT_VIEW) {
+                    currentTrigger = retainedTrigger ?: PrepareTrigger.PLAYBACK
+                    if (retainedTrigger == null && !isPlaybackGateOpen(playbackHasGeneratedChapters)) {
                         resetToIdle()
                     }
                 }
@@ -782,6 +786,13 @@ class FingerprintTimingManager @Inject constructor(
         currentIsStreaming = false
         currentEager = false
         currentTrigger = PrepareTrigger.PLAYBACK
+        retainedTrigger = null
+    }
+
+    private fun retainTrigger(trigger: PrepareTrigger) {
+        if (trigger == PrepareTrigger.CHAT || trigger == PrepareTrigger.BOOKMARK) {
+            retainedTrigger = trigger
+        }
     }
 
     /**

@@ -206,6 +206,21 @@ class FingerprintTimingManagerPlaybackTest {
     }
 
     @Test
+    fun `closing the transcript keeps a chat quote preparation when generated chapters are hidden`() {
+        val manager = createManager(GeneratedChaptersFixture(initialShowGeneratedChapters = false))
+        play(generatedChapters)
+        manager.onChatQuoteShown(episode.uuid)
+        awaitState(manager) { it is FingerprintTimingManager.State.Unavailable }
+        manager.onTranscriptShown(episode.uuid)
+        Thread.sleep(NO_FETCH_WAIT_MS)
+
+        manager.onTranscriptDismissed(episode.uuid)
+        Thread.sleep(NO_FETCH_WAIT_MS)
+
+        assertTrue(manager.state is FingerprintTimingManager.State.Unavailable)
+    }
+
+    @Test
     fun `closing the transcript keeps the playback preparation when generated chapters are shown`() {
         val manager = createManager(GeneratedChaptersFixture())
         play(generatedChapters)
