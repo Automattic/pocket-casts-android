@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatQuoteSeeker
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatSendFailure
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ClearedChat
 import au.com.shiftyjelly.pocketcasts.repositories.chat.answerRating
+import au.com.shiftyjelly.pocketcasts.repositories.chat.findChatTimestamps
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.NetworkConnectionWatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -237,8 +238,7 @@ class ChatViewModel @Inject constructor(
         isAdoptingUnansweredQuestion = true
         quoteLoadId.incrementAndGet()
         _uiState.update {
-            it.copy(
-                loadingQuoteUuid = null,
+            it.withoutQuoteLoading().copy(
                 episodeUuid = episode.uuid,
                 episodeTitle = episode.title,
                 podcastUuid = episode.podcastUuid,
@@ -378,14 +378,16 @@ class ChatViewModel @Inject constructor(
                 _uiState.map { it.episodeUuid to it.messages }.distinctUntilChanged(),
                 playbackManager.playbackStateFlow.map { it.loadedEpisodeUuid }.distinctUntilChanged(),
             ) { (chatEpisodeUuid, messages), loadedEpisodeUuid ->
+                val isLoaded = chatEpisodeUuid == loadedEpisodeUuid
                 val quotes = messages.filterIsInstance<ChatMessage.Quote>().filter { it.canPlay }
-                chatEpisodeUuid to quotes.takeIf { chatEpisodeUuid == loadedEpisodeUuid }.orEmpty()
-            }.collect { (chatEpisodeUuid, quotes) -> warmUpQuotes(chatEpisodeUuid, quotes) }
+                val hasAnswerTimestamps = messages.any { it is ChatMessage.Assistant && findChatTimestamps(it.displayText).isNotEmpty() }
+                Triple(chatEpisodeUuid, quotes.takeIf { isLoaded }.orEmpty(), isLoaded && hasAnswerTimestamps)
+            }.collect { (chatEpisodeUuid, quotes, hasAnswerTimestamps) -> warmUpQuotes(chatEpisodeUuid, quotes, hasAnswerTimestamps) }
         }
     }
 
-    private fun warmUpQuotes(episodeUuid: String, quotes: List<ChatMessage.Quote>) {
-        if (quotes.isEmpty()) return
+    private fun warmUpQuotes(episodeUuid: String, quotes: List<ChatMessage.Quote>, hasAnswerTimestamps: Boolean) {
+        if (quotes.isEmpty() && !hasAnswerTimestamps) return
         if (warmedUpEpisodeUuids.add(episodeUuid)) {
             quoteSeeker.warmUpFingerprints(episodeUuid)
         }
@@ -637,6 +639,35 @@ class ChatViewModel @Inject constructor(
         if (quoteUuid == _uiState.value.loadingQuoteUuid) return
 
         val episodeUuid = episodeUuid
+        playFromChat(
+            startMs = quote.startMs,
+            quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
+            loading = { it.copy(loadingQuoteUuid = quoteUuid) },
+            quoteTime = { quoteSeeker.quoteTime(episodeUuid, quote) },
+        )
+    }
+
+    fun playAnswerTimestamp(answerUuid: String, startMs: Int) {
+        val timestamp = ChatAnswerTimestamp(answerUuid, startMs)
+        val state = _uiState.value
+        if (state.messages.none { it is ChatMessage.Assistant && it.uuid == answerUuid }) return
+        if (timestamp == state.loadingAnswerTimestamp) return
+
+        playFromChat(
+            startMs = startMs,
+            quoteSource = EpisodeChatQuoteSourceType.AnswerTimestamp,
+            loading = { it.copy(loadingAnswerTimestamp = timestamp) },
+            quoteTime = { ChatQuoteSeeker.QuoteTime(timeMs = startMs, referenceTimeMs = startMs) },
+        )
+    }
+
+    private fun playFromChat(
+        startMs: Int,
+        quoteSource: EpisodeChatQuoteSourceType,
+        loading: (ChatUiState) -> ChatUiState,
+        quoteTime: suspend () -> ChatQuoteSeeker.QuoteTime,
+    ) {
+        val episodeUuid = episodeUuid
         val podcastUuid = podcastUuid
         val isOtherEpisode = _uiState.value.otherPlayingEpisode != null
         eventHorizon.track(
@@ -644,45 +675,46 @@ class ChatViewModel @Inject constructor(
                 source = sourceView.analyticsValue,
                 episodeUuid = episodeUuid,
                 podcastUuid = podcastUuid,
-                quoteSource = EpisodeChatQuoteSourceType.InlineTimestamp,
+                quoteSource = quoteSource,
                 isOtherEpisode = isOtherEpisode,
             ),
         )
-        val loadId = startQuoteLoading(quoteUuid)
+        val loadId = startQuoteLoading(loading)
         val previousJob = quotePlaybackJob
         previousJob?.cancel()
         quotePlaybackJob = applicationScope.launch(ioDispatcher) {
             try {
                 previousJob?.join()
-                seekToQuote(quote, episodeUuid, podcastUuid, isOtherEpisode, loadId)
+                seekToQuote(startMs, quoteTime, episodeUuid, podcastUuid, isOtherEpisode, loadId)
             } finally {
                 finishQuoteLoading(loadId)
             }
         }
     }
 
-    private fun startQuoteLoading(quoteUuid: String): Int {
+    private fun startQuoteLoading(loading: (ChatUiState) -> ChatUiState): Int {
         val loadId = quoteLoadId.incrementAndGet()
-        _uiState.update { it.copy(loadingQuoteUuid = quoteUuid) }
+        _uiState.update { loading(it.withoutQuoteLoading()) }
         return loadId
     }
 
     private fun finishQuoteLoading(loadId: Int) {
         _uiState.update { state ->
-            if (quoteLoadId.get() == loadId) state.copy(loadingQuoteUuid = null) else state
+            if (quoteLoadId.get() == loadId) state.withoutQuoteLoading() else state
         }
     }
 
     private suspend fun seekToQuote(
-        quote: ChatMessage.Quote,
+        startMs: Int,
+        quoteTime: suspend () -> ChatQuoteSeeker.QuoteTime,
         episodeUuid: String,
         podcastUuid: String,
         isOtherEpisode: Boolean,
         loadId: Int,
     ) = coroutineScope {
         val episode = episodeManager.findEpisodeByUuid(episodeUuid)
-        if (episode == null || !quote.isWithinEpisode(episode.durationMs)) return@coroutineScope
-        val quoteTime = async { quoteSeeker.quoteTime(episodeUuid, quote) }
+        if (episode == null || !isWithinEpisode(startMs, episode.durationMs)) return@coroutineScope
+        val quoteTime = async { quoteTime() }
         val userSeek = async(start = CoroutineStart.UNDISPATCHED) { playbackManager.userSeeks.first() }
         val state = playbackManager.playbackStateFlow.first()
         val episodeSwitch = if (state.loadedEpisodeUuid != episodeUuid) {
@@ -1032,14 +1064,14 @@ class ChatViewModel @Inject constructor(
     ): List<ChatMessage> {
         return map { message ->
             if (message is ChatMessage.Quote) {
-                message.copy(canPlay = message.isWithinEpisode(episodeDurationMs))
+                message.copy(canPlay = isWithinEpisode(message.startMs, episodeDurationMs))
             } else {
                 message
             }
         }
     }
 
-    private fun ChatMessage.Quote.isWithinEpisode(episodeDurationMs: Int): Boolean {
+    private fun isWithinEpisode(startMs: Int, episodeDurationMs: Int): Boolean {
         return startMs >= 0 && (episodeDurationMs <= 0 || startMs < episodeDurationMs)
     }
 }
@@ -1167,6 +1199,7 @@ data class ChatUiState(
     val answerRatings: Map<String, ChatAnswerRating> = emptyMap(),
     val restoredMessageUuids: Set<String> = emptySet(),
     val loadingQuoteUuid: String? = null,
+    val loadingAnswerTimestamp: ChatAnswerTimestamp? = null,
     val starterQuestions: List<String> = emptyList(),
     val isLoadingStarterQuestions: Boolean = false,
 ) {
@@ -1212,6 +1245,13 @@ private val ChatInputType.analyticsValue
         ChatInputType.SuggestedPrompt -> EpisodeChatInputType.SuggestedPrompt
         ChatInputType.FollowUp -> EpisodeChatInputType.FollowUp
     }
+
+data class ChatAnswerTimestamp(
+    val answerUuid: String,
+    val startMs: Int,
+)
+
+private fun ChatUiState.withoutQuoteLoading() = copy(loadingQuoteUuid = null, loadingAnswerTimestamp = null)
 
 data class ChatPlayingEpisode(
     val episodeTitle: String,

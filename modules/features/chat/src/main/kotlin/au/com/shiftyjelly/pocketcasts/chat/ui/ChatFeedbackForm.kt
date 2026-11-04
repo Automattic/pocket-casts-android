@@ -236,7 +236,7 @@ private fun LegalNote(
         withLink(
             LinkAnnotation.Clickable(
                 tag = LEARN_MORE_TAG,
-                styles = TextLinkStyles(SpanStyle(color = theme.quoteTimestamp)),
+                styles = TextLinkStyles(SpanStyle(color = theme.link)),
                 linkInteractionListener = { onClickLearnMore() },
             ),
         ) {

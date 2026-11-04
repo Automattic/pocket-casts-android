@@ -214,6 +214,7 @@ class ChatFragment : BaseDialogFragment() {
                     onClickSuggestion = viewModel::onSuggestionClick,
                     onRetry = viewModel::retry,
                     onPlayQuote = viewModel::playQuote,
+                    onPlayAnswerTimestamp = viewModel::playAnswerTimestamp,
                     onRateAnswer = ::rateAnswer,
                     snackbarHostState = snackbarHostState,
                     onDismissBetaSheet = viewModel::dismissBetaSheet,

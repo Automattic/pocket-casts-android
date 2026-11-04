@@ -1691,6 +1691,75 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `playing an answer timestamp seeks to it and tracks it as an answer timestamp`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        answerState()
+        eventSink.skipEvent()
+
+        viewModel.playAnswerTimestamp(ANSWER_UUID, 65_000)
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatQuotePlayTappedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                quoteSource = EpisodeChatQuoteSourceType.AnswerTimestamp,
+                isOtherEpisode = false,
+            ),
+            eventSink.pollEvent(),
+        )
+        verify(quoteSeeker).playbackTimeMs(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 65_000, referenceTimeMs = 65_000)))
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(65_000), anyOrNull())
+        verify(playbackManager).playQueueSuspend(any(), any())
+        assertNull(viewModel.uiState.value.loadingAnswerTimestamp)
+    }
+
+    @Test
+    fun `an answer timestamp shows as loading until playback starts`() = runTest {
+        val seekTime = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { seekTime.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        answerState()
+
+        viewModel.playAnswerTimestamp(ANSWER_UUID, 65_000)
+        runCurrent()
+
+        assertEquals(ChatAnswerTimestamp(ANSWER_UUID, 65_000), viewModel.uiState.value.loadingAnswerTimestamp)
+
+        seekTime.complete(65_000)
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.loadingAnswerTimestamp)
+    }
+
+    @Test
+    fun `an answer timestamp past the episode end does not touch playback`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        answerState()
+
+        viewModel.playAnswerTimestamp(ANSWER_UUID, 500_000)
+        advanceUntilIdle()
+
+        verifyNoSeek()
+    }
+
+    @Test
+    fun `a timestamp from an unknown answer is ignored`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        answerState()
+        eventSink.skipEvent()
+
+        viewModel.playAnswerTimestamp("other-answer-uuid", 65_000)
+        advanceUntilIdle()
+
+        verifyNoSeek()
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
     fun `playing a quote seeks to its start and keeps playing`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
@@ -2703,6 +2772,12 @@ class ChatViewModelTest {
         return viewModel.uiState.value.messages.filterIsInstance<ChatMessage.Quote>().single().canPlay
     }
 
+    private fun TestScope.answerState() {
+        chatManager.messages.value = listOf(ChatMessage.Assistant(text = "It comes up at 00:01:05.", uuid = ANSWER_UUID))
+        setEpisodeInfo()
+        advanceUntilIdle()
+    }
+
     private fun createQuote(startMs: Int, endMs: Int, uuid: String = "quote-uuid") = ChatMessage.Quote(
         text = "Quote",
         start = "start",
@@ -3635,6 +3710,7 @@ class ChatViewModelTest {
         const val PODCAST_UUID = "podcast-uuid"
         const val OTHER_EPISODE_UUID = "other-episode-uuid"
         const val OTHER_PODCAST_UUID = "other-podcast-uuid"
+        const val ANSWER_UUID = "answer-uuid"
     }
 }
 
