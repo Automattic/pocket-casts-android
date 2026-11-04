@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.chat
 
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeChatDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
@@ -19,21 +20,26 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 @Singleton
 class ChatManagerImpl @Inject constructor(
     private val episodeChatDao: EpisodeChatDao,
     private val podcastCacheServiceManager: PodcastCacheServiceManager,
     private val tokenHandler: TokenHandler,
+    @ApplicationScope private val scope: CoroutineScope,
     moshi: Moshi,
 ) : ChatManager {
     private val quoteMetadataAdapter = moshi.adapter(QuoteMetadata::class.java)
     private val userMetadataAdapter = moshi.adapter(UserMessageMetadata::class.java)
     private val assistantMetadataAdapter = moshi.adapter(AssistantMessageMetadata::class.java)
-    private val starterQuestions = ConcurrentHashMap<String, List<String>>()
+    private val starterQuestions = ConcurrentHashMap<String, Deferred<List<String>>>()
 
     override fun observeMessages(episodeUuid: String): Flow<List<ChatMessage>> {
         return episodeChatDao.observeMessages(episodeUuid).map { it.toChatMessages() }
@@ -112,8 +118,24 @@ class ChatManagerImpl @Inject constructor(
     }
 
     override suspend fun getStarterQuestions(episodeUuid: String, podcastUuid: String): List<String> {
-        starterQuestions[episodeUuid]?.let { return it }
-        val questions = try {
+        val request = CompletableDeferred<List<String>>()
+        starterQuestions.putIfAbsent(episodeUuid, request)?.let { return it.await() }
+        scope.launch {
+            var questions = emptyList<String>()
+            try {
+                questions = fetchStarterQuestions(episodeUuid, podcastUuid)
+            } finally {
+                if (questions.isEmpty()) {
+                    starterQuestions.remove(episodeUuid, request)
+                }
+                request.complete(questions)
+            }
+        }
+        return request.await()
+    }
+
+    private suspend fun fetchStarterQuestions(episodeUuid: String, podcastUuid: String): List<String> {
+        return try {
             podcastCacheServiceManager.episodeChatStarterQuestions(
                 authorization = authorization(),
                 request = EpisodeChatStarterQuestionsRequest(podcastUuid = podcastUuid, episodeUuid = episodeUuid),
@@ -124,10 +146,6 @@ class ChatManagerImpl @Inject constructor(
             LogBuffer.e(LOG_TAG, e, "Failed to load episode chat starter questions")
             emptyList()
         }
-        if (questions.isNotEmpty()) {
-            starterQuestions[episodeUuid] = questions
-        }
-        return questions
     }
 
     private suspend fun authorization(): String {
