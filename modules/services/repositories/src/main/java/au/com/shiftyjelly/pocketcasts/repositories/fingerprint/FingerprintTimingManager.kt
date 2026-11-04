@@ -188,6 +188,9 @@ class FingerprintTimingManager @Inject constructor(
     @Volatile
     private var currentIsStreaming: Boolean = false
 
+    @Volatile
+    private var playbackHasGeneratedChapters = false
+
     // When true, decode the whole file locally from the start instead of following the PCM tap,
     // so the full reference<->playback map is available for chapter alignment.
     @Volatile
@@ -205,6 +208,7 @@ class FingerprintTimingManager @Inject constructor(
                 if (!FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS)) return@collect
                 val uuid = state.episodeUuid
                 val hasGeneratedChapters = generatedChaptersAvailability.isAllowed() && state.chapters.hasGeneratedChapters
+                playbackHasGeneratedChapters = hasGeneratedChapters
                 if (state.isPlaying && !uuid.isNullOrEmpty() && uuid != lastEpisodeUuid) {
                     lastEpisodeUuid = uuid
                     lastHasGeneratedChapters = hasGeneratedChapters
@@ -360,6 +364,9 @@ class FingerprintTimingManager @Inject constructor(
             mutex.withLock {
                 if (currentEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.TRANSCRIPT_VIEW) {
                     currentTrigger = PrepareTrigger.PLAYBACK
+                    if (!isPlaybackGateOpen(playbackHasGeneratedChapters)) {
+                        resetToIdle()
+                    }
                 }
             }
         }
