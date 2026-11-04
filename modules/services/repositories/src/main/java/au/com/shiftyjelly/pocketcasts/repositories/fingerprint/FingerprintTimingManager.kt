@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.PlayerChapterFingerprintCalculatedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationCompletedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationFailedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationStartedEvent
@@ -186,6 +187,8 @@ class FingerprintTimingManager @Inject constructor(
 
     @Volatile
     private var currentIsStreaming: Boolean = false
+    private var currentPodcastUuid: String? = null
+    private var currentHasGeneratedChapters: Boolean = false
 
     // When true, decode the whole file locally from the start instead of following the PCM tap,
     // so the full reference<->playback map is available for chapter alignment.
@@ -622,14 +625,25 @@ class FingerprintTimingManager @Inject constructor(
         _stateFlow.value = State.Active(coverage)
         if (!hasReachedActive) {
             hasReachedActive = true
+            val durationMs = elapsedPreparationMs()
             Timber.d("FingerprintTimingManager: reached active state with $coverage mappings")
             eventHorizon.track(
                 SyncedTranscriptsPreparationCompletedEvent(
-                    durationMs = elapsedPreparationMs(),
+                    durationMs = durationMs,
                     isStreaming = currentIsStreaming,
                     episodeUuid = currentEpisodeUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
                 ),
             )
+            if (currentHasGeneratedChapters) {
+                eventHorizon.track(
+                    PlayerChapterFingerprintCalculatedEvent(
+                        durationMs = durationMs,
+                        isStreaming = currentIsStreaming,
+                        episodeUuid = currentEpisodeUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+                        podcastUuid = currentPodcastUuid,
+                    ),
+                )
+            }
         }
     }
 
@@ -728,6 +742,8 @@ class FingerprintTimingManager @Inject constructor(
         preparationStartMs = 0
         currentIsStreaming = false
         currentEager = false
+        currentPodcastUuid = null
+        currentHasGeneratedChapters = false
         currentTrigger = PrepareTrigger.PLAYBACK
     }
 
@@ -736,12 +752,12 @@ class FingerprintTimingManager @Inject constructor(
      * and only for local downloads. Everything else builds the map from the player's PCM tap
      * plus the bounded on-demand resolver, so nothing is ever downloaded twice.
      */
-    private suspend fun shouldRunEagerPass(episodeUuid: String, isDownloaded: Boolean): Boolean {
+    private fun shouldRunEagerPass(hasGeneratedChapters: Boolean, isDownloaded: Boolean): Boolean {
         if (Util.getAppPlatform(context) != AppPlatform.Phone) return false
         if (decodePolicy.current() != FingerprintPolicy.PLATFORM) return false
         return computeEager(
             isGeneratedChaptersAllowed = generatedChaptersAvailability.isAllowed(),
-            hasGeneratedChapters = chapterManager.get().hasGeneratedChapters(episodeUuid),
+            hasGeneratedChapters = hasGeneratedChapters,
             isDownloaded = isDownloaded,
         )
     }
@@ -794,11 +810,14 @@ class FingerprintTimingManager @Inject constructor(
             return
         }
 
-        val eager = shouldRunEagerPass(episodeUuid, isDownloaded)
+        val hasGeneratedChapters = chapterManager.get().hasGeneratedChapters(episodeUuid)
+        val eager = shouldRunEagerPass(hasGeneratedChapters, isDownloaded)
         mutex.withLock {
             if (gen != generation) return
             currentTrigger = trigger
             currentEpisodeUuid = episodeUuid
+            currentPodcastUuid = podcastUuid
+            currentHasGeneratedChapters = hasGeneratedChapters
             activeEpisodeUuid = episodeUuid
             currentAudioFilePath = audioSource
             currentSharedCacheKey = sharedCacheKey
