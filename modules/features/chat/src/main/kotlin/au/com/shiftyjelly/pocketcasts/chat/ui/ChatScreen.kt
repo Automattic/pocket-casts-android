@@ -675,7 +675,7 @@ private data class ExitingWelcome(
 
 private fun ChatUiState.isAnswerLanding(initialMessageUuids: Set<String>): Boolean {
     val newestMessage = messages.lastOrNull()
-    return error == null && newestMessage is ChatMessage.User && newestMessage.uuid !in initialMessageUuids
+    return error == null && newestMessage is ChatMessage.User && !newestMessage.isStopped && newestMessage.uuid !in initialMessageUuids
 }
 
 @Composable

@@ -636,7 +636,14 @@ class ChatViewModel @Inject constructor(
         val durationMs = replyRequestedAt?.elapsedNow()?.inWholeMilliseconds ?: 0L
         transientUserMessage = null
         pendingSend.cancel()
-        _uiState.update { it.copy(isAwaitingReply = false, error = null) }
+        val stoppedQuestion = question.copy(isStopped = true)
+        _uiState.update { state ->
+            state.copy(
+                isAwaitingReply = false,
+                error = null,
+                messages = state.messages.map { if (it.uuid == question.uuid) stoppedQuestion else it },
+            )
+        }
         applicationScope.launch(ioDispatcher) {
             pendingSend.join()
             chatManager.stopMessage(episodeUuid, question)

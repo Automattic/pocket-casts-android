@@ -669,6 +669,20 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a stopped question shows as stopped straight away`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+
+        viewModel.onStopAnswer()
+
+        assertTrue((viewModel.uiState.value.messages.last() as ChatMessage.User).isStopped)
+    }
+
+    @Test
     fun `a question sent after a stopped one keeps both`() = runTest {
         setEpisodeInfo()
         connectToInternet()
