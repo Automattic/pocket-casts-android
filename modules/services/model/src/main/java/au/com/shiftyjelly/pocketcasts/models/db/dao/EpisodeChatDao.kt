@@ -37,6 +37,9 @@ abstract class EpisodeChatDao {
     @Query("SELECT * FROM episode_chat_messages WHERE episode_uuid = :episodeUuid ORDER BY created_at ASC")
     abstract suspend fun getMessages(episodeUuid: String): List<EpisodeChatMessage>
 
+    @Query("SELECT * FROM episode_chat_messages WHERE uuid = :uuid")
+    abstract suspend fun getMessage(uuid: String): EpisodeChatMessage?
+
     @Query("DELETE FROM episode_chat_messages WHERE uuid = :uuid")
     abstract suspend fun deleteMessage(uuid: String)
 

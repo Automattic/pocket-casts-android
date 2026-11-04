@@ -141,6 +141,12 @@ class ChatManagerImpl @Inject constructor(
         episodeChatDao.deleteMessage(uuid)
     }
 
+    override suspend fun stopMessage(episodeUuid: String, message: ChatMessage.User) {
+        val stopped = message.copy(failure = null, isStopped = true).toEntity(episodeUuid)
+        val createdAt = episodeChatDao.getMessage(message.uuid)?.createdAt ?: stopped.createdAt
+        episodeChatDao.insertMessage(stopped.copy(createdAt = createdAt))
+    }
+
     private fun EpisodeChatQuote.toQuoteMessage(): ChatMessage.Quote? {
         val quoteText = text.takeIf { it.isNotBlank() } ?: return null
         val quoteStart = start.orEmpty()
