@@ -206,6 +206,7 @@ class TranscriptManagerImpl @Inject constructor(
             val meta = transcriptService.getTranscriptOrThrow(metaUrl).use { body ->
                 metaAdapter.fromJson(body.source())
             }
+            if (!generatedChaptersAvailability.isAllowed()) return GeneratedChaptersResult.Unavailable
             if (saveAiChapters(episodeUuid, meta?.chapters)) {
                 GeneratedChaptersResult.Loaded
             } else {
