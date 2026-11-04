@@ -152,7 +152,7 @@ internal fun AiQuoteBubble(
     revealProgress: (() -> Float)? = null,
     onClickPlay: () -> Unit = {},
 ) {
-    val timestampColor = if (isPlayable) theme.quoteTimestamp else theme.secondaryText
+    val timestampColor = if (isPlayable) theme.link else theme.secondaryText
     val quoteColor = if (isLoading) theme.aiBubbleText.copy(alpha = LOADING_QUOTE_ALPHA) else theme.aiBubbleText
     val text = remember(quote, timestampLabel, timestampColor, quoteColor, isLoading) {
         quoteText(quote, timestampLabel, quoteColor, timestampColor, isLoading)
