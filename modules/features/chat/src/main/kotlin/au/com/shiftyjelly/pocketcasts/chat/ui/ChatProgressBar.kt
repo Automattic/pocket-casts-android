@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -20,7 +21,6 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
@@ -97,7 +97,7 @@ internal fun ChatProgressBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .touchHeight()
+            .height(TouchHeight)
             .then(seekModifier)
             .semantics {
                 contentDescription = description
@@ -111,7 +111,7 @@ internal fun ChatProgressBar(
             }
             .drawBehind {
                 val barHeight = BarHeight.toPx()
-                val top = (size.height - barHeight) / 2
+                val top = size.height - barHeight
                 val radius = CornerRadius(barHeight / 2)
                 drawRoundRect(color = trackColor, topLeft = Offset(0f, top), size = Size(size.width, barHeight))
                 val progressWidth = size.width * progress
@@ -124,23 +124,14 @@ internal fun ChatProgressBar(
                 )
                 if (isDragging) {
                     val thumbX = if (isRtl) progressLeft else progressWidth
-                    drawCircle(color = progressColor, radius = ThumbRadius.toPx(), center = Offset(thumbX, size.height / 2))
+                    drawCircle(color = progressColor, radius = ThumbRadius.toPx(), center = Offset(thumbX, top + barHeight / 2))
                 }
             },
     )
 }
 
-private fun Modifier.touchHeight() = layout { measurable, constraints ->
-    val touchHeight = TouchHeight.roundToPx()
-    val barHeight = BarHeight.roundToPx()
-    val placeable = measurable.measure(constraints.copy(minHeight = touchHeight, maxHeight = touchHeight))
-    layout(placeable.width, barHeight) {
-        placeable.place(0, (barHeight - touchHeight) / 2)
-    }
-}
-
 private val BarHeight = 2.dp
-private val TouchHeight = 24.dp
+private val TouchHeight = 14.dp
 private val ThumbRadius = 6.dp
 private const val SEEK_HOLD_MS = 1_500L
 
