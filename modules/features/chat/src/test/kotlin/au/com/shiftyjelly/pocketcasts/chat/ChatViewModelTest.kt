@@ -58,6 +58,7 @@ import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseRatingClearedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseStoppedEvent
 import com.automattic.eventhorizon.EpisodeChatSentimentType
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -632,6 +633,86 @@ class ChatViewModelTest {
 
         assertEquals(listOf(SendMessage(EPISODE_UUID, "First question")), chatManager.sentMessages)
         assertEquals("Second question", viewModel.uiState.value.inputText)
+    }
+
+    @Test
+    fun `stopping an answer keeps the question as stopped and tracks how long it waited`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+        timeSource += 1_500.milliseconds
+        while (!eventSink.isEmpty()) eventSink.skipEvent()
+
+        viewModel.onStopAnswer()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isAwaitingReply)
+        assertNull(state.error)
+        val question = state.messages.single() as ChatMessage.User
+        assertEquals("Question", question.text)
+        assertTrue(question.isStopped)
+        assertEquals(
+            EpisodeChatResponseStoppedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                durationMs = 1_500,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.isEmpty())
+        assertTrue(chatManager.sentMessages.isEmpty())
+    }
+
+    @Test
+    fun `a question sent after a stopped one keeps both`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("First question")
+        viewModel.onSend()
+        runCurrent()
+        viewModel.onStopAnswer()
+        advanceUntilIdle()
+
+        chatManager.sendMessageGate = null
+        viewModel.onInputTextChange("Second question")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        assertTrue(chatManager.discardedMessageUuids.isEmpty())
+        assertEquals(listOf(SendMessage(EPISODE_UUID, "Second question")), chatManager.sentMessages)
+        assertEquals(listOf("First question"), chatManager.sentHistories.single())
+        assertEquals(
+            listOf("First question", "Second question", "Response"),
+            viewModel.uiState.value.messages.map { it.text() },
+        )
+    }
+
+    @Test
+    fun `stop does nothing while no answer is loading`() = runTest {
+        setEpisodeInfo()
+        advanceUntilIdle()
+        while (!eventSink.isEmpty()) eventSink.skipEvent()
+
+        viewModel.onStopAnswer()
+        advanceUntilIdle()
+
+        assertTrue(eventSink.isEmpty())
+        assertTrue(viewModel.uiState.value.messages.isEmpty())
+    }
+
+    @Test
+    fun `a stopped question is not offered for retry when the chat reopens`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", isStopped = true))
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.error)
     }
 
     @Test
@@ -3656,6 +3737,16 @@ class ChatViewModelTest {
 
         override suspend fun createChat(episodeUuid: String, podcastUuid: String) {
             createdChats += CreateChat(episodeUuid, podcastUuid)
+        }
+
+        override suspend fun stopMessage(episodeUuid: String, message: ChatMessage.User) {
+            val episodeMessages = messagesFor(episodeUuid)
+            val stopped = message.copy(isStopped = true)
+            episodeMessages.value = if (episodeMessages.value.any { it.uuid == message.uuid }) {
+                episodeMessages.value.map { if (it.uuid == message.uuid) stopped else it }
+            } else {
+                episodeMessages.value + stopped
+            }
         }
 
         override suspend fun sendMessage(
