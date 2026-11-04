@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import au.com.shiftyjelly.pocketcasts.servers.di.NoCache
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import com.automattic.eventhorizon.EventHorizon
@@ -37,6 +38,9 @@ class FingerprintReferenceRetriever @Inject constructor(
     @ApplicationContext private val context: Context,
     private val eventHorizon: EventHorizon,
 ) {
+    @VisibleForTesting
+    internal var retryBaseDelayMs = 1000L
+
     sealed interface FetchResult {
         class Success(val data: ByteArray, val bytesReceived: Long = data.size.toLong()) : FetchResult
         data object NotFound : FetchResult
@@ -87,7 +91,7 @@ class FingerprintReferenceRetriever @Inject constructor(
             coroutineContext.ensureActive()
 
             if (attempt > 0) {
-                val delayMs = (1L shl attempt) * 1000L
+                val delayMs = (1L shl attempt) * retryBaseDelayMs
                 delay(delayMs)
             }
 

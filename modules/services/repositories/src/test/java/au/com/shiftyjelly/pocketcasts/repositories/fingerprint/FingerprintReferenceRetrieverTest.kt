@@ -45,7 +45,7 @@ class FingerprintReferenceRetrieverTest {
         val context = mock(Context::class.java)
         whenever(context.cacheDir).thenReturn(tempFolder.root)
         whenever(context.getSystemService(Context.CONNECTIVITY_SERVICE)).doReturn(connectivityManager)
-        retriever = FingerprintReferenceRetriever(OkHttpClient(), context, EventHorizon(eventSink))
+        retriever = FingerprintReferenceRetriever(OkHttpClient(), context, EventHorizon(eventSink)).apply { retryBaseDelayMs = 0L }
     }
 
     @Test
