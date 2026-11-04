@@ -70,7 +70,7 @@ fun ChaptersPage(
     val reveal = rememberGeneratedChaptersReveal(emptyState, hasGeneratedChapters)
     AnimatedContent(
         targetState = emptyState,
-        transitionSpec = { chaptersContentTransform(density) },
+        transitionSpec = { chaptersContentTransform(density, hasGeneratedChapters) },
         label = "chaptersContent",
         modifier = modifier.background(LocalChaptersTheme.current.background),
     ) { state ->
@@ -189,9 +189,10 @@ private fun ChaptersList(
 
 private fun AnimatedContentTransitionScope<ChaptersViewModel.EmptyState?>.chaptersContentTransform(
     density: Density,
+    hasGeneratedChapters: Boolean,
 ): ContentTransform {
     val shift = with(density) { STATE_SHIFT.roundToPx() }
-    return if (initialState == ChaptersViewModel.EmptyState.GeneratingChapters && targetState == null) {
+    return if (initialState == ChaptersViewModel.EmptyState.GeneratingChapters && targetState == null && hasGeneratedChapters) {
         val exit = fadeOut(tween(durationMillis = GENERATING_EXIT_MS, easing = EaseIn))
         (EnterTransition.None togetherWith exit using null).apply { targetContentZIndex = -1f }
     } else {
