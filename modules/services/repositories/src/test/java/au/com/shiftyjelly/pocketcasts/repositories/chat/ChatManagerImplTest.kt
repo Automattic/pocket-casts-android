@@ -333,6 +333,68 @@ class ChatManagerImplTest {
     }
 
     @Test
+    fun `stopping a question keeps it as stopped in its place`() = runTest {
+        val createdAt = Date(1_000)
+        episodeChatDao.messages += createMessage(uuid = "user-uuid", episodeUuid = EPISODE_UUID, text = "Question")
+            .copy(role = ChatRole.User.value, createdAt = createdAt)
+
+        manager.stopMessage(EPISODE_UUID, ChatMessage.User(text = "Question", inputType = ChatInputType.SummaryPrompt, uuid = "user-uuid"))
+
+        assertEquals(
+            listOf(ChatMessage.User(text = "Question", inputType = ChatInputType.SummaryPrompt, isStopped = true, uuid = "user-uuid")),
+            storedQuestions(),
+        )
+        assertEquals(createdAt, episodeChatDao.messages.single().createdAt)
+    }
+
+    @Test
+    fun `stopping a question that was not stored yet stores it`() = runTest {
+        val isStopped = manager.stopMessage(EPISODE_UUID, ChatMessage.User(text = "Question", uuid = "user-uuid"))
+
+        assertTrue(isStopped)
+        assertEquals(listOf(ChatMessage.User(text = "Question", isStopped = true, uuid = "user-uuid")), storedQuestions())
+    }
+
+    @Test
+    fun `stopping a question that was already answered leaves it`() = runTest {
+        episodeChatDao.messages += createMessage(uuid = "user-uuid", episodeUuid = EPISODE_UUID, text = "Question")
+            .copy(role = ChatRole.User.value, createdAt = Date(1_000))
+        episodeChatDao.messages += createMessage(uuid = "answer-uuid", episodeUuid = EPISODE_UUID, text = "Answer")
+            .copy(createdAt = Date(2_000))
+
+        val isStopped = manager.stopMessage(EPISODE_UUID, ChatMessage.User(text = "Question", uuid = "user-uuid"))
+
+        assertFalse(isStopped)
+        assertEquals(listOf(ChatMessage.User(text = "Question", uuid = "user-uuid")), storedQuestions())
+    }
+
+    @Test
+    fun `stopped questions are left out of the conversation history`() = runTest {
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(EpisodeChatResponse(reply = "Reply", quote = null))
+
+        manager.sendMessage(
+            episodeUuid = EPISODE_UUID,
+            podcastUuid = PODCAST_UUID,
+            message = ChatMessage.User(text = "Second question", uuid = "second-uuid"),
+            allMessages = listOf(
+                ChatMessage.User(text = "Earlier question", uuid = "earlier-uuid"),
+                ChatMessage.Assistant(text = "Earlier answer", uuid = "earlier-answer-uuid"),
+                ChatMessage.User(text = "Stopped question", isStopped = true, uuid = "stopped-uuid"),
+            ),
+        )
+
+        val requestCaptor = argumentCaptor<EpisodeChatRequest>()
+        verify(podcastCacheServiceManager).episodeChat(any(), requestCaptor.capture())
+        assertEquals(
+            listOf(
+                ConversationMessage(role = "user", content = "Earlier question"),
+                ConversationMessage(role = "assistant", content = "Earlier answer"),
+            ),
+            requestCaptor.firstValue.conversationHistory,
+        )
+    }
+
+    @Test
     fun `discarding a message deletes it`() = runTest {
         episodeChatDao.messages += createMessage(uuid = "message-uuid", episodeUuid = EPISODE_UUID, text = "Question")
 

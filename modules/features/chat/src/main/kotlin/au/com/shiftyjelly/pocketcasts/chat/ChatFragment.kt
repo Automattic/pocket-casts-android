@@ -211,6 +211,7 @@ class ChatFragment : BaseDialogFragment() {
                     onSeek = viewModel::onSeek,
                     onInputTextChange = viewModel::onInputTextChange,
                     onSend = viewModel::onSend,
+                    onStopAnswer = viewModel::onStopAnswer,
                     onClickSuggestion = viewModel::onSuggestionClick,
                     onRetry = viewModel::retry,
                     onPlayQuote = viewModel::playQuote,

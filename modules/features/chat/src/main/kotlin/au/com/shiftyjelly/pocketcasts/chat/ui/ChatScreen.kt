@@ -115,6 +115,7 @@ fun ChatScreen(
     onSeek: (positionMs: Int) -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
+    onStopAnswer: () -> Unit,
     onClickSuggestion: (String, ChatInputType) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
@@ -220,6 +221,7 @@ fun ChatScreen(
                         onSeek = onSeek,
                         onInputTextChange = onInputTextChange,
                         onSend = onSend,
+                        onStopAnswer = onStopAnswer,
                         onClickSuggestion = onClickSuggestion,
                         onRetry = onRetry,
                         onPlayQuote = onPlayQuote,
@@ -249,6 +251,7 @@ private fun ChatContent(
     onSeek: (positionMs: Int) -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
+    onStopAnswer: () -> Unit,
     onClickSuggestion: (String, ChatInputType) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
@@ -260,6 +263,7 @@ private fun ChatContent(
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
+    val answerStream = rememberChatAnswerStream(uiState.messages, initialMessageUuids)
     val isWelcomeVisible = uiState.areMessagesLoaded && uiState.messages.isEmpty() && !uiState.isAwaitingReply
     val currentOnWelcomeEnter by rememberUpdatedState(onWelcomeEnter)
     val welcomePosition = remember { PlacedCoordinates() }
@@ -461,7 +465,6 @@ private fun ChatContent(
                             .alpha(if (exitingWelcome != null) 0f else 1f),
                     )
                 }
-                val answerStream = rememberChatAnswerStream(uiState.messages, initialMessageUuids)
                 val answerUuidsByLastIndex = uiState.answerUuidsByLastIndex
                 uiState.messages.forEachIndexed { index, message ->
                     if (answerStream?.hasStarted(message.uuid) == false) return@forEachIndexed
@@ -624,6 +627,14 @@ private fun ChatContent(
                 exitWelcome(tappedSuggestion = null)
                 onSend()
             },
+            isAnswering = uiState.isAwaitingReply || answerStream?.isComplete == false,
+            onStop = {
+                if (uiState.isAwaitingReply) {
+                    onStopAnswer()
+                } else {
+                    coroutineScope.launch { answerStream?.skip() }
+                }
+            },
             isConnected = uiState.isConnected,
             canSend = uiState.canSend,
             showBetaNote = uiState.isBetaNoteVisible,
@@ -664,7 +675,7 @@ private data class ExitingWelcome(
 
 private fun ChatUiState.isAnswerLanding(initialMessageUuids: Set<String>): Boolean {
     val newestMessage = messages.lastOrNull()
-    return error == null && newestMessage is ChatMessage.User && newestMessage.uuid !in initialMessageUuids
+    return error == null && newestMessage is ChatMessage.User && !newestMessage.isStopped && newestMessage.uuid !in initialMessageUuids
 }
 
 @Composable
@@ -873,6 +884,7 @@ private fun ChatScreenPreview(
                 onSeek = {},
                 onInputTextChange = {},
                 onSend = {},
+                onStopAnswer = {},
                 onClickSuggestion = { _, _ -> },
                 onRetry = {},
                 onPlayQuote = {},
@@ -915,6 +927,7 @@ private fun ChatScreenEmptyPreview(
                 onSeek = {},
                 onInputTextChange = {},
                 onSend = {},
+                onStopAnswer = {},
                 onClickSuggestion = { _, _ -> },
                 onRetry = {},
                 onPlayQuote = {},
@@ -958,6 +971,7 @@ private fun ChatScreenErrorPreview(
                 onSeek = {},
                 onInputTextChange = {},
                 onSend = {},
+                onStopAnswer = {},
                 onClickSuggestion = { _, _ -> },
                 onRetry = {},
                 onPlayQuote = {},

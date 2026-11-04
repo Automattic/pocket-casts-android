@@ -317,6 +317,8 @@ class ChatFeedbackViewModelTest {
 
         override suspend fun discardMessage(uuid: String) = Unit
 
+        override suspend fun stopMessage(episodeUuid: String, message: ChatMessage.User) = true
+
         override suspend fun createChat(episodeUuid: String, podcastUuid: String) = Unit
 
         override suspend fun sendMessage(

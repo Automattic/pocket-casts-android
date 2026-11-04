@@ -50,6 +50,7 @@ import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseRatingClearedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseStoppedEvent
 import com.automattic.eventhorizon.EpisodeChatSentimentType
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -61,6 +62,7 @@ import java.time.ZoneId
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
+import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -138,6 +140,7 @@ class ChatViewModel @Inject constructor(
     private val warmedUpQuoteUuids = mutableSetOf<String>()
     private var lastQuotePlaybackUndoId = 0
     private var transientUserMessage: ChatMessage.User? = null
+    private var replyRequestedAt: TimeMark? = null
     private var pendingShownEntryPoint: ChatEntryPoint? = null
     private var hasReceivedAnswer = false
     private var hasSubmittedFeedback = false
@@ -313,7 +316,7 @@ class ChatViewModel @Inject constructor(
         if (!isAdoptingUnansweredQuestion || state.episodeUuid != messagesEpisodeUuid) return null
         isAdoptingUnansweredQuestion = false
         if (state.isAwaitingReply || transientUserMessage != null) return null
-        val question = messages.lastOrNull() as? ChatMessage.User ?: return null
+        val question = (messages.lastOrNull() as? ChatMessage.User)?.takeUnless { it.isStopped } ?: return null
         transientUserMessage = question
         return question
     }
@@ -625,6 +628,39 @@ class ChatViewModel @Inject constructor(
         performSend(message = ChatMessage.User(text = text, inputType = inputType))
     }
 
+    fun onStopAnswer() {
+        if (!_uiState.value.isAwaitingReply) return
+        val question = transientUserMessage ?: return
+        val pendingSend = sendJob ?: return
+        val episodeUuid = episodeUuid
+        val podcastUuid = podcastUuid
+        val pendingClear = clearJob
+        val durationMs = replyRequestedAt?.elapsedNow()?.inWholeMilliseconds ?: 0L
+        transientUserMessage = null
+        pendingSend.cancel()
+        val stoppedQuestion = question.copy(isStopped = true)
+        _uiState.update { state ->
+            state.copy(
+                isAwaitingReply = false,
+                error = null,
+                messages = state.messages.map { if (it.uuid == question.uuid) stoppedQuestion else it },
+            )
+        }
+        applicationScope.launch(ioDispatcher) {
+            pendingSend.join()
+            pendingClear?.join()
+            if (!chatManager.stopMessage(episodeUuid, question)) return@launch
+            eventHorizon.track(
+                EpisodeChatResponseStoppedEvent(
+                    source = sourceView.analyticsValue,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                    durationMs = durationMs,
+                ),
+            )
+        }
+    }
+
     fun retry() {
         if (!_uiState.value.isConnected || _uiState.value.isAwaitingReply) return
         val failedUserMessage = transientUserMessage ?: return
@@ -846,6 +882,7 @@ class ChatViewModel @Inject constructor(
         val supersededQuestionUuid = transientUserMessage?.uuid?.takeIf { it != message.uuid }
         val unsentMessageUuids = setOfNotNull(transientUserMessage?.uuid, message.uuid)
         transientUserMessage = message
+        replyRequestedAt = null
         val currentMessages = _uiState.value.messages.filterNot { it.uuid in unsentMessageUuids }
         val messageIndex = currentMessages.count { it is ChatMessage.User } + 1L
         eventHorizon.track(
@@ -878,7 +915,7 @@ class ChatViewModel @Inject constructor(
                     _undoExpired.trySend(Unit)
                 }
                 supersededQuestionUuid?.let { chatManager.discardMessage(it) }
-                val sentAt = timeSource.markNow()
+                val sentAt = timeSource.markNow().also { replyRequestedAt = it }
                 chatManager.sendMessage(episodeUuid, podcastUuid, message, currentMessages)
                 val responseDuration = sentAt.elapsedNow()
                 transientUserMessage = null
