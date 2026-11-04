@@ -68,6 +68,7 @@ internal fun ChatInputBar(
                 .alpha(if (isConnected) 1f else DISABLED_ALPHA)
                 .padding(
                     start = 16.dp,
+                    top = 8.dp,
                     end = 16.dp,
                     bottom = 8.dp,
                 ),
