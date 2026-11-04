@@ -37,6 +37,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,10 +56,12 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -80,6 +83,7 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.repositories.chat.findChatTimestamps
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlin.math.ceil
 import kotlinx.coroutines.delay
@@ -92,6 +96,9 @@ internal fun AiMessageBubble(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
     revealProgress: (() -> Float)? = null,
+    episodeDurationMs: Int = 0,
+    loadingTimestampMs: Int? = null,
+    onClickTimestamp: (startMs: Int) -> Unit = {},
 ) {
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
@@ -99,9 +106,20 @@ internal fun AiMessageBubble(
         with(density) { textMeasurer.measure(BULLET_PREFIX, AiMessageTextStyle).size.width.toSp() }
     }
     val styledText = remember(text, bulletIndent) { text.withHangingBullets(bulletIndent) }
+    val currentOnClickTimestamp by rememberUpdatedState(onClickTimestamp)
+    val isRevealed = revealProgress == null
+    val linkedText = remember(styledText, theme.link, isRevealed, episodeDurationMs, loadingTimestampMs) {
+        styledText.withTimestampLinks(
+            linkColor = theme.link,
+            isEnabled = isRevealed,
+            episodeDurationMs = episodeDurationMs,
+            loadingStartMs = loadingTimestampMs,
+            onClick = { startMs -> currentOnClickTimestamp(startMs) },
+        )
+    }
     val wipe = remember { TextWipe() }
     Text(
-        text = styledText,
+        text = linkedText,
         color = theme.aiBubbleText,
         style = AiMessageTextStyle,
         onTextLayout = wipe::onTextLayout,
@@ -121,6 +139,41 @@ private fun Modifier.revealedBy(
     val timeline = remember(text) { TextRevealTimeline(text) }
     return textWipe(wipe) { timeline.revealedLength(revealProgress()) }
 }
+
+private fun AnnotatedString.withTimestampLinks(
+    linkColor: Color,
+    isEnabled: Boolean,
+    episodeDurationMs: Int,
+    loadingStartMs: Int?,
+    onClick: (startMs: Int) -> Unit,
+): AnnotatedString {
+    val timestamps = findChatTimestamps(text).filter { episodeDurationMs <= 0 || it.startMs < episodeDurationMs }
+    if (timestamps.isEmpty()) return this
+    val source = this
+    return buildAnnotatedString {
+        append(source)
+        timestamps.forEach { timestamp ->
+            val style = SpanStyle(color = if (timestamp.startMs == loadingStartMs) linkColor.copy(alpha = LOADING_QUOTE_ALPHA) else linkColor)
+            val start = timestamp.range.first
+            val end = timestamp.range.last + 1
+            if (isEnabled) {
+                addLink(
+                    LinkAnnotation.Clickable(
+                        tag = TIMESTAMP_LINK_TAG,
+                        styles = TextLinkStyles(style),
+                        linkInteractionListener = { onClick(timestamp.startMs) },
+                    ),
+                    start,
+                    end,
+                )
+            } else {
+                addStyle(style, start, end)
+            }
+        }
+    }
+}
+
+private const val TIMESTAMP_LINK_TAG = "timestamp"
 
 internal fun String.withHangingBullets(indent: TextUnit): AnnotatedString {
     val lines = lines()

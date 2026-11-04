@@ -118,6 +118,7 @@ fun ChatScreen(
     onClickSuggestion: (String, ChatInputType) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
+    onPlayAnswerTimestamp: (answerUuid: String, startMs: Int) -> Unit,
     onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
     snackbarHostState: SnackbarHostState,
     onDismissBetaSheet: () -> Unit,
@@ -222,6 +223,7 @@ fun ChatScreen(
                         onClickSuggestion = onClickSuggestion,
                         onRetry = onRetry,
                         onPlayQuote = onPlayQuote,
+                        onPlayAnswerTimestamp = onPlayAnswerTimestamp,
                         onRateAnswer = onRateAnswer,
                         snackbarHostState = snackbarHostState,
                     )
@@ -250,6 +252,7 @@ private fun ChatContent(
     onClickSuggestion: (String, ChatInputType) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
+    onPlayAnswerTimestamp: (answerUuid: String, startMs: Int) -> Unit,
     onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
@@ -487,6 +490,9 @@ private fun ChatContent(
                                     text = message.displayText,
                                     theme = theme,
                                     revealProgress = answerStream?.takeIf { isStreaming }?.revealProgress(message.uuid),
+                                    episodeDurationMs = uiState.episodeDurationMs,
+                                    loadingTimestampMs = uiState.loadingAnswerTimestamp?.takeIf { it.answerUuid == message.uuid }?.startMs,
+                                    onClickTimestamp = { startMs -> onPlayAnswerTimestamp(message.uuid, startMs) },
                                 )
                             }
 
@@ -870,6 +876,7 @@ private fun ChatScreenPreview(
                 onClickSuggestion = { _, _ -> },
                 onRetry = {},
                 onPlayQuote = {},
+                onPlayAnswerTimestamp = { _, _ -> },
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},
@@ -911,6 +918,7 @@ private fun ChatScreenEmptyPreview(
                 onClickSuggestion = { _, _ -> },
                 onRetry = {},
                 onPlayQuote = {},
+                onPlayAnswerTimestamp = { _, _ -> },
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},
@@ -953,6 +961,7 @@ private fun ChatScreenErrorPreview(
                 onClickSuggestion = { _, _ -> },
                 onRetry = {},
                 onPlayQuote = {},
+                onPlayAnswerTimestamp = { _, _ -> },
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},
