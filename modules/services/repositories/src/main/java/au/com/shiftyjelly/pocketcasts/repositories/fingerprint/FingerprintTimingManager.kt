@@ -257,7 +257,7 @@ class FingerprintTimingManager @Inject constructor(
         scope.launch { prepareCurrentEpisode(trigger) }
     }
 
-    private suspend fun prepareCurrentEpisode(trigger: PrepareTrigger) {
+    private suspend fun prepareCurrentEpisode(trigger: PrepareTrigger, retained: PrepareTrigger? = null) {
         val episode = playbackManager.getCurrentEpisode() ?: run {
             // No episode is currently loaded, so there is no episode UUID to attribute this to.
             markUnavailable(reason = "no_episode", episodeUuid = null)
@@ -298,6 +298,7 @@ class FingerprintTimingManager @Inject constructor(
             preparingEpisodeUuid = episodeUuid
             currentTrigger = trigger
             retainTrigger(trigger)
+            retained?.let(::retainTrigger)
         }
         scope.launch {
             // Abort if a newer stop()/prepare() has started since we acquired the lock.
@@ -324,15 +325,18 @@ class FingerprintTimingManager @Inject constructor(
         val episode = playbackManager.getCurrentEpisode() ?: return
         if (episode.uuid != episodeUuid || !episode.isDownloaded) return
         scope.launch {
-            val trigger = currentTrigger
+            val trigger: PrepareTrigger
+            val retained: PrepareTrigger?
             mutex.withLock {
                 if (currentEpisodeUuid != episodeUuid || !currentIsStreaming) return@launch
+                trigger = currentTrigger
+                retained = retainedTrigger
                 generation++
                 resetState()
                 _stateFlow.value = State.Idle
             }
             Timber.d("FingerprintTimingManager: episode finished downloading — switching to local file")
-            prepareForCurrentEpisode(trigger)
+            prepareCurrentEpisode(trigger, retained)
         }
     }
 
