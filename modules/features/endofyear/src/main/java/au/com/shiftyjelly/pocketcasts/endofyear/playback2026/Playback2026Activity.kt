@@ -21,8 +21,6 @@ import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.webkit.WebViewCompat
-import androidx.webkit.WebViewFeature
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import com.automattic.pocketcasts.playback.PlaybackController
 import com.automattic.pocketcasts.playback.PlaybackEvent
@@ -112,9 +110,6 @@ class Playback2026Activity : ComponentActivity() {
             finish()
         }
         this.controller = controller
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-            WebViewCompat.addDocumentStartJavaScript(controller.webView, WEBGL_DEPTH_BUFFER_SCRIPT, setOf(PAGE_ORIGIN))
-        }
 
         container.removeAllViews()
         container.addView(
@@ -184,18 +179,6 @@ class Playback2026Activity : ComponentActivity() {
         private val BACKGROUND_COLOR = Color.rgb(0x2D, 0x00, 0x04)
         private const val SHARE_DIRECTORY = "playback_2026"
         private const val SHARE_FILE_NAME = "playback-2026.png"
-        private const val PAGE_ORIGIN = "https://appassets.androidplatform.net"
-
-        // TODO: Remove once PlaybackKit requests a depth buffer itself. Without one, Adreno GPUs
-        // only clear part of the canvas, leaving a black band across the top of the backdrop.
-        private const val WEBGL_DEPTH_BUFFER_SCRIPT = """
-            (() => {
-              const getContext = HTMLCanvasElement.prototype.getContext;
-              HTMLCanvasElement.prototype.getContext = function (type, attributes) {
-                return getContext.call(this, type, type === 'webgl2' ? { ...attributes, depth: true } : attributes);
-              };
-            })();
-        """
 
         fun newIntent(context: Context) = Intent(context, Playback2026Activity::class.java)
     }
