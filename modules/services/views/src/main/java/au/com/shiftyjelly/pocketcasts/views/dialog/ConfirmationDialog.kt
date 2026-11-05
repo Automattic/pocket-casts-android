@@ -1,10 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.views.dialog
 
 import android.app.Dialog
-import android.content.Context
 import android.content.DialogInterface
 import android.content.res.Resources
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -13,9 +11,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.DrawableRes
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.core.view.doOnLayout
@@ -127,7 +123,8 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
             ConfirmationDialogContent(
                 title = title,
                 summary = summary,
-                icon = remember { iconDrawable(dialogContext) },
+                iconRes = iconId.takeIf { it != 0 },
+                iconTint = iconTintAttr?.let { Color(dialogContext.getThemeColor(it)) },
                 buttonType = buttonType,
                 secondaryType = secondaryType,
                 onConfirm = {
@@ -147,13 +144,6 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
                 removeSecondaryButtonBorder = removeSecondaryButtonBorder,
             )
         }
-    }
-
-    private fun iconDrawable(context: Context): Drawable? {
-        if (iconId == 0) return null
-        val drawable = AppCompatResources.getDrawable(context, iconId)?.mutate() ?: return null
-        iconTintAttr?.let { drawable.setTint(context.getThemeColor(it)) }
-        return drawable
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
