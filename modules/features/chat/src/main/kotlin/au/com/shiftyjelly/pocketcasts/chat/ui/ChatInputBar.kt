@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -175,21 +176,27 @@ private fun SendOrStopButton(
             targetState = isAnswering,
             animationSpec = if (rememberIsReduceMotionEnabled()) snap() else tween(SEND_STOP_CROSSFADE_MS),
             label = "sendOrStop",
+            modifier = Modifier.size(SendIconSize),
         ) { showStop ->
-            if (showStop) {
-                Box(
-                    modifier = Modifier
-                        .size(StopIconSize)
-                        .background(theme.sendButtonIcon, RoundedCornerShape(3.dp))
-                        .semantics { contentDescription = stopLabel },
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = stringResource(LR.string.chat_send),
-                    tint = if (canSend) theme.sendButtonIcon else theme.inputHint,
-                    modifier = Modifier.size(24.dp),
-                )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                if (showStop) {
+                    Box(
+                        modifier = Modifier
+                            .size(StopIconSize)
+                            .background(theme.sendButtonIcon, RoundedCornerShape(3.dp))
+                            .semantics { contentDescription = stopLabel },
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = stringResource(LR.string.chat_send),
+                        tint = if (canSend) theme.sendButtonIcon else theme.inputHint,
+                        modifier = Modifier.size(SendIconSize),
+                    )
+                }
             }
         }
     }
@@ -220,6 +227,7 @@ private fun ChatOfflineNote(
 }
 
 internal const val DISABLED_ALPHA = 0.4f
+private val SendIconSize = 24.dp
 private val StopIconSize = 14.dp
 private const val SEND_STOP_CROSSFADE_MS = 150
 
