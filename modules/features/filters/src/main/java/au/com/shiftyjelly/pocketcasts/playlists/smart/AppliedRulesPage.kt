@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -133,6 +134,7 @@ internal fun AppliedRulesPage(
                             EpisodeRow(
                                 episode = episodeWrapper.episode,
                                 useEpisodeArtwork = useEpisodeArtwork,
+                                backgroundColor = Color.Transparent,
                             )
                         }
                     } else {

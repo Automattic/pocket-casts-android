@@ -34,7 +34,6 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.GradientIcon
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
@@ -86,6 +85,7 @@ fun EpisodeRow(
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
+    backgroundColor: Color = MaterialTheme.theme.colors.primaryUi02,
 ) {
     val colors = MaterialTheme.theme.colors
     SwipeRow(
@@ -98,7 +98,7 @@ fun EpisodeRow(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(if (isMultiSelecting && isSelected) colors.primaryUi02Selected else colors.primaryUi02)
+                .background(if (isMultiSelecting && isSelected) colors.primaryUi02Selected else backgroundColor)
                 .then(
                     if (onClick != null || onLongClick != null) {
                         Modifier.combinedClickable(
@@ -199,7 +199,6 @@ private fun EpisodeRowTitle(title: String, isStarred: Boolean) {
     ) {
         TextH40(
             text = title,
-            lineHeight = 15.sp,
             maxLines = 2,
             modifier = Modifier.weight(1f, fill = false),
         )

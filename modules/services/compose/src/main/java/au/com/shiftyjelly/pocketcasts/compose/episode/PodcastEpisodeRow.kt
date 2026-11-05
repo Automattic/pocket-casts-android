@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
@@ -43,6 +44,7 @@ fun EpisodeRow(
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
+    backgroundColor: Color = MaterialTheme.theme.colors.primaryUi02,
 ) {
     val context = LocalContext.current
     val header = rememberEpisodeRowHeader(episode)
@@ -64,6 +66,7 @@ fun EpisodeRow(
         onClick = onClick,
         onLongClick = onLongClick,
         trailing = trailing,
+        backgroundColor = backgroundColor,
         modifier = modifier,
     )
 }
