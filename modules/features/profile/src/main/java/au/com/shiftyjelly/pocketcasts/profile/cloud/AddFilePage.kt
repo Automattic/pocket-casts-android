@@ -44,8 +44,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.widget.doAfterTextChanged
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.profile.R
 import com.google.android.material.textfield.TextInputEditText
@@ -119,17 +119,15 @@ internal fun AddFilePage(
                     .fillMaxWidth(),
             )
             Row(modifier = Modifier.padding(top = 16.dp)) {
-                TextViewText(
+                TextP50(
                     text = state.fileName,
-                    fontSize = 14.sp,
                     color = colors.primaryText02,
                     modifier = Modifier
                         .padding(start = 16.dp, end = 8.dp)
                         .weight(1f),
                 )
-                TextViewText(
+                TextP50(
                     text = state.fileSize,
-                    fontSize = 14.sp,
                     color = colors.primaryText02,
                     modifier = Modifier.padding(end = 16.dp),
                 )
@@ -175,23 +173,21 @@ internal fun AddFilePage(
 @Composable
 private fun SaveAction(onClick: () -> Unit) {
     Box(
-        contentAlignment = TextViewAlignment.Center,
+        contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxHeight()
             .padding(end = 16.dp),
     ) {
         Box(
-            contentAlignment = TextViewAlignment.Center,
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)
                 .clickable(role = Role.Button, onClick = onClick)
                 .padding(horizontal = 8.dp),
         ) {
-            TextViewText(
+            TextH50(
                 text = stringResource(LR.string.profile_files_addfile_save).uppercase(),
-                fontSize = 14.sp,
                 color = MaterialTheme.theme.colors.secondaryText01,
-                fontWeight = FontWeight.Medium,
                 maxLines = 2,
             )
         }
