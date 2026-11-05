@@ -177,7 +177,7 @@ private fun ReasonRow(
             selected = isSelected,
             onClick = null,
             colors = RadioButtonDefaults.colors(
-                selectedColor = theme.quoteTimestamp,
+                selectedColor = theme.primaryText,
                 unselectedColor = theme.primaryText,
             ),
         )
@@ -236,7 +236,7 @@ private fun LegalNote(
         withLink(
             LinkAnnotation.Clickable(
                 tag = LEARN_MORE_TAG,
-                styles = TextLinkStyles(SpanStyle(color = theme.quoteTimestamp)),
+                styles = TextLinkStyles(SpanStyle(color = theme.link)),
                 linkInteractionListener = { onClickLearnMore() },
             ),
         ) {

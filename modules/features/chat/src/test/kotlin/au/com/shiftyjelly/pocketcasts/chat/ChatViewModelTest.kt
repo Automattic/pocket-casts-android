@@ -58,6 +58,7 @@ import com.automattic.eventhorizon.EpisodeChatQuoteSourceType
 import com.automattic.eventhorizon.EpisodeChatResponseRatedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseRatingClearedEvent
 import com.automattic.eventhorizon.EpisodeChatResponseReceivedEvent
+import com.automattic.eventhorizon.EpisodeChatResponseStoppedEvent
 import com.automattic.eventhorizon.EpisodeChatSentimentType
 import com.automattic.eventhorizon.EpisodeChatShownEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -433,41 +434,42 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `starter questions show as loading until they arrive`() = runTest {
+    fun `starter questions are added when they arrive`() = runTest {
         val questions = CompletableDeferred<List<String>>()
         chatManager.starterQuestionsResult = questions
         setEpisodeInfo()
         runCurrent()
 
-        assertTrue(viewModel.uiState.value.isLoadingStarterQuestions)
+        assertTrue(viewModel.uiState.value.starterQuestions.isEmpty())
 
         questions.complete(listOf("Who is the guest?"))
         advanceUntilIdle()
 
-        assertFalse(viewModel.uiState.value.isLoadingStarterQuestions)
         assertEquals(listOf("Who is the guest?"), viewModel.uiState.value.starterQuestions)
     }
 
     @Test
-    fun `failed starter questions stop loading`() = runTest {
+    fun `failed starter questions leave only the summary suggestion`() = runTest {
         setEpisodeInfo()
         advanceUntilIdle()
 
-        assertFalse(viewModel.uiState.value.isLoadingStarterQuestions)
         assertTrue(viewModel.uiState.value.starterQuestions.isEmpty())
     }
 
     @Test
-    fun `switching episodes while starter questions load stops loading`() = runTest {
-        chatManager.starterQuestionsResult = CompletableDeferred()
+    fun `starter questions arriving after switching episodes are dropped`() = runTest {
+        val questions = CompletableDeferred<List<String>>()
+        chatManager.starterQuestionsResult = questions
         setEpisodeInfo()
         runCurrent()
         chatManager.otherMessages.value = listOf(ChatMessage.User(text = "Q1", uuid = "q1"))
 
         viewModel.openHistoryChat(historyItem(OTHER_EPISODE_UUID))
         runCurrent()
+        questions.complete(listOf("Who is the guest?"))
+        advanceUntilIdle()
 
-        assertFalse(viewModel.uiState.value.isLoadingStarterQuestions)
+        assertTrue(viewModel.uiState.value.starterQuestions.isEmpty())
     }
 
     @Test
@@ -632,6 +634,141 @@ class ChatViewModelTest {
 
         assertEquals(listOf(SendMessage(EPISODE_UUID, "First question")), chatManager.sentMessages)
         assertEquals("Second question", viewModel.uiState.value.inputText)
+    }
+
+    @Test
+    fun `stopping an answer keeps the question as stopped and tracks how long it waited`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+        timeSource += 1_500.milliseconds
+        while (!eventSink.isEmpty()) eventSink.skipEvent()
+
+        viewModel.onStopAnswer()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isAwaitingReply)
+        assertNull(state.error)
+        val question = state.messages.single() as ChatMessage.User
+        assertEquals("Question", question.text)
+        assertTrue(question.isStopped)
+        assertEquals(
+            EpisodeChatResponseStoppedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                durationMs = 1_500,
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.isEmpty())
+        assertTrue(chatManager.sentMessages.isEmpty())
+    }
+
+    @Test
+    fun `a stopped question shows as stopped straight away`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+
+        viewModel.onStopAnswer()
+
+        assertTrue((viewModel.uiState.value.messages.last() as ChatMessage.User).isStopped)
+    }
+
+    @Test
+    fun `a question sent after a stopped one keeps both`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("First question")
+        viewModel.onSend()
+        runCurrent()
+        viewModel.onStopAnswer()
+        advanceUntilIdle()
+
+        chatManager.sendMessageGate = null
+        viewModel.onInputTextChange("Second question")
+        viewModel.onSend()
+        advanceUntilIdle()
+
+        assertTrue(chatManager.discardedMessageUuids.isEmpty())
+        assertEquals(listOf(SendMessage(EPISODE_UUID, "Second question")), chatManager.sentMessages)
+        assertEquals(listOf("First question"), chatManager.sentHistories.single())
+        assertEquals(
+            listOf("First question", "Second question", "Response"),
+            viewModel.uiState.value.messages.map { it.text() },
+        )
+    }
+
+    @Test
+    fun `stopping just after the answer was saved does not track a stop`() = runTest {
+        setEpisodeInfo()
+        connectToInternet()
+        chatManager.sendMessageGate = CompletableDeferred()
+        viewModel.onInputTextChange("Question")
+        viewModel.onSend()
+        runCurrent()
+        chatManager.messages.value += ChatMessage.Assistant(text = "Answer", uuid = "answer-uuid")
+        while (!eventSink.isEmpty()) eventSink.skipEvent()
+
+        viewModel.onStopAnswer()
+        advanceUntilIdle()
+
+        assertTrue(eventSink.isEmpty())
+        assertFalse((chatManager.messages.value.first() as ChatMessage.User).isStopped)
+    }
+
+    @Test
+    fun `stopping right after clearing keeps the stopped question`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Old question"), ChatMessage.Assistant(text = "Old answer"))
+        setEpisodeInfo()
+        connectToInternet()
+        val clearGate = CompletableDeferred<Unit>()
+        chatManager.clearMessagesGate = clearGate
+        viewModel.clearChat()
+        runCurrent()
+        viewModel.onInputTextChange("New question")
+        viewModel.onSend()
+        runCurrent()
+
+        viewModel.onStopAnswer()
+        runCurrent()
+        clearGate.complete(Unit)
+        advanceUntilIdle()
+
+        val question = chatManager.messages.value.single() as ChatMessage.User
+        assertEquals("New question", question.text)
+        assertTrue(question.isStopped)
+    }
+
+    @Test
+    fun `stop does nothing while no answer is loading`() = runTest {
+        setEpisodeInfo()
+        advanceUntilIdle()
+        while (!eventSink.isEmpty()) eventSink.skipEvent()
+
+        viewModel.onStopAnswer()
+        advanceUntilIdle()
+
+        assertTrue(eventSink.isEmpty())
+        assertTrue(viewModel.uiState.value.messages.isEmpty())
+    }
+
+    @Test
+    fun `a stopped question is not offered for retry when the chat reopens`() = runTest {
+        chatManager.messages.value = listOf(ChatMessage.User(text = "Question", isStopped = true))
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.error)
     }
 
     @Test
@@ -1691,6 +1828,75 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `playing an answer timestamp seeks to it and tracks it as an answer timestamp`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        answerState()
+        eventSink.skipEvent()
+
+        viewModel.playAnswerTimestamp(ANSWER_UUID, 65_000)
+        advanceUntilIdle()
+
+        assertEquals(
+            EpisodeChatQuotePlayTappedEvent(
+                source = SourceView.PLAYER.analyticsValue,
+                episodeUuid = EPISODE_UUID,
+                podcastUuid = PODCAST_UUID,
+                quoteSource = EpisodeChatQuoteSourceType.AnswerTimestamp,
+                isOtherEpisode = false,
+            ),
+            eventSink.pollEvent(),
+        )
+        verify(quoteSeeker).playbackTimeMs(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 65_000, referenceTimeMs = 65_000)))
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(65_000), anyOrNull())
+        verify(playbackManager).playQueueSuspend(any(), any())
+        assertNull(viewModel.uiState.value.loadingAnswerTimestamp)
+    }
+
+    @Test
+    fun `an answer timestamp shows as loading until playback starts`() = runTest {
+        val seekTime = CompletableDeferred<Int>()
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { seekTime.await() }
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        answerState()
+
+        viewModel.playAnswerTimestamp(ANSWER_UUID, 65_000)
+        runCurrent()
+
+        assertEquals(ChatAnswerTimestamp(ANSWER_UUID, 65_000), viewModel.uiState.value.loadingAnswerTimestamp)
+
+        seekTime.complete(65_000)
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.value.loadingAnswerTimestamp)
+    }
+
+    @Test
+    fun `an answer timestamp past the episode end does not touch playback`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        answerState()
+
+        viewModel.playAnswerTimestamp(ANSWER_UUID, 500_000)
+        advanceUntilIdle()
+
+        verifyNoSeek()
+    }
+
+    @Test
+    fun `a timestamp from an unknown answer is ignored`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        answerState()
+        eventSink.skipEvent()
+
+        viewModel.playAnswerTimestamp("other-answer-uuid", 65_000)
+        advanceUntilIdle()
+
+        verifyNoSeek()
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
     fun `playing a quote seeks to its start and keeps playing`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
@@ -2504,7 +2710,7 @@ class ChatViewModelTest {
 
         val state = viewModel.uiState.value
         assertEquals(ChatPlayingEpisode("Other episode", "other-podcast-uuid", "Other podcast"), state.otherPlayingEpisode)
-        assertEquals(ChatPlayback(isPlaying = true, positionMs = 10_000, durationMs = 40_000), state.playback)
+        assertEquals(ChatPlayback(isPlaying = true, positionMs = 10_000, durationMs = 40_000, isSeekable = true), state.playback)
         assertEquals("Episode title", state.episodeTitle)
     }
 
@@ -2574,7 +2780,32 @@ class ChatViewModelTest {
         )
         advanceUntilIdle()
 
-        assertEquals(ChatPlayback(isPlaying = true, positionMs = 80_000, durationMs = 190_000), viewModel.uiState.value.playback)
+        assertEquals(ChatPlayback(isPlaying = true, positionMs = 80_000, durationMs = 190_000, isSeekable = true), viewModel.uiState.value.playback)
+    }
+
+    @Test
+    fun `seeking moves the loaded episode`() = runTest {
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.onSeek(120_000)
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(120_000), anyOrNull())
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
+    }
+
+    @Test
+    fun `seeking does nothing when no episode is loaded`() = runTest {
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.onSeek(120_000)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.playback.isSeekable)
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
     }
 
     @Test
@@ -2676,6 +2907,12 @@ class ChatViewModelTest {
         setEpisodeInfo(episodeDurationMs)
         advanceUntilIdle()
         return viewModel.uiState.value.messages.filterIsInstance<ChatMessage.Quote>().single().canPlay
+    }
+
+    private fun TestScope.answerState() {
+        chatManager.messages.value = listOf(ChatMessage.Assistant(text = "It comes up at 00:01:05.", uuid = ANSWER_UUID))
+        setEpisodeInfo()
+        advanceUntilIdle()
     }
 
     private fun createQuote(startMs: Int, endMs: Int, uuid: String = "quote-uuid") = ChatMessage.Quote(
@@ -3558,6 +3795,19 @@ class ChatViewModelTest {
             createdChats += CreateChat(episodeUuid, podcastUuid)
         }
 
+        override suspend fun stopMessage(episodeUuid: String, message: ChatMessage.User): Boolean {
+            val episodeMessages = messagesFor(episodeUuid)
+            val stopped = message.copy(isStopped = true)
+            val isStored = episodeMessages.value.any { it.uuid == message.uuid }
+            if (isStored && episodeMessages.value.last().uuid != message.uuid) return false
+            episodeMessages.value = if (isStored) {
+                episodeMessages.value.map { if (it.uuid == message.uuid) stopped else it }
+            } else {
+                episodeMessages.value + stopped
+            }
+            return true
+        }
+
         override suspend fun sendMessage(
             episodeUuid: String,
             podcastUuid: String,
@@ -3610,6 +3860,7 @@ class ChatViewModelTest {
         const val PODCAST_UUID = "podcast-uuid"
         const val OTHER_EPISODE_UUID = "other-episode-uuid"
         const val OTHER_PODCAST_UUID = "other-podcast-uuid"
+        const val ANSWER_UUID = "answer-uuid"
     }
 }
 
