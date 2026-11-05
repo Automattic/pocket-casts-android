@@ -71,7 +71,7 @@ fun EpisodeRowPlayButton(
                         item.onClick(listener, episode.uuid)
                     },
                 ) {
-                    Text(stringResource(item.title))
+                    Text(stringResource(item.title), color = MaterialTheme.theme.colors.primaryText01)
                 }
             }
         }
