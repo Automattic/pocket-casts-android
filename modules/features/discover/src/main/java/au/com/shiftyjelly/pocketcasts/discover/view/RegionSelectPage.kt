@@ -30,8 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
@@ -61,7 +60,6 @@ internal fun RegionSelectPage(
             backgroundColor = MaterialTheme.theme.colors.secondaryUi01,
             modifier = toolbarModifier,
         )
-        val titleColor = MaterialTheme.theme.colors.primaryText01
         LazyColumn(
             contentPadding = bottomInset,
             modifier = Modifier.fillMaxWidth().weight(1f),
@@ -70,7 +68,6 @@ internal fun RegionSelectPage(
                 RegionRow(
                     region = region,
                     isSelected = region.code == selectedRegionCode,
-                    titleColor = titleColor,
                     modifier = Modifier.clickable { onRegionClick(region) },
                 )
             }
@@ -82,7 +79,6 @@ internal fun RegionSelectPage(
 private fun RegionRow(
     region: DiscoverRegion,
     isSelected: Boolean,
-    titleColor: Color,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -100,20 +96,12 @@ private fun RegionRow(
             modifier = Modifier.size(40.dp),
         )
         Spacer(modifier = Modifier.width(16.dp))
-        Box(
-            contentAlignment = TextViewAlignment.CenterStart,
+        TextP40(
+            text = region.name.tryToLocalise(LocalResources.current),
             modifier = Modifier
                 .weight(1f)
-                .fillMaxHeight()
                 .padding(end = 16.dp),
-        ) {
-            TextViewText(
-                text = region.name.tryToLocalise(LocalResources.current),
-                fontSize = 16.sp,
-                color = titleColor,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
+        )
         if (isSelected) {
             Icon(
                 painter = painterResource(IR.drawable.ic_tick),
