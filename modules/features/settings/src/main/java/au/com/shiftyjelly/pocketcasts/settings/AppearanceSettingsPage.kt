@@ -49,7 +49,8 @@ import androidx.core.content.res.use
 import androidx.core.graphics.drawable.toDrawable
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import kotlin.math.roundToInt
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -178,10 +179,8 @@ internal fun AppearanceSettingsPage(
 
 @Composable
 private fun SectionHeader(titleRes: Int, paddingBottom: Dp = 0.dp) {
-    TextViewText(
+    TextH40(
         text = stringResource(titleRes),
-        fontSize = 15.sp,
-        fontWeight = FontWeight.Medium,
         color = MaterialTheme.theme.colors.primaryInteractive01,
         modifier = Modifier.padding(start = 72.dp, top = 16.dp, bottom = paddingBottom),
     )
@@ -207,11 +206,8 @@ private fun TextRow(titleRes: Int, onClick: () -> Unit) {
             .clickable(interactionSource = interactionSource, indication = null, onClick = onClick),
     ) {
         SelectableItemBackground(interactionSource, Modifier.matchParentSize())
-        TextViewText(
+        TextH40(
             text = stringResource(titleRes),
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.theme.colors.primaryText01,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 72.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
@@ -240,18 +236,13 @@ private fun SwitchRow(
     Layout(
         content = {
             SelectableItemBackground(interactionSource)
-            TextViewText(
+            TextH40(
                 text = title,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-                color = colors.primaryText01,
                 modifier = Modifier.padding(top = titlePaddingTop, bottom = titlePaddingBottom),
             )
             if (details != null) {
-                TextViewText(
+                TextH40(
                     text = details,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium,
                     color = colors.primaryText02,
                     modifier = Modifier.padding(bottom = 8.dp),
                 )
@@ -345,21 +336,16 @@ private fun UpgradeBanner(listener: AppearanceListener) {
                     .padding(top = 16.dp)
                     .size(width = 232.dp, height = 32.dp),
             )
-            TextViewText(
+            TextH40(
                 text = stringResource(LR.string.settings_get_plus_and_more),
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
                 color = colors.primaryText02,
-                lineSpacingMultiplier = 1.1f,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(start = 64.dp, top = 16.dp, end = 64.dp)
                     .fillMaxWidth(),
             )
-            TextViewText(
+            TextH50(
                 text = stringResource(LR.string.settings_learn_more),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
                 color = colors.primaryInteractive01,
                 textAlign = TextAlign.Center,
                 modifier = Modifier

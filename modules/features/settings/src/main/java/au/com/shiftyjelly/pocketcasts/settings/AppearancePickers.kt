@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.res.use
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -160,11 +160,8 @@ private fun AppearanceCell(
             } else {
                 Box(Modifier)
             }
-            TextViewText(
+            TextH40(
                 text = option.label,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-                color = colors.primaryText01,
             )
         },
         modifier = Modifier
