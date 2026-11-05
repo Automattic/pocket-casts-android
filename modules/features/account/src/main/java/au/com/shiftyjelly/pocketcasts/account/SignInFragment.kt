@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.fragment.app.viewModels
@@ -26,36 +28,40 @@ class SignInFragment : BaseFragment() {
 
     private val viewModel: SignInViewModel by viewModels()
     private var form by mutableStateOf(SignInForm())
-    private var fieldsState: SignInFieldsState? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
         AppTheme(theme.activeTheme) {
             val isCar = Util.isCarUiMode(requireContext())
             val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
             val form = form
-            val fieldsState = rememberSignInFieldsState().also { this@SignInFragment.fieldsState = it }
+            var email by rememberSaveable { mutableStateOf("") }
+            var password by rememberSaveable { mutableStateOf("") }
+            LaunchedEffect(Unit) {
+                if (email.isNotEmpty()) viewModel.updateEmail(email)
+                if (password.isNotEmpty()) viewModel.updatePassword(password)
+            }
             SignInPage(
                 state = SignInPageState(
                     isCar = isCar,
                     isLandscape = isLandscape,
+                    email = email,
+                    password = password,
+                    isEmailValid = !form.isEmailInvalid,
                     isFormValid = !form.isEmailInvalid && !form.isPasswordInvalid,
                     isLoading = form.isLoading,
                     isProgressVisible = form.isProgressVisible,
                     errorText = form.errorText,
                 ),
+                onEmailChange = {
+                    email = it
+                    viewModel.updateEmail(it)
+                },
+                onPasswordChange = {
+                    password = it
+                    viewModel.updatePassword(it)
+                },
                 onSignInClick = ::signIn,
                 onForgotPasswordClick = { findNavController().navigate(R.id.action_signInFragment_to_resetPasswordFragment) },
-                fields = {
-                    SignInFields(
-                        state = fieldsState,
-                        isCar = isCar,
-                        isLandscape = isLandscape,
-                        isEmailInvalid = form.isEmailInvalid,
-                        onEmailChange = viewModel::updateEmail,
-                        onPasswordChange = viewModel::updatePassword,
-                        onSubmit = ::signIn,
-                    )
-                },
             )
         }
     }
@@ -107,11 +113,6 @@ class SignInFragment : BaseFragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        fieldsState = null
-    }
-
     private fun signIn() {
         val view = view ?: return
         form = form.copy(isProgressVisible = true)
@@ -128,7 +129,6 @@ class SignInFragment : BaseFragment() {
 
     private fun updateForm(invalidEmail: Boolean, invalidPwd: Boolean, loading: Boolean) {
         form = form.copy(isEmailInvalid = invalidEmail, isPasswordInvalid = invalidPwd, isLoading = loading)
-        fieldsState?.updateIcons(invalidEmail)
     }
 }
 
