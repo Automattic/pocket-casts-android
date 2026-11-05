@@ -353,6 +353,7 @@ internal fun UserMessageBubble(
     chipMorph: () -> Float = { 0f },
 ) {
     val isChipWidth by remember(chipMorph) { derivedStateOf { chipMorph() >= CHIP_WIDTH_MORPH_POINT } }
+    val widestLine = remember { WidestLine() }
     Column(
         horizontalAlignment = Alignment.End,
         modifier = modifier.fillMaxWidth(),
@@ -376,11 +377,13 @@ internal fun UserMessageBubble(
                 color = theme.userBubbleText,
                 fontSize = 15.sp,
                 lineHeight = 20.sp,
+                onTextLayout = widestLine::onTextLayout,
                 modifier = Modifier
-                    .widthIn(max = if (isChipWidth) Dp.Unspecified else UserBubbleMaxWidth)
+                    .then(if (isChipWidth) Modifier.chipMaxWidth() else Modifier.widthIn(max = UserBubbleMaxWidth))
                     .drawBehind { drawUserBubble(chipMorph(), theme) }
                     .padding(horizontal = 16.dp)
-                    .verticalPadding { lerp(10.dp, 12.dp, chipMorph()) },
+                    .verticalPadding { lerp(10.dp, 12.dp, chipMorph()) }
+                    .hugWidestLine(widestLine),
             )
             if (isNotSent) {
                 ChatNotSentLabel(theme = theme)
