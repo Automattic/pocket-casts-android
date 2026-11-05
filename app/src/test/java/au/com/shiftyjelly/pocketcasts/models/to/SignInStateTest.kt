@@ -1,3 +1,4 @@
+// CI skip probe: unit-test-only change. Close this validation PR without merging.
 package au.com.shiftyjelly.pocketcasts.models.to
 
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
