@@ -27,12 +27,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class PlaybackStatsManagerTest {
+class EndOfYearManagerPlaybackStatsTest {
     private lateinit var database: AppDatabase
     private lateinit var podcastDao: PodcastDao
     private lateinit var episodeDao: EpisodeDao
 
-    private lateinit var manager: PlaybackStatsManager
+    private lateinit var manager: EndOfYearManager
 
     private val zone = ZoneId.of("Australia/Adelaide")
     private val year = Year.of(2026)
@@ -46,7 +46,7 @@ class PlaybackStatsManagerTest {
         podcastDao = database.podcastDao()
         episodeDao = database.episodeDao()
 
-        manager = PlaybackStatsManager(
+        manager = EndOfYearManagerImpl(
             endOfYearDao = database.endOfYearDao(),
             clock = Clock.fixed(Instant.EPOCH, zone),
         )
@@ -59,7 +59,7 @@ class PlaybackStatsManagerTest {
 
     @Test
     fun getStatsWithoutAnyData() = runTest {
-        val stats = manager.getStats(year)
+        val stats = manager.getPlaybackStats(year)
 
         val expected = PlaybackStats(
             podcasts = emptyList(),
@@ -88,7 +88,7 @@ class PlaybackStatsManagerTest {
             ),
         )
 
-        val podcasts = manager.getStats(year).podcasts
+        val podcasts = manager.getPlaybackStats(year).podcasts
 
         assertEquals(listOf("podcast-2", "podcast-1"), podcasts.map(PlaybackPodcastStats::uuid))
         assertEquals(listOf(400.0, 150.0), podcasts.map(PlaybackPodcastStats::playedSeconds))
@@ -110,7 +110,7 @@ class PlaybackStatsManagerTest {
             ),
         )
 
-        val monthlySeconds = manager.getStats(year).monthlySeconds
+        val monthlySeconds = manager.getPlaybackStats(year).monthlySeconds
 
         assertEquals(listOf(30.0, 0.0, 0.0, 0.0, 0.0, 30.0, 0.0, 0.0, 0.0, 0.0, 0.0, 40.0), monthlySeconds)
     }
@@ -126,7 +126,7 @@ class PlaybackStatsManagerTest {
             ),
         )
 
-        assertEquals(30.0, manager.getStats(year).lastYearSeconds, 0.0)
+        assertEquals(30.0, manager.getPlaybackStats(year).lastYearSeconds, 0.0)
     }
 
     @Test
@@ -142,7 +142,7 @@ class PlaybackStatsManagerTest {
             ),
         )
 
-        val stats = manager.getStats(year)
+        val stats = manager.getPlaybackStats(year)
 
         assertEquals(5, stats.startedEpisodeCount)
         assertEquals(2, stats.completedEpisodeCount)

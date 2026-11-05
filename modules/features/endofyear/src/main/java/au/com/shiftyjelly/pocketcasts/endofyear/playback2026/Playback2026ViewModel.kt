@@ -2,8 +2,8 @@ package au.com.shiftyjelly.pocketcasts.endofyear.playback2026
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
-import au.com.shiftyjelly.pocketcasts.repositories.endofyear.PlaybackStatsManager
 import com.automattic.pocketcasts.playback.PlaybackPayload
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -16,7 +16,7 @@ import timber.log.Timber
 @HiltViewModel
 class Playback2026ViewModel @Inject constructor(
     private val endOfYearSync: EndOfYearSync,
-    private val playbackStatsManager: PlaybackStatsManager,
+    private val endOfYearManager: EndOfYearManager,
 ) : ViewModel() {
     private val _payload = MutableStateFlow<PlaybackPayload?>(null)
 
@@ -30,7 +30,7 @@ class Playback2026ViewModel @Inject constructor(
             if (!endOfYearSync.sync(Playback2026.YEAR)) {
                 Timber.i("Playback 2026: listening history not synced, using local data")
             }
-            _payload.value = playbackStatsManager.getStats(Playback2026.YEAR).toPlaybackPayload(Playback2026.YEAR)
+            _payload.value = endOfYearManager.getPlaybackStats(Playback2026.YEAR).toPlaybackPayload(Playback2026.YEAR)
         }
     }
 }
