@@ -1,11 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.profile.cloud
 
 import android.graphics.Bitmap
-import android.text.InputType
-import android.view.ContextThemeWrapper
-import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import android.widget.LinearLayout
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,29 +22,25 @@ import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.widget.doAfterTextChanged
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.components.FormField
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.profile.R
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal data class AddFilePageState(
@@ -196,29 +187,13 @@ private fun SaveAction(onClick: () -> Unit) {
 
 @Composable
 private fun NameField(name: String, onNameChange: (String) -> Unit, modifier: Modifier = Modifier) {
-    val hint = stringResource(LR.string.profile_files_add_filename)
-    val textColor = MaterialTheme.theme.colors.primaryText01.toArgb()
-    val currentOnNameChange by rememberUpdatedState(onNameChange)
-    AndroidView(
-        factory = { context ->
-            TextInputLayout(ContextThemeWrapper(context, R.style.AddFileNameInput)).apply {
-                val editText = TextInputEditText(this.context).apply {
-                    imeOptions = EditorInfo.IME_ACTION_DONE
-                    inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-                    doAfterTextChanged { currentOnNameChange(it.toString()) }
-                }
-                addView(editText, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
-            }
-        },
-        update = { layout ->
-            layout.hint = hint
-            layout.editText?.let { editText ->
-                editText.setTextColor(textColor)
-                if (editText.text.toString() != name) {
-                    editText.setText(name)
-                }
-            }
-        },
+    val keyboardController = LocalSoftwareKeyboardController.current
+    FormField(
+        value = name,
+        placeholder = stringResource(LR.string.profile_files_add_filename),
+        onValueChange = onNameChange,
+        onImeAction = { keyboardController?.hide() },
+        keyboardOptions = KeyboardOptions(autoCorrectEnabled = false, imeAction = ImeAction.Done),
         modifier = modifier,
     )
 }
