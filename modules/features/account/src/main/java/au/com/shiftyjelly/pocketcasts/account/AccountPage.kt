@@ -12,12 +12,14 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -34,23 +36,20 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.res.use
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.cartheme.R as CR
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -81,8 +80,16 @@ internal fun AccountPage(
         if (!state.isCar) {
             AccountHeader(onCloseClick)
         }
-        CenteredScroll(modifier = Modifier.weight(1f)) {
-            AccountIntro(state, continueWithGoogle, onCreateClick, onSignInClick)
+        BoxWithConstraints(modifier = Modifier.weight(1f)) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .heightIn(min = maxHeight),
+            ) {
+                AccountIntro(state, continueWithGoogle, onCreateClick, onSignInClick)
+            }
         }
         if (!state.isCar) {
             RowButton(
@@ -132,7 +139,7 @@ private fun AccountHeader(onCloseClick: () -> Unit) {
                 painter = painterResource(logo),
                 contentDescription = null,
                 modifier = Modifier
-                    .align(FloorCenter)
+                    .align(Alignment.Center)
                     .size(width = 170.dp, height = 34.dp),
             )
         }
@@ -162,24 +169,37 @@ private fun AccountIntro(
             modifier = iconModifier,
         )
         val titleTop = if (state.isCar) dimensionResource(R.dimen.car_create_heading_top_margin) else 16.dp
-        AccountText(
+        TextH20(
             text = stringResource(if (state.isSignedIn) LR.string.profile_alreadysignedin else LR.string.profile_sign_in_or_create_account),
             fontSize = if (state.isCar) 56.sp else 22.sp,
-            fontWeight = if (state.isCar) FontWeight.Normal else FontWeight.Medium,
-            color = colors.primaryText01,
+            lineHeight = if (state.isCar) 64.sp else 30.sp,
+            textAlign = TextAlign.Center,
             modifier = Modifier
                 .padding(start = 24.dp, top = titleTop, end = 24.dp)
                 .then(if (state.isCar) Modifier else Modifier.fillMaxWidth()),
         )
-        AccountText(
-            text = stringResource(if (state.isSignedIn) LR.string.profile_alreadysignedindescription else LR.string.profile_save_your_podcasts),
-            fontSize = if (state.isCar) 32.sp else 15.sp,
-            fontWeight = if (state.isCar) FontWeight.Normal else FontWeight.Medium,
-            color = colors.primaryText02,
-            modifier = Modifier
-                .padding(start = 24.dp, top = if (state.isCar) 32.dp else 8.dp, end = 24.dp)
-                .then(if (state.isCar) Modifier.width(670.dp) else Modifier.fillMaxWidth()),
-        )
+        val description = stringResource(if (state.isSignedIn) LR.string.profile_alreadysignedindescription else LR.string.profile_save_your_podcasts)
+        if (state.isCar) {
+            TextP40(
+                text = description,
+                fontSize = 32.sp,
+                lineHeight = 40.sp,
+                color = colors.primaryText02,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(start = 24.dp, top = 32.dp, end = 24.dp)
+                    .width(670.dp),
+            )
+        } else {
+            TextH40(
+                text = description,
+                color = colors.primaryText02,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(start = 24.dp, top = 8.dp, end = 24.dp)
+                    .fillMaxWidth(),
+            )
+        }
         if (state.isCar) {
             CarButtons(state, continueWithGoogle, onCreateClick, onSignInClick)
         }
@@ -227,24 +247,6 @@ private fun CarButtons(
 }
 
 @Composable
-private fun AccountText(
-    text: String,
-    fontSize: TextUnit,
-    fontWeight: FontWeight,
-    color: Color,
-    modifier: Modifier = Modifier,
-) {
-    TextViewText(
-        text = text,
-        fontSize = fontSize,
-        fontWeight = fontWeight,
-        color = color,
-        textAlign = TextAlign.Center,
-        modifier = modifier,
-    )
-}
-
-@Composable
 private fun AccountGradientIcon(drawableId: Int, tintColor: Color?, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val drawable = remember(context, drawableId, tintColor) {
@@ -278,23 +280,3 @@ private fun gradientBitmap(drawable: Drawable, width: Int, height: Int, start: I
     canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
     return bitmap
 }
-
-@Composable
-private fun CenteredScroll(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
-        val viewport = constraints.maxHeight
-        Layout(
-            content = content,
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
-        ) { measurables, constraints ->
-            val child = measurables.first().measure(constraints.copy(minHeight = 0, maxHeight = Constraints.Infinity))
-            layout(constraints.maxWidth, maxOf(viewport, child.height)) {
-                child.place((constraints.maxWidth - child.width) / 2, (viewport - child.height) / 2)
-            }
-        }
-    }
-}
-
-private val FloorCenter = Alignment { size, space, _ -> IntOffset((space.width - size.width) / 2, (space.height - size.height) / 2) }
