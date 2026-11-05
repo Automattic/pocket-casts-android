@@ -29,8 +29,8 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.views.compose.MultiSelectController
-import au.com.shiftyjelly.pocketcasts.views.compose.MultiSelectTopBar
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectTopAppBar
 import com.automattic.eventhorizon.EventHorizon
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -111,7 +111,7 @@ class BookmarksContainerFragment : BaseDialogFragment() {
                     }
                 },
                 multiSelectTopBar = if (isMultiSelecting) {
-                    { MultiSelectTopBar(controller, eventHorizon) }
+                    { MultiSelectTopAppBar(controller, eventHorizon) }
                 } else {
                     null
                 },
