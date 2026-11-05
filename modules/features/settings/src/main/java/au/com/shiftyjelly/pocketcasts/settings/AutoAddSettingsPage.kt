@@ -3,50 +3,35 @@ package au.com.shiftyjelly.pocketcasts.settings
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
-import androidx.core.content.res.use
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingsSection
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import coil3.compose.AsyncImage
-import kotlin.math.ceil
-import kotlin.math.cos
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal data class AutoAddOption(
@@ -96,22 +81,17 @@ internal fun AutoAddSettingsPage(
                         color = colors.primaryText02,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 56.dp, top = 16.dp, end = 24.dp, bottom = 16.dp),
+                            .padding(start = SettingsSection.indentedStartPadding, top = 16.dp, end = 24.dp, bottom = 16.dp),
                     )
                 }
                 item {
-                    Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .background(colors.primaryUi05),
-                    )
+                    HorizontalDivider()
                     TextH50(
                         text = stringResource(LR.string.settings_auto_up_next_podcasts),
                         color = colors.support01,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 56.dp, top = 16.dp, end = 24.dp, bottom = 16.dp),
+                            .padding(start = SettingsSection.indentedStartPadding, top = 16.dp, end = 24.dp, bottom = 16.dp),
                     )
                 }
             }
@@ -124,102 +104,39 @@ internal fun AutoAddSettingsPage(
 
 @Composable
 private fun OptionRow(option: AutoAddOption) {
-    val colors = MaterialTheme.theme.colors
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = option.onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-    ) {
-        Box(modifier = Modifier.size(24.dp)) {
-            if (option.iconResId != null) {
-                Icon(
-                    painter = painterResource(option.iconResId),
-                    contentDescription = null,
-                    tint = colors.primaryIcon01,
-                    modifier = Modifier.size(24.dp),
-                )
-            }
-        }
-        Column(modifier = Modifier.padding(start = 16.dp)) {
-            TextP40(text = option.title, modifier = Modifier.fillMaxWidth())
-            TextP50(text = option.subtitle, color = colors.primaryText02, modifier = Modifier.fillMaxWidth())
-        }
-    }
+    SettingRow(
+        primaryText = option.title,
+        secondaryText = option.subtitle,
+        icon = option.iconResId?.let { painterResource(it) },
+        iconTint = MaterialTheme.theme.colors.primaryIcon01,
+        modifier = Modifier.clickable(onClick = option.onClick),
+    )
 }
 
 @Composable
 private fun PodcastRow(podcast: Podcast, onClick: () -> Unit) {
     val colors = MaterialTheme.theme.colors
-    val context = LocalContext.current
-    val request = remember(podcast.uuid, context) { PocketCastsImageRequestFactory(context).create(podcast) }
-    val card = rememberCompatCard()
     Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
-        AsyncImage(
-            model = request,
+        PodcastImage(
+            uuid = podcast.uuid,
+            imageSize = 56.dp,
             contentDescription = null,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .compatCard(card)
-                .size(56.dp),
         )
-        Spacer(Modifier.width(8.dp))
-        Box(
-            contentAlignment = Alignment.CenterStart,
-            modifier = Modifier
-                .weight(1f)
-                .height(56.dp + card.verticalPadding * 2),
-        ) {
-            Column {
-                TextP40(text = podcast.title, maxLines = 1, modifier = Modifier.fillMaxWidth())
-                val subtitle = when (podcast.autoAddToUpNext) {
-                    Podcast.AutoAddUpNext.PLAY_NEXT -> stringResource(LR.string.settings_auto_up_next_to_top)
-                    Podcast.AutoAddUpNext.PLAY_LAST -> stringResource(LR.string.settings_auto_up_next_to_bottom)
-                    Podcast.AutoAddUpNext.OFF -> ""
-                }
-                TextP50(text = subtitle, color = colors.primaryText02, maxLines = 1, modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            TextP40(text = podcast.title, maxLines = 1, modifier = Modifier.fillMaxWidth())
+            val subtitle = when (podcast.autoAddToUpNext) {
+                Podcast.AutoAddUpNext.PLAY_NEXT -> stringResource(LR.string.settings_auto_up_next_to_top)
+                Podcast.AutoAddUpNext.PLAY_LAST -> stringResource(LR.string.settings_auto_up_next_to_bottom)
+                Podcast.AutoAddUpNext.OFF -> ""
             }
+            TextP50(text = subtitle, color = colors.primaryText02, maxLines = 1, modifier = Modifier.fillMaxWidth())
         }
     }
 }
-
-private class CompatCard(
-    val horizontalPadding: Dp,
-    val verticalPadding: Dp,
-    val backgroundColor: Color,
-)
-
-@Composable
-private fun rememberCompatCard(): CompatCard {
-    val density = LocalDensity.current
-    val context = LocalContext.current
-    return remember(density, context) {
-        with(density) {
-            val elevation = CardElevation.toPx()
-            val radius = CardCornerRadius.toPx()
-            val corner = (1 - cos(Math.toRadians(45.0))) * radius
-            val horizontal = elevation + corner
-            val vertical = elevation * 1.5 + corner
-            val windowBackground = context.obtainStyledAttributes(intArrayOf(android.R.attr.colorBackground)).use { it.getColor(0, 0) }
-            val hsv = FloatArray(3).also { android.graphics.Color.colorToHSV(windowBackground, it) }
-            CompatCard(
-                horizontalPadding = ceil(horizontal).toInt().toDp(),
-                verticalPadding = ceil(vertical).toInt().toDp(),
-                backgroundColor = if (hsv[2] > 0.5f) Color(0xFFFFFFFF) else Color(0xFF424242),
-            )
-        }
-    }
-}
-
-private fun Modifier.compatCard(card: CompatCard): Modifier = padding(horizontal = card.horizontalPadding, vertical = card.verticalPadding)
-    .shadow(CardElevation, RoundedCornerShape(CardCornerRadius))
-    .background(card.backgroundColor)
-
-private val CardElevation = 2.dp
-private val CardCornerRadius = 4.dp
