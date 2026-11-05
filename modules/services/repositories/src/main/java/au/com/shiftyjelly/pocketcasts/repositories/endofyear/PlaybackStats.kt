@@ -8,7 +8,7 @@ data class PlaybackStats(
     /** Listening seconds per month of the year, January first. Always 12 entries. */
     val monthlySeconds: List<Double>,
     val lastYearSeconds: Double,
-    /** Distinct episodes listened to in the year. */
+    /** Episodes listened to in the year. */
     val startedEpisodeCount: Int,
     /** Episodes listened to in the year that were finished (marked played or 90% in). */
     val completedEpisodeCount: Int,

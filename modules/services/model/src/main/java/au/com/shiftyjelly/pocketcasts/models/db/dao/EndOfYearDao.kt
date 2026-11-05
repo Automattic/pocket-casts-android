@@ -125,8 +125,8 @@ abstract class EndOfYearDao {
           episode.last_playback_interaction_date IS NOT NULL
           AND episode.last_playback_interaction_date >= :fromEpochMs
           AND episode.last_playback_interaction_date < :toEpochMs
+          AND episode.played_up_to > 0
         GROUP BY podcast.uuid
-        HAVING played_seconds > 0
         ORDER BY played_seconds DESC
         """,
     )
@@ -161,6 +161,7 @@ abstract class EndOfYearDao {
           episode.last_playback_interaction_date IS NOT NULL
           AND episode.last_playback_interaction_date >= :fromEpochMs
           AND episode.last_playback_interaction_date < :toEpochMs
+          AND episode.played_up_to > 0
         """,
     )
     abstract suspend fun getPlaybackCompletion(fromEpochMs: Long, toEpochMs: Long): PlaybackCompletion

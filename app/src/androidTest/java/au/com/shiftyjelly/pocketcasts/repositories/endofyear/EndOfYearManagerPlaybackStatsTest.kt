@@ -83,6 +83,7 @@ class EndOfYearManagerPlaybackStatsTest {
                 episode(uuid = "id-3", podcastUuid = "podcast-2", playedUpTo = 400.0),
                 // Interacted with but never listened to
                 episode(uuid = "id-4", podcastUuid = "podcast-3", playedUpTo = 0.0),
+                episode(uuid = "id-6", podcastUuid = "podcast-1", playedUpTo = 0.0),
                 // Listened to in another year
                 episode(uuid = "id-5", podcastUuid = "podcast-1", playedUpTo = 1000.0, date = LocalDate.of(2025, 12, 31)),
             ),
@@ -139,6 +140,8 @@ class EndOfYearManagerPlaybackStatsTest {
                 episode(uuid = "id-4", playedUpTo = 89.0, duration = 100.0),
                 episode(uuid = "id-5", playedUpTo = 10.0, duration = 0.0),
                 episode(uuid = "id-6", playedUpTo = 100.0, duration = 100.0, date = LocalDate.of(2025, 6, 1)),
+                // Marked as played without listening
+                episode(uuid = "id-7", playedUpTo = 0.0, duration = 100.0, playingStatus = EpisodePlayingStatus.COMPLETED),
             ),
         )
 
