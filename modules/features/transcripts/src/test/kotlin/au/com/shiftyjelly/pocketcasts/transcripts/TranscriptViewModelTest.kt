@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTiming
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.GeneratedChaptersResult
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -873,5 +874,5 @@ private class TestTranscriptManager : TranscriptManager {
         shouldLoadTranscripts = true
     }
 
-    override suspend fun loadGeneratedChapters(episodeUuid: String) = true
+    override suspend fun loadGeneratedChapters(episodeUuid: String) = GeneratedChaptersResult.Unavailable
 }

@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel
+import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.EmptyState
 import au.com.shiftyjelly.pocketcasts.player.view.chapters.ChaptersViewModel.Mode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -22,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.GeneratedChaptersResult
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -31,6 +33,8 @@ import com.automattic.eventhorizon.ChapterOriginType
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersPromptShownEvent
+import com.automattic.eventhorizon.GeneratedChaptersPromptType
 import com.automattic.eventhorizon.GeneratedChaptersToggleSourceType
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
 import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
@@ -39,8 +43,11 @@ import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
@@ -48,6 +55,7 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -55,7 +63,9 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -78,11 +88,11 @@ class ChaptersViewModelTest {
     private val episodeManager = mock<EpisodeManager>()
     private val settings = mock<Settings>()
     private val transcriptManager = mock<TranscriptManager> {
-        on { loadGeneratedChapters(any()) } doReturn true
+        on { loadGeneratedChapters(any()) } doReturn GeneratedChaptersResult.Loaded
     }
     private val isGeneratedChaptersAllowed = MutableStateFlow(true)
     private val generatedChaptersAvailability = mock<GeneratedChaptersAvailability> {
-        on { isAllowedFlow } doReturn isGeneratedChaptersAllowed
+        on { isAllowedFlow } doAnswer { combine(isGeneratedChaptersAllowed, showGeneratedChaptersFlow) { isAllowed, show -> isAllowed && show } }
     }
     private val generatedChapterSeeker = mock<GeneratedChapterSeeker> {
         on { resolvingChapterIndex(any()) } doReturn MutableStateFlow<Int?>(null)
@@ -111,13 +121,17 @@ class ChaptersViewModelTest {
     private val subscriptionFlow = MutableStateFlow<Subscription?>(plusSubscription)
 
     private val eventSink = TestEventSink()
-    private val showGeneratedChapters = mock<UserSetting<Boolean>>()
+    private val showGeneratedChaptersFlow = MutableStateFlow(false)
+    private val showGeneratedChapters = mock<UserSetting<Boolean>> {
+        on { flow } doReturn showGeneratedChaptersFlow
+    }
 
     private lateinit var chaptersViewModel: ChaptersViewModel
 
     @Before
     fun setup() {
         whenever(playbackManager.playbackStateFlow).thenReturn(playbackStateFlow)
+        whenever(episodeManager.findEpisodeByUuidFlow(any())).thenReturn(emptyFlow())
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(episodeFlow)
         whenever(chapterManager.observerChaptersForEpisode("id")).thenReturn(chaptersFlow)
         val userSetting = mock<UserSetting<Subscription?>>()
@@ -141,6 +155,7 @@ class ChaptersViewModelTest {
 
     @Test
     fun `episode mode loads generated chapters for its episode`() = runTest {
+        showGeneratedChaptersFlow.value = true
         verifyBlocking(transcriptManager) { loadGeneratedChapters("id") }
     }
 
@@ -155,6 +170,7 @@ class ChaptersViewModelTest {
 
     @Test
     fun `loads generated chapters when they become allowed`() = runTest {
+        showGeneratedChaptersFlow.value = true
         clearInvocations(transcriptManager)
         isGeneratedChaptersAllowed.value = false
         createViewModel()
@@ -167,6 +183,9 @@ class ChaptersViewModelTest {
 
     @Test
     fun `player mode loads generated chapters for each new playing episode`() = runTest {
+        showGeneratedChaptersFlow.value = true
+        whenever(chapterManager.observerChaptersForEpisode("id2")).thenReturn(chaptersFlow)
+        whenever(episodeManager.findEpisodeByUuidFlow("id2")).thenReturn(MutableStateFlow(episode.copy(uuid = "id2")))
         clearInvocations(transcriptManager)
         playbackStateFlow.value = PlaybackState(episodeUuid = "")
         ChaptersViewModel(
@@ -193,8 +212,9 @@ class ChaptersViewModelTest {
 
     @Test
     fun `retries generated chapters with backoff while loading fails`() = runTest {
+        showGeneratedChaptersFlow.value = true
         clearInvocations(transcriptManager)
-        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(false, false, true)
+        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(GeneratedChaptersResult.Failed, GeneratedChaptersResult.Failed, GeneratedChaptersResult.Loaded)
         ChaptersViewModel(
             mode = Mode.Episode("id"),
             chapterManager = chapterManager,
@@ -415,7 +435,127 @@ class ChaptersViewModelTest {
     }
 
     @Test
+    fun `prompt shown reports the upsell to free users`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            assertTrue(awaitItem().showUpsell)
+            chaptersViewModel.trackChaptersShown(ChaptersShownSource.EpisodeDetails)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertEquals(
+            GeneratedChaptersPromptShownEvent(
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                prompt = GeneratedChaptersPromptType.PlusUpsell,
+                source = ChaptersShownSource.EpisodeDetails,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `prompt shown reports no chapters yet to subscribers who have not opted in`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            assertEquals(EmptyState.NoChaptersYet, awaitItem().emptyState)
+            chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertEquals(
+            GeneratedChaptersPromptShownEvent(
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                prompt = GeneratedChaptersPromptType.NoChaptersYet,
+                source = ChaptersShownSource.FullscreenPlayer,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `prompt shown reports the off state`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters(hasHiddenGeneratedChapters = true)
+
+        chaptersViewModel.uiState.test {
+            assertEquals(EmptyState.GeneratedChaptersOff, awaitItem().emptyState)
+            chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertEquals(
+            GeneratedChaptersPromptShownEvent(
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                prompt = GeneratedChaptersPromptType.GeneratedChaptersOff,
+                source = ChaptersShownSource.FullscreenPlayer,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `prompt shown reports the loaded prompt before the ui state is collected`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+
+        assertEquals(
+            GeneratedChaptersPromptShownEvent(
+                episodeUuid = "id",
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                prompt = GeneratedChaptersPromptType.NoChaptersYet,
+                source = ChaptersShownSource.FullscreenPlayer,
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `prompt shown is reported once per episode and prompt`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+        chaptersFlow.value = Chapters(hasHiddenGeneratedChapters = true)
+        chaptersViewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+
+        assertEquals(GeneratedChaptersPromptType.NoChaptersYet, (eventSink.pollEvent() as GeneratedChaptersPromptShownEvent).prompt)
+        assertEquals(GeneratedChaptersPromptType.GeneratedChaptersOff, (eventSink.pollEvent() as GeneratedChaptersPromptShownEvent).prompt)
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `prompt shown is not reported while generating`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+        whenever(transcriptManager.loadGeneratedChapters("id")).doSuspendableAnswer { CompletableDeferred<GeneratedChaptersResult>().await() }
+        val viewModel = createViewModel()
+
+        viewModel.trackChaptersShown(ChaptersShownSource.FullscreenPlayer)
+
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
     fun `chapters shown is not reported when there are no chapters`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
         whenever(episodeManager.findEpisodeByUuid("id")).thenReturn(episode)
         chaptersFlow.value = Chapters()
 
@@ -471,23 +611,24 @@ class ChaptersViewModelTest {
     fun `show off state when generated chapters are turned off`() = runTest {
         chaptersViewModel.uiState.test {
             val visible = awaitItem()
-            assertFalse(visible.showOffState)
+            assertNull(visible.emptyState)
             assertTrue(visible.showChaptersTab)
 
             chaptersFlow.value = Chapters(hasHiddenGeneratedChapters = true)
             val off = awaitItem()
-            assertTrue(off.showOffState)
+            assertEquals(EmptyState.GeneratedChaptersOff, off.emptyState)
             assertTrue(off.showChaptersTab)
         }
     }
 
     @Test
-    fun `hide chapters tab when there are no chapters and generated chapters are not turned off`() = runTest {
+    fun `hide chapters tab when there are no chapters and generated chapters are not available`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
         chaptersFlow.value = Chapters()
 
         chaptersViewModel.uiState.test {
             val state = awaitItem()
-            assertFalse(state.showOffState)
+            assertNull(state.emptyState)
             assertFalse(state.showChaptersTab)
         }
     }
@@ -498,7 +639,7 @@ class ChaptersViewModelTest {
 
         chaptersViewModel.uiState.test {
             val state = awaitItem()
-            assertFalse(state.showOffState)
+            assertNull(state.emptyState)
             assertTrue(state.showChaptersTab)
         }
     }
@@ -573,13 +714,229 @@ class ChaptersViewModelTest {
         }
     }
 
+    @Test
+    fun `free user without chapters still gets the upsell instead of a generate prompt`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        subscriptionFlow.value = null
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(state.showUpsell)
+            assertNull(state.emptyState)
+        }
+    }
+
+    @Test
+    fun `show no chapters yet to subscribers who have not turned on generated chapters`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertEquals(EmptyState.NoChaptersYet, state.emptyState)
+            assertTrue(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `show generating chapters while the first load is in flight`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+        val load = CompletableDeferred<GeneratedChaptersResult>()
+        whenever(transcriptManager.loadGeneratedChapters("id")).doSuspendableAnswer { load.await() }
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val loading = awaitItem()
+            assertEquals(EmptyState.GeneratingChapters, loading.emptyState)
+            assertTrue(loading.showChaptersTab)
+
+            load.complete(GeneratedChaptersResult.Unavailable)
+            assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
+        }
+    }
+
+    @Test
+    fun `keep generating until chapters saved by a successful load arrive`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+
+        createViewModel().uiState.test {
+            assertEquals(EmptyState.GeneratingChapters, awaitItem().emptyState)
+
+            chaptersFlow.value = chapters
+            assertNull(awaitItem().emptyState)
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `show no chapters for this episode right away when none are available`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(GeneratedChaptersResult.Unavailable)
+
+        createViewModel().uiState.test {
+            val state = awaitItem()
+            assertEquals(EmptyState.NoGeneratedChapters, state.emptyState)
+            assertTrue(state.showChaptersTab)
+        }
+        assertEquals(0, testScheduler.currentTime)
+    }
+
+    @Test
+    fun `show no chapters after loading fails for 30 seconds and keep retrying quietly`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(GeneratedChaptersResult.Failed)
+        clearInvocations(transcriptManager)
+
+        createViewModel().uiState.test {
+            assertEquals(EmptyState.GeneratingChapters, awaitItem().emptyState)
+
+            advanceTimeBy(29.seconds)
+            runCurrent()
+            expectNoEvents()
+
+            advanceTimeBy(1.seconds)
+            runCurrent()
+            assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
+            verifyBlocking(transcriptManager, times(4)) { loadGeneratedChapters("id") }
+
+            whenever(transcriptManager.loadGeneratedChapters("id")).doSuspendableAnswer {
+                chaptersFlow.value = chapters
+                GeneratedChaptersResult.Loaded
+            }
+            advanceTimeBy(40.seconds)
+            runCurrent()
+            assertNull(awaitItem().emptyState)
+            verifyBlocking(transcriptManager, times(5)) { loadGeneratedChapters("id") }
+        }
+    }
+
+    @Test
+    fun `stop retrying generated chapters after the last backoff`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(GeneratedChaptersResult.Failed)
+        clearInvocations(transcriptManager)
+
+        createViewModel().uiState.test {
+            assertEquals(EmptyState.GeneratingChapters, awaitItem().emptyState)
+            assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
+
+            advanceTimeBy(10.minutes)
+            verifyBlocking(transcriptManager, times(6)) { loadGeneratedChapters("id") }
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `reload generated chapters when the episode gets a generated transcript`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+        val load = CompletableDeferred<GeneratedChaptersResult>()
+        whenever(transcriptManager.loadGeneratedChapters("id")).thenReturn(GeneratedChaptersResult.Unavailable)
+
+        createViewModel().uiState.test {
+            assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
+
+            whenever(transcriptManager.loadGeneratedChapters("id")).doSuspendableAnswer { load.await() }
+            episodeFlow.value = episode.copy(hasGeneratedTranscript = true)
+            assertEquals(EmptyState.GeneratingChapters, awaitItem().emptyState)
+
+            chaptersFlow.value = chapters
+            load.complete(GeneratedChaptersResult.Loaded)
+            assertNull(expectMostRecentItem().emptyState)
+        }
+    }
+
+    @Test
+    fun `show the chapters list when generated chapters arrive`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        showGeneratedChaptersFlow.value = true
+
+        chaptersViewModel.uiState.test {
+            assertEquals(EmptyState.GeneratingChapters, awaitItem().emptyState)
+            assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
+
+            chaptersFlow.value = chapters
+            val state = awaitItem()
+            assertNull(state.emptyState)
+            assertEquals(3, state.chaptersCount)
+        }
+    }
+
+    @Test
+    fun `show the creator chapters list to subscribers`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertNull(state.emptyState)
+            assertTrue(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `do not offer generated chapters for user files`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        episodeFlow.value = UserEpisode(uuid = "id", publishedDate = Date())
+
+        chaptersViewModel.uiState.test {
+            val state = awaitItem()
+            assertNull(state.emptyState)
+            assertFalse(state.showChaptersTab)
+        }
+    }
+
+    @Test
+    fun `generate chapters enables the setting and tracks it`() = runTest {
+        chaptersViewModel.generateChapters()
+
+        verify(showGeneratedChapters).set(true, updateModifiedAt = true)
+        assertEquals(SettingsGeneralGeneratedChaptersToggledEvent(enabled = true, source = GeneratedChaptersToggleSourceType.ChaptersGenerateButton), eventSink.pollEvent())
+    }
+
+    @Test
+    fun `turning on generated chapters loads them and shows generating meanwhile`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        chaptersFlow.value = Chapters()
+        isGeneratedChaptersAllowed.value = false
+        clearInvocations(transcriptManager)
+
+        createViewModel().uiState.test {
+            assertEquals(EmptyState.NoChaptersYet, awaitItem().emptyState)
+            verifyBlocking(transcriptManager, never()) { loadGeneratedChapters(any()) }
+
+            val load = CompletableDeferred<GeneratedChaptersResult>()
+            whenever(transcriptManager.loadGeneratedChapters("id")).doSuspendableAnswer { load.await() }
+            showGeneratedChaptersFlow.value = true
+            isGeneratedChaptersAllowed.value = true
+            assertEquals(EmptyState.GeneratingChapters, expectMostRecentItem().emptyState)
+            verifyBlocking(transcriptManager, atLeastOnce()) { loadGeneratedChapters("id") }
+
+            load.complete(GeneratedChaptersResult.Unavailable)
+            assertEquals(EmptyState.NoGeneratedChapters, awaitItem().emptyState)
+        }
+    }
+
     private fun createViewModel() = ChaptersViewModel(
         mode = Mode.Episode("id"),
         chapterManager = chapterManager,
         playbackManager = playbackManager,
         episodeManager = episodeManager,
         settings = settings,
-        eventHorizon = EventHorizon(TestEventSink()),
+        eventHorizon = EventHorizon(eventSink),
         generatedChapterSeeker = generatedChapterSeeker,
         transcriptManager = transcriptManager,
         generatedChaptersAvailability = generatedChaptersAvailability,

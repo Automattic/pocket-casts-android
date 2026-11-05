@@ -3,14 +3,17 @@ package au.com.shiftyjelly.pocketcasts.repositories.transcript
 import android.content.Context
 import androidx.collection.LruCache
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
+import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.generatedTranscriptUrl
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -20,22 +23,31 @@ import com.automattic.eventhorizon.GeneratedChaptersFileDownloadedEvent
 import com.automattic.eventhorizon.GeneratedChaptersFileType
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.net.HttpURLConnection.HTTP_NOT_FOUND
 import java.net.HttpURLConnection.HTTP_NOT_MODIFIED
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.CacheControl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import retrofit2.HttpException
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript as DbTranscript
@@ -46,6 +58,7 @@ class TranscriptManagerImpl @Inject constructor(
     private val transcriptService: TranscriptService,
     private val episodeManager: EpisodeManager,
     private val chapterManager: ChapterManager,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     private val generatedChaptersAvailability: GeneratedChaptersAvailability,
     private val moshi: Moshi,
     private val parsers: Map<TranscriptType, @JvmSuppressWildcards TranscriptParser>,
@@ -56,6 +69,7 @@ class TranscriptManagerImpl @Inject constructor(
     private val lruCache = LruCache<String, Transcript>(maxSize = 20)
     private val generatedLruCache = LruCache<String, Transcript.Text>(maxSize = 5)
     private val metaAdapter = moshi.adapter(EpisodeMetaResponse::class.java)
+    private val generatedChaptersLoads = ConcurrentHashMap<String, Deferred<GeneratedChaptersResult>>()
 
     override fun observeIsTranscriptAvailable(episodeUuid: String): Flow<Boolean> {
         return transcriptDao.observeTranscripts(episodeUuid).map { it.isNotEmpty() }
@@ -168,24 +182,57 @@ class TranscriptManagerImpl @Inject constructor(
             .getOrNull()
     }
 
-    override suspend fun loadGeneratedChapters(episodeUuid: String): Boolean {
-        if (!generatedChaptersAvailability.isAllowed()) return true
+    override suspend fun loadGeneratedChapters(episodeUuid: String): GeneratedChaptersResult {
+        if (!generatedChaptersAvailability.isAllowed()) return GeneratedChaptersResult.Unavailable
 
+        val load = generatedChaptersLoads.computeIfAbsent(episodeUuid) {
+            applicationScope.async(start = CoroutineStart.LAZY) {
+                fetchGeneratedChapters(episodeUuid).also { result -> forgetGeneratedChaptersLoad(episodeUuid, result) }
+            }
+        }
+        load.start()
+        return load.await()
+    }
+
+    private fun forgetGeneratedChaptersLoad(episodeUuid: String, result: GeneratedChaptersResult) {
+        if (result == GeneratedChaptersResult.Failed) {
+            applicationScope.launch {
+                delay(FAILED_GENERATED_CHAPTERS_REUSE)
+                generatedChaptersLoads.remove(episodeUuid)
+            }
+        } else {
+            generatedChaptersLoads.remove(episodeUuid)
+        }
+    }
+
+    private suspend fun fetchGeneratedChapters(episodeUuid: String): GeneratedChaptersResult {
         return try {
-            if (chapterManager.hasChapters(episodeUuid)) return true
+            if (chapterManager.hasChapters(episodeUuid)) return GeneratedChaptersResult.Loaded
 
-            val generatedTranscript = loadLocalTranscripts(episodeUuid)
-                .firstOrNull { it.isGenerated } ?: return true
+            val episode = episodeManager.findByUuid(episodeUuid)
+            if (episode == null || !episode.hasGeneratedTranscript) return GeneratedChaptersResult.Unavailable
 
-            val metaUrl = generatedTranscript.url.removeSuffix(".vtt") + "-meta.json"
-            val meta = metaAdapter.fromJson(downloadMeta(episodeUuid, metaUrl).decodeToString()) ?: return true
-            saveAiChaptersIfNeeded(episodeUuid, meta.chapters)
-            true
+            val transcriptUrl = generatedTranscriptUrl(BuildConfig.SERVER_SHOW_NOTES_URLS.toHttpUrl(), episode.podcastUuid, episodeUuid)
+            val metaUrl = transcriptUrl.removeSuffix(".vtt") + "-meta.json"
+            val meta = metaAdapter.fromJson(downloadMeta(episodeUuid, metaUrl).decodeToString())
+            if (!generatedChaptersAvailability.isAllowed()) return GeneratedChaptersResult.Unavailable
+            if (saveAiChapters(episodeUuid, meta?.chapters)) {
+                GeneratedChaptersResult.Loaded
+            } else {
+                GeneratedChaptersResult.Unavailable
+            }
         } catch (e: CancellationException) {
             throw e
+        } catch (e: HttpException) {
+            if (e.code() == HTTP_NOT_FOUND) {
+                GeneratedChaptersResult.Unavailable
+            } else {
+                Timber.tag("GeneratedChapters").e(e, "Failed to load generated chapters for episode $episodeUuid")
+                GeneratedChaptersResult.Failed
+            }
         } catch (e: Exception) {
             Timber.tag("GeneratedChapters").e(e, "Failed to load generated chapters for episode $episodeUuid")
-            false
+            GeneratedChaptersResult.Failed
         }
     }
 
@@ -219,8 +266,8 @@ class TranscriptManagerImpl @Inject constructor(
         )
     }
 
-    private suspend fun saveAiChaptersIfNeeded(episodeUuid: String, chapters: List<EpisodeMetaResponse.MetaChapter>?) {
-        if (chapters.isNullOrEmpty()) return
+    private suspend fun saveAiChapters(episodeUuid: String, chapters: List<EpisodeMetaResponse.MetaChapter>?): Boolean {
+        if (chapters.isNullOrEmpty()) return false
 
         val dbChapters = chapters
             .mapNotNull { chapter ->
@@ -235,10 +282,10 @@ class TranscriptManagerImpl @Inject constructor(
                 )
             }
             .mapIndexed { index, chapter -> chapter.copy(index = index) }
-        if (dbChapters.isNotEmpty()) {
-            chapterManager.updateChapters(episodeUuid, dbChapters)
-            Timber.tag("GeneratedChapters").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")
-        }
+        if (dbChapters.isEmpty()) return false
+        chapterManager.updateChapters(episodeUuid, dbChapters)
+        Timber.tag("GeneratedChapters").d("Saved ${dbChapters.size} AI chapters for episode $episodeUuid")
+        return true
     }
 
     override fun resetInvalidTranscripts(
@@ -247,6 +294,8 @@ class TranscriptManagerImpl @Inject constructor(
         transcriptUrlBlacklist.remove(episodeUuid)
     }
 }
+
+private val FAILED_GENERATED_CHAPTERS_REUSE = 3.seconds
 
 internal val TranscriptsComparator = compareBy<DbTranscript>(
     { it.isGenerated },
