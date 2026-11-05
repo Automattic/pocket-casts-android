@@ -405,6 +405,17 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-10-21"),
     ),
+
+    // Playback 2026, the yearly listening recap. Also the remote kill switch: turning it off hides every entry point.
+    PLAYBACK_2026(
+        key = "playback_2026",
+        title = "Playback 2026",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+        addedOn = LocalDate.parse("2026-11-04"),
+    ),
 }
 
 sealed class FeatureTier {

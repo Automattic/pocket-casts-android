@@ -3,6 +3,9 @@ package au.com.shiftyjelly.pocketcasts.models.db.dao
 import androidx.room.Dao
 import androidx.room.Query
 import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaybackCompletion
+import au.com.shiftyjelly.pocketcasts.models.to.PlaybackListeningTime
+import au.com.shiftyjelly.pocketcasts.models.to.PlaybackPodcastStats
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastRatingGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
@@ -105,6 +108,63 @@ abstract class EndOfYearDao {
         """,
     )
     abstract suspend fun getLongestPlayedEpisode(fromEpochMs: Long, toEpochMs: Long): LongestEpisode?
+
+    @Query(
+        """
+        SELECT
+          podcast.uuid AS uuid,
+          podcast.title AS title,
+          podcast.author AS author,
+          podcast.podcast_category AS category,
+          SUM(episode.played_up_to) AS played_seconds,
+          COUNT(episode.uuid) AS played_episode_count
+        FROM podcast_episodes AS episode
+          JOIN podcasts AS podcast
+          ON podcast.uuid IS episode.podcast_id
+        WHERE
+          episode.last_playback_interaction_date IS NOT NULL
+          AND episode.last_playback_interaction_date >= :fromEpochMs
+          AND episode.last_playback_interaction_date < :toEpochMs
+          AND episode.played_up_to > 0
+        GROUP BY podcast.uuid
+        ORDER BY played_seconds DESC
+        """,
+    )
+    abstract suspend fun getPlaybackPodcastStats(fromEpochMs: Long, toEpochMs: Long): List<PlaybackPodcastStats>
+
+    @Query(
+        """
+        SELECT
+          episode.last_playback_interaction_date AS interaction_epoch_ms,
+          episode.played_up_to AS played_seconds
+        FROM podcast_episodes AS episode
+        WHERE
+          episode.last_playback_interaction_date IS NOT NULL
+          AND episode.last_playback_interaction_date >= :fromEpochMs
+          AND episode.last_playback_interaction_date < :toEpochMs
+          AND episode.played_up_to > 0
+        """,
+    )
+    abstract suspend fun getPlaybackListeningTimes(fromEpochMs: Long, toEpochMs: Long): List<PlaybackListeningTime>
+
+    @Query(
+        """
+        SELECT
+          COUNT(*) AS started,
+          COUNT(
+            CASE
+              WHEN episode.playing_status IS 2 OR (episode.duration > 0 AND episode.played_up_to >= 0.9 * episode.duration) THEN 1
+            END
+          ) AS completed
+        FROM podcast_episodes AS episode
+        WHERE
+          episode.last_playback_interaction_date IS NOT NULL
+          AND episode.last_playback_interaction_date >= :fromEpochMs
+          AND episode.last_playback_interaction_date < :toEpochMs
+          AND episode.played_up_to > 0
+        """,
+    )
+    abstract suspend fun getPlaybackCompletion(fromEpochMs: Long, toEpochMs: Long): PlaybackCompletion
 
     suspend fun getRatingStats(fromEpochMs: Long, toEpochMs: Long): RatingStats {
         val rating = getRatingGrouping(fromEpochMs, toEpochMs)

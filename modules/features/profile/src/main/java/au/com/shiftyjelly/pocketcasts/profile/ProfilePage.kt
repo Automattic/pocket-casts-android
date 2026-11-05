@@ -79,6 +79,7 @@ internal fun ProfilePage(
     onDismissCreateFreeAccountBannerClick: () -> Unit,
     onEndOfYearCardShow: () -> Unit,
     onPlaybackClick: () -> Unit,
+    onPlayback2026Click: () -> Unit,
     onClaimReferralsClick: () -> Unit,
     onHideReferralsCardClick: () -> Unit,
     onReferralsCardShow: () -> Unit,
@@ -121,6 +122,21 @@ internal fun ProfilePage(
                 )
                 item {
                     VerticalSpacer()
+                }
+                if (state.isPlayback2026BannerVisible) {
+                    item {
+                        EndOfYearPromptCard(
+                            onClick = onPlayback2026Click,
+                            onShow = {},
+                            imageId = R.drawable.playback_2026_banner,
+                            title = stringResource(LR.string.playback_2026_banner_title),
+                            summary = stringResource(LR.string.playback_2026_banner_description),
+                            modifier = Modifier.padding(horizontal = horizontalPadding),
+                        )
+                    }
+                    item {
+                        VerticalSpacer()
+                    }
                 }
                 if (state.isFreeAccountBannerVisible) {
                     item {
@@ -226,6 +242,7 @@ internal data class ProfilePageState(
     val isWhatsNewVisible: Boolean,
     val hasWhatsNewDot: Boolean,
     val isPlaybackEnabled: Boolean,
+    val isPlayback2026BannerVisible: Boolean,
     val isFreeAccountBannerVisible: Boolean,
     val isUpgradeBannerVisible: Boolean,
     val miniPlayerPadding: Dp,
@@ -418,6 +435,7 @@ private fun ProfilePageStub(
             isWhatsNewVisible = true,
             hasWhatsNewDot = true,
             isPlaybackEnabled = true,
+            isPlayback2026BannerVisible = true,
             isUpgradeBannerVisible = true,
             isFreeAccountBannerVisible = true,
             miniPlayerPadding = 64.dp,
@@ -454,6 +472,7 @@ private fun ProfilePageStub(
         onDismissCreateFreeAccountBannerClick = {},
         onEndOfYearCardShow = {},
         onPlaybackClick = {},
+        onPlayback2026Click = {},
         onSendReferralsClick = {},
         onHideReferralsCardClick = {},
         onReferralsCardShow = {},
