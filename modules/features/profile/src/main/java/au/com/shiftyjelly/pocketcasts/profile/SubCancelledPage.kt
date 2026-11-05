@@ -3,12 +3,10 @@ package au.com.shiftyjelly.pocketcasts.profile
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,29 +15,20 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -89,10 +78,19 @@ internal fun SubCancelledPage(
                     .padding(start = 32.dp, top = 8.dp, end = 32.dp, bottom = 64.dp)
                     .fillMaxWidth(),
             )
-            NotesPanel(
-                expiryHint = expiryHint,
+            NotesCard(
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 32.dp),
-            )
+            ) {
+                NotesCardRow(text = expiryHint) {
+                    NoteIcon(IR.drawable.ic_subscription)
+                }
+                NotesCardRow(text = stringResource(LR.string.profile_sub_cancel_hint1)) {
+                    NoteIcon(IR.drawable.ic_locked_large, tint = colorResource(UR.color.yellow_50))
+                }
+                NotesCardRow(text = stringResource(LR.string.profile_sub_cancel_hint2)) {
+                    NoteIcon(R.drawable.ic_cloud_strikethrough)
+                }
+            }
         }
         RowButton(
             text = stringResource(LR.string.done),
@@ -104,60 +102,16 @@ internal fun SubCancelledPage(
 }
 
 @Composable
-private fun NotesPanel(
-    expiryHint: String,
-    modifier: Modifier = Modifier,
-) {
-    val borderColor = MaterialTheme.theme.colors.primaryText02
-    val density = LocalDensity.current
-    val strokeWidth = with(density) { 2.dp.roundToPx().toFloat() }
-    val radius = with(density) { 8.dp.toPx() }
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .drawBehind {
-                drawRoundRect(
-                    color = borderColor,
-                    topLeft = Offset(strokeWidth / 2, strokeWidth / 2),
-                    size = Size(size.width - strokeWidth, size.height - strokeWidth),
-                    cornerRadius = CornerRadius(radius),
-                    style = Stroke(strokeWidth),
-                )
-            }
-            .padding(bottom = 32.dp),
-    ) {
-        NoteRow(iconRes = IR.drawable.ic_subscription, text = expiryHint)
-        NoteRow(iconRes = IR.drawable.ic_locked_large, text = stringResource(LR.string.profile_sub_cancel_hint1), iconTint = colorResource(UR.color.yellow_50))
-        NoteRow(iconRes = R.drawable.ic_cloud_strikethrough, text = stringResource(LR.string.profile_sub_cancel_hint2))
-    }
-}
-
-@Composable
-private fun NoteRow(
+private fun NoteIcon(
     @DrawableRes iconRes: Int,
-    text: String,
-    iconTint: Color = Color.Unspecified,
+    tint: Color = Color.Unspecified,
 ) {
-    Box(modifier = Modifier.padding(start = 32.dp, top = 30.dp, end = 16.dp)) {
-        TextP50(
-            text = text,
-            color = MaterialTheme.theme.colors.primaryText02,
-            modifier = Modifier
-                .padding(start = 40.dp)
-                .fillMaxWidth(),
-        )
-        Box(
-            contentAlignment = Alignment.CenterStart,
-            modifier = Modifier.matchParentSize(),
-        ) {
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = stringResource(LR.string.profile_plus),
-                tint = iconTint,
-                modifier = Modifier.requiredSize(24.dp),
-            )
-        }
-    }
+    Icon(
+        painter = painterResource(iconRes),
+        contentDescription = stringResource(LR.string.profile_plus),
+        tint = tint,
+        modifier = Modifier.size(24.dp),
+    )
 }
 
 @Preview
