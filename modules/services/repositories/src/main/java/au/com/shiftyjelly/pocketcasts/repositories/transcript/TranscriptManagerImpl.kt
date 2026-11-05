@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
+import android.content.Context
 import androidx.collection.LruCache
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
@@ -13,9 +15,16 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.generatedTranscriptUrl
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
+import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
+import com.automattic.eventhorizon.GeneratedChaptersFileDownloadedEvent
+import com.automattic.eventhorizon.GeneratedChaptersFileType
 import com.squareup.moshi.Moshi
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
+import java.net.HttpURLConnection.HTTP_NOT_MODIFIED
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -53,6 +62,8 @@ class TranscriptManagerImpl @Inject constructor(
     private val generatedChaptersAvailability: GeneratedChaptersAvailability,
     private val moshi: Moshi,
     private val parsers: Map<TranscriptType, @JvmSuppressWildcards TranscriptParser>,
+    private val eventHorizon: EventHorizon,
+    @ApplicationContext private val context: Context,
 ) : TranscriptManager {
     private val transcriptUrlBlacklist = ConcurrentHashMap<String, String>()
     private val lruCache = LruCache<String, Transcript>(maxSize = 20)
@@ -203,9 +214,7 @@ class TranscriptManagerImpl @Inject constructor(
 
             val transcriptUrl = generatedTranscriptUrl(BuildConfig.SERVER_SHOW_NOTES_URLS.toHttpUrl(), episode.podcastUuid, episodeUuid)
             val metaUrl = transcriptUrl.removeSuffix(".vtt") + "-meta.json"
-            val meta = transcriptService.getTranscriptOrThrow(metaUrl).use { body ->
-                metaAdapter.fromJson(body.source())
-            }
+            val meta = metaAdapter.fromJson(downloadMeta(episodeUuid, metaUrl).decodeToString())
             if (!generatedChaptersAvailability.isAllowed()) return GeneratedChaptersResult.Unavailable
             if (saveAiChapters(episodeUuid, meta?.chapters)) {
                 GeneratedChaptersResult.Loaded
@@ -225,6 +234,36 @@ class TranscriptManagerImpl @Inject constructor(
             Timber.tag("GeneratedChapters").e(e, "Failed to load generated chapters for episode $episodeUuid")
             GeneratedChaptersResult.Failed
         }
+    }
+
+    private suspend fun downloadMeta(episodeUuid: String, metaUrl: String): ByteArray {
+        val response = transcriptService.getTranscriptResponse(metaUrl)
+        val networkResponse = response.raw().networkResponse?.takeIf { it.code != HTTP_NOT_MODIFIED }
+        val body = response.body()
+        if (!response.isSuccessful || body == null) {
+            if (networkResponse != null) trackMetaDownload(episodeUuid, bytes = 0L, success = false)
+            throw HttpException(response)
+        }
+        val bytes = body.use { it.bytes() }
+        if (networkResponse != null) {
+            val bytesReceived = networkResponse.header("Content-Length")?.toLongOrNull() ?: bytes.size.toLong()
+            trackMetaDownload(episodeUuid, bytes = bytesReceived, success = true)
+        }
+        return bytes
+    }
+
+    private suspend fun trackMetaDownload(episodeUuid: String, bytes: Long, success: Boolean) {
+        eventHorizon.track(
+            GeneratedChaptersFileDownloadedEvent(
+                file = GeneratedChaptersFileType.Meta,
+                bytes = bytes,
+                isMetered = Network.isActiveNetworkMetered(context),
+                trigger = GeneratedChaptersDownloadTriggerType.ChaptersTab,
+                success = success,
+                episodeUuid = episodeUuid,
+                podcastUuid = episodeManager.findByUuid(episodeUuid)?.podcastUuid ?: AnalyticsTracker.INVALID_OR_NULL_VALUE,
+            ),
+        )
     }
 
     private suspend fun saveAiChapters(episodeUuid: String, chapters: List<EpisodeMetaResponse.MetaChapter>?): Boolean {

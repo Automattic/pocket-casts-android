@@ -80,6 +80,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import au.com.shiftyjelly.pocketcasts.chat.ChatError
 import au.com.shiftyjelly.pocketcasts.chat.ChatUiState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -111,11 +112,14 @@ fun ChatScreen(
     onOpenHistoryChat: (EpisodeChatHistoryItem) -> Unit,
     onDeleteHistoryChat: (EpisodeChatHistoryItem) -> Unit,
     onClickPlayPause: () -> Unit,
+    onSeek: (positionMs: Int) -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
+    onStopAnswer: () -> Unit,
     onClickSuggestion: (String, ChatInputType) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
+    onPlayAnswerTimestamp: (answerUuid: String, startMs: Int) -> Unit,
     onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
     snackbarHostState: SnackbarHostState,
     onDismissBetaSheet: () -> Unit,
@@ -214,11 +218,14 @@ fun ChatScreen(
                         onClickClose = onClickClose,
                         onClickMore = onClickMore,
                         onClickPlayPause = onClickPlayPause,
+                        onSeek = onSeek,
                         onInputTextChange = onInputTextChange,
                         onSend = onSend,
+                        onStopAnswer = onStopAnswer,
                         onClickSuggestion = onClickSuggestion,
                         onRetry = onRetry,
                         onPlayQuote = onPlayQuote,
+                        onPlayAnswerTimestamp = onPlayAnswerTimestamp,
                         onRateAnswer = onRateAnswer,
                         snackbarHostState = snackbarHostState,
                     )
@@ -241,11 +248,14 @@ private fun ChatContent(
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
     onClickPlayPause: () -> Unit,
+    onSeek: (positionMs: Int) -> Unit,
     onInputTextChange: (String) -> Unit,
     onSend: () -> Unit,
+    onStopAnswer: () -> Unit,
     onClickSuggestion: (String, ChatInputType) -> Unit,
     onRetry: () -> Unit,
     onPlayQuote: (quoteUuid: String) -> Unit,
+    onPlayAnswerTimestamp: (answerUuid: String, startMs: Int) -> Unit,
     onRateAnswer: (answerUuid: String, rating: ChatAnswerRating) -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
@@ -253,6 +263,7 @@ private fun ChatContent(
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val isReduceMotionEnabled = rememberIsReduceMotionEnabled()
+    val answerStream = rememberChatAnswerStream(uiState.messages, initialMessageUuids)
     val isWelcomeVisible = uiState.areMessagesLoaded && uiState.messages.isEmpty() && !uiState.isAwaitingReply
     val currentOnWelcomeEnter by rememberUpdatedState(onWelcomeEnter)
     val welcomePosition = remember { PlacedCoordinates() }
@@ -262,7 +273,6 @@ private fun ChatContent(
         if (isWelcomeVisible && !isReduceMotionEnabled) {
             exitingWelcome = ExitingWelcome(
                 starterQuestions = uiState.starterQuestions,
-                isLoadingStarterQuestions = uiState.isLoadingStarterQuestions,
                 tappedSuggestion = tappedSuggestion,
                 topInRoot = welcomePosition.topInRoot(),
             )
@@ -338,12 +348,14 @@ private fun ChatContent(
             playback = uiState.playback,
             onClickClose = onClickClose,
             onClickPlayPause = onClickPlayPause,
+            onSeek = onSeek,
             onClickMore = {
                 focusManager.clearFocus(force = true)
                 keyboardController?.hide()
                 onClickMore()
             },
             theme = theme,
+            modifier = Modifier.zIndex(1f),
         )
 
         Box(
@@ -355,7 +367,6 @@ private fun ChatContent(
                 key(exiting) {
                     ChatWelcome(
                         starterQuestions = exiting.starterQuestions,
-                        isLoadingStarterQuestions = exiting.isLoadingStarterQuestions,
                         isSuggestionEnabled = uiState.isConnected,
                         onClickSuggestion = { _, _, _ -> },
                         theme = theme,
@@ -425,34 +436,34 @@ private fun ChatContent(
                     )
                 }
                 if (isWelcomeVisible) {
-                    val animateWelcome = remember { !isWelcomeEntered }
-                    LaunchedEffect(Unit) { currentOnWelcomeEnter() }
-                    val canSendSuggestion = !uiState.isAwaitingReply && uiState.isConnected && flyingSuggestion?.hasLanded != false
-                    ChatWelcome(
-                        starterQuestions = uiState.starterQuestions,
-                        isLoadingStarterQuestions = uiState.isLoadingStarterQuestions,
-                        isSuggestionEnabled = uiState.isConnected,
-                        onClickSuggestion = { text, inputType, topInRoot ->
-                            if (canSendSuggestion && !isReduceMotionEnabled) {
-                                onFlyingSuggestionChange(
-                                    FlyingSuggestion(
-                                        text = text,
-                                        fromTopInRoot = topInRoot,
-                                        toTopInRoot = welcomePosition.topInRoot(),
-                                    ),
-                                )
-                                exitWelcome(tappedSuggestion = text)
-                            }
-                            onClickSuggestion(text, inputType)
-                        },
-                        theme = theme,
-                        animate = animateWelcome,
-                        modifier = Modifier
-                            .onPlaced(welcomePosition::onPlaced)
-                            .alpha(if (exitingWelcome != null) 0f else 1f),
-                    )
+                    key(uiState.episodeUuid) {
+                        val animateWelcome = remember { !isWelcomeEntered }
+                        LaunchedEffect(Unit) { currentOnWelcomeEnter() }
+                        val canSendSuggestion = !uiState.isAwaitingReply && uiState.isConnected && flyingSuggestion?.hasLanded != false
+                        ChatWelcome(
+                            starterQuestions = uiState.starterQuestions,
+                            isSuggestionEnabled = uiState.isConnected,
+                            onClickSuggestion = { text, inputType, topInRoot ->
+                                if (canSendSuggestion && !isReduceMotionEnabled) {
+                                    onFlyingSuggestionChange(
+                                        FlyingSuggestion(
+                                            text = text,
+                                            fromTopInRoot = topInRoot,
+                                            toTopInRoot = welcomePosition.topInRoot(),
+                                        ),
+                                    )
+                                    exitWelcome(tappedSuggestion = text)
+                                }
+                                onClickSuggestion(text, inputType)
+                            },
+                            theme = theme,
+                            animate = animateWelcome,
+                            modifier = Modifier
+                                .onPlaced(welcomePosition::onPlaced)
+                                .alpha(if (exitingWelcome != null) 0f else 1f),
+                        )
+                    }
                 }
-                val answerStream = rememberChatAnswerStream(uiState.messages, initialMessageUuids)
                 val answerUuidsByLastIndex = uiState.answerUuidsByLastIndex
                 uiState.messages.forEachIndexed { index, message ->
                     if (answerStream?.hasStarted(message.uuid) == false) return@forEachIndexed
@@ -481,6 +492,9 @@ private fun ChatContent(
                                     text = message.displayText,
                                     theme = theme,
                                     revealProgress = answerStream?.takeIf { isStreaming }?.revealProgress(message.uuid),
+                                    episodeDurationMs = uiState.episodeDurationMs,
+                                    loadingTimestampMs = uiState.loadingAnswerTimestamp?.takeIf { it.answerUuid == message.uuid }?.startMs,
+                                    onClickTimestamp = { startMs -> onPlayAnswerTimestamp(message.uuid, startMs) },
                                 )
                             }
 
@@ -533,7 +547,13 @@ private fun ChatContent(
                             ) {
                                 ChatAnswerRatingRow(
                                     rating = uiState.answerRatings[answerUuid],
-                                    onRate = { rating -> onRateAnswer(answerUuid, rating) },
+                                    onRate = { rating ->
+                                        if (rating == ChatAnswerRating.Negative) {
+                                            focusManager.clearFocus(force = true)
+                                            keyboardController?.hide()
+                                        }
+                                        onRateAnswer(answerUuid, rating)
+                                    },
                                     theme = theme,
                                     modifier = Modifier.padding(top = 8.dp),
                                 )
@@ -606,6 +626,14 @@ private fun ChatContent(
                 exitWelcome(tappedSuggestion = null)
                 onSend()
             },
+            isAnswering = uiState.isAwaitingReply || answerStream?.isComplete == false,
+            onStop = {
+                if (uiState.isAwaitingReply) {
+                    onStopAnswer()
+                } else {
+                    coroutineScope.launch { answerStream?.skip() }
+                }
+            },
             isConnected = uiState.isConnected,
             canSend = uiState.canSend,
             showBetaNote = uiState.isBetaNoteVisible,
@@ -639,14 +667,13 @@ private data class FlyingSuggestion(
 
 private data class ExitingWelcome(
     val starterQuestions: List<String>,
-    val isLoadingStarterQuestions: Boolean,
     val tappedSuggestion: String?,
     val topInRoot: Float,
 )
 
 private fun ChatUiState.isAnswerLanding(initialMessageUuids: Set<String>): Boolean {
     val newestMessage = messages.lastOrNull()
-    return error == null && newestMessage is ChatMessage.User && newestMessage.uuid !in initialMessageUuids
+    return error == null && newestMessage is ChatMessage.User && !newestMessage.isStopped && newestMessage.uuid !in initialMessageUuids
 }
 
 @Composable
@@ -823,7 +850,7 @@ private fun ChatScreenPreview(
                             text = "What was the main point?",
                         ),
                         ChatMessage.Assistant(
-                            text = "The hosts focused on making discovery feel personal without adding friction.",
+                            text = "The hosts focused on making discovery feel personal without adding friction (00:12:04 - 00:12:18).",
                             followUps = listOf(
                                 "How do recommendations work?",
                                 "Who is the guest?",
@@ -852,11 +879,14 @@ private fun ChatScreenPreview(
                 onOpenHistoryChat = {},
                 onDeleteHistoryChat = {},
                 onClickPlayPause = {},
+                onSeek = {},
                 onInputTextChange = {},
                 onSend = {},
+                onStopAnswer = {},
                 onClickSuggestion = { _, _ -> },
                 onRetry = {},
                 onPlayQuote = {},
+                onPlayAnswerTimestamp = { _, _ -> },
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},
@@ -892,11 +922,14 @@ private fun ChatScreenEmptyPreview(
                 onOpenHistoryChat = {},
                 onDeleteHistoryChat = {},
                 onClickPlayPause = {},
+                onSeek = {},
                 onInputTextChange = {},
                 onSend = {},
+                onStopAnswer = {},
                 onClickSuggestion = { _, _ -> },
                 onRetry = {},
                 onPlayQuote = {},
+                onPlayAnswerTimestamp = { _, _ -> },
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},
@@ -933,11 +966,14 @@ private fun ChatScreenErrorPreview(
                 onOpenHistoryChat = {},
                 onDeleteHistoryChat = {},
                 onClickPlayPause = {},
+                onSeek = {},
                 onInputTextChange = {},
                 onSend = {},
+                onStopAnswer = {},
                 onClickSuggestion = { _, _ -> },
                 onRetry = {},
                 onPlayQuote = {},
+                onPlayAnswerTimestamp = { _, _ -> },
                 onRateAnswer = { _, _ -> },
                 snackbarHostState = remember { SnackbarHostState() },
                 onDismissBetaSheet = {},

@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvai
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
 import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
@@ -210,7 +211,7 @@ class DriftFilterTest {
         val restricted = buildManager(FingerprintPolicy.TAP_ONLY)
         val episode = PodcastEpisode(uuid = "episode-uuid", publishedDate = Date())
 
-        val result = restricted.resolvePlaybackTime(episode, 100.seconds)
+        val result = restricted.resolvePlaybackTime(episode, 100.seconds, GeneratedChaptersDownloadTriggerType.ChapterTap)
 
         assertEquals(
             ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_UNSUPPORTED_DEVICE),
