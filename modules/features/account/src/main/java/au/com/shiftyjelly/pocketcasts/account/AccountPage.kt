@@ -1,17 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.LinearGradient
-import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
-import android.graphics.Shader
-import android.graphics.drawable.Drawable
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -25,28 +15,24 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.res.use
+import au.com.shiftyjelly.pocketcasts.compose.buttons.CloseButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
+import au.com.shiftyjelly.pocketcasts.compose.components.GradientIcon
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -121,19 +107,12 @@ private fun AccountHeader(onCloseClick: () -> Unit) {
             .fillMaxWidth()
             .height(56.dp),
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .padding(start = 8.dp, top = 8.dp)
-                .size(48.dp)
-                .clickable(interactionSource = null, indication = ripple(bounded = false), role = Role.Button, onClick = onCloseClick),
-        ) {
-            Icon(
-                painter = painterResource(IR.drawable.ic_cancel),
-                contentDescription = stringResource(LR.string.cancel),
-                tint = MaterialTheme.theme.colors.primaryIcon01,
-            )
-        }
+        CloseButton(
+            onClick = onCloseClick,
+            tintColor = MaterialTheme.theme.colors.primaryIcon01,
+            contentDescription = stringResource(LR.string.cancel),
+            modifier = Modifier.padding(start = 8.dp, top = 8.dp),
+        )
         if (logo != 0) {
             Image(
                 painter = painterResource(logo),
@@ -163,9 +142,9 @@ private fun AccountIntro(
             state.isCar -> Modifier.size(360.dp)
             else -> Modifier.size(width = 171.dp, height = 160.dp)
         }
-        AccountGradientIcon(
-            drawableId = if (state.isSignedIn) IR.drawable.ic_alert_small else R.drawable.ic_create_new_account,
-            tintColor = if (state.isSignedIn) colors.support05 else null,
+        GradientIcon(
+            painter = painterResource(if (state.isSignedIn) IR.drawable.ic_alert_small else R.drawable.ic_create_new_account),
+            gradientBrush = Brush.linearGradient(listOf(colors.gradient02A, colors.gradient02E)),
             modifier = iconModifier,
         )
         val titleTop = if (state.isCar) dimensionResource(R.dimen.car_create_heading_top_margin) else 16.dp
@@ -243,39 +222,4 @@ private fun CarButtons(
             )
         }
     }
-}
-
-@Composable
-private fun AccountGradientIcon(drawableId: Int, tintColor: Color?, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    val drawable = remember(context, drawableId, tintColor) {
-        AppCompatResources.getDrawable(context, drawableId)?.mutate()?.apply {
-            if (tintColor != null) setTint(tintColor.toArgb())
-        }
-    }
-    val start = MaterialTheme.theme.colors.gradient02A.toArgb()
-    val end = MaterialTheme.theme.colors.gradient02E.toArgb()
-    Box(
-        modifier = modifier.drawWithCache {
-            val w = size.width.toInt()
-            val h = size.height.toInt()
-            val bitmap = if (drawable != null && w > 0 && h > 0) gradientBitmap(drawable, w, h, start, end) else null
-            onDrawBehind {
-                bitmap?.let { drawContext.canvas.nativeCanvas.drawBitmap(it, 0f, 0f, Paint(Paint.ANTI_ALIAS_FLAG)) }
-            }
-        },
-    )
-}
-
-private fun gradientBitmap(drawable: Drawable, width: Int, height: Int, start: Int, end: Int): Bitmap {
-    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-    val canvas = Canvas(bitmap)
-    drawable.setBounds(0, 0, width, height)
-    drawable.draw(canvas)
-    val paint = Paint().apply {
-        shader = LinearGradient(0f, 0f, width.toFloat(), height.toFloat(), start, end, Shader.TileMode.CLAMP)
-        xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-    }
-    canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
-    return bitmap
 }
