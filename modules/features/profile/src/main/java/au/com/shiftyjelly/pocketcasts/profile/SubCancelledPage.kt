@@ -37,8 +37,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.account.R as AR
@@ -72,19 +74,15 @@ internal fun SubCancelledPage(
                     .padding(start = 16.dp, top = 32.dp, end = 16.dp)
                     .size(140.dp),
             )
-            TextViewText(
+            TextH30(
                 text = stringResource(LR.string.profile_sub_sorry_to_see_you_go),
-                fontSize = 18.sp,
-                color = MaterialTheme.theme.colors.primaryText01,
-                fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(start = 32.dp, top = 32.dp, end = 32.dp)
                     .fillMaxWidth(),
             )
-            TextViewText(
+            TextP30(
                 text = stringResource(LR.string.profile_sub_thankyou_for_support),
-                fontSize = 18.sp,
                 color = MaterialTheme.theme.colors.primaryText02,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -141,9 +139,8 @@ private fun NoteRow(
     iconTint: Color = Color.Unspecified,
 ) {
     Box(modifier = Modifier.padding(start = 32.dp, top = 30.dp, end = 16.dp)) {
-        TextViewText(
+        TextP50(
             text = text,
-            fontSize = 14.sp,
             color = MaterialTheme.theme.colors.primaryText02,
             modifier = Modifier
                 .padding(start = 40.dp)
