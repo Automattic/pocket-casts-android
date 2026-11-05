@@ -48,8 +48,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -95,23 +95,20 @@ internal fun PodcastSelectPage(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
         ) {
             Box(
-                contentAlignment = TextViewAlignment.CenterStart,
+                contentAlignment = Alignment.CenterStart,
                 modifier = Modifier
                     .weight(1f)
                     .height(48.dp),
             ) {
-                TextViewText(
+                TextP50(
                     text = selectedText,
-                    fontSize = 14.sp,
-                    letterSpacing = 0.02.em,
-                    lineSpacingExtra = 4.sp,
                     color = colors.primaryText02,
                     maxLines = 2,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
             Box(
-                contentAlignment = TextViewAlignment.Center,
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .height(48.dp)
                     .padding(vertical = 6.dp)
@@ -121,14 +118,10 @@ internal fun PodcastSelectPage(
                     .padding(horizontal = 8.dp),
             ) {
                 val selectText = stringResource(if (selectedUuids.size == podcasts.size) LR.string.select_none else LR.string.select_all)
-                TextViewText(
+                TextH50(
                     text = selectText,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = BUTTON_LETTER_SPACING.em,
                     color = tintColor ?: colors.primaryInteractive01,
                     maxLines = 1,
-                    modifier = Modifier.width(rememberButtonTextWidth(selectText)),
                 )
             }
         }
@@ -184,11 +177,11 @@ private fun PodcastSelectRow(
                 .padding(start = 8.dp)
                 .weight(1f),
         ) {
-            TextViewText(text = podcast.title, fontSize = 14.sp, color = colors.primaryText01, maxLines = 1, modifier = Modifier.fillMaxWidth())
-            TextViewText(text = podcast.author, fontSize = 14.sp, color = colors.primaryText02, maxLines = 1, modifier = Modifier.fillMaxWidth())
+            TextP50(text = podcast.title, maxLines = 1, modifier = Modifier.fillMaxWidth())
+            TextP50(text = podcast.author, color = colors.primaryText02, maxLines = 1, modifier = Modifier.fillMaxWidth())
         }
         Box(
-            contentAlignment = TextViewAlignment.CenterStart,
+            contentAlignment = Alignment.CenterStart,
             modifier = Modifier
                 .width(44.dp)
                 .height(56.dp),
@@ -218,18 +211,3 @@ private fun rememberCardBackground(): Color {
         if (hsv[2] > 0.5f) Color(0xFFFFFFFF) else Color(0xFF424242)
     }
 }
-
-@Composable
-private fun rememberButtonTextWidth(text: String): Dp {
-    val density = LocalDensity.current
-    return remember(text, density) {
-        val paint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-            textSize = with(density) { 14.sp.roundToPx().toFloat() }
-            letterSpacing = BUTTON_LETTER_SPACING
-            typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
-        }
-        with(density) { ceil(Layout.getDesiredWidth(text, paint) + paint.letterSpacing * paint.textSize).toInt().toDp() }
-    }
-}
-
-private const val BUTTON_LETTER_SPACING = 0.0892857143f
