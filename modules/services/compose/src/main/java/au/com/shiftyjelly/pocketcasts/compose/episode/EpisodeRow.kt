@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
@@ -140,7 +141,8 @@ fun EpisodeRow(
                     modifier = Modifier
                         .padding(vertical = 12.dp)
                         .size(56.dp)
-                        .alpha(if (isGreyedOut) 0.5f else 1f),
+                        .alpha(if (isGreyedOut) 0.5f else 1f)
+                        .clearAndSetSemantics {},
                 ) {
                     artwork()
                 }
