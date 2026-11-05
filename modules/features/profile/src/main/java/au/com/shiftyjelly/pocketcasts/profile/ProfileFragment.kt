@@ -66,7 +66,7 @@ class ProfileFragment :
             isWhatsNewVisible = FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED),
             hasWhatsNewDot = hasWhatsNewDot,
             isPlaybackEnabled = profileViewModel.isPlaybackAvailable.collectAsState().value,
-            isPlayback2026BannerVisible = Playback2026.isAvailableFlow.collectAsState().value,
+            isPlayback2026BannerVisible = profileViewModel.isPlayback2026Available.collectAsState().value,
             isFreeAccountBannerVisible = profileViewModel.isFreeAccountBannerVisible.collectAsState().value,
             isUpgradeBannerVisible = profileViewModel.showUpgradeBanner.collectAsState(false).value,
             miniPlayerPadding = profileViewModel.miniPlayerInset.collectAsState().value.pxToDp(requireContext()).dp,
