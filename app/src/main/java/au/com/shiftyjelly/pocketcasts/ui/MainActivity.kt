@@ -40,6 +40,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
@@ -1141,7 +1142,7 @@ class MainActivity :
         lifecycleScope.launch {
             if (!viewModel.shouldShowPlayback2026Sheet()) return@launch
             val viewGroup = binding.modalBottomSheet
-            if (viewModel.state.value.shouldShowWhatsNew || viewGroup.childCount > 0) return@launch
+            if (viewModel.state.value.shouldShowWhatsNew || viewGroup.isNotEmpty()) return@launch
             viewGroup.addView(
                 ComposeView(viewGroup.context).apply {
                     setContent {
