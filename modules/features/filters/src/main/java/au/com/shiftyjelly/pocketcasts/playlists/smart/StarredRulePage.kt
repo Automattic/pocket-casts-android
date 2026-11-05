@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.episode.EpisodeRow
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -152,7 +153,7 @@ private fun EpisodesColumn(
         modifier = modifier,
     ) {
         items(episodes) { episodeWrapper ->
-            SmartEpisodeRow(
+            EpisodeRow(
                 episode = episodeWrapper.episode,
                 useEpisodeArtwork = useEpisodeArtwork,
             )

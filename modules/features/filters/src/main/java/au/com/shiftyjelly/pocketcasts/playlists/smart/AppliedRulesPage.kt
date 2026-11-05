@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.episode.EpisodeRow
 import au.com.shiftyjelly.pocketcasts.compose.layout.verticalNavigationBars
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -129,7 +130,7 @@ internal fun AppliedRulesPage(
                             key = { episode -> episode.uuid },
                             contentType = { "episode" },
                         ) { episodeWrapper ->
-                            SmartEpisodeRow(
+                            EpisodeRow(
                                 episode = episodeWrapper.episode,
                                 useEpisodeArtwork = useEpisodeArtwork,
                             )
