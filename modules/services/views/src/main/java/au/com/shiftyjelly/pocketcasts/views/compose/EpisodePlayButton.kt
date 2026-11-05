@@ -37,7 +37,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -146,7 +145,7 @@ fun EpisodePlayButton(
             modifier = Modifier.matchParentSize(),
         )
         Box(
-            contentAlignment = TruncatedCenter,
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .matchParentSize()
                 .padding(top = topPadding),
@@ -216,10 +215,6 @@ private val PlayButtonMenuItem.menuId
         PlayButtonMenuItem.Stream -> R.id.stream
         PlayButtonMenuItem.StopDownloading -> R.id.stop_downloading
     }
-
-internal val TruncatedCenter = Alignment { size, space, _ ->
-    IntOffset((space.width - size.width) / 2, (space.height - size.height) / 2)
-}
 
 @Preview
 @Composable

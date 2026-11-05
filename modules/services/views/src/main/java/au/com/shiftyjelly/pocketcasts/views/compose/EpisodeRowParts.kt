@@ -102,7 +102,7 @@ internal fun EpisodeRowHeader(
     colors: EpisodeRowColors,
 ) {
     Row(
-        verticalAlignment = TruncatedCenterVertically,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .clearAndSetSemantics {},
