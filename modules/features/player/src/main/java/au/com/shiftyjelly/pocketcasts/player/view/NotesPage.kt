@@ -1,9 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.player.view
 
-import android.graphics.Paint
-import android.graphics.Typeface
-import android.text.Layout
-import android.text.TextPaint
 import android.view.View
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -38,22 +34,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.player.R
-import kotlin.math.ceil
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 internal data class NotesHeader(
@@ -90,17 +80,15 @@ internal fun NotesPage(
             .nestedScroll(rememberNestedScrollInteropConnection())
             .verticalScroll(scrollState),
     ) {
-        TextViewText(
+        TextH20(
             text = header?.title.orEmpty(),
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Medium,
             color = colors.contrast01,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp, start = 16.dp, end = 16.dp),
         )
         Row(
-            verticalAlignment = FloorCenterVertically,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp),
         ) {
             Icon(
@@ -110,13 +98,9 @@ internal fun NotesPage(
                 modifier = Modifier.size(width = 17.dp, height = 18.dp),
             )
             Spacer(Modifier.width(8.dp))
-            val date = header?.date.orEmpty()
-            TextViewText(
-                text = date,
-                fontSize = 15.sp,
-                letterSpacing = (-0.01).em,
+            TextP50(
+                text = header?.date.orEmpty(),
                 color = colors.contrast02,
-                modifier = Modifier.width(rememberTextViewWidth(date, 15.sp, -0.01f)),
             )
             Spacer(Modifier.width(8.dp))
             Icon(
@@ -125,10 +109,8 @@ internal fun NotesPage(
                 tint = colors.contrast02,
             )
             Spacer(Modifier.width(8.dp))
-            TextViewText(
+            TextP50(
                 text = header?.duration.orEmpty(),
-                fontSize = 15.sp,
-                letterSpacing = (-0.01).em,
                 color = colors.contrast02,
                 modifier = Modifier.semantics { contentDescription = header?.durationDescription.orEmpty() },
             )
@@ -160,11 +142,8 @@ internal fun NotesPage(
             }
         }
         if (errorText != null) {
-            TextViewText(
+            TextP50(
                 text = errorText,
-                fontSize = 14.sp,
-                letterSpacing = 0.02.em,
-                lineSpacingExtra = 4.sp,
                 color = Color(0xB3FFFFFF),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -174,8 +153,6 @@ internal fun NotesPage(
         Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
     }
 }
-
-private val FloorCenterVertically = Alignment.Vertical { size, space -> (space - size) / 2 }
 
 @Suppress("ktlint:compose:modifier-composed-check")
 private fun Modifier.platformVerticalScrollbar(scrollState: ScrollState) = composed {
@@ -202,18 +179,5 @@ private fun Modifier.platformVerticalScrollbar(scrollState: ScrollState) = compo
         thumb.setBounds(size.width.toInt() - thickness, top, size.width.toInt(), top + length)
         thumb.alpha = (alpha * 255).toInt()
         thumb.draw(drawContext.canvas.nativeCanvas)
-    }
-}
-
-@Composable
-private fun rememberTextViewWidth(text: String, fontSize: TextUnit, letterSpacing: Float): Dp {
-    val density = LocalDensity.current
-    return remember(text, fontSize, letterSpacing, density) {
-        val paint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-            textSize = with(density) { fontSize.roundToPx().toFloat() }
-            this.letterSpacing = letterSpacing
-            typeface = Typeface.SANS_SERIF
-        }
-        with(density) { ceil(Layout.getDesiredWidth(text, paint)).toInt().toDp() }
     }
 }
