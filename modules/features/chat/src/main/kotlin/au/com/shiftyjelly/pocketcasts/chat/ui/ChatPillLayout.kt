@@ -43,4 +43,4 @@ internal fun Modifier.chipMaxWidth() = layout { measurable, constraints ->
 }
 
 internal val ChipCornerRadius = 22.dp
-private val ChipMinStartGap = 48.dp
+private val ChipMinStartGap = 32.dp
