@@ -102,7 +102,7 @@ internal fun StatusLine(
     val imageAlpha = if (isGreyedOut) 0.5f else 1f
     val captionColor = colors.theme.primaryText02
     Row(
-        verticalAlignment = TruncatedCenterVertically,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.padding(bottom = bottomPadding),
     ) {
         if (isInUpNext) {
@@ -158,8 +158,6 @@ internal fun StatusLine(
 private val StatusTextSize = 13.sp
 
 internal fun Modifier.imageViewAlpha(alpha: Float) = graphicsLayer(alpha = alpha, compositingStrategy = CompositingStrategy.ModulateAlpha)
-
-internal val TruncatedCenterVertically = Alignment.Vertical { size, space -> (space - size) / 2 }
 
 @Composable
 internal fun StatusImage(
