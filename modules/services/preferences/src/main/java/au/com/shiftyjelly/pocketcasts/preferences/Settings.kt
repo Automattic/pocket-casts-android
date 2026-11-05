@@ -622,6 +622,8 @@ interface Settings {
 
     val lastEoySyncTimestamp: UserSetting<Instant>
 
+    val lastEoySyncYear: UserSetting<Int>
+
     /** Whether the Playback 2026 announcement sheet has been shown. It is shown once. */
     val playback2026SheetShown: UserSetting<Boolean>
 

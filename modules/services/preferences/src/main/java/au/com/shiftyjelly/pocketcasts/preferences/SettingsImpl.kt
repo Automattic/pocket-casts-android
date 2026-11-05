@@ -1685,6 +1685,12 @@ class SettingsImpl @Inject constructor(
         toString = { value -> value.toString() },
     )
 
+    override val lastEoySyncYear = UserSetting.IntPref(
+        sharedPrefKey = "eoy_sync_year",
+        defaultValue = 2025,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val playback2026SheetShown = UserSetting.BoolPref(
         sharedPrefKey = "playback_2026_sheet_shown",
         defaultValue = false,
