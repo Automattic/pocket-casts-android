@@ -46,7 +46,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.endofyear.playback2026.Playback2026Banner
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearPromptCard
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
@@ -126,8 +125,12 @@ internal fun ProfilePage(
                 }
                 if (state.isPlayback2026BannerVisible) {
                     item {
-                        Playback2026Banner(
+                        EndOfYearPromptCard(
                             onClick = onPlayback2026Click,
+                            onShow = {},
+                            imageId = R.drawable.playback_2026_banner,
+                            title = stringResource(LR.string.playback_2026_banner_title),
+                            summary = stringResource(LR.string.playback_2026_banner_description),
                             modifier = Modifier.padding(horizontal = horizontalPadding),
                         )
                     }

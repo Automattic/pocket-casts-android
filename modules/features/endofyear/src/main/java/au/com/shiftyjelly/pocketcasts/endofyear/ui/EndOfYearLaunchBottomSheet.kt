@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -32,6 +34,9 @@ fun EndOfYearLaunchBottomSheet(
     onCollapse: () -> Unit,
     modifier: Modifier = Modifier,
     shouldShow: Boolean = true,
+    @DrawableRes imageId: Int = IR.drawable.playback_launch_banner,
+    summary: String = stringResource(LR.string.end_of_year_launch_modal_summary),
+    buttonLabel: String = stringResource(LR.string.end_of_year_launch_modal_primary_button_title),
 ) {
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -47,15 +52,16 @@ fun EndOfYearLaunchBottomSheet(
         content = BottomSheetContentState.Content(
             imageContent = {
                 ImageContent(
+                    imageId = imageId,
                     modifier = Modifier.clickable {
                         onClick()
                         scope.launch { sheetState.hide() }
                     },
                 )
             },
-            summaryText = stringResource(LR.string.end_of_year_launch_modal_summary),
+            summaryText = summary,
             primaryButton = BottomSheetContentState.Content.Button.Primary(
-                label = stringResource(LR.string.end_of_year_launch_modal_primary_button_title),
+                label = buttonLabel,
                 onClick = onClick,
             ),
         ),
@@ -64,15 +70,21 @@ fun EndOfYearLaunchBottomSheet(
 }
 
 @Composable
-private fun ImageContent(modifier: Modifier = Modifier) {
+private fun ImageContent(
+    @DrawableRes imageId: Int,
+    modifier: Modifier = Modifier,
+) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxWidth(),
     ) {
         Image(
-            painter = painterResource(IR.drawable.playback_launch_banner),
+            painter = painterResource(imageId),
             contentDescription = null,
-            modifier = Modifier.clip(RoundedCornerShape(16.dp)),
+            contentScale = ContentScale.FillWidth,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp)),
         )
     }
 }
