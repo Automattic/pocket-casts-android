@@ -913,7 +913,7 @@ private fun ChatScreenEmptyPreview(
                     starterQuestions = listOf(
                         "Who is the guest?",
                         "How do recommendations work?",
-                        "What changed this year?",
+                        "Which state elected Keisha Lance Bottoms governor in the latest election?",
                     ),
                 ),
                 onClickClose = {},

@@ -499,7 +499,6 @@ private fun chipMorphShape(chipMorph: Float) = RoundedCornerShape(
     bottomStart = lerp(16.dp, ChipCornerRadius, chipMorph),
 )
 
-private val ChipCornerRadius = 22.dp
 private val ChipBorderWidth = 1.dp
 private val UserBubbleMaxWidth = 250.dp
 private const val CHIP_WIDTH_MORPH_POINT = 0.5f
