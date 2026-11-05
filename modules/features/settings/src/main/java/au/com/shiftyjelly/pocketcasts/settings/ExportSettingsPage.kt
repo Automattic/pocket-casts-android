@@ -27,7 +27,9 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.res.use
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -117,10 +119,8 @@ private fun PreferenceCategory(
             .padding(top = 16.dp)
             .padding(start = 72.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
     ) {
-        TextViewText(
+        TextH50(
             text = title,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
             color = rememberThemeColor(androidx.appcompat.R.attr.colorAccent),
             modifier = Modifier
                 .fillMaxWidth()
@@ -141,14 +141,11 @@ private fun PreferenceRow(
             .clickable(onClick = onClick)
             .padding(start = 72.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
     ) {
-        TextViewText(
+        TextP40(
             text = title,
-            fontSize = 16.sp,
-            color = MaterialTheme.theme.colors.primaryText01,
         )
-        TextViewText(
+        TextP50(
             text = summary,
-            fontSize = 14.sp,
             color = rememberThemeColor(android.R.attr.textColorSecondary),
             maxLines = 10,
         )

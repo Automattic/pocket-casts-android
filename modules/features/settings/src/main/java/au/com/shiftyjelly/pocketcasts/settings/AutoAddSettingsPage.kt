@@ -38,8 +38,9 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.res.use
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -90,9 +91,8 @@ internal fun AutoAddSettingsPage(
             items(options) { option -> OptionRow(option) }
             if (footer != null) {
                 item {
-                    TextViewText(
+                    TextP50(
                         text = footer,
-                        fontSize = 14.sp,
                         color = colors.primaryText02,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -106,10 +106,8 @@ internal fun AutoAddSettingsPage(
                             .height(1.dp)
                             .background(colors.primaryUi05),
                     )
-                    TextViewText(
+                    TextH50(
                         text = stringResource(LR.string.settings_auto_up_next_podcasts),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
                         color = colors.support01,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -145,8 +143,8 @@ private fun OptionRow(option: AutoAddOption) {
             }
         }
         Column(modifier = Modifier.padding(start = 16.dp)) {
-            TextViewText(text = option.title, fontSize = 16.sp, color = colors.primaryText01, modifier = Modifier.fillMaxWidth())
-            TextViewText(text = option.subtitle, fontSize = 14.sp, color = colors.primaryText02, modifier = Modifier.fillMaxWidth())
+            TextP40(text = option.title, modifier = Modifier.fillMaxWidth())
+            TextP50(text = option.subtitle, color = colors.primaryText02, modifier = Modifier.fillMaxWidth())
         }
     }
 }
@@ -173,19 +171,19 @@ private fun PodcastRow(podcast: Podcast, onClick: () -> Unit) {
         )
         Spacer(Modifier.width(8.dp))
         Box(
-            contentAlignment = TextViewAlignment.CenterStart,
+            contentAlignment = Alignment.CenterStart,
             modifier = Modifier
                 .weight(1f)
                 .height(56.dp + card.verticalPadding * 2),
         ) {
             Column {
-                TextViewText(text = podcast.title, fontSize = 16.sp, color = colors.primaryText01, maxLines = 1, modifier = Modifier.fillMaxWidth())
+                TextP40(text = podcast.title, maxLines = 1, modifier = Modifier.fillMaxWidth())
                 val subtitle = when (podcast.autoAddToUpNext) {
                     Podcast.AutoAddUpNext.PLAY_NEXT -> stringResource(LR.string.settings_auto_up_next_to_top)
                     Podcast.AutoAddUpNext.PLAY_LAST -> stringResource(LR.string.settings_auto_up_next_to_bottom)
                     Podcast.AutoAddUpNext.OFF -> ""
                 }
-                TextViewText(text = subtitle, fontSize = 15.sp, letterSpacing = (-0.01).em, color = colors.primaryText02, maxLines = 1, modifier = Modifier.fillMaxWidth())
+                TextP50(text = subtitle, color = colors.primaryText02, maxLines = 1, modifier = Modifier.fillMaxWidth())
             }
         }
     }
