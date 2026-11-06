@@ -60,6 +60,7 @@ data class EpisodeRowStatus(
     val contentDescription: String = text,
     @DrawableRes val iconId: Int? = null,
     val isIconHighlighted: Boolean = false,
+    val isIconTinted: Boolean = true,
     val progress: Float? = null,
     val isBuffering: Boolean = false,
     val isInUpNext: Boolean = false,
@@ -225,7 +226,12 @@ private fun EpisodeRowStatusLine(status: EpisodeRowStatus) {
             StatusIcon(IR.drawable.ic_upnext, colors.support01)
         }
         if (status.iconId != null) {
-            StatusIcon(status.iconId, if (status.isIconHighlighted) colors.support02 else colors.primaryIcon02)
+            val tint = when {
+                !status.isIconTinted -> Color.Unspecified
+                status.isIconHighlighted -> colors.support02
+                else -> colors.primaryIcon02
+            }
+            StatusIcon(status.iconId, tint)
         }
         if (status.isUploaded) {
             GradientIcon(
