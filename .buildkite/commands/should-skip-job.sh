@@ -15,10 +15,11 @@ if [[ "${POCKET_CASTS_CI_FULL_BUILD:-}" == 1 || "${BUILDKITE_SOURCE:-}" != webho
   exit 1
 fi
 
-# Scope documentation skips so bundled Markdown and text fixtures still run jobs.
+# Preserve the existing documentation/tooling exclusions for every job.
 SKIP_PATTERNS=(
-  '*/README.md' '!(*/*).md' 'docs/*' '.github/*.md' '.agents/*.md' '.claude/*.md'
-  '.gitignore' 'metadata/*'
+  '*.md' '*.pot' '*.txt' '.gitignore'
+  'config/*' 'fastlane/*' 'Gemfile' 'Gemfile.lock' 'version.properties'
+  'docs/*' 'metadata/*'
 )
 case "$job" in
   validation|unit-tests|instrumented-tests) SKIP_PATTERNS+=('*/src/main/res/values*/strings.xml') ;;
@@ -34,8 +35,8 @@ case "$job" in
       target="${job%-build}"
       SKIP_PATTERNS+=('*/src/androidTest/*')
     fi
-    # App source trees are independent. Keep every Gradle/config change and all
-    # shared modules relevant, since they can affect more than one app.
+    # App source trees are independent; shared modules and module build files
+    # still matter, since they can affect more than one app.
     for app in app automotive wear tv; do
       [[ "$app" == "$target" ]] || SKIP_PATTERNS+=("$app/src/*")
     done
