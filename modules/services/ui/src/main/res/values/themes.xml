@@ -1515,10 +1515,6 @@
         <item name="android:background">@drawable/bg_bottom_sheet_dialog_fragment_dark</item>
     </style>
 
-    <style name="SwitchStyle">
-        <item name="colorControlActivated">?attr/colorAccent</item>
-    </style>
-
     <style name="CheckboxStyle" parent="Widget.AppCompat.CompoundButton.CheckBox">
         <item name="android:buttonTint">?attr/primary_interactive_01</item>
     </style>
