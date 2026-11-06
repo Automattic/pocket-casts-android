@@ -130,6 +130,7 @@ fun EmailField(
     placeholder: String = stringResource(LR.string.profile_email_address),
     imeAction: ImeAction = ImeAction.Next,
     focusRequester: FocusRequester = remember { FocusRequester() },
+    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     val formModifier = modifier.focusRequester(focusRequester)
         .semantics {
@@ -148,6 +149,7 @@ fun EmailField(
                 contentDescription = null,
             )
         },
+        trailingIcon = trailingIcon,
         keyboardOptions = FormFieldDefaults.keyboardOptions.copy(
             capitalization = KeyboardCapitalization.None,
             imeAction = imeAction,
