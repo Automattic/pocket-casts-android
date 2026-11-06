@@ -2615,6 +2615,7 @@
     <string name="chat_undo">Undo</string>
     <string name="chat_now_playing_episode">Now playing %1$s</string>
     <string name="chat_jumped_to_time">Jumped to %1$s</string>
+    <string name="chat_jumping_to_time">Jumping to %1$s…</string>
     <string name="chat_quote_play_failed">Couldn’t play this part of the episode</string>
     <string name="chat_about_episode">Chat about %1$s</string>
     <string name="chat_not_sent_tap_to_retry">Not sent. Tap to try again.</string>

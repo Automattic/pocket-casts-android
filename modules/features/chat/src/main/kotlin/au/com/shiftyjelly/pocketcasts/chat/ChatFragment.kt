@@ -154,8 +154,11 @@ class ChatFragment : BaseDialogFragment() {
             viewModel.toasts.collectLatest { toast ->
                 try {
                     snackbarHostState.currentSnackbarData?.dismiss()
+                    if (toast == ChatToast.QuoteJumpCancelled) return@collectLatest
                     shownToast = toast
-                    val result = if (toast.isUndoable) {
+                    val result = if (toast is ChatToast.QuoteJumping) {
+                        snackbarHostState.showSnackbar(message = toast.message(resources), duration = SnackbarDuration.Indefinite)
+                    } else if (toast.isUndoable) {
                         coroutineScope {
                             val expiry = launch {
                                 delay(undoToastTimeoutMs)
@@ -176,7 +179,7 @@ class ChatFragment : BaseDialogFragment() {
                             ChatToast.ChatCleared -> viewModel.undoClearChat()
                             ChatToast.ChatDeleted -> viewModel.undoDeleteChat()
                             is ChatToast.QuotePlaying -> viewModel.undoQuotePlay()
-                            ChatToast.FeedbackThanks, ChatToast.QuotePlayFailed -> Unit
+                            ChatToast.FeedbackThanks, ChatToast.QuotePlayFailed, is ChatToast.QuoteJumping, ChatToast.QuoteJumpCancelled -> Unit
                         }
                     }
                 } finally {
@@ -313,7 +316,7 @@ class ChatFragment : BaseDialogFragment() {
             else -> playingPodcast?.let(::PodcastColors) ?: args.podcastColors
         }
 
-    private val ChatToast.isUndoable get() = this != ChatToast.FeedbackThanks && this != ChatToast.QuotePlayFailed
+    private val ChatToast.isUndoable get() = this is ChatToast.ChatCleared || this is ChatToast.ChatDeleted || this is ChatToast.QuotePlaying
 
     private fun ChatToast.message(resources: Resources) = when (this) {
         ChatToast.FeedbackThanks -> resources.getString(LR.string.chat_feedback_thank_you)
@@ -328,6 +331,10 @@ class ChatFragment : BaseDialogFragment() {
                 ?: resources.getString(LR.string.chat_now_playing_episode, episodeTitle)
 
         ChatToast.QuotePlayFailed -> resources.getString(LR.string.chat_quote_play_failed)
+
+        is ChatToast.QuoteJumping -> resources.getString(LR.string.chat_jumping_to_time, formatChatTimestamp(startMs))
+
+        ChatToast.QuoteJumpCancelled -> ""
     }
 
     @Parcelize

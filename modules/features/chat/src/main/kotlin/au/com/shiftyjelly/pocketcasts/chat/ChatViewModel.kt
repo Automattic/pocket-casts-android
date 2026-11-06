@@ -62,6 +62,8 @@ import java.time.ZoneId
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 import kotlinx.coroutines.CancellationException
@@ -73,6 +75,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -139,6 +142,7 @@ class ChatViewModel @Inject constructor(
     private val warmedUpEpisodeUuids = mutableSetOf<String>()
     private val warmedUpQuoteUuids = mutableSetOf<String>()
     private val prefetchedMessageUuids = mutableSetOf<String>()
+    private val quoteTapId = AtomicInteger()
     private var lastQuotePlaybackUndoId = 0
     private var transientUserMessage: ChatMessage.User? = null
     private var replyRequestedAt: TimeMark? = null
@@ -741,14 +745,21 @@ class ChatViewModel @Inject constructor(
             ),
         )
         val loadId = startQuoteLoading(loading)
+        val tapId = quoteTapId.incrementAndGet()
+        val previousUndo = quotePlaybackUndo.get()
         val previousJob = quotePlaybackJob
         previousJob?.cancel()
         quotePlaybackJob = applicationScope.launch(ioDispatcher) {
+            var jump: QuoteJump? = null
             try {
                 previousJob?.join()
-                seekToQuote(startMs, quoteTime, episodeUuid, podcastUuid, isOtherEpisode, loadId)
+                jump = QuoteJump(startMs = startMs, previousUndo = previousUndo, loadId = loadId)
+                seekToQuote(jump, quoteTime, episodeUuid, podcastUuid, isOtherEpisode)
             } finally {
                 finishQuoteLoading(loadId)
+                if (jump?.isJumpingToastShown == true && !jump.isFinished && quoteTapId.get() == tapId) {
+                    showToast(ChatToast.QuoteJumpCancelled)
+                }
             }
         }
     }
@@ -766,15 +777,20 @@ class ChatViewModel @Inject constructor(
     }
 
     private suspend fun seekToQuote(
-        startMs: Int,
+        jump: QuoteJump,
         quoteTime: suspend () -> ChatQuoteSeeker.QuoteTime,
         episodeUuid: String,
         podcastUuid: String,
         isOtherEpisode: Boolean,
-        loadId: Int,
     ) = coroutineScope {
+        val startMs = jump.startMs
         val episode = episodeManager.findEpisodeByUuid(episodeUuid)
         if (episode == null || !isWithinEpisode(startMs, episode.durationMs)) return@coroutineScope
+        val jumpingToast = launch {
+            delay(QUOTE_JUMPING_TOAST_DELAY)
+            jump.isJumpingToastShown = true
+            showToast(ChatToast.QuoteJumping(startMs))
+        }
         val quoteTime = async { quoteTime() }
         val userSeek = async(start = CoroutineStart.UNDISPATCHED) { playbackManager.userSeeks.first() }
         val state = playbackManager.playbackStateFlow.first()
@@ -787,7 +803,9 @@ class ChatViewModel @Inject constructor(
             if (!awaitPlaybackEpisode(episodeUuid)) {
                 quoteTime.cancel()
                 userSeek.cancel()
-                finishQuoteLoading(loadId)
+                jumpingToast.cancel()
+                jump.isFinished = true
+                finishQuoteLoading(jump.loadId)
                 showToast(ChatToast.QuotePlayFailed)
                 if (playbackManager.upNextQueue.currentEpisode?.uuid == episodeUuid) {
                     restorePlayback(state.toPlaybackPosition(episodeUuid, podcastUuid, switch, isOtherEpisode))
@@ -804,23 +822,22 @@ class ChatViewModel @Inject constructor(
             null
         }
         val seekTimeMs = try {
-            quoteSeeker.playbackTimeMs(episode, quoteTime.await())
+            val seekQuoteTime = quoteTime.await()
+            withTimeoutOrNull(QUOTE_JUMP_TIMEOUT) { quoteSeeker.playbackTime(episode, seekQuoteTime).await() } ?: seekQuoteTime.timeMs
         } finally {
             userSeek.cancel()
         }
         if (userSeek.isCompleted && !userSeek.isCancelled) return@coroutineScope
         if (playbackManager.playbackStateFlow.first().loadedEpisodeUuid != episodeUuid) return@coroutineScope
         playbackManager.seekToTimeMsSuspend(positionMs = seekTimeMs)
-        playbackManager.playQueueSuspend(sourceView = sourceView)
+        jumpingToast.cancel()
         val undoId = ++lastQuotePlaybackUndoId
-        quotePlaybackUndo.updateAndGet { undo ->
-            QuotePlaybackUndo(
-                id = undoId,
-                position = undo?.position?.withLaterSwitch(episodeSwitch, isOtherEpisode)
-                    ?: state.toPlaybackPosition(episodeUuid, podcastUuid, episodeSwitch, isOtherEpisode),
-            )
-        }
+        val undoPosition = (quotePlaybackUndo.get() ?: jump.previousUndo)?.position?.withLaterSwitch(episodeSwitch, isOtherEpisode)
+            ?: state.toPlaybackPosition(episodeUuid, podcastUuid, episodeSwitch, isOtherEpisode)
+        quotePlaybackUndo.set(QuotePlaybackUndo(id = undoId, position = undoPosition))
+        jump.isFinished = true
         showToast(ChatToast.QuotePlaying(episode.title, undoId, jumpedToMs = startMs.takeIf { episodeSwitch == null }))
+        playbackManager.playQueueSuspend(sourceView = sourceView)
     }
 
     fun onQuoteUndoExpired(undoId: Int) {
@@ -828,7 +845,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun showToast(toast: ChatToast) {
-        if (toast !is ChatToast.QuotePlaying) {
+        if (toast !is ChatToast.QuotePlaying && toast !is ChatToast.QuoteJumping && toast != ChatToast.QuoteJumpCancelled) {
             quotePlaybackUndo.set(null)
         }
         _toasts.trySend(toast)
@@ -1139,6 +1156,8 @@ class ChatViewModel @Inject constructor(
 }
 
 private const val QUOTE_PLAYBACK_EPISODE_TIMEOUT_MS = 10_000L
+private val QUOTE_JUMPING_TOAST_DELAY = 100.milliseconds
+private val QUOTE_JUMP_TIMEOUT = 5.seconds
 private const val LOG_TAG = "EpisodeChat"
 
 private val PlaybackState.loadedEpisodeUuid
@@ -1228,6 +1247,18 @@ sealed interface ChatNavigation {
     data object Close : ChatNavigation
 }
 
+private class QuoteJump(
+    val startMs: Int,
+    val previousUndo: QuotePlaybackUndo?,
+    val loadId: Int,
+) {
+    @Volatile
+    var isJumpingToastShown = false
+
+    @Volatile
+    var isFinished = false
+}
+
 private fun List<ChatMessage>.latestAnswerGroup() = takeLastWhile { it !is ChatMessage.User }
 
 sealed interface ChatToast {
@@ -1235,6 +1266,8 @@ sealed interface ChatToast {
     data object ChatCleared : ChatToast
     data object ChatDeleted : ChatToast
     data class QuotePlaying(val episodeTitle: String, val undoId: Int, val jumpedToMs: Int? = null) : ChatToast
+    data class QuoteJumping(val startMs: Int) : ChatToast
+    data object QuoteJumpCancelled : ChatToast
     data object QuotePlayFailed : ChatToast
 }
 
