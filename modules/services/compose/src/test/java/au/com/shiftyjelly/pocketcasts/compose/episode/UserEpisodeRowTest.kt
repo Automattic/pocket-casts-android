@@ -40,4 +40,38 @@ class UserEpisodeRowTest {
         assertEquals(true, status.isUploaded)
         assertEquals(true, status.isInUpNext)
     }
+
+    @Test
+    fun `keeps the up next and bookmark icons of a file queued for upload`() {
+        val episode = UserEpisode(uuid = "1", publishedDate = Date(), serverStatus = UserEpisodeServerStatus.QUEUED)
+        val data = UserEpisodeRowData(episode, downloadProgress = 0, uploadProgress = 0, playbackState = PlaybackState(), isInUpNext = true, hasBookmarks = true)
+
+        val status = userEpisodeRowStatus(data, context)
+
+        assertEquals(true, status.isInUpNext)
+        assertEquals(true, status.hasBookmarks)
+    }
+
+    @Test
+    fun `keeps the up next and bookmark icons of a file waiting for wifi to upload`() {
+        val episode = UserEpisode(uuid = "1", publishedDate = Date(), serverStatus = UserEpisodeServerStatus.WAITING_FOR_WIFI)
+        val data = UserEpisodeRowData(episode, downloadProgress = 0, uploadProgress = 0, playbackState = PlaybackState(), isInUpNext = true, hasBookmarks = true)
+
+        val status = userEpisodeRowStatus(data, context)
+
+        assertEquals(IR.drawable.ic_waitingforwifi, status.iconId)
+        assertEquals(true, status.isInUpNext)
+        assertEquals(true, status.hasBookmarks)
+    }
+
+    @Test
+    fun `shows the playback failed icon of a file untinted`() {
+        val episode = UserEpisode(uuid = "1", publishedDate = Date(), playErrorDetails = "Error")
+        val data = UserEpisodeRowData(episode, downloadProgress = 0, uploadProgress = 0, playbackState = PlaybackState(), isInUpNext = false, hasBookmarks = false)
+
+        val status = userEpisodeRowStatus(data, context)
+
+        assertEquals(IR.drawable.ic_failed, status.iconId)
+        assertEquals(false, status.isIconTinted)
+    }
 }

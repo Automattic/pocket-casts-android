@@ -51,7 +51,7 @@ fun userEpisodeRowStatus(data: UserEpisodeRowData, context: Context): EpisodeRow
     val downloadStatus = when {
         isBuffering -> EpisodeRowStatus(context.getString(LR.string.episode_row_buffering), isBuffering = true)
 
-        episode.playErrorDetails != null -> EpisodeRowStatus(episode.playErrorDetails.orEmpty(), iconId = IR.drawable.ic_failed)
+        episode.playErrorDetails != null -> EpisodeRowStatus(episode.playErrorDetails.orEmpty(), iconId = IR.drawable.ic_failed, isIconTinted = false)
 
         episode.isDownloaded -> TimeHelper.getTimeLeft(episode.playedUpToMs, episode.durationMs.toLong(), episode.isInProgress, context)
             .let { EpisodeRowStatus(it.text, it.description, IR.drawable.ic_downloaded, isIconHighlighted = true) }
@@ -73,11 +73,7 @@ fun userEpisodeRowStatus(data: UserEpisodeRowData, context: Context): EpisodeRow
 
         else -> TimeHelper.getTimeLeft(episode.playedUpToMs, episode.durationMs.toLong(), episode.isInProgress, context)
             .let { EpisodeRowStatus(it.text, it.description) }
-    }.copy(
-        isUploaded = episode.serverStatus == UserEpisodeServerStatus.UPLOADED,
-        isInUpNext = data.isInUpNext,
-        hasBookmarks = data.hasBookmarks,
-    )
+    }.copy(isUploaded = episode.serverStatus == UserEpisodeServerStatus.UPLOADED)
     return when (episode.serverStatus) {
         UserEpisodeServerStatus.UPLOADING -> downloadStatus.copy(
             text = context.getString(LR.string.episode_row_uploading, data.uploadProgress),
@@ -91,5 +87,5 @@ fun userEpisodeRowStatus(data: UserEpisodeRowData, context: Context): EpisodeRow
         UserEpisodeServerStatus.QUEUED -> status(LR.string.episode_row_queued_upload)
 
         else -> downloadStatus
-    }
+    }.copy(isInUpNext = data.isInUpNext, hasBookmarks = data.hasBookmarks)
 }
