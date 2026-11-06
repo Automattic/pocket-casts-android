@@ -79,6 +79,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -91,6 +92,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
@@ -169,12 +171,15 @@ class ChatViewModelTest {
         viewModel = createViewModel()
     }
 
+    private val playbackTimesVersion = MutableStateFlow(0)
+
     private val quoteSeeker = mock<ChatQuoteSeeker> {
+        on { playbackTimesVersion } doReturn playbackTimesVersion
         on { quoteTime(any(), any()) } doSuspendableAnswer {
             val quote = it.arguments[1] as ChatMessage.Quote
             ChatQuoteSeeker.QuoteTime(timeMs = quote.startMs, referenceTimeMs = null)
         }
-        on { playbackTimeMs(any(), any()) } doSuspendableAnswer { (it.arguments[1] as ChatQuoteSeeker.QuoteTime).timeMs }
+        on { playbackTime(any(), any()) } doAnswer { CompletableDeferred((it.arguments[1] as ChatQuoteSeeker.QuoteTime).timeMs) }
     }
 
     private fun createViewModel() = ChatViewModel(
@@ -1847,7 +1852,7 @@ class ChatViewModelTest {
             ),
             eventSink.pollEvent(),
         )
-        verify(quoteSeeker).playbackTimeMs(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 65_000, referenceTimeMs = 65_000)))
+        verify(quoteSeeker).playbackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 65_000, referenceTimeMs = 65_000)))
         verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(65_000), anyOrNull())
         verify(playbackManager).playQueueSuspend(any(), any())
         assertNull(viewModel.uiState.value.loadingAnswerTimestamp)
@@ -1856,7 +1861,7 @@ class ChatViewModelTest {
     @Test
     fun `an answer timestamp shows as loading until playback starts`() = runTest {
         val seekTime = CompletableDeferred<Int>()
-        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { seekTime.await() }
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(seekTime)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
         answerState()
@@ -1917,7 +1922,7 @@ class ChatViewModelTest {
     @Test
     fun `playing a quote seeks to the time the seeker resolves`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
-        whenever(quoteSeeker.playbackTimeMs(any(), any())).thenReturn(31_500)
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(CompletableDeferred(31_500))
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
         playableState(quote)
@@ -1932,13 +1937,13 @@ class ChatViewModelTest {
     fun `playing a quote drops the seek when the user seeks while it resolves`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         val resolved = CompletableDeferred<Int>()
-        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(resolved)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
         playableState(quote)
 
         viewModel.playQuote(quote.uuid)
-        advanceUntilIdle()
+        runCurrent()
         userSeeks.emit(Unit)
         resolved.complete(31_500)
         advanceUntilIdle()
@@ -1948,10 +1953,125 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `a timestamp whose position is ready jumps without the jumping toast`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        answerState()
+
+        viewModel.toasts.test {
+            viewModel.playAnswerTimestamp(ANSWER_UUID, 65_000)
+            advanceUntilIdle()
+
+            assertEquals(65_000, (awaitItem() as ChatToast.QuotePlaying).jumpedToMs)
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `a timestamp whose position is not ready shows the jumping toast until it jumps`() = runTest {
+        val resolved = CompletableDeferred<Int?>()
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(resolved)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        answerState()
+
+        viewModel.toasts.test {
+            viewModel.playAnswerTimestamp(ANSWER_UUID, 65_000)
+            advanceTimeBy(1_000)
+
+            assertEquals(ChatToast.QuoteJumping(startMs = 65_000), awaitItem())
+            verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+
+            resolved.complete(80_000)
+            runCurrent()
+
+            verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(80_000), anyOrNull())
+            assertEquals(65_000, (awaitItem() as ChatToast.QuotePlaying).jumpedToMs)
+        }
+    }
+
+    @Test
+    fun `a timestamp jumps to the provided time when its position takes longer than 5 s`() = runTest {
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(CompletableDeferred<Int?>())
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        answerState()
+
+        viewModel.playAnswerTimestamp(ANSWER_UUID, 65_000)
+        advanceTimeBy(4_900)
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+        advanceTimeBy(200)
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(65_000), anyOrNull())
+    }
+
+    @Test
+    fun `a timestamp jumps to the provided time when its position cannot be found`() = runTest {
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(CompletableDeferred(value = null))
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        answerState()
+
+        viewModel.playAnswerTimestamp(ANSWER_UUID, 65_000)
+        runCurrent()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(65_000), anyOrNull())
+    }
+
+    @Test
+    fun `tapping another timestamp while jumping cancels the first`() = runTest {
+        val first = CompletableDeferred<Int?>()
+        whenever(quoteSeeker.playbackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 65_000, referenceTimeMs = 65_000)))).thenReturn(first)
+        whenever(quoteSeeker.playbackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 90_000, referenceTimeMs = 90_000)))).thenReturn(CompletableDeferred(95_000))
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        chatManager.messages.value = listOf(ChatMessage.Assistant(text = "At 00:01:05 and 00:01:30.", uuid = ANSWER_UUID))
+        setEpisodeInfo()
+        advanceUntilIdle()
+
+        viewModel.toasts.test {
+            viewModel.playAnswerTimestamp(ANSWER_UUID, 65_000)
+            advanceTimeBy(1_000)
+            assertEquals(ChatToast.QuoteJumping(startMs = 65_000), awaitItem())
+
+            viewModel.playAnswerTimestamp(ANSWER_UUID, 90_000)
+            runCurrent()
+            first.complete(70_000)
+            advanceUntilIdle()
+
+            assertEquals(90_000, (awaitItem() as ChatToast.QuotePlaying).jumpedToMs)
+            expectNoEvents()
+        }
+        verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(70_000), anyOrNull())
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(95_000), anyOrNull())
+    }
+
+    @Test
+    fun `seeking while jumping cancels the jump and its toast`() = runTest {
+        val resolved = CompletableDeferred<Int?>()
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(resolved)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        answerState()
+
+        viewModel.toasts.test {
+            viewModel.playAnswerTimestamp(ANSWER_UUID, 65_000)
+            advanceTimeBy(1_000)
+            assertEquals(ChatToast.QuoteJumping(startMs = 65_000), awaitItem())
+
+            userSeeks.emit(Unit)
+            runCurrent()
+
+            assertEquals(ChatToast.QuoteJumpCancelled, awaitItem())
+        }
+        verify(playbackManager, never()).seekToTimeMsSuspend(any(), anyOrNull())
+    }
+
+    @Test
     fun `playing a quote drops the seek when the user seeks while the episode loads`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
-        whenever(quoteSeeker.playbackTimeMs(any(), any())).thenReturn(31_500)
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(CompletableDeferred(31_500))
         playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = "other-uuid")
         whenever(playbackManager.playNowSuspend(any<BaseEpisode>(), any(), any(), any())).doSuspendableAnswer {
             userSeeks.emit(Unit)
@@ -1970,13 +2090,13 @@ class ChatViewModelTest {
     fun `playing a quote drops the seek when the episode changes while it resolves`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         val resolved = CompletableDeferred<Int>()
-        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(resolved)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
         playableState(quote)
 
         viewModel.playQuote(quote.uuid)
-        advanceUntilIdle()
+        runCurrent()
         playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID, positionMs = 0)
         resolved.complete(31_500)
         advanceUntilIdle()
@@ -2002,7 +2122,7 @@ class ChatViewModelTest {
     @Test
     fun `playing a quote in the loaded episode says the tapped time it jumped to`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
-        whenever(quoteSeeker.playbackTimeMs(any(), any())).thenReturn(31_500)
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(CompletableDeferred(31_500))
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
         playableState(quote)
@@ -2110,6 +2230,51 @@ class ChatViewModelTest {
 
         verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
         verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(1_500), anyOrNull())
+    }
+
+    @Test
+    fun `undo keeps going back before the first quote when a jump is replaced while the next one is jumping`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        val third = createQuote(startMs = 9_000, endMs = 11_000, uuid = "third-quote-uuid")
+        whenever(quoteSeeker.playbackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 5_000, referenceTimeMs = null)))).thenReturn(CompletableDeferred())
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        chatManager.messages.value = listOf(first, second, third)
+        setEpisodeInfo(123_000)
+        advanceUntilIdle()
+
+        viewModel.playQuote(first.uuid)
+        advanceUntilIdle()
+        val firstToast = quotePlayingToast()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 1_500)
+        viewModel.playQuote(second.uuid)
+        advanceTimeBy(1_000)
+        viewModel.onQuoteUndoExpired(firstToast.undoId)
+        viewModel.playQuote(third.uuid)
+        advanceUntilIdle()
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+        verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(1_500), anyOrNull())
+    }
+
+    @Test
+    fun `switching to the chat's episode forgets its cached positions`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(playbackManager.playNowSuspend(any<BaseEpisode>(), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        verify(quoteSeeker, atLeastOnce()).forgetPlaybackTimes(EPISODE_UUID)
     }
 
     @Test
@@ -2263,6 +2428,7 @@ class ChatViewModelTest {
             viewModel.playQuote(quote.uuid)
             advanceUntilIdle()
 
+            assertEquals(ChatToast.QuoteJumping(startMs = 1_000), awaitItem())
             assertEquals(ChatToast.QuotePlayFailed, awaitItem())
         }
     }
@@ -2326,6 +2492,7 @@ class ChatViewModelTest {
             viewModel.playQuote(quote.uuid)
             advanceUntilIdle()
 
+            assertEquals(ChatToast.QuoteJumping(startMs = 1_000), awaitItem())
             assertEquals(ChatToast.QuotePlayFailed, awaitItem())
         }
         verify(playbackManager, never()).playNowSuspend(org.mockito.kotlin.eq(other), any(), any(), any())
@@ -2347,6 +2514,7 @@ class ChatViewModelTest {
             viewModel.playQuote(quote.uuid)
             advanceUntilIdle()
 
+            assertEquals(ChatToast.QuoteJumping(startMs = 1_000), awaitItem())
             assertEquals(ChatToast.QuotePlayFailed, awaitItem())
         }
         verify(upNextQueue, never()).removeEpisode(any(), any())
@@ -2515,14 +2683,14 @@ class ChatViewModelTest {
     fun `a tapped quote loads until it plays`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         val resolved = CompletableDeferred<Int>()
-        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(resolved)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
         playableState(quote)
 
         viewModel.playQuote(quote.uuid)
         assertEquals(quote.uuid, viewModel.uiState.value.loadingQuoteUuid)
-        advanceUntilIdle()
+        runCurrent()
         assertEquals(quote.uuid, viewModel.uiState.value.loadingQuoteUuid)
 
         resolved.complete(1_000)
@@ -2563,13 +2731,13 @@ class ChatViewModelTest {
     fun `a tapped quote stops loading when the user seeks first`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         val resolved = CompletableDeferred<Int>()
-        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(resolved)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
         playableState(quote)
 
         viewModel.playQuote(quote.uuid)
-        advanceUntilIdle()
+        runCurrent()
         userSeeks.emit(Unit)
         resolved.complete(1_000)
         advanceUntilIdle()
@@ -2581,22 +2749,22 @@ class ChatViewModelTest {
     fun `tapping a loading quote again is ignored`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         val resolved = CompletableDeferred<Int>()
-        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(resolved)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
         playableState(quote)
         eventSink.skipEvent(eventSink.size)
 
         viewModel.playQuote(quote.uuid)
-        advanceUntilIdle()
+        runCurrent()
         viewModel.playQuote(quote.uuid)
-        advanceUntilIdle()
+        runCurrent()
         resolved.complete(1_000)
         advanceUntilIdle()
 
         assertTrue(eventSink.pollEvent() is EpisodeChatQuotePlayTappedEvent)
         assertTrue(eventSink.isEmpty())
-        verify(quoteSeeker, times(1)).playbackTimeMs(any(), any())
+        verify(quoteSeeker, times(1)).playbackTime(any(), any())
         verify(playbackManager, times(1)).seekToTimeMsSuspend(any(), anyOrNull())
     }
 
@@ -2605,17 +2773,17 @@ class ChatViewModelTest {
         val first = createQuote(startMs = 1_000, endMs = 3_000)
         val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
         val resolved = CompletableDeferred<Int>()
-        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { resolved.await() }
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(resolved)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
         chatManager.messages.value = listOf(first, second)
         setEpisodeInfo()
-        advanceUntilIdle()
+        runCurrent()
 
         viewModel.playQuote(first.uuid)
-        advanceUntilIdle()
+        runCurrent()
         viewModel.playQuote(second.uuid)
-        advanceUntilIdle()
+        runCurrent()
 
         assertEquals(second.uuid, viewModel.uiState.value.loadingQuoteUuid)
         resolved.complete(5_000)
@@ -2627,7 +2795,7 @@ class ChatViewModelTest {
     @Test
     fun `switching chats stops showing the quote loading`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
-        whenever(quoteSeeker.playbackTimeMs(any(), any())).doSuspendableAnswer { CompletableDeferred<Int>().await() }
+        whenever(quoteSeeker.playbackTime(any(), any())).thenReturn(CompletableDeferred<Int?>())
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
         playableState(quote)
@@ -2638,6 +2806,64 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         assertNull(viewModel.uiState.value.loadingQuoteUuid)
+    }
+
+    @Test
+    fun `the latest answer's timestamps and quotes are prefetched when its episode is loaded`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+
+        chatManager.messages.value = listOf(
+            ChatMessage.User("Earlier"),
+            ChatMessage.Assistant("Earlier at 00:00:30.", uuid = "earlier-answer-uuid"),
+            ChatMessage.User("Question"),
+            ChatMessage.Assistant("It comes up at 00:01:05.", uuid = ANSWER_UUID),
+            quote,
+        )
+        advanceUntilIdle()
+
+        verify(quoteSeeker).prefetchPlaybackTime(org.mockito.kotlin.eq(episode.value), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 65_000, referenceTimeMs = 65_000)))
+        verify(quoteSeeker).prefetchQuote(org.mockito.kotlin.eq(episode.value), org.mockito.kotlin.argThat { uuid == quote.uuid })
+        verify(quoteSeeker, never()).prefetchPlaybackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 30_000, referenceTimeMs = 30_000)))
+    }
+
+    @Test
+    fun `the latest answer is prefetched again after its cached positions are forgotten`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        answerState()
+
+        playbackTimesVersion.value = 1
+        advanceUntilIdle()
+
+        verify(quoteSeeker, times(2)).prefetchPlaybackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 65_000, referenceTimeMs = 65_000)))
+    }
+
+    @Test
+    fun `timestamps are not prefetched while another episode is loaded`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID)
+        answerState()
+
+        verify(quoteSeeker, never()).prefetchPlaybackTime(any(), any())
+    }
+
+    @Test
+    fun `a new answer is prefetched once when it arrives`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        answerState()
+        val second = ChatMessage.Assistant("Later at 00:02:00.", uuid = "second-answer-uuid")
+
+        chatManager.messages.value = listOf(ChatMessage.Assistant("It comes up at 00:01:05.", uuid = ANSWER_UUID), ChatMessage.User("Next"), second)
+        advanceUntilIdle()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 2_000)
+        advanceUntilIdle()
+
+        verify(quoteSeeker, times(1)).prefetchPlaybackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 65_000, referenceTimeMs = 65_000)))
+        verify(quoteSeeker, times(1)).prefetchPlaybackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 120_000, referenceTimeMs = 120_000)))
     }
 
     @Test

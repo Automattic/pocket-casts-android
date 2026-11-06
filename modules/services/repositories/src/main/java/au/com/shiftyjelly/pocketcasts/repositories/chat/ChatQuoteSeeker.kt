@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -19,21 +20,62 @@ import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
 
 @Singleton
 class ChatQuoteSeeker @Inject constructor(
     private val transcriptManager: TranscriptManager,
     private val fingerprintTimingManager: Lazy<FingerprintTimingManager>,
+    private val playbackManager: Lazy<PlaybackManager>,
     private val appPlatform: AppPlatform,
     private val decodePolicy: FingerprintDecodePolicy,
     @ApplicationScope private val scope: CoroutineScope,
 ) {
     private val pendingTranscripts = ConcurrentHashMap<Pair<String, Boolean>, Deferred<Transcript.Text?>>()
+    private val playbackTimes = ConcurrentHashMap<PlaybackTimeKey, Deferred<Int?>>()
+    private val prefetches = Channel<PlaybackTimePrefetch>(Channel.UNLIMITED)
+    private val _playbackTimesVersion = MutableStateFlow(0)
+    val playbackTimesVersion = _playbackTimesVersion.asStateFlow()
+
+    init {
+        scope.launch {
+            playbackManager.get().playbackStateFlow
+                .map { state -> state.episodeUuid.takeIf { it.isNotEmpty() && !state.isEmpty && !state.isStopped && !state.isError } }
+                .distinctUntilChanged()
+                .drop(1)
+                .filterNotNull()
+                .collect { episodeUuid -> forgetPlaybackTimes(episodeUuid) }
+        }
+        scope.launch {
+            for (prefetch in prefetches) {
+                try {
+                    prefetch.load().join()
+                } catch (e: CancellationException) {
+                    currentCoroutineContext().ensureActive()
+                } catch (e: Exception) {
+                    Timber.w(e, "ChatQuoteSeeker: playback time prefetch failed")
+                }
+            }
+        }
+    }
 
     data class QuoteTime(
         val timeMs: Int,
@@ -87,12 +129,60 @@ class ChatQuoteSeeker @Inject constructor(
     }
 
     suspend fun playbackTimeMs(episode: BaseEpisode, quoteTime: QuoteTime): Int {
-        val referenceTimeMs = quoteTime.referenceTimeMs?.takeIf { it >= 0 && isFingerprintSeekEnabled() }
-            ?: return quoteTime.timeMs
-        val playbackTime = withTimeoutOrNull(FINGERPRINT_RESOLVE_TIMEOUT) {
-            playbackTime(episode, referenceTimeMs.milliseconds)
+        return playbackTime(episode, quoteTime).await() ?: quoteTime.timeMs
+    }
+
+    fun playbackTime(episode: BaseEpisode, quoteTime: QuoteTime): Deferred<Int?> {
+        return pendingPlaybackTime(episode, quoteTime).also { it.start() }
+    }
+
+    fun prefetchPlaybackTime(episode: BaseEpisode, quoteTime: QuoteTime) {
+        prefetches.trySend(PlaybackTimePrefetch { pendingPlaybackTime(episode, quoteTime) })
+    }
+
+    fun prefetchQuote(episode: BaseEpisode, quote: ChatMessage.Quote) {
+        prefetches.trySend(PlaybackTimePrefetch { pendingPlaybackTime(episode, quoteTime(episode.uuid, quote)) })
+    }
+
+    fun forgetPlaybackTimes(episodeUuid: String) {
+        if (playbackTimes.keys.removeAll { it.episodeUuid == episodeUuid }) {
+            _playbackTimesVersion.update { it + 1 }
         }
-        return playbackTime?.inWholeMilliseconds?.toInt() ?: quoteTime.timeMs
+    }
+
+    private fun pendingPlaybackTime(episode: BaseEpisode, quoteTime: QuoteTime): Deferred<Int?> {
+        val referenceTimeMs = quoteTime.referenceTimeMs?.takeIf { it >= 0 && isFingerprintSeekEnabled() }
+            ?: return CompletableDeferred(value = null)
+        val key = PlaybackTimeKey(episode.uuid, episode.downloadedFilePath ?: episode.downloadUrl, referenceTimeMs)
+        return playbackTimes.computeIfAbsent(key) {
+            lateinit var playbackTime: Deferred<Int?>
+            playbackTime = scope.async(start = CoroutineStart.LAZY) {
+                var playbackTimeMs: Int? = null
+                try {
+                    playbackTimeMs = withTimeoutOrNull(FINGERPRINT_RESOLVE_TIMEOUT) {
+                        playbackTime(episode, referenceTimeMs.milliseconds)
+                    }?.inWholeMilliseconds?.toInt()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Timber.w(e, "ChatQuoteSeeker: could not resolve the playback time for $referenceTimeMs ms")
+                } finally {
+                    if (playbackTimeMs == null) playbackTimes.remove(key, playbackTime)
+                }
+                playbackTimeMs
+            }
+            playbackTime
+        }
+    }
+
+    private data class PlaybackTimeKey(
+        val episodeUuid: String,
+        val audioSource: String?,
+        val referenceTimeMs: Int,
+    )
+
+    private fun interface PlaybackTimePrefetch {
+        suspend fun load(): Deferred<Int?>
     }
 
     private suspend fun loadTextTranscript(episodeUuid: String, isGenerated: Boolean): Transcript.Text? {

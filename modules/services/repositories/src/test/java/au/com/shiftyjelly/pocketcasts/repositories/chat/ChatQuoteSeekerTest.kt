@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -17,13 +19,18 @@ import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.job
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -46,6 +53,8 @@ class ChatQuoteSeekerTest {
     private val episode = PodcastEpisode(uuid = EPISODE_UUID, publishedDate = Date())
     private val transcriptManager = mock<TranscriptManager>()
     private val timingManager = mock<FingerprintTimingManager>()
+    private val playbackState = MutableStateFlow(PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID))
+    private val playbackManager = mock<PlaybackManager> { on { playbackStateFlow } doReturn playbackState }
 
     private val generatedTranscript = transcript(
         isGenerated = true,
@@ -77,12 +86,14 @@ class ChatQuoteSeekerTest {
     private fun TestScope.seeker(
         appPlatform: AppPlatform = AppPlatform.Phone,
         policy: FingerprintPolicy = FingerprintPolicy.PLATFORM,
+        scope: CoroutineScope = backgroundScope,
     ) = ChatQuoteSeeker(
         transcriptManager = transcriptManager,
         fingerprintTimingManager = Lazy { timingManager },
+        playbackManager = Lazy { playbackManager },
         appPlatform = appPlatform,
         decodePolicy = mock { on { current() } doReturn policy },
-        scope = backgroundScope,
+        scope = scope,
     )
 
     @Test
@@ -92,6 +103,175 @@ class ChatQuoteSeekerTest {
 
         assertEquals(1_413_480, seeker().seek(generatedQuote))
         verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any(), any()) }
+    }
+
+    @Test
+    fun `a prefetched playback time is reused by the tap`() = runTest {
+        whenever(timingManager.resolvePlaybackTime(any(), any(), any()))
+            .thenReturn(ChapterSeekResult.Resolved(31_000.milliseconds, usedPrior = false))
+        val seeker = seeker()
+        val quoteTime = ChatQuoteSeeker.QuoteTime(timeMs = 1_000, referenceTimeMs = 1_000)
+
+        seeker.prefetchPlaybackTime(episode, quoteTime)
+        runCurrent()
+
+        assertEquals(31_000, seeker.playbackTimeMs(episode, quoteTime))
+        verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any(), any()) }
+    }
+
+    @Test
+    fun `prefetches resolve one at a time and a tap does not wait for the queue`() = runTest {
+        val first = CompletableDeferred<ChapterSeekResult>()
+        whenever(timingManager.resolvePlaybackTime(any(), eq(1_000.milliseconds), any())).doSuspendableAnswer { first.await() }
+        whenever(timingManager.resolvePlaybackTime(any(), eq(2_000.milliseconds), any()))
+            .thenReturn(ChapterSeekResult.Resolved(32_000.milliseconds, usedPrior = false))
+        val seeker = seeker()
+        val firstTime = ChatQuoteSeeker.QuoteTime(timeMs = 1_000, referenceTimeMs = 1_000)
+        val secondTime = ChatQuoteSeeker.QuoteTime(timeMs = 2_000, referenceTimeMs = 2_000)
+
+        seeker.prefetchPlaybackTime(episode, firstTime)
+        seeker.prefetchPlaybackTime(episode, secondTime)
+        runCurrent()
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), eq(2_000.milliseconds), any()) }
+
+        assertEquals(32_000, seeker.playbackTimeMs(episode, secondTime))
+        first.complete(ChapterSeekResult.Resolved(31_000.milliseconds, usedPrior = false))
+        assertEquals(31_000, seeker.playbackTimeMs(episode, firstTime))
+    }
+
+    @Test
+    fun `an unresolved playback time is retried on the next tap`() = runTest {
+        whenever(timingManager.resolvePlaybackTime(any(), any(), any()))
+            .thenReturn(ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_METERED_NETWORK))
+            .thenReturn(ChapterSeekResult.Resolved(31_000.milliseconds, usedPrior = false))
+        val seeker = seeker()
+        val quoteTime = ChatQuoteSeeker.QuoteTime(timeMs = 1_000, referenceTimeMs = 1_000)
+
+        assertNull(seeker.playbackTime(episode, quoteTime).await())
+        assertEquals(31_000, seeker.playbackTime(episode, quoteTime).await())
+    }
+
+    @Test
+    fun `playback times are not resolved when fingerprints are disabled`() = runTest {
+        val seeker = seeker(policy = FingerprintPolicy.DISABLED)
+        val quoteTime = ChatQuoteSeeker.QuoteTime(timeMs = 1_000, referenceTimeMs = 1_000)
+
+        seeker.prefetchPlaybackTime(episode, quoteTime)
+        runCurrent()
+
+        assertNull(seeker.playbackTime(episode, quoteTime).await())
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any(), any()) }
+    }
+
+    @Test
+    fun `a prefetched quote finds its transcript time before resolving`() = runTest {
+        whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
+        whenever(timingManager.resolvePlaybackTime(any(), eq(1_383_380.milliseconds), any()))
+            .thenReturn(ChapterSeekResult.Resolved(1_353_280.milliseconds, usedPrior = false))
+        val seeker = seeker()
+
+        seeker.prefetchQuote(episode, generatedQuote)
+        runCurrent()
+
+        verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), eq(1_383_380.milliseconds), any()) }
+        assertEquals(1_353_280, seeker.seek(generatedQuote))
+        verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any(), any()) }
+    }
+
+    @Test
+    fun `a playback time that throws is retried on the next tap`() = runTest {
+        whenever(timingManager.resolvePlaybackTime(any(), any(), any()))
+            .thenThrow(IllegalStateException("decoder"))
+            .thenReturn(ChapterSeekResult.Resolved(31_000.milliseconds, usedPrior = false))
+        val seeker = seeker()
+        val quoteTime = ChatQuoteSeeker.QuoteTime(timeMs = 1_000, referenceTimeMs = 1_000)
+
+        assertNull(seeker.playbackTime(episode, quoteTime).await())
+        assertEquals(31_000, seeker.playbackTime(episode, quoteTime).await())
+    }
+
+    @Test
+    fun `prefetching keeps going after a quote fails to load`() = runTest {
+        whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenThrow(IllegalStateException("network"))
+        whenever(timingManager.resolvePlaybackTime(any(), eq(2_000.milliseconds), any()))
+            .thenReturn(ChapterSeekResult.Resolved(32_000.milliseconds, usedPrior = false))
+        val seeker = seeker(scope = CoroutineScope(backgroundScope.coroutineContext + SupervisorJob(backgroundScope.coroutineContext.job)))
+
+        seeker.prefetchQuote(episode, generatedQuote)
+        seeker.prefetchPlaybackTime(episode, ChatQuoteSeeker.QuoteTime(timeMs = 2_000, referenceTimeMs = 2_000))
+        runCurrent()
+
+        verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), eq(2_000.milliseconds), any()) }
+    }
+
+    @Test
+    fun `reloading the episode forgets its playback times`() = runTest {
+        whenever(timingManager.resolvePlaybackTime(any(), any(), any()))
+            .thenReturn(ChapterSeekResult.Resolved(31_000.milliseconds, usedPrior = false))
+            .thenReturn(ChapterSeekResult.Resolved(45_000.milliseconds, usedPrior = false))
+        val seeker = seeker()
+        val quoteTime = ChatQuoteSeeker.QuoteTime(timeMs = 1_000, referenceTimeMs = 1_000)
+        runCurrent()
+        assertEquals(31_000, seeker.playbackTime(episode, quoteTime).await())
+
+        playbackState.value = PlaybackState(state = PlaybackState.State.STOPPED, episodeUuid = EPISODE_UUID)
+        runCurrent()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+        runCurrent()
+
+        assertEquals(45_000, seeker.playbackTime(episode, quoteTime).await())
+        assertEquals(1, seeker.playbackTimesVersion.value)
+    }
+
+    @Test
+    fun `pausing keeps the episode's playback times`() = runTest {
+        whenever(timingManager.resolvePlaybackTime(any(), any(), any()))
+            .thenReturn(ChapterSeekResult.Resolved(31_000.milliseconds, usedPrior = false))
+        val seeker = seeker()
+        val quoteTime = ChatQuoteSeeker.QuoteTime(timeMs = 1_000, referenceTimeMs = 1_000)
+        runCurrent()
+        assertEquals(31_000, seeker.playbackTime(episode, quoteTime).await())
+
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        runCurrent()
+
+        assertEquals(31_000, seeker.playbackTime(episode, quoteTime).await())
+        verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any(), any()) }
+    }
+
+    @Test
+    fun `a prefetch queued before a forget resolves against the new load`() = runTest {
+        val first = CompletableDeferred<ChapterSeekResult>()
+        whenever(timingManager.resolvePlaybackTime(any(), eq(1_000.milliseconds), any())).doSuspendableAnswer { first.await() }
+        whenever(timingManager.resolvePlaybackTime(any(), eq(2_000.milliseconds), any()))
+            .thenReturn(ChapterSeekResult.Resolved(32_000.milliseconds, usedPrior = false))
+        val seeker = seeker()
+        val secondTime = ChatQuoteSeeker.QuoteTime(timeMs = 2_000, referenceTimeMs = 2_000)
+        seeker.prefetchPlaybackTime(episode, ChatQuoteSeeker.QuoteTime(timeMs = 1_000, referenceTimeMs = 1_000))
+        seeker.prefetchPlaybackTime(episode, secondTime)
+        runCurrent()
+
+        seeker.forgetPlaybackTimes(EPISODE_UUID)
+        first.complete(ChapterSeekResult.Resolved(31_000.milliseconds, usedPrior = false))
+        runCurrent()
+
+        verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), eq(2_000.milliseconds), any()) }
+        assertEquals(32_000, seeker.playbackTime(episode, secondTime).await())
+        verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), eq(2_000.milliseconds), any()) }
+    }
+
+    @Test
+    fun `forgotten playback times are resolved again`() = runTest {
+        whenever(timingManager.resolvePlaybackTime(any(), any(), any()))
+            .thenReturn(ChapterSeekResult.Resolved(31_000.milliseconds, usedPrior = false))
+            .thenReturn(ChapterSeekResult.Resolved(45_000.milliseconds, usedPrior = false))
+        val seeker = seeker()
+        val quoteTime = ChatQuoteSeeker.QuoteTime(timeMs = 1_000, referenceTimeMs = 1_000)
+
+        assertEquals(31_000, seeker.playbackTime(episode, quoteTime).await())
+        seeker.forgetPlaybackTimes(EPISODE_UUID)
+
+        assertEquals(45_000, seeker.playbackTime(episode, quoteTime).await())
     }
 
     @Test
