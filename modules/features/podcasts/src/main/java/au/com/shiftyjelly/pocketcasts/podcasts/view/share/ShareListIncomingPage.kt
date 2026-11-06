@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.share
 
-import android.widget.ProgressBar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,7 +31,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -87,10 +86,7 @@ internal fun ShareListIncomingPage(
                 },
             )
             if (share == null || share is ShareState.Loading) {
-                AndroidView(
-                    factory = { context -> ProgressBar(context, null, android.R.attr.progressBarStyleLarge) },
-                    modifier = Modifier.align(Alignment.Center),
-                )
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         }
     }

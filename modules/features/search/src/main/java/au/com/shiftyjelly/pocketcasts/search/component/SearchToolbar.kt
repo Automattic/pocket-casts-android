@@ -50,7 +50,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -100,7 +99,7 @@ internal fun SearchToolbar(
             modifier = Modifier.padding(start = 16.dp, top = if (isFloating) 17.dp else 0.dp),
         ) {
             Row(
-                verticalAlignment = CenterVerticallyFloor,
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
@@ -122,7 +121,7 @@ internal fun SearchToolbar(
                     keyboardActions = KeyboardActions(onSearch = { onSearch() }),
                     decorationBox = { innerTextField ->
                         Box(
-                            contentAlignment = CenterStartFloor,
+                            contentAlignment = Alignment.CenterStart,
                             modifier = Modifier.padding(horizontal = 8.dp),
                         ) {
                             if (query.isEmpty()) {
@@ -186,7 +185,3 @@ internal fun SearchToolbar(
         }
     }
 }
-
-private val CenterStartFloor = Alignment { size, space, _ -> IntOffset(0, (space.height - size.height) / 2) }
-
-private val CenterVerticallyFloor = Alignment.Vertical { size, space -> (space - size) / 2 }

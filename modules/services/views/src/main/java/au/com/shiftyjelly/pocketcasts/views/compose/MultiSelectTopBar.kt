@@ -189,7 +189,7 @@ private fun RowScope.ActionButton(
             .size(48.dp)
             .align(ActionAlignment),
     ) {
-        DrawableIcon(iconRes, tint, Modifier.size(24.dp).align(TruncatedCenter))
+        DrawableIcon(iconRes, tint, Modifier.size(24.dp).align(Alignment.Center))
     }
 }
 
