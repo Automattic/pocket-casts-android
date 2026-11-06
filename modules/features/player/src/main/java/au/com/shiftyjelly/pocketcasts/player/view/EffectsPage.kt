@@ -49,8 +49,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateTint
@@ -95,10 +96,8 @@ internal fun EffectsPage(
                     .padding(top = 12.dp)
                     .align(Alignment.TopCenter),
             )
-            TextViewText(
+            TextH30(
                 text = stringResource(LR.string.podcast_playback_effects),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
                 color = colors.contrast01,
                 modifier = Modifier.padding(start = 16.dp, top = 24.dp),
             )
@@ -113,9 +112,8 @@ internal fun EffectsPage(
                 .height(29.dp),
         ) {
             EffectIcon(R.drawable.ic_speed, colors.contrast02)
-            TextViewText(
+            TextP40(
                 text = stringResource(LR.string.player_effects_speed),
-                fontSize = 16.sp,
                 color = colors.contrast01,
                 modifier = Modifier
                     .padding(start = 16.dp)
@@ -123,14 +121,14 @@ internal fun EffectsPage(
             )
             IconButton(IR.drawable.ic_minus, stringResource(LR.string.player_effects_speed_down), colors.contrast02, onSpeedDownClick)
             Box(
-                contentAlignment = TextViewAlignment.Center,
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .wrapContentHeight(unbounded = true)
                     .border(1.dp, colors.contrast05, RoundedCornerShape(4.dp))
                     .clickable(interactionSource = null, indication = null, onClick = onSpeedClick)
                     .padding(horizontal = 16.dp, vertical = 4.dp),
             ) {
-                TextViewText(text = speedText, fontSize = 16.sp, color = colors.contrast01)
+                TextP40(text = speedText, color = colors.contrast01)
             }
             IconButton(IR.drawable.ic_effects_plus, stringResource(LR.string.player_effects_speed_up), colors.contrast02, onSpeedUpClick)
         }
@@ -187,9 +185,8 @@ private fun EffectSection(
         Spacer(Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
             Row {
-                TextViewText(
+                TextP40(
                     text = title,
-                    fontSize = 16.sp,
                     color = colors.contrast01,
                     modifier = Modifier.weight(1f),
                 )
@@ -210,10 +207,8 @@ private fun EffectSection(
             belowTitle()
             val detailEnd = if (isDetailFullWidth) with(LocalDensity.current) { switchWidth.toDp() } else 0.dp
             Box(modifier = Modifier.padding(top = 4.dp, end = detailEnd)) {
-                TextViewText(
+                TextP50(
                     text = detail,
-                    fontSize = 15.sp,
-                    letterSpacing = (-0.01).em,
                     color = colors.contrast02,
                 )
             }

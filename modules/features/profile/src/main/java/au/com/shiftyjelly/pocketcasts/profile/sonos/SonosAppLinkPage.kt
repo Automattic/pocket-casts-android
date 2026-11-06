@@ -25,7 +25,8 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -66,21 +67,16 @@ internal fun SonosAppLinkPage(
                 .padding(top = 60.dp)
                 .align(BiasAlignment.Horizontal(-0.1f)),
         )
-        TextViewText(
+        TextH20(
             text = stringResource(LR.string.profile_sonos_title),
-            fontSize = 22.sp,
             color = textColors.title,
-            fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .padding(start = 20.dp, top = 48.dp, end = 20.dp)
                 .align(Alignment.CenterHorizontally),
         )
-        TextViewText(
+        TextP40(
             text = explanation,
-            fontSize = 16.sp,
             color = textColors.explanation,
-            letterSpacing = (-0.01).em,
-            lineSpacingMultiplier = 1.3f,
             modifier = Modifier
                 .padding(start = 20.dp, top = 32.dp, end = 20.dp)
                 .fillMaxWidth(),

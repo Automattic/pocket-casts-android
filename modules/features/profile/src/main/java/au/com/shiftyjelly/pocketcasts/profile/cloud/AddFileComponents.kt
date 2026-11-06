@@ -3,9 +3,7 @@ package au.com.shiftyjelly.pocketcasts.profile.cloud
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.RectF
-import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
-import android.text.TextPaint
 import android.widget.ProgressBar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -54,11 +52,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
 import androidx.core.graphics.withMatrix
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.profile.R
-import kotlin.math.ceil
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -69,20 +66,11 @@ data class AddFileColour(val tintColorIndex: Int, val color: Int, val lockable: 
 internal fun AddFileImageButton(text: String, isLockVisible: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val density = LocalDensity.current
     val lockGap = with(density) { 4.dp.roundToPx() }
-    val textSizePx = with(density) { 14.sp.roundToPx() }
-    val textWidth = remember(text, textSizePx) {
-        val paint = TextPaint().apply {
-            textSize = textSizePx.toFloat()
-            typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
-            letterSpacing = 0.0892857143f
-        }
-        ceil(android.text.Layout.getDesiredWidth(text, paint)).toInt()
-    }
     Layout(
         modifier = modifier.fillMaxWidth(),
         content = {
             Box(
-                contentAlignment = TextViewAlignment.Center,
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .defaultMinSize(minWidth = 64.dp, minHeight = 48.dp)
                     .padding(vertical = 6.dp)
@@ -90,15 +78,11 @@ internal fun AddFileImageButton(text: String, isLockVisible: Boolean, onClick: (
                     .clickable(role = Role.Button, onClick = onClick)
                     .padding(horizontal = 8.dp, vertical = 4.dp),
             ) {
-                TextViewText(
+                TextH50(
                     text = text,
-                    fontSize = 14.sp,
                     color = MaterialTheme.theme.colors.primaryInteractive01,
-                    fontWeight = FontWeight.Medium,
-                    letterSpacing = 0.0892857143.em,
                     textAlign = TextAlign.Center,
                     maxLines = 1,
-                    modifier = Modifier.width(with(density) { textWidth.toDp() }),
                 )
             }
             if (isLockVisible) {
@@ -193,22 +177,17 @@ internal fun AddFileUpgradeCallout(onClick: () -> Unit, onCloseClick: () -> Unit
                     .padding(top = 16.dp)
                     .size(232.dp, 32.dp),
             )
-            TextViewText(
+            TextH40(
                 text = stringResource(LR.string.profile_get_plus),
-                fontSize = 15.sp,
                 color = colors.primaryText02,
-                fontWeight = FontWeight.Medium,
-                lineSpacingMultiplier = 1.1f,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(start = 64.dp, top = 16.dp, end = 64.dp)
                     .fillMaxWidth(),
             )
-            TextViewText(
+            TextH50(
                 text = stringResource(LR.string.plus_learn_more_about_plus),
-                fontSize = 14.sp,
                 color = colors.primaryInteractive01,
-                fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(start = 64.dp, top = 16.dp, end = 64.dp)
@@ -272,7 +251,7 @@ internal fun AddFileImage(
     modifier: Modifier = Modifier,
 ) {
     val description = stringResource(LR.string.profile_file)
-    Box(contentAlignment = TextViewAlignment.Center, modifier = modifier.size(160.dp)) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier.size(160.dp)) {
         Icon(
             painter = painterResource(IR.drawable.ic_uploadedfile),
             contentDescription = description,

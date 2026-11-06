@@ -41,8 +41,9 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.NumberStepper
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.airbnb.lottie.LottieDrawable
@@ -127,10 +128,8 @@ private fun SleepSetup(state: SleepState.Setup, colors: SleepColors, listener: S
     Column {
         Layout(
             content = {
-                TextViewText(
+                TextH30(
                     text = stringResource(LR.string.player_sleep_timer_title),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
                     color = colors.contrast01,
                 )
                 Box(
@@ -238,14 +237,13 @@ private fun SleepRow(
             .height(64.dp)
             .clickable(onClick = onClick),
     ) {
-        Box(
-            contentAlignment = TextViewAlignment.CenterStart,
+        TextP40(
+            text = text,
+            color = colors.contrast01,
             modifier = Modifier
-                .fillMaxSize()
+                .align(Alignment.CenterStart)
                 .padding(start = 32.dp),
-        ) {
-            TextViewText(text = text, fontSize = 16.sp, color = colors.contrast01)
-        }
+        )
         trailing()
     }
 }
@@ -300,12 +298,11 @@ private fun SleepRunningTime(state: SleepState.RunningTime, colors: SleepColors,
         modifier = Modifier.fillMaxWidth(),
     ) {
         SleepAnimation(colors)
-        TextViewText(
+        TextH10(
             text = state.timeLeftText,
             fontSize = 60.sp,
-            fontWeight = FontWeight.Bold,
+            lineHeight = 72.sp,
             fontFamily = FontFamily.Monospace,
-            lineSpacingExtra = 11.sp,
             color = colors.contrast01,
             modifier = Modifier.padding(top = 8.dp),
         )
@@ -331,9 +328,8 @@ private fun SleepRunningEndOfEpisodeOrChapter(state: SleepState.RunningEndOfEpis
         modifier = Modifier.fillMaxWidth(),
     ) {
         SleepAnimation(colors)
-        TextViewText(
+        TextP40(
             text = state.sleepingInText,
-            fontSize = 16.sp,
             color = colors.contrast01,
             modifier = Modifier.padding(top = 24.dp),
         )

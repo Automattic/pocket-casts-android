@@ -23,8 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -55,21 +56,16 @@ internal fun PromoCodeUpgradedPage(
                 .padding(top = 16.dp)
                 .size(width = 156.dp, height = 148.dp),
         )
-        TextViewText(
+        TextH20(
             text = stringResource(LR.string.profile_promo_upgraded),
-            fontSize = 22.sp,
-            color = MaterialTheme.theme.colors.primaryText01,
-            fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .padding(top = 16.dp)
                 .fillMaxWidth(),
         )
-        TextViewText(
+        TextP30(
             text = "$codeDescription\n${stringResource(LR.string.profile_promo_upgraded_welcome)}",
-            fontSize = 18.sp,
             color = MaterialTheme.theme.colors.primaryText02,
-            lineSpacingMultiplier = 1.2f,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .padding(top = 10.dp)

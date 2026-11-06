@@ -27,8 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -76,7 +75,7 @@ private fun OptionRow(
 ) {
     CompositionLocalProvider(LocalRippleConfiguration provides OptionRippleConfiguration) {
         Box(
-            contentAlignment = TextViewAlignment.CenterStart,
+            contentAlignment = Alignment.CenterStart,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(64.dp)
@@ -87,9 +86,8 @@ private fun OptionRow(
                     onClick = onClick,
                 ),
         ) {
-            TextViewText(
+            TextP40(
                 text = label,
-                fontSize = 16.sp,
                 color = MaterialTheme.theme.colors.playerContrast01,
                 modifier = Modifier
                     .padding(start = 32.dp)

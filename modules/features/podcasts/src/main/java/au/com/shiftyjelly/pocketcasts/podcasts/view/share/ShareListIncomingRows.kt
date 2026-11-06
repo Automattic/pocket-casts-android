@@ -27,7 +27,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -43,22 +46,15 @@ internal fun ShareListIncomingHeader(
     description: String?,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        TextViewText(
+        TextH20(
             text = title.orEmpty(),
-            fontSize = 20.sp,
-            color = MaterialTheme.theme.colors.primaryText01,
-            fontWeight = FontWeight.Medium,
-            includeFontPadding = false,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 8.dp, end = 16.dp),
         )
         if (!description.isNullOrBlank()) {
-            TextViewText(
+            TextP40(
                 text = description,
-                fontSize = 16.sp,
-                color = MaterialTheme.theme.colors.primaryText01,
-                includeFontPadding = false,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, top = 6.dp, end = 16.dp),
@@ -114,21 +110,15 @@ internal fun ShareListIncomingPodcastRow(
                 .padding(start = 88.dp, end = 61.dp)
                 .clearAndSetSemantics {},
         ) {
-            TextViewText(
+            TextP40(
                 text = podcast.title,
-                fontSize = 16.sp,
-                color = MaterialTheme.theme.colors.primaryText01,
                 maxLines = 1,
-                includeFontPadding = false,
                 modifier = Modifier.fillMaxWidth().padding(bottom = 2.dp),
             )
-            TextViewText(
+            TextP50(
                 text = podcast.author,
-                fontSize = 15.sp,
                 color = MaterialTheme.theme.colors.primaryText02,
-                letterSpacing = (-0.01).em,
                 maxLines = 1,
-                includeFontPadding = false,
                 modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
             )
         }
@@ -172,10 +162,8 @@ internal fun ShareListIncomingFooter(
             .padding(bottom = 16.dp),
     ) {
         if (!podcasts.isNullOrEmpty()) {
-            TextViewText(
+            TextP50(
                 text = LocalResources.current.getStringPluralPodcasts(podcasts.size),
-                fontSize = 14.sp,
-                color = MaterialTheme.theme.colors.primaryText01,
                 modifier = Modifier.padding(16.dp),
             )
             if (!isSubscribedToAll) {
@@ -185,11 +173,9 @@ internal fun ShareListIncomingFooter(
                         .clickable { onSubscribeToAllClick(podcasts) }
                         .padding(16.dp),
                 ) {
-                    TextViewText(
+                    TextH50(
                         text = stringResource(LR.string.podcasts_share_subscribe_to_all),
-                        fontSize = 14.sp,
                         color = MaterialTheme.theme.colors.support02,
-                        fontWeight = FontWeight.Medium,
                     )
                 }
             }
