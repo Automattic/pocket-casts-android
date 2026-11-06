@@ -735,7 +735,6 @@ Language: en_GB
     <string name="settings_manage_downloads_total">Total</string>
     <string name="settings_manage_downloads_include_starred">Include starred</string>
     <string name="settings_lock_image">lock image</string>
-    <string name="settings_licenses">Licenses</string>
     <string name="settings_learn_more">Learn More</string>
     <string name="settings_keep_screen_awake_summary">If on, the screen won\'t lock while playing.</string>
     <string name="settings_keep_screen_awake">Keep screen awake</string>
@@ -1185,7 +1184,6 @@ Language: en_GB
     <string name="podcasts_share_missing_title">Please enter a title for your list.</string>
     <string name="podcasts_share_create_error">Oops! Unable to share</string>
     <string name="podcasts_share_title">Title</string>
-    <string name="podcasts_share_selected_podcasts">Share selected podcasts</string>
     <string name="podcasts_share_select_all">Select all</string>
     <string name="podcasts_share_list">Shared list</string>
     <string name="podcasts_share_description">Description (optional)</string>
@@ -1247,11 +1245,9 @@ Language: en_GB
     <string name="player_sleep_60_minutes">60 minutes</string>
     <string name="player_sleep_30_minutes">30 minutes</string>
     <string name="player_sleep_15_minutes">15 minutes</string>
-    <string name="player_pip">Enter Picture-in-picture</string>
     <string name="player_notification_skip_forward">Forward %d secs</string>
     <string name="player_notification_skip_back">Back %d secs</string>
     <string name="player_more_actions">More actions</string>
-    <string name="player_full_screen">Full screen</string>
     <string name="player_effects_volume_boost">Volume Boost</string>
     <string name="player_effects_voices_sound_louder">Voices sound louder</string>
     <string name="player_effects_trim_silence">Trim Silence</string>
@@ -1265,7 +1261,6 @@ Language: en_GB
     <string name="player_effects">Player effects</string>
     <string name="player_close">Close player</string>
     <string name="player_chapter_url">Chapter URL</string>
-    <string name="player_actions">Episode actions</string>
     <string name="player_action_previous_chapter">Previous chapter</string>
     <string name="player_action_next_chapter">Next chapter</string>
     <string name="time_left">%s left</string>

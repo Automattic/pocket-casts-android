@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-20 09:54:26+0000
+Translation-Revision-Date: 2026-11-05 10:55:36+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="settings_generated_chapters_summary">Lorsqu’un épisode n’a pas de chapitres, Pocket Casts les génère automatiquement pour vous.</string>
+    <string name="podcasts_played_podcasts_hide">Masquer</string>
+    <string name="podcasts_played_podcasts_description">Masque les podcasts que vous avez entièrement écoutés. Ils réapparaissent lorsqu’un nouvel épisode arrive.</string>
+    <string name="chapters_generated_upsell_button">Obtenir les chapitres générés</string>
+    <string name="podcasts_played_podcasts_show">Afficher</string>
+    <string name="podcasts_menu_played_podcasts">Podcasts écoutés</string>
+    <string name="chapters_generated_upsell_message">Avec Pocket Casts Plus, ne cherchez plus pendant des heures. Passez directement à la partie qui vous intéresse.</string>
+    <string name="chapters_generated_upsell_title">Génération automatique des chapitres</string>
+    <string name="chapters_generated_turn_on">Activer</string>
+    <string name="chapters_generated_off_message">Réactivez-les pour accéder directement au passage qui vous intéresse</string>
+    <string name="chapters_generated_off_title">Les chapitres générés sont désactivés</string>
+    <string name="chapters_generated_undo">Annuler</string>
+    <string name="chapters_generated_turned_off">Chapitres générés désactivés</string>
+    <string name="chapters_generated_turn_off">Désactiver les chapitres générés</string>
+    <string name="chat_loading_still_working">Toujours en cours…</string>
+    <string name="chat_loading_writing_answer">Rédaction de votre réponse</string>
+    <string name="chat_loading_finding_moments">Recherche des moments clés</string>
+    <string name="chat_loading_reading_transcript">Lecture de la transcription</string>
+    <string name="automotive_nothing_playing_title">Choisir un épisode à lire</string>
+    <string name="chat_quote_play_failed">Impossible de lire cette partie de l’épisode</string>
+    <string name="chat_quote_finding_moment">Recherche du moment…</string>
+    <string name="chat_history_empty_body">Posez des questions sur un épisode et votre discussion apparaîtra ici.</string>
+    <string name="chat_history_empty_title">Pas encore de discussion</string>
     <string name="chat_about_episode">Discussion à propos de %1$s</string>
     <string name="chat_now_playing_episode">En cours de lecture : %1$s</string>
     <string name="chat_undo">Annuler</string>
@@ -18,8 +41,6 @@ Language: fr
     <string name="chat_answering">Réponse en cours</string>
     <string name="chat_error_server_on_our_end">Un problème est survenu de notre côté.</string>
     <string name="chat_not_sent_tap_to_retry">Non envoyé. Touchez pour réessayer.</string>
-    <string name="chat_feedback_send_failed">Impossible d’envoyer vos commentaires. Vérifiez votre connexion.</string>
-    <string name="chat_feedback_sending">Envoi des commentaires</string>
     <string name="chat_feedback_what_went_wrong">Ce qui s’est passé</string>
     <string name="chat_beta_sheet_sign_in">Se connecter pour essayer</string>
     <string name="episode_chat_needs_transcript_message">La fonctionnalité Poser une question sur cet épisode nécessite une transcription. Cet épisode n’en a pas.</string>
@@ -213,8 +234,7 @@ Language: fr
     <string name="settings_audio_only_summary">Si cette option est activée, les épisodes vidéo seront lus uniquement en tant qu’audio, ce qui permet d’économiser des données.</string>
     <string name="settings_audio_only">Audio uniquement</string>
     <string name="profile_try_duration_for_free">Essayer %1$s gratuitement</string>
-    <string name="settings_generated_chapters_summary">Affichez les chapitres générés automatiquement lorsqu’ils sont disponibles.</string>
-    <string name="settings_generated_chapters">Chapitres générés</string>
+    <string name="settings_generated_chapters">Générer automatiquement les chapitres</string>
     <string name="profile_stats_listening_activity_info_summary">Une estimation du moment où vous avez écouté, en fonction de votre historique de lecture. Si vous terminez un épisode sur quelques jours, il s’affiche le dernier jour.</string>
     <string name="profile_stats_listening_activity_info_title">Activité d’écoute</string>
     <string name="profile_stats_listening_activity_info_help">Informations</string>
@@ -256,7 +276,6 @@ Language: fr
     <string name="blogs_found_headline">Lire votre blog à haute voix</string>
     <string name="blogs_found_followed_badge">PODCAST SUIVI</string>
     <string name="blogs_found_feed_detected">Flux trouvé</string>
-    <string name="chapters_generated_disclaimer">Ces chapitres sont générés automatiquement et peuvent ne pas être parfaitement exacts.</string>
     <string name="chat_play_quote">Lire la citation</string>
     <string name="chat_clear">Effacer la discussion</string>
     <string name="chat_send">Envoyer</string>
@@ -1793,7 +1812,6 @@ Language: fr
     <string name="settings_notifications_new_episodes">Nouveaux épisodes</string>
     <string name="settings_manage_downloads_include_starred">Inclure les favoris</string>
     <string name="settings_lock_image">verrouiller l’image</string>
-    <string name="settings_licenses">Licences</string>
     <string name="settings_learn_more">En savoir plus</string>
     <string name="settings_keep_screen_awake_summary">Si cette option est activée, l’écran ne se verrouille pas pendant la lecture.</string>
     <string name="settings_keep_screen_awake">Garder l’écran actif</string>
@@ -2267,7 +2285,6 @@ Language: fr
     <string name="podcasts_share_missing_title">Veuillez indiquer un titre pour votre liste.</string>
     <string name="podcasts_share_create_error">Oups, impossible de partager</string>
     <string name="podcasts_share_title">Titre</string>
-    <string name="podcasts_share_selected_podcasts">Partager les podcasts sélectionnés</string>
     <string name="podcasts_share_select_all">Tout sélectionner</string>
     <string name="podcasts_share_list">Liste partagée</string>
     <string name="podcasts_share_description">Description (facultative)</string>
@@ -2308,10 +2325,8 @@ Language: fr
     <string name="player_sleep_60_minutes">60 minutes</string>
     <string name="player_sleep_30_minutes">30 minutes</string>
     <string name="player_sleep_15_minutes">15 minutes</string>
-    <string name="player_pip">Ouvrir Picture-in-picture</string>
     <string name="player_notification_skip_forward">Avancer de %d s</string>
     <string name="player_notification_skip_back">Reculer de %d s</string>
-    <string name="player_full_screen">Plein écran</string>
     <string name="player_effects_voices_sound_louder">Les voix sont plus fortes</string>
     <string name="player_effects_trim_level">Sensibilité de coupe</string>
     <string name="player_effects_speed_up">Accélérer</string>
@@ -2320,7 +2335,6 @@ Language: fr
     <string name="player_effects">Effets du lecteur</string>
     <string name="player_close">Fermer le lecteur</string>
     <string name="player_chapter_url">URL de chapitre</string>
-    <string name="player_actions">Actions d’épisode</string>
     <string name="player_action_previous_chapter">Chapitre précédent</string>
     <string name="player_action_next_chapter">Chapitre suivant</string>
     <string name="time_short_seconds">%ds</string>
@@ -2482,6 +2496,14 @@ Language: fr
     <plurals name="chapter">
         <item quantity="one">chapitre</item>
         <item quantity="other">chapitres</item>
+    </plurals>
+    <plurals name="chapters_generated_count">
+        <item quantity="one">%d  chapitre généré </item>
+        <item quantity="other">%d chapitres générés</item>
+    </plurals>
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="one">%1$d  chapitre généré  • %2$d masqué</item>
+        <item quantity="other">%1$d chapitres générés • %2$d masqués</item>
     </plurals>
     <plurals name="day">
         <item quantity="one">jour</item>

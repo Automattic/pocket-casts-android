@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-20 14:59:09+0000
+Translation-Revision-Date: 2026-11-03 17:58:39+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="settings_generated_chapters_summary">När ett avsnitt inte har några egna kapitel genererar Pocket Casts dem automatiskt åt dig.</string>
+    <string name="podcasts_played_podcasts_show">Visa</string>
+    <string name="podcasts_played_podcasts_hide">Dölj</string>
+    <string name="podcasts_played_podcasts_description">Döljer podcasts som du har lyssnat klart på. De dyker upp igen när ett nytt avsnitt kommer.</string>
+    <string name="podcasts_menu_played_podcasts">Uppspelade podcasts</string>
+    <string name="chapters_generated_upsell_button">Få genererade kapitel</string>
+    <string name="chapters_generated_upsell_message">Med Pocket Casts Plus slipper du spola. Hoppa direkt till den del du kom för.</string>
+    <string name="chapters_generated_upsell_title">Kapitel genererade automatiskt</string>
+    <string name="chapters_generated_turn_on">Slå på</string>
+    <string name="chapters_generated_off_message">Slå på dem igen för att hoppa direkt till den del du kom för.</string>
+    <string name="chapters_generated_off_title">Genererade kapitel är avstängda</string>
+    <string name="chapters_generated_undo">Ångra</string>
+    <string name="chapters_generated_turned_off">Stängde av genererade kapitel</string>
+    <string name="chapters_generated_turn_off">Stäng av genererade kapitel</string>
+    <string name="chat_loading_still_working">Jobbar fortfarande på det…</string>
+    <string name="chat_loading_writing_answer">Skriver ditt svar</string>
+    <string name="chat_loading_finding_moments">Hittar rätt ögonblick</string>
+    <string name="chat_loading_reading_transcript">Läser transkriptionen</string>
+    <string name="automotive_nothing_playing_title">Välj ett avsnitt att spela upp</string>
+    <string name="chat_quote_finding_moment">Hittar ögonblicket…</string>
+    <string name="chat_quote_play_failed">Det gick inte att spela upp den här delen av avsnittet</string>
+    <string name="chat_history_empty_body">Fråga om ett avsnitt så visas din chatt här.</string>
+    <string name="chat_history_empty_title">Inga chattar ännu</string>
     <string name="chat_undo">Ångra</string>
     <string name="chat_history_older">Äldre</string>
     <string name="chat_history">Chatthistorik</string>
@@ -14,12 +37,10 @@ Language: sv_SE
     <string name="chat_cleared">Chatt rensad</string>
     <string name="chat_now_playing_episode">Spelar nu upp %1$s</string>
     <string name="chat_history_previous_7_days">Föregående 7 dagar</string>
-    <string name="chat_feedback_send_failed">Kunde inte skicka din feedback. Kontrollera din anslutning.</string>
     <string name="chat_offline_note">Du är offline. Anslut för att ställa en fråga.</string>
     <string name="chat_answering">Svarar</string>
     <string name="chat_error_server_on_our_end">Något gick fel hos oss.</string>
     <string name="chat_not_sent_tap_to_retry">Inte skickat. Tryck för att försöka igen.</string>
-    <string name="chat_feedback_sending">Skickar feedback</string>
     <string name="chat_beta_sheet_sign_in">Logga in för att prova det</string>
     <string name="chat_feedback_what_went_wrong">Vad som gick fel</string>
     <string name="episode_chat_needs_transcript_message">Fråga om detta avsnitt behöver en transkription. Detta avsnitt har ingen.</string>
@@ -213,8 +234,7 @@ Language: sv_SE
     <string name="settings_audio_only_summary">Om detta är aktiverat spelas avsnitt med video endast upp som ljud, vilket sparar data.</string>
     <string name="settings_audio_only">Endast ljud</string>
     <string name="profile_try_duration_for_free">Testa %1$s gratis</string>
-    <string name="settings_generated_chapters_summary">Visa automatiskt genererade kapitel när de är tillgängliga.</string>
-    <string name="settings_generated_chapters">Genererade kapitel</string>
+    <string name="settings_generated_chapters">Generera kapitel automatiskt</string>
     <string name="profile_stats_listening_activity_info_summary">En uppskattning av när du har lyssnat, baserat på din uppspelningshistorik. Om du avslutar ett avsnitt under några dagar visas det på den sista dagen.</string>
     <string name="profile_stats_listening_activity_info_title">Lyssningsaktivitet</string>
     <string name="profile_stats_listening_activity_info_help">Information</string>
@@ -256,7 +276,6 @@ Language: sv_SE
     <string name="blogs_found_headline">Högläsning av din blogg</string>
     <string name="blogs_found_followed_badge">FÖLJD PODCAST</string>
     <string name="blogs_found_feed_detected">Flöde hittades</string>
-    <string name="chapters_generated_disclaimer">Dessa kapitel genereras automatiskt och är kanske inte helt korrekta.</string>
     <string name="chat_play_quote">Spela upp citat</string>
     <string name="chat_clear">Rensa chatt</string>
     <string name="chat_send">Skicka</string>
@@ -1797,7 +1816,6 @@ Language: sv_SE
     <string name="settings_notifications_new_episodes">Nya avsnitt</string>
     <string name="settings_manage_downloads_include_starred">Inkludera stjärnmärkta</string>
     <string name="settings_lock_image">lås bild</string>
-    <string name="settings_licenses">Licenser</string>
     <string name="settings_learn_more">Lär dig mer</string>
     <string name="settings_keep_screen_awake_summary">Om detta är aktiverat låses inte skärmen under uppspelning.</string>
     <string name="settings_keep_screen_awake">Håll skärmen vaken</string>
@@ -2031,8 +2049,8 @@ Language: sv_SE
     <string name="profile_files_add_filename">Namn</string>
     <string name="profile_file_locked">låst</string>
     <string name="profile_file">Fil</string>
-    <string name="profile_license_agreement">Pocket Casts värdesätter din integritet. Denna sekretesspolicy beskriver vilken information vi samlar in om dig, varför vi samlar in informationen, vad vi kan göra med informationen och hur vi hanterar den. Den gäller för Pocket Casts-apparna på iOS och Android, samt för Pocket Casts-webbtjänsten med tillhörande macOS- och Windows-appar (gemensamt och separat – tjänsten). Genom att använda tjänsten samtycker du till denna sekretesspolicy. Om du aktiverar push-notiser i appen lagrar vi den push-token som Apple tillhandahåller för att leverera dessa push-notiser till din enhet. Om du köper webbappen lagrar vi ett transaktions-ID för ditt köp. Om du väljer att inte skapa ett konto, och inte använder push-notiser, lagras ingen data om dig på våra servrar. Pocket Casts-webbtjänsten använder även cookies och liknande teknik för att hålla dig inloggad. Om du skulle välja att skapa en supportbegäran inuti tjänsten kan vi generera en bilaga som innehåller ytterligare data för att underlätta hanteringen av din supportbegäran. Du är välkommen att granska denna bilaga innan dess inskickande.</string>
     <string name="profile_feature_requires">Den här funktionen kräver\nPocket Casts Plus</string>
+    <string name="profile_license_agreement">Pocket Casts värdesätter din integritet. Denna sekretesspolicy beskriver vilken information vi samlar in om dig, varför vi samlar in informationen, vad vi kan göra med informationen och hur vi hanterar den. Den gäller för Pocket Casts-apparna på iOS och Android, samt för Pocket Casts-webbtjänsten med tillhörande macOS- och Windows-appar (gemensamt och separat – tjänsten). Genom att använda tjänsten samtycker du till denna sekretesspolicy. Om du aktiverar push-notiser i appen lagrar vi den push-token som Apple tillhandahåller för att leverera dessa push-notiser till din enhet. Om du köper webbappen lagrar vi ett transaktions-ID för ditt köp. Om du väljer att inte skapa ett konto, och inte använder push-notiser, lagras ingen data om dig på våra servrar. Pocket Casts-webbtjänsten använder även cookies och liknande teknik för att hålla dig inloggad. Om du skulle välja att skapa en supportbegäran inuti tjänsten kan vi generera en bilaga som innehåller ytterligare data för att underlätta hanteringen av din supportbegäran. Du är välkommen att granska denna bilaga innan dess inskickande.</string>
     <string name="profile_ends">Slutar %s</string>
     <string name="profile_ended">Slutade %s</string>
     <string name="profile_end_tour">AVSLUTA RUNDTUR</string>
@@ -2260,7 +2278,6 @@ Language: sv_SE
     <string name="podcasts_share_via">Dela via</string>
     <string name="podcasts_share_missing_podcast">Välj minst en podcast.</string>
     <string name="podcasts_share_title">Rubrik</string>
-    <string name="podcasts_share_selected_podcasts">Dela valda podcasts</string>
     <string name="podcasts_share_select_all">Välj alla</string>
     <string name="podcasts_share_list">Delad lista</string>
     <string name="podcasts_share_description">Beskrivning (valfritt)</string>
@@ -2301,10 +2318,8 @@ Language: sv_SE
     <string name="player_sleep_60_minutes">60 minuter</string>
     <string name="player_sleep_30_minutes">30 minuter</string>
     <string name="player_sleep_15_minutes">15 minuter</string>
-    <string name="player_pip">Aktivera bild-i-bild </string>
     <string name="player_notification_skip_forward">Framåt %d sekunder</string>
     <string name="player_notification_skip_back">Bakåt %d sekunder</string>
-    <string name="player_full_screen">Fullskärm</string>
     <string name="player_effects_voices_sound_louder">Röster låter starkare</string>
     <string name="player_effects_trim_level">Trimningsnivå</string>
     <string name="player_effects_speed_up">Snabba upp</string>
@@ -2313,7 +2328,6 @@ Language: sv_SE
     <string name="player_effects">Spelareffekter</string>
     <string name="player_close">Stäng spelare</string>
     <string name="player_chapter_url">Kapitel-URL</string>
-    <string name="player_actions">Avsnittsåtgärder</string>
     <string name="player_action_previous_chapter">Föregående kapitel</string>
     <string name="player_action_next_chapter">Nästa kapitel</string>
     <string name="time_short_seconds">%ds</string>
@@ -2482,6 +2496,14 @@ Language: sv_SE
     <plurals name="chapter">
         <item quantity="one">kapitel</item>
         <item quantity="other">kapitel</item>
+    </plurals>
+    <plurals name="chapters_generated_count">
+        <item quantity="one">%d genererat kapitel</item>
+        <item quantity="other">%d genererade kapitel</item>
+    </plurals>
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="one">%1$d genererat kapitel • %2$d dolda</item>
+        <item quantity="other">%1$d genererade kapitel • %2$d dolda</item>
     </plurals>
     <plurals name="day">
         <item quantity="one">dag</item>
