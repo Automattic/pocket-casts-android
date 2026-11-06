@@ -4,15 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentCreateDoneBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountError
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,16 +28,26 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class CreateDoneFragment : BaseFragment() {
 
     private val viewModel: CreateAccountViewModel by activityViewModels()
-    private var binding: FragmentCreateDoneBinding? = null
+    private var form by mutableStateOf(CreateDoneForm())
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentCreateDoneBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
+        AppTheme(theme.activeTheme) {
+            val form = form
+            val newsletter by viewModel.newsletter.observeAsState(false)
+            CreateDonePage(
+                state = CreateDonePageState(
+                    isCar = Util.isCarUiMode(requireContext()),
+                    imageRes = form.imageRes,
+                    title = form.title,
+                    detail = form.detail,
+                    isNewsletterChecked = newsletter,
+                    isProgressVisible = form.isProgressVisible,
+                ),
+                onNewsletterChange = { isChecked -> if (isChecked != viewModel.newsletter.value) viewModel.updateNewsletter(isChecked) },
+                onCloseClick = ::closeForm,
+                onDoneClick = ::closeForm,
+            )
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -40,31 +55,32 @@ class CreateDoneFragment : BaseFragment() {
 
         UiUtil.hideKeyboard(view)
 
+        form = CreateDoneForm()
+
         viewModel.updateStateToFinished()
         viewModel.createAccountState.observe(
             viewLifecycleOwner,
             Observer {
-                val progress = binding?.progress ?: return@Observer
                 when (it) {
                     is CreateAccountState.CurrentlyValid -> {
-                        progress.isVisible = false
+                        form = form.copy(isProgressVisible = false)
                     }
 
                     is CreateAccountState.AccountCreated -> {
-                        progress.isVisible = false
+                        form = form.copy(isProgressVisible = false)
                         processCreated(viewModel.subscriptionType.value)
                     }
 
                     is CreateAccountState.Finished -> {
-                        progress.isVisible = false
+                        form = form.copy(isProgressVisible = false)
                         processCreated(viewModel.subscriptionType.value)
                     }
 
                     is CreateAccountState.Failure -> {
-                        progress.isVisible = false
+                        form = form.copy(isProgressVisible = false)
                         val serverFail = it.errors.contains(CreateAccountError.CANNOT_CREATE_ACCOUNT)
                         if (!serverFail) {
-                            updateForm(complete = true, title = getString(LR.string.profile_create_failed_title), detail = getString(LR.string.please_try_again))
+                            form = form.copy(title = getString(LR.string.profile_create_failed_title), detail = getString(LR.string.please_try_again))
                         }
                     }
 
@@ -72,25 +88,6 @@ class CreateDoneFragment : BaseFragment() {
                 }
             },
         )
-
-        val binding = binding ?: return
-
-        binding.imgDone.setImageResource(IR.drawable.ic_circle)
-        binding.btnClose?.setOnClickListener {
-            closeForm()
-        }
-
-        binding.btnNewsletter.setOnClickListener {
-            binding.switchNewsletter.isChecked = !binding.switchNewsletter.isChecked
-        }
-        binding.switchNewsletter.isChecked = viewModel.newsletter.value ?: false
-        binding.switchNewsletter.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.updateNewsletter(isChecked)
-        }
-
-        binding.btnDone.setOnClickListener {
-            closeForm()
-        }
     }
 
     private fun closeForm() {
@@ -103,29 +100,27 @@ class CreateDoneFragment : BaseFragment() {
     }
 
     private fun processCreated(subscriptionType: SubscriptionType?) {
-        var resourceId = 0
-        var title = ""
-        var detail = ""
-        if (subscriptionType != null) {
-            if (subscriptionType == SubscriptionType.FREE) {
-                resourceId = R.drawable.ic_created_free_account
-                detail = getString(LR.string.profile_welcome_to_free)
-                title = getString(LR.string.profile_account_created)
-            } else {
-                resourceId = R.drawable.ic_created_plus_account
-                detail = getString(LR.string.profile_welcome_to_plus)
-                title = getString(LR.string.profile_account_upgraded)
-            }
-        }
-        binding?.imgDone?.setImageResource(resourceId)
-        updateForm(true, title, detail)
-    }
+        form = when (subscriptionType) {
+            null -> form.copy(imageRes = null, title = "", detail = "")
 
-    private fun updateForm(complete: Boolean, title: String, detail: String) {
-        val binding = binding ?: return
-        binding.imgDone.isVisible = true
-        binding.txtTitle.text = title
-        binding.txtDetail.text = detail
-        binding.btnDone.isVisible = complete
+            SubscriptionType.FREE -> form.copy(
+                imageRes = R.drawable.ic_created_free_account,
+                title = getString(LR.string.profile_account_created),
+                detail = getString(LR.string.profile_welcome_to_free),
+            )
+
+            else -> form.copy(
+                imageRes = R.drawable.ic_created_plus_account,
+                title = getString(LR.string.profile_account_upgraded),
+                detail = getString(LR.string.profile_welcome_to_plus),
+            )
+        }
     }
 }
+
+private data class CreateDoneForm(
+    val imageRes: Int? = IR.drawable.ic_circle,
+    val title: String = "",
+    val detail: String = "",
+    val isProgressVisible: Boolean = true,
+)
