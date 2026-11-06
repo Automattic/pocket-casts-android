@@ -1,13 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.player.view.chapters
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
@@ -62,6 +65,7 @@ fun ChaptersGenerating(
     episodeUuid: String?,
     onTurnOffGeneratedClick: () -> Unit,
     modifier: Modifier = Modifier,
+    skeletonModifier: Modifier = Modifier,
     showSlowNote: Boolean = false,
 ) {
     var isSlowNoteVisible by rememberSaveable(episodeUuid) { mutableStateOf(showSlowNote) }
@@ -69,6 +73,7 @@ fun ChaptersGenerating(
         delay(SLOW_NOTE_DELAY)
         isSlowNoteVisible = true
     }
+    val slowNoteShift = with(LocalDensity.current) { 6.dp.roundToPx() }
     Column(
         modifier = modifier
             .background(LocalChaptersTheme.current.background)
@@ -76,10 +81,11 @@ fun ChaptersGenerating(
             .verticalScroll(rememberScrollState()),
     ) {
         GeneratingHeader(onTurnOffGeneratedClick = onTurnOffGeneratedClick)
-        SkeletonChapters()
+        SkeletonChapters(modifier = skeletonModifier)
         AnimatedVisibility(
             visible = isSlowNoteVisible,
-            enter = fadeIn(tween(durationMillis = 400)),
+            enter = fadeIn(tween(durationMillis = SLOW_NOTE_ENTER_MS, easing = EaseOut)) +
+                slideInVertically(tween(durationMillis = SLOW_NOTE_ENTER_MS, easing = EaseOut)) { slowNoteShift },
         ) {
             TextP40(
                 text = stringResource(LR.string.chapters_generated_generating_note),
@@ -97,11 +103,18 @@ fun ChaptersGenerating(
 private fun GeneratingHeader(
     onTurnOffGeneratedClick: () -> Unit,
 ) {
-    val pulse by rememberInfiniteTransition(label = "sparklePulse").animateFloat(
+    val sparkleTransition = rememberInfiniteTransition(label = "sparkle")
+    val sparkleScale by sparkleTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0.78f,
+        animationSpec = infiniteRepeatable(tween(durationMillis = SPARKLE_PULSE_MS, easing = EaseInOut), RepeatMode.Reverse),
+        label = "sparkleScale",
+    )
+    val sparkleRotation by sparkleTransition.animateFloat(
         initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(durationMillis = 900, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label = "sparklePulseProgress",
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(tween(durationMillis = SPARKLE_TURN_MS, easing = EaseInOut)),
+        label = "sparkleRotation",
     )
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -114,11 +127,9 @@ private fun GeneratingHeader(
             modifier = Modifier
                 .size(16.dp)
                 .graphicsLayer {
-                    val scale = lerp(0.85f, 1.1f, pulse)
-                    scaleX = scale
-                    scaleY = scale
-                    rotationZ = lerp(-12f, 12f, pulse)
-                    alpha = lerp(0.6f, 1f, pulse)
+                    scaleX = sparkleScale
+                    scaleY = sparkleScale
+                    rotationZ = sparkleRotation
                 },
         )
         Spacer(Modifier.width(8.dp))
@@ -140,7 +151,9 @@ private fun GeneratingHeader(
 }
 
 @Composable
-private fun SkeletonChapters() {
+private fun SkeletonChapters(
+    modifier: Modifier = Modifier,
+) {
     val chaptersTheme = LocalChaptersTheme.current
     val barColor = chaptersTheme.headerToggle.copy(alpha = 0.12f).compositeOver(chaptersTheme.background)
     val highlight = chaptersTheme.headerToggle.copy(alpha = 0.22f)
@@ -148,12 +161,12 @@ private fun SkeletonChapters() {
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            tween(durationMillis = SHIMMER_SWEEP_MS, delayMillis = SHIMMER_GAP_MS, easing = FastOutSlowInEasing),
+            tween(durationMillis = SHIMMER_SWEEP_MS, delayMillis = SHIMMER_GAP_MS, easing = EaseInOut),
         ),
         label = "skeletonShimmerProgress",
     )
     Column(
-        modifier = Modifier
+        modifier = modifier
             .clearAndSetSemantics {}
             .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
             .drawWithContent {
@@ -246,6 +259,9 @@ private val SkeletonRows = listOf(
 private val SLOW_NOTE_DELAY = 5.seconds
 private const val SHIMMER_SWEEP_MS = 1100
 private const val SHIMMER_GAP_MS = 100
+private const val SPARKLE_PULSE_MS = 600
+private const val SPARKLE_TURN_MS = 12 * SPARKLE_PULSE_MS
+private const val SLOW_NOTE_ENTER_MS = 400
 
 @Preview(name = "Light")
 @Composable
