@@ -2000,6 +2000,40 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `playing a quote in the loaded episode says where it jumped to`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        playableState(quote)
+
+        viewModel.toasts.test {
+            viewModel.playQuote(quote.uuid)
+            advanceUntilIdle()
+
+            assertEquals(1_000, (awaitItem() as ChatToast.QuotePlaying).jumpedToMs)
+        }
+    }
+
+    @Test
+    fun `playing a quote that switches episodes does not say where it jumped to`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID, positionMs = 0)
+        whenever(playbackManager.playNowSuspend(org.mockito.kotlin.eq(episode.value), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        playableState(quote)
+
+        viewModel.toasts.test {
+            viewModel.playQuote(quote.uuid)
+            advanceUntilIdle()
+
+            assertNull((awaitItem() as ChatToast.QuotePlaying).jumpedToMs)
+        }
+    }
+
+    @Test
     fun `undoing a quote goes back to where playback was and pauses if it was paused`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)

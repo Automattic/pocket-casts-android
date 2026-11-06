@@ -791,7 +791,7 @@ class ChatViewModel @Inject constructor(
                     ?: state.toPlaybackPosition(episodeUuid, podcastUuid, episodeSwitch, isOtherEpisode),
             )
         }
-        showToast(ChatToast.QuotePlaying(episode.title, undoId))
+        showToast(ChatToast.QuotePlaying(episode.title, undoId, jumpedToMs = startMs.takeIf { episodeSwitch == null }))
     }
 
     fun onQuoteUndoExpired(undoId: Int) {
@@ -1203,7 +1203,7 @@ sealed interface ChatToast {
     data object FeedbackThanks : ChatToast
     data object ChatCleared : ChatToast
     data object ChatDeleted : ChatToast
-    data class QuotePlaying(val episodeTitle: String, val undoId: Int) : ChatToast
+    data class QuotePlaying(val episodeTitle: String, val undoId: Int, val jumpedToMs: Int? = null) : ChatToast
     data object QuotePlayFailed : ChatToast
 }
 
