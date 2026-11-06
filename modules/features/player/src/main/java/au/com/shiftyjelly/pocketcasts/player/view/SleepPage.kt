@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view
 
 import android.provider.Settings
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.withTranslation
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.buttons.ViewMaterialButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.NumberStepper
 import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.images.drawableBackground
@@ -355,14 +357,12 @@ private fun SleepWideButton(@StringRes textRes: Int, colors: SleepColors, onClic
 
 @Composable
 private fun SleepButton(text: String, colors: SleepColors, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    ViewMaterialButton(
+    RowOutlinedButton(
         text = text,
         onClick = onClick,
-        backgroundColor = Color.Transparent,
-        textColor = colors.highlight,
-        strokeColor = colors.highlight,
-        fontSize = 16.sp,
-        elevation = 0.dp,
-        modifier = modifier.height(56.dp),
+        includePadding = false,
+        border = BorderStroke(2.dp, colors.highlight),
+        colors = ButtonDefaults.outlinedButtonColors(backgroundColor = Color.Transparent, contentColor = colors.highlight),
+        modifier = modifier,
     )
 }

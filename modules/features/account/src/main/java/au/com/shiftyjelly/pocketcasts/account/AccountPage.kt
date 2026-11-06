@@ -43,10 +43,10 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.core.content.res.use
-import au.com.shiftyjelly.pocketcasts.compose.buttons.ViewMaterialButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -83,33 +83,18 @@ internal fun AccountPage(
             AccountIntro(state, continueWithGoogle, onCreateClick, onSignInClick)
         }
         if (!state.isCar) {
-            ViewMaterialButton(
+            RowButton(
                 text = stringResource(if (state.isSignedIn) LR.string.done else LR.string.create_account),
                 onClick = onCreateClick,
-                backgroundColor = colors.primaryInteractive01,
-                textColor = colors.primaryInteractive02,
-                fontSize = 18.sp,
-                letterSpacing = 0.02.em,
-                cornerRadius = 8.dp,
-                verticalPadding = 16.dp,
-                modifier = Modifier
-                    .padding(start = 16.dp, top = 24.dp, end = 16.dp)
-                    .fillMaxWidth(),
+                includePadding = false,
+                modifier = Modifier.padding(start = 16.dp, top = 24.dp, end = 16.dp),
             )
             if (!state.isSignedIn) {
-                ViewMaterialButton(
+                RowTextButton(
                     text = stringResource(LR.string.sign_in),
                     onClick = onSignInClick,
-                    backgroundColor = Color.Transparent,
-                    textColor = colors.primaryInteractive01,
-                    fontSize = 18.sp,
-                    letterSpacing = 0.02.em,
-                    cornerRadius = 8.dp,
-                    elevation = 0.dp,
-                    verticalPadding = 16.dp,
-                    modifier = Modifier
-                        .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
-                        .fillMaxWidth(),
+                    includePadding = false,
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
                 )
             }
         }
@@ -206,7 +191,6 @@ private fun CarButtons(
     onCreateClick: () -> Unit,
     onSignInClick: () -> Unit,
 ) {
-    val colors = MaterialTheme.theme.colors
     val textSize = dimensionResource(CR.dimen.car_body2_size).value.sp
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
@@ -216,30 +200,21 @@ private fun CarButtons(
         ) {
             continueWithGoogle()
         }
-        ViewMaterialButton(
+        RowButton(
             text = stringResource(if (state.isSignedIn) LR.string.done else LR.string.create_account),
             onClick = onCreateClick,
-            backgroundColor = colors.primaryInteractive01,
-            textColor = colors.primaryInteractive02,
+            includePadding = false,
             fontSize = textSize,
-            letterSpacing = 0.02.em,
-            cornerRadius = 8.dp,
-            verticalPadding = 16.dp,
             modifier = Modifier
                 .padding(start = 16.dp, top = 32.dp, end = 16.dp)
                 .width(592.dp),
         )
         if (!state.isSignedIn) {
-            ViewMaterialButton(
+            RowTextButton(
                 text = stringResource(LR.string.sign_in),
                 onClick = onSignInClick,
-                backgroundColor = Color.Transparent,
-                textColor = colors.primaryInteractive01,
+                includePadding = false,
                 fontSize = textSize,
-                letterSpacing = 0.02.em,
-                cornerRadius = 8.dp,
-                elevation = 0.dp,
-                verticalPadding = 16.dp,
                 modifier = Modifier
                     .padding(start = 16.dp, top = 32.dp, end = 16.dp)
                     .width(592.dp),

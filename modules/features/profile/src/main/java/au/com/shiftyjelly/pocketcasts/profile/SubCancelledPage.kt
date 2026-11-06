@@ -31,10 +31,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.buttons.ViewMaterialButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
@@ -95,20 +94,11 @@ internal fun SubCancelledPage(
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 32.dp),
             )
         }
-        ViewMaterialButton(
+        RowButton(
             text = stringResource(LR.string.done),
             onClick = onDoneClick,
-            backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
-            textColor = MaterialTheme.theme.colors.primaryInteractive02,
-            fontSize = 18.sp,
-            letterSpacing = 0.02.em,
-            cornerRadius = 12.dp,
-            elevation = 0.dp,
-            verticalPadding = 16.dp,
-            strokeColor = (if (MaterialTheme.theme.isLight) Color.Black else Color.White).copy(alpha = 0.12f),
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
-                .fillMaxWidth(),
+            includePadding = false,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
         )
     }
 }

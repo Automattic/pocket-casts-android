@@ -4,7 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -23,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.AppCompatTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
-import au.com.shiftyjelly.pocketcasts.compose.buttons.ViewMaterialButton
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -84,15 +83,12 @@ internal fun SonosAppLinkPage(
                 .padding(start = 20.dp, top = 32.dp, end = 20.dp)
                 .fillMaxWidth(),
         )
-        ViewMaterialButton(
+        RowButton(
             text = buttonText,
             onClick = onConnectClick,
-            backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+            includePadding = false,
             textColor = textColors.button,
-            modifier = Modifier
-                .padding(start = 20.dp, top = 56.dp, end = 20.dp)
-                .fillMaxWidth()
-                .height(56.dp),
+            modifier = Modifier.padding(start = 20.dp, top = 56.dp, end = 20.dp),
         )
     }
 }
