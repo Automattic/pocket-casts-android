@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-19 20:51:23+0000
+Translation-Revision-Date: 2026-10-30 21:50:26+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="chapters_generated_turn_on">Activa</string>
+    <string name="chapters_generated_off_message">Torna\'ls a activar per anar directament a la part que t\'interessa.</string>
+    <string name="chapters_generated_off_title">Els capítols generats estan desactivats</string>
+    <string name="chapters_generated_undo">Desfés</string>
+    <string name="chapters_generated_turned_off">S\'han desactivat els capítols generats</string>
+    <string name="chapters_generated_turn_off">Desactiva els capítols generats</string>
+    <string name="chat_loading_still_working">Encara hi estem treballant…</string>
+    <string name="chat_loading_writing_answer">S\'està escrivint la resposta</string>
+    <string name="chat_loading_finding_moments">S\'estan cercant els moments adequats</string>
+    <string name="chat_loading_reading_transcript">S\'està llegint la transcripció</string>
+    <string name="automotive_nothing_playing_title">Tria un episodi per reproduir-lo</string>
+    <string name="chat_quote_finding_moment">S\'està cercant el moment…</string>
+    <string name="chat_quote_play_failed">No s\'ha pogut reproduir aquesta part de l\'episodi</string>
+    <string name="chat_history_empty_body">Fes una pregunta sobre un episodi i la conversa apareixerà aquí.</string>
+    <string name="chat_history_empty_title">Encara no hi ha cap conversa</string>
     <string name="chat_about_episode">Xat sobre %1$s</string>
     <string name="chat_now_playing_episode">S\'està reproduint %1$s</string>
     <string name="chat_undo">Desfés</string>
@@ -18,8 +33,6 @@ Language: ca
     <string name="chat_answering">S\'està responent</string>
     <string name="chat_error_server_on_our_end">Alguna cosa ha fallat per part nostra.</string>
     <string name="chat_not_sent_tap_to_retry">No s\'ha enviat. Toca per tornar-ho a provar.</string>
-    <string name="chat_feedback_send_failed">No s\'han pogut enviar els teus comentaris. Comprova la connexió.</string>
-    <string name="chat_feedback_sending">S\'estan enviant els comentaris</string>
     <string name="chat_feedback_what_went_wrong">Què ha fallat</string>
     <string name="chat_beta_sheet_sign_in">Inicia la sessió per provar-ho</string>
     <string name="episode_chat_needs_transcript_message">«Pregunta sobre aquest episodi» necessita una transcripció, i aquest episodi no en té.</string>
@@ -213,8 +226,6 @@ Language: ca
     <string name="settings_audio_only_summary">Si s\'activa, els episodis amb vídeo es reproduiran només en àudio i s\'estalviaran dades.</string>
     <string name="settings_audio_only">Només àudio</string>
     <string name="profile_try_duration_for_free">Prova %1$s gratis</string>
-    <string name="settings_generated_chapters_summary">Mostra els capítols generats automàticament quan estiguin disponibles.</string>
-    <string name="settings_generated_chapters">Capítols generats</string>
     <string name="profile_stats_listening_activity_info_summary">Una estimació de quan has estat escoltant, basada en el teu historial de reproducció. Si acabes un episodi al llarg de diversos dies, es mostra l\'últim dia.</string>
     <string name="profile_stats_listening_activity_info_title">Activitat d\'escolta</string>
     <string name="profile_stats_listening_activity_info_help">Informació</string>
@@ -256,7 +267,6 @@ Language: ca
     <string name="blogs_found_headline">Llegim el teu blog en veu alta</string>
     <string name="blogs_found_followed_badge">PÒDCAST SEGUIT</string>
     <string name="blogs_found_feed_detected">S\'ha trobat el feed</string>
-    <string name="chapters_generated_disclaimer">Aquests capítols es generen automàticament i poden no ser del tot precisos.</string>
     <string name="chat_play_quote">Reprodueix la citació</string>
     <string name="chat_clear">Esborra el xat</string>
     <string name="chat_send">Envia</string>
@@ -1790,7 +1800,6 @@ Language: ca
     <string name="settings_notifications_new_episodes">Episodis nous</string>
     <string name="settings_logs">Registres</string>
     <string name="settings_lock_image">imatge de bloqueig</string>
-    <string name="settings_licenses">Llicències</string>
     <string name="settings_keep_screen_awake_summary">Si aquesta opció està activada, la pantalla no es bloquejarà mentre es reprodueixi alguna cosa.</string>
     <string name="settings_auto_archive_limit_1">1 episodi més recent</string>
     <string name="settings_auto_archive_inactive_never">Mai</string>
@@ -2104,8 +2113,8 @@ Language: ca
     <string name="profile_get_plus">Aconsegueix Pocket Casts Plus per a desbloquejar aquesta funció i moltes més!</string>
     <string name="profile_files_empty_summary">Vols escoltar els teus propis fitxers? \nToca el botó + per a obrir-los a Pocket Casts, i apareixeran aquí.</string>
     <string name="filters_no_episodes">No s\'han trobat episodis</string>
-    <string name="profile_license_agreement">Pocket Casts valora la teva privadesa. Aquesta política de privadesa explica quina informació recopilem sobre tu i per què, què podem fer amb aquesta informació i com la gestionem. S\'aplica a les aplicacions Pocket Casts per iOS i Android, i al servei web Pocket Casts amb les aplicacions associades per macOS i Windows (conjuntament i de manera solidària, el Servei). En utilitzar el servei, acceptes aquesta política de privadesa. Si actives les notificacions push a l\'aplicació, emmagatzemem el token push que Apple ens proporciona per a poder enviar-te aquestes notificacions push al teu dispositiu. Si compres l\'aplicació web, emmagatzemem una id de transacció per la teva compra. Si decideixes no crear un compte, i no utilitzes notificacions push, no s\'emmagatzema cap dada teva als nostres servidors. El servei web Pocket Casts també utilitza galetes i tecnologies similars per a mantenir-te connectat. Si decideixes generar una sol·licitud d\'assistència des del servei, podem generar un adjunt que contingui dades addicionals per a ajudar a abordar la teva sol·licitud d\'assistència que pots consultar abans de la seva presentació.</string>
     <string name="filters_create_select_criteria">Selecciona els teus criteris de filtre amb aquests botons per a crear una llista de reproducció intel·ligent d\'episodis actualitzada.</string>
+    <string name="profile_license_agreement">Pocket Casts valora la teva privadesa. Aquesta política de privadesa explica quina informació recopilem sobre tu i per què, què podem fer amb aquesta informació i com la gestionem. S\'aplica a les aplicacions Pocket Casts per iOS i Android, i al servei web Pocket Casts amb les aplicacions associades per macOS i Windows (conjuntament i de manera solidària, el Servei). En utilitzar el servei, acceptes aquesta política de privadesa. Si actives les notificacions push a l\'aplicació, emmagatzemem el token push que Apple ens proporciona per a poder enviar-te aquestes notificacions push al teu dispositiu. Si compres l\'aplicació web, emmagatzemem una id de transacció per la teva compra. Si decideixes no crear un compte, i no utilitzes notificacions push, no s\'emmagatzema cap dada teva als nostres servidors. El servei web Pocket Casts també utilitza galetes i tecnologies similars per a mantenir-te connectat. Si decideixes generar una sol·licitud d\'assistència des del servei, podem generar un adjunt que contingui dades addicionals per a ajudar a abordar la teva sol·licitud d\'assistència que pots consultar abans de la seva presentació.</string>
     <string name="podcasts">Pòdcasts</string>
     <string name="download_warning_title">Descarrega-ho tot</string>
     <string name="episode_row_download_failed">Error a la descàrrega</string>
@@ -2239,7 +2248,6 @@ Language: ca
     <string name="podcasts_share_missing_title">Introdueix un títol per a la teva llista.</string>
     <string name="podcasts_share_create_error">Vaja, no s\'ha pogut compartir</string>
     <string name="podcasts_share_title">Títol</string>
-    <string name="podcasts_share_selected_podcasts">Comparteix els pòdcasts triats</string>
     <string name="podcasts_share_select_all">Selecciona-ho tot</string>
     <string name="podcasts_share_list">Llista compartida</string>
     <string name="podcasts_share_0_selected">0 triats</string>
@@ -2266,11 +2274,9 @@ Language: ca
     <string name="player_sleep_15_minutes">15 minuts</string>
     <string name="player_notification_skip_forward">Avançar %d segons</string>
     <string name="player_notification_skip_back">Endarrerir %d segons</string>
-    <string name="player_full_screen">Pantalla completa</string>
     <string name="player_effects_trim_level">Nivell de retall</string>
     <string name="player_effects">Efectes de reproducció</string>
     <string name="player_chapter_url">URL del capítol</string>
-    <string name="player_actions">Accions de l\'episodi</string>
     <string name="time_left">Queden %s</string>
     <string name="time_short_seconds">%ds</string>
     <string name="time_short_minutes">%dm</string>
@@ -2344,7 +2350,6 @@ Language: ca
     <string name="player_up_next_move_to_bottom">Mou al final</string>
     <string name="player_up_next_empty">No hi ha res a la cua de «Tot seguit»</string>
     <string name="player_up_next_clear_queue_button">Esborra la llista «Tot seguit»</string>
-    <string name="player_pip">Entra al mode Imatge sobre imatge (PiP)</string>
     <string name="player_effects_trim_silence">Retalla els silencis</string>
     <string name="player_effects_speed_up">Accelera</string>
     <string name="player_effects_speed_down">Alenteix</string>
@@ -2482,6 +2487,14 @@ Language: ca
     <plurals name="chapter">
         <item quantity="one">capítol</item>
         <item quantity="other">capítols</item>
+    </plurals>
+    <plurals name="chapters_generated_count">
+        <item quantity="one">%d capítol generat</item>
+        <item quantity="other">%d capítols generats</item>
+    </plurals>
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="one">%1$d capítol generat • amagats: %2$d</item>
+        <item quantity="other">%1$d capítols generats • amagats: %2$d</item>
     </plurals>
     <plurals name="day">
         <item quantity="one">dia</item>

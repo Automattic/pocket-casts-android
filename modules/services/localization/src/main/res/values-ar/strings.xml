@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-20 16:56:58+0000
+Translation-Revision-Date: 2026-11-04 09:57:47+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="settings_generated_chapters_summary">عندما لا تحتوي الحلقة على فصول خاصة بها، سيقوم تطبيق Pocket Casts بإنشائها تلقائيًا من أجلك.</string>
+    <string name="podcasts_played_podcasts_show">عرض</string>
+    <string name="podcasts_played_podcasts_hide">إخفاء</string>
+    <string name="podcasts_played_podcasts_description">يخفي حلقات البث الصوتي الذي استمعت إليه بالكامل. تظهر مرة أخرى عند وصول حلقة جديدة.</string>
+    <string name="podcasts_menu_played_podcasts">حلقات البث الصوتي التي تم تشغيلها</string>
+    <string name="chapters_generated_upsell_button">الحصول على الفصول التي تم إنشاؤها</string>
+    <string name="chapters_generated_upsell_message">مع Pocket Casts Plus، لن تحتاج إلى تحريك شريط التشغيل يدويًا بعد الآن. انتقل مباشرةً إلى الجزء الذي جئت من أجله.</string>
+    <string name="chapters_generated_upsell_title">الفصول التي تم إنشاؤها تلقائيًا</string>
+    <string name="chapters_generated_turn_on">التشغيل</string>
+    <string name="chapters_generated_off_message">أعِد تشغيلها للانتقال مباشرةً إلى الجزء الذي تريده</string>
+    <string name="chapters_generated_off_title">تم إيقاف تشغيل الفصول التي تم إنشاؤها</string>
+    <string name="chapters_generated_undo">تراجع</string>
+    <string name="chapters_generated_turned_off">تم إيقاف تشغيل الفصول التي تم إنشاؤها</string>
+    <string name="chapters_generated_turn_off">إيقاف تشغيل الفصول التي تم إنشاؤها</string>
+    <string name="chat_loading_still_working">لا يزال العمل مستمرًا على ذلك…</string>
+    <string name="chat_loading_writing_answer">جارٍ كتابة إجابتك</string>
+    <string name="chat_loading_finding_moments">جارٍ العثور على اللحظات المناسبة</string>
+    <string name="chat_loading_reading_transcript">جارٍ قراءة النص التفريغي</string>
+    <string name="automotive_nothing_playing_title">إختيار حلقة لتشغيلها</string>
+    <string name="chat_quote_finding_moment">جار إيجاد اللحظة…</string>
+    <string name="chat_quote_play_failed">يتعذر تشغيل هذا الجزء من الحلقة</string>
+    <string name="chat_history_empty_body">اسأل عن إحدى الحلقات وستظهر محادثتك هنا.</string>
+    <string name="chat_history_empty_title">لا توجد محادثات حتى الآن</string>
     <string name="chat_about_episode">دردشة حول ⁦%1$s⁩</string>
     <string name="chat_now_playing_episode">الحلقة الجاري تشغيلها الآن ⁦%1$s⁩</string>
     <string name="chat_undo">تراجع</string>
@@ -18,8 +41,6 @@ Language: ar
     <string name="chat_answering">جارٍ الإجابة</string>
     <string name="chat_error_server_on_our_end">حدث خطأ ما من جانبنا.</string>
     <string name="chat_not_sent_tap_to_retry">لم يتم الإرسال. اضغط لإعادة المحاولة.</string>
-    <string name="chat_feedback_send_failed">تعذَّر إرسال ملاحظاتك. تحقق من اتصالك بالشبكة.</string>
-    <string name="chat_feedback_sending">جارٍ إرسال الملاحظات</string>
     <string name="chat_feedback_what_went_wrong">ما الخطأ الذي حدث</string>
     <string name="chat_beta_sheet_sign_in">سجّل الدخول لتجربة ذلك</string>
     <string name="episode_chat_needs_transcript_message">تحتاج إلى نصّ مفرّغ للحلقة حتى تتمكن من طرح أسئلة حولها. لا يتوفر نصّ مفرّغ لهذه الحلقة.</string>
@@ -213,8 +234,7 @@ Language: ar
     <string name="settings_audio_only_summary">إذا كان مُمكّنًا، فسوف تُشغَّل الحلقات التي تحتوي على فيديو كصوتي فقط، مما يوفّر بيانات الاتصال.</string>
     <string name="settings_audio_only">صوت فقط</string>
     <string name="profile_try_duration_for_free">جرِّب ⁦%1$s⁩ مجّانًا</string>
-    <string name="settings_generated_chapters_summary">عرض الفصول التي تم إنشاؤها تلقائيًا عندما تكون متوفرة.</string>
-    <string name="settings_generated_chapters">فصول تم إنشاؤها</string>
+    <string name="settings_generated_chapters">إنشاء الفصول تلقائيًا</string>
     <string name="profile_stats_listening_activity_info_summary">تقديرًا للوقت الذي قضيتَهُ في الاستماع، بناءً على سجل التشغيل الخاص بك. إذا أنهيت حلقة على مدار بضعة أيَّام، فسوف تظهر في اليوم الأخير.</string>
     <string name="profile_stats_listening_activity_info_title">نشاط الاستماع</string>
     <string name="profile_stats_listening_activity_info_help">معلومات</string>
@@ -256,7 +276,6 @@ Language: ar
     <string name="blogs_found_headline">قراءة مدونتك بصوت عالٍ</string>
     <string name="blogs_found_followed_badge">تمت متابعة البث الصوتي</string>
     <string name="blogs_found_feed_detected">تم العثور على تلقيم</string>
-    <string name="chapters_generated_disclaimer">يجري إنشاء هذه الفصول تلقائيًا، وقد لا تكون دقيقة بالكامل.</string>
     <string name="chat_play_quote">تشغيل اقتباس</string>
     <string name="chat_clear">مسح المحادثة</string>
     <string name="chat_send">إرسال</string>
@@ -1790,7 +1809,6 @@ Language: ar
     <string name="settings_manage_downloads_total">الإجمالي</string>
     <string name="settings_manage_downloads_include_starred">تضمين</string>
     <string name="settings_lock_image">lock image</string>
-    <string name="settings_licenses">التراخيص</string>
     <string name="settings_learn_more">أعرف أكثر</string>
     <string name="settings_keep_screen_awake_summary">إذا كان قيد التشغيل، فلن تقفل الشاشة في أثناء التشغيل.</string>
     <string name="settings_keep_screen_awake">إبقاء الشاشة نشطة</string>
@@ -2248,7 +2266,6 @@ Language: ar
     <string name="podcasts_share_missing_title">يرجى إدخال اسم لقائمتك.</string>
     <string name="podcasts_share_create_error">عذرًا، تتعذر المشاركة</string>
     <string name="podcasts_share_title">الاسم</string>
-    <string name="podcasts_share_selected_podcasts">مشاركة حلقات البث الصوتي المُحدَّدة</string>
     <string name="podcasts_share_select_all">تحديد الكل</string>
     <string name="podcasts_share_list">قائمة مشتركة</string>
     <string name="podcasts_share_description">الوصف (إختياري)</string>
@@ -2310,11 +2327,9 @@ Language: ar
     <string name="player_sleep_60_minutes">60 دقيقة</string>
     <string name="player_sleep_30_minutes">30 دقيقة</string>
     <string name="player_sleep_15_minutes">15 دقيقة</string>
-    <string name="player_pip">دخول صورة داخل صورة</string>
     <string name="player_notification_skip_forward">تقديم %d من الثواني</string>
     <string name="player_notification_skip_back">الرجوع %d من الثواني</string>
     <string name="player_more_actions">المزيد من الإجراءات</string>
-    <string name="player_full_screen">وضع ملء الشاشة</string>
     <string name="player_effects_volume_boost">تعزيز الصوت</string>
     <string name="player_effects_voices_sound_louder">تبدو الأصوات أعلى</string>
     <string name="player_effects_trim_silence">إزالة السكوت</string>
@@ -2328,7 +2343,6 @@ Language: ar
     <string name="player_effects">تأثيرات المُشغِّل</string>
     <string name="player_close">إغلاق المُشغِّل</string>
     <string name="player_chapter_url">عنوان URL الخاص بالفصل</string>
-    <string name="player_actions">أحداث الحلقة</string>
     <string name="player_action_previous_chapter">الفصل السابق</string>
     <string name="player_action_next_chapter">الفصل التالي</string>
     <string name="time_left">متبقي %s</string>
@@ -2494,6 +2508,22 @@ Language: ar
         <item quantity="few">فصول</item>
         <item quantity="many">فصول</item>
         <item quantity="other">فصول</item>
+    </plurals>
+    <plurals name="chapters_generated_count">
+        <item quantity="zero">%d من الفصول تم إنشاؤها</item>
+        <item quantity="one">%d من الفصول تم إنشاؤها</item>
+        <item quantity="two">%d من الفصول تم إنشاؤها</item>
+        <item quantity="few">%d من الفصول تم إنشاؤها</item>
+        <item quantity="many">%d من الفصول تم إنشاؤها</item>
+        <item quantity="other">%d من الفصول تم إنشاؤها</item>
+    </plurals>
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="zero">⁦%1$d⁩ من الفصول تم إنشاؤها • ⁦%2$d⁩ مخفية</item>
+        <item quantity="one">⁦%1$d⁩ من الفصول تم إنشاؤها • ⁦%2$d⁩ مخفية</item>
+        <item quantity="two">⁦%1$d⁩ من الفصول تم إنشاؤها • ⁦%2$d⁩ مخفية</item>
+        <item quantity="few">⁦%1$d⁩ من الفصول تم إنشاؤها • ⁦%2$d⁩ مخفية</item>
+        <item quantity="many">⁦%1$d⁩ من الفصول تم إنشاؤها • ⁦%2$d⁩ مخفية</item>
+        <item quantity="other">⁦%1$d⁩ من الفصول تم إنشاؤها • ⁦%2$d⁩ مخفية</item>
     </plurals>
     <plurals name="day">
         <item quantity="zero">يوم</item>

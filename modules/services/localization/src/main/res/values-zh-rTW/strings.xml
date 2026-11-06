@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-21 09:55:08+0000
+Translation-Revision-Date: 2026-11-05 09:56:00+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="settings_generated_chapters_summary">若單集未提供章節資訊，Pocket Casts 會自動產生。</string>
+    <string name="podcasts_played_podcasts_show">顯示</string>
+    <string name="podcasts_played_podcasts_hide">隱藏</string>
+    <string name="podcasts_played_podcasts_description">隱藏聽過的 Podcast。 有新單集時會重新顯示。</string>
+    <string name="podcasts_menu_played_podcasts">播放過的 Podcast 節目</string>
+    <string name="chapters_generated_upsell_button">讀取產生的章節</string>
+    <string name="chapters_generated_upsell_message">有了 Pocket Casts Plus，再也不用手動控制進度。 直接進入正題。</string>
+    <string name="chapters_generated_upsell_title">自動產生的章節</string>
+    <string name="chapters_generated_turn_on">開啟</string>
+    <string name="chapters_generated_off_message">重新開啟，以直接跳至你想聽的部分。</string>
+    <string name="chapters_generated_off_title">產生的章節已關閉</string>
+    <string name="chapters_generated_undo">復原</string>
+    <string name="chapters_generated_turned_off">已關閉產生的章節</string>
+    <string name="chapters_generated_turn_off">關閉產生的章節</string>
+    <string name="chat_loading_still_working">仍在處理中…</string>
+    <string name="chat_loading_writing_answer">撰寫你的答案</string>
+    <string name="chat_loading_finding_moments">正在尋找正確的時間點</string>
+    <string name="chat_loading_reading_transcript">正在閱讀逐字稿</string>
+    <string name="automotive_nothing_playing_title">選擇要播放的單集</string>
+    <string name="chat_quote_finding_moment">正在尋找出現時刻…</string>
+    <string name="chat_quote_play_failed">無法播放此單集的這個部分</string>
+    <string name="chat_history_empty_body">詢問單集相關問題，聊天室就會顯示於此處。</string>
+    <string name="chat_history_empty_title">尚無聊天</string>
     <string name="chat_about_episode">討論「%1$s」</string>
     <string name="chat_now_playing_episode">正在播放「%1$s」</string>
     <string name="chat_undo">復原</string>
@@ -18,8 +41,6 @@ Language: zh_TW
     <string name="chat_answering">正在回答</string>
     <string name="chat_error_server_on_our_end">系統發生錯誤。</string>
     <string name="chat_not_sent_tap_to_retry">未傳送， 點選即可重試。</string>
-    <string name="chat_feedback_send_failed">無法傳送意見回饋， 請檢查連線。</string>
-    <string name="chat_feedback_sending">正在傳送意見回饋</string>
     <string name="chat_feedback_what_went_wrong">問題狀況</string>
     <string name="chat_beta_sheet_sign_in">登入即可試試看</string>
     <string name="episode_chat_needs_transcript_message">如果要詢問關於此單集的內容，需要提供逐字稿。 這個單集並未提供逐字稿。</string>
@@ -213,8 +234,7 @@ Language: zh_TW
     <string name="settings_audio_only">僅音訊</string>
     <string name="settings_audio_only_summary">如果開啟，含影片的單集將以僅音訊的形式播放，以節省流量。</string>
     <string name="profile_try_duration_for_free">免費試用 %1$s</string>
-    <string name="settings_generated_chapters_summary">顯示自動產生的章節 (若有)。</string>
-    <string name="settings_generated_chapters">產生的章節</string>
+    <string name="settings_generated_chapters">自動產生章節</string>
     <string name="profile_stats_listening_activity_info_title">收聽活動</string>
     <string name="profile_stats_listening_activity_info_help">資訊</string>
     <string name="profile_stats_listening_activity_info_summary">根據播放歷史，預估收聽的時間點。 如果你分幾天聽完一集，此記錄會在最後一天顯示。</string>
@@ -256,7 +276,6 @@ Language: zh_TW
     <string name="blogs_found_followed_badge">已追蹤的 PODCAST</string>
     <string name="blogs_found_feed_detected">找到的摘要</string>
     <string name="blogs_found_headline">大聲朗讀你的部落格</string>
-    <string name="chapters_generated_disclaimer">系統會自動產生這些章節，但可能不會完全正確。</string>
     <string name="chat_play_quote">播放引文</string>
     <string name="chat_clear">清除對話</string>
     <string name="chat_send">傳送</string>
@@ -1771,7 +1790,6 @@ Language: zh_TW
     <string name="settings_notification_actions">動作</string>
     <string name="settings_manage_downloads_include_starred">包括加星號項目</string>
     <string name="settings_lock_image">鎖定圖片</string>
-    <string name="settings_licenses">授權</string>
     <string name="settings_keep_screen_awake_summary">若啟用，播放時螢幕不會鎖定。</string>
     <string name="settings_keep_screen_awake">保持螢幕喚醒</string>
     <string name="settings_instagram">Instagram 連結</string>
@@ -2256,7 +2274,6 @@ Language: zh_TW
     <string name="podcasts_share_missing_title">請為清單輸入標題。</string>
     <string name="podcasts_share_create_error">糟糕，無法分享</string>
     <string name="podcasts_share_title">標題</string>
-    <string name="podcasts_share_selected_podcasts">分享選取的 Podcast</string>
     <string name="podcasts_share_select_all">全部選取</string>
     <string name="podcasts_share_list">已分享的清單</string>
     <string name="podcasts_share_description">說明 (選填)</string>
@@ -2297,10 +2314,8 @@ Language: zh_TW
     <string name="player_sleep_60_minutes">60 分鐘</string>
     <string name="player_sleep_30_minutes">30 分鐘</string>
     <string name="player_sleep_15_minutes">15 分鐘</string>
-    <string name="player_pip">進入子母畫面</string>
     <string name="player_notification_skip_forward">往前 %d 秒</string>
     <string name="player_notification_skip_back">倒退 %d 秒</string>
-    <string name="player_full_screen">全螢幕</string>
     <string name="player_effects_voices_sound_louder">音量更大聲</string>
     <string name="player_effects_trim_level">修剪等級</string>
     <string name="player_effects_speed_up">加速</string>
@@ -2308,7 +2323,6 @@ Language: zh_TW
     <string name="player_effects_speed">速度</string>
     <string name="player_effects">播放器效果</string>
     <string name="player_close">關閉播放器</string>
-    <string name="player_actions">單集動作</string>
     <string name="player_action_previous_chapter">上一節</string>
     <string name="player_action_next_chapter">下一節</string>
     <string name="time_left">剩下 %s</string>
@@ -2479,6 +2493,12 @@ Language: zh_TW
     </plurals>
     <plurals name="chapter">
         <item quantity="other">章節</item>
+    </plurals>
+    <plurals name="chapters_generated_count">
+        <item quantity="other">%d 個產生的章節</item>
+    </plurals>
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="other">%1$d 個產生的章節 • %2$d 個已隱藏的章節</item>
     </plurals>
     <plurals name="day">
         <item quantity="other">天</item>
