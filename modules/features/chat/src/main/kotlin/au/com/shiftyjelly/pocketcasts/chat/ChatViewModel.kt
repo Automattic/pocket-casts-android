@@ -397,19 +397,19 @@ class ChatViewModel @Inject constructor(
             }.collect { (chatEpisodeUuid, quotes, hasAnswerTimestamps) -> warmUpQuotes(chatEpisodeUuid, quotes, hasAnswerTimestamps) }
         }
         viewModelScope.launch(ioDispatcher) {
-            var previousLoadedEpisodeUuid: String? = null
+            var prefetchedVersion = quoteSeeker.playbackTimesVersion.value
             combine(
                 _uiState.map { it.episodeUuid to it.messages }.distinctUntilChanged(),
                 playbackManager.playbackStateFlow.map { it.loadedEpisodeUuid }.distinctUntilChanged(),
-            ) { (chatEpisodeUuid, messages), loadedEpisodeUuid ->
-                Triple(chatEpisodeUuid, loadedEpisodeUuid, messages.latestAnswerGroup())
-            }.collect { (chatEpisodeUuid, loadedEpisodeUuid, answerGroup) ->
-                if (loadedEpisodeUuid != previousLoadedEpisodeUuid && previousLoadedEpisodeUuid != null && loadedEpisodeUuid != null) {
-                    quoteSeeker.forgetPlaybackTimes(loadedEpisodeUuid)
+                quoteSeeker.playbackTimesVersion,
+            ) { (chatEpisodeUuid, messages), loadedEpisodeUuid, version ->
+                Triple(chatEpisodeUuid.takeIf { it == loadedEpisodeUuid }, messages.latestAnswerGroup(), version)
+            }.collect { (loadedChatEpisodeUuid, answerGroup, version) ->
+                if (version != prefetchedVersion) {
+                    prefetchedVersion = version
                     prefetchedMessageUuids.clear()
                 }
-                previousLoadedEpisodeUuid = loadedEpisodeUuid
-                if (chatEpisodeUuid == loadedEpisodeUuid) prefetchPlaybackTimes(chatEpisodeUuid, answerGroup)
+                if (loadedChatEpisodeUuid != null) prefetchPlaybackTimes(loadedChatEpisodeUuid, answerGroup)
             }
         }
     }

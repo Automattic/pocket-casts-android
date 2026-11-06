@@ -171,7 +171,10 @@ class ChatViewModelTest {
         viewModel = createViewModel()
     }
 
+    private val playbackTimesVersion = MutableStateFlow(0)
+
     private val quoteSeeker = mock<ChatQuoteSeeker> {
+        on { playbackTimesVersion } doReturn playbackTimesVersion
         on { quoteTime(any(), any()) } doSuspendableAnswer {
             val quote = it.arguments[1] as ChatMessage.Quote
             ChatQuoteSeeker.QuoteTime(timeMs = quote.startMs, referenceTimeMs = null)
@@ -2824,6 +2827,18 @@ class ChatViewModelTest {
         verify(quoteSeeker).prefetchPlaybackTime(org.mockito.kotlin.eq(episode.value), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 65_000, referenceTimeMs = 65_000)))
         verify(quoteSeeker).prefetchQuote(org.mockito.kotlin.eq(episode.value), org.mockito.kotlin.argThat { uuid == quote.uuid })
         verify(quoteSeeker, never()).prefetchPlaybackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 30_000, referenceTimeMs = 30_000)))
+    }
+
+    @Test
+    fun `the latest answer is prefetched again after its cached positions are forgotten`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        answerState()
+
+        playbackTimesVersion.value = 1
+        advanceUntilIdle()
+
+        verify(quoteSeeker, times(2)).prefetchPlaybackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 65_000, referenceTimeMs = 65_000)))
     }
 
     @Test

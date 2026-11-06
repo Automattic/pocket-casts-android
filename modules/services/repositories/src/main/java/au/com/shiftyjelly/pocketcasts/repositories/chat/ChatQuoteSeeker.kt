@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -28,6 +29,13 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
@@ -36,6 +44,7 @@ import timber.log.Timber
 class ChatQuoteSeeker @Inject constructor(
     private val transcriptManager: TranscriptManager,
     private val fingerprintTimingManager: Lazy<FingerprintTimingManager>,
+    private val playbackManager: Lazy<PlaybackManager>,
     private val appPlatform: AppPlatform,
     private val decodePolicy: FingerprintDecodePolicy,
     @ApplicationScope private val scope: CoroutineScope,
@@ -43,8 +52,18 @@ class ChatQuoteSeeker @Inject constructor(
     private val pendingTranscripts = ConcurrentHashMap<Pair<String, Boolean>, Deferred<Transcript.Text?>>()
     private val playbackTimes = ConcurrentHashMap<PlaybackTimeKey, Deferred<Int?>>()
     private val prefetches = Channel<PlaybackTimePrefetch>(Channel.UNLIMITED)
+    private val _playbackTimesVersion = MutableStateFlow(0)
+    val playbackTimesVersion = _playbackTimesVersion.asStateFlow()
 
     init {
+        scope.launch {
+            playbackManager.get().playbackStateFlow
+                .map { state -> state.episodeUuid.takeIf { it.isNotEmpty() && !state.isEmpty && !state.isStopped && !state.isError } }
+                .distinctUntilChanged()
+                .drop(1)
+                .filterNotNull()
+                .collect { episodeUuid -> forgetPlaybackTimes(episodeUuid) }
+        }
         scope.launch {
             for (prefetch in prefetches) {
                 try {
@@ -118,8 +137,7 @@ class ChatQuoteSeeker @Inject constructor(
     }
 
     fun prefetchPlaybackTime(episode: BaseEpisode, quoteTime: QuoteTime) {
-        val playbackTime = pendingPlaybackTime(episode, quoteTime)
-        prefetches.trySend(PlaybackTimePrefetch { playbackTime })
+        prefetches.trySend(PlaybackTimePrefetch { pendingPlaybackTime(episode, quoteTime) })
     }
 
     fun prefetchQuote(episode: BaseEpisode, quote: ChatMessage.Quote) {
@@ -127,7 +145,9 @@ class ChatQuoteSeeker @Inject constructor(
     }
 
     fun forgetPlaybackTimes(episodeUuid: String) {
-        playbackTimes.keys.removeAll { it.episodeUuid == episodeUuid }
+        if (playbackTimes.keys.removeAll { it.episodeUuid == episodeUuid }) {
+            _playbackTimesVersion.update { it + 1 }
+        }
     }
 
     private fun pendingPlaybackTime(episode: BaseEpisode, quoteTime: QuoteTime): Deferred<Int?> {
@@ -135,7 +155,8 @@ class ChatQuoteSeeker @Inject constructor(
             ?: return CompletableDeferred(value = null)
         val key = PlaybackTimeKey(episode.uuid, episode.downloadedFilePath ?: episode.downloadUrl, referenceTimeMs)
         return playbackTimes.computeIfAbsent(key) {
-            scope.async(start = CoroutineStart.LAZY) {
+            lateinit var playbackTime: Deferred<Int?>
+            playbackTime = scope.async(start = CoroutineStart.LAZY) {
                 var playbackTimeMs: Int? = null
                 try {
                     playbackTimeMs = withTimeoutOrNull(FINGERPRINT_RESOLVE_TIMEOUT) {
@@ -146,10 +167,11 @@ class ChatQuoteSeeker @Inject constructor(
                 } catch (e: Exception) {
                     Timber.w(e, "ChatQuoteSeeker: could not resolve the playback time for $referenceTimeMs ms")
                 } finally {
-                    if (playbackTimeMs == null) playbackTimes.remove(key)
+                    if (playbackTimeMs == null) playbackTimes.remove(key, playbackTime)
                 }
                 playbackTimeMs
             }
+            playbackTime
         }
     }
 
