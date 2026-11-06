@@ -26,6 +26,8 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
@@ -48,7 +50,7 @@ class ChatQuoteSeeker @Inject constructor(
                 try {
                     prefetch.load().join()
                 } catch (e: CancellationException) {
-                    throw e
+                    currentCoroutineContext().ensureActive()
                 } catch (e: Exception) {
                     Timber.w(e, "ChatQuoteSeeker: playback time prefetch failed")
                 }
@@ -124,16 +126,28 @@ class ChatQuoteSeeker @Inject constructor(
         prefetches.trySend(PlaybackTimePrefetch { pendingPlaybackTime(episode, quoteTime(episode.uuid, quote)) })
     }
 
+    fun forgetPlaybackTimes(episodeUuid: String) {
+        playbackTimes.keys.removeAll { it.episodeUuid == episodeUuid }
+    }
+
     private fun pendingPlaybackTime(episode: BaseEpisode, quoteTime: QuoteTime): Deferred<Int?> {
         val referenceTimeMs = quoteTime.referenceTimeMs?.takeIf { it >= 0 && isFingerprintSeekEnabled() }
             ?: return CompletableDeferred(value = null)
         val key = PlaybackTimeKey(episode.uuid, episode.downloadedFilePath ?: episode.downloadUrl, referenceTimeMs)
         return playbackTimes.computeIfAbsent(key) {
             scope.async(start = CoroutineStart.LAZY) {
-                val playbackTimeMs = withTimeoutOrNull(FINGERPRINT_RESOLVE_TIMEOUT) {
-                    playbackTime(episode, referenceTimeMs.milliseconds)
-                }?.inWholeMilliseconds?.toInt()
-                if (playbackTimeMs == null) playbackTimes.remove(key)
+                var playbackTimeMs: Int? = null
+                try {
+                    playbackTimeMs = withTimeoutOrNull(FINGERPRINT_RESOLVE_TIMEOUT) {
+                        playbackTime(episode, referenceTimeMs.milliseconds)
+                    }?.inWholeMilliseconds?.toInt()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Timber.w(e, "ChatQuoteSeeker: could not resolve the playback time for $referenceTimeMs ms")
+                } finally {
+                    if (playbackTimeMs == null) playbackTimes.remove(key)
+                }
                 playbackTimeMs
             }
         }

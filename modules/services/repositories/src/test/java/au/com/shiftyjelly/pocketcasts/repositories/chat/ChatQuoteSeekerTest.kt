@@ -17,9 +17,12 @@ import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.job
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -78,12 +81,13 @@ class ChatQuoteSeekerTest {
     private fun TestScope.seeker(
         appPlatform: AppPlatform = AppPlatform.Phone,
         policy: FingerprintPolicy = FingerprintPolicy.PLATFORM,
+        scope: CoroutineScope = backgroundScope,
     ) = ChatQuoteSeeker(
         transcriptManager = transcriptManager,
         fingerprintTimingManager = Lazy { timingManager },
         appPlatform = appPlatform,
         decodePolicy = mock { on { current() } doReturn policy },
-        scope = backgroundScope,
+        scope = scope,
     )
 
     @Test
@@ -166,6 +170,46 @@ class ChatQuoteSeekerTest {
         verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), eq(1_383_380.milliseconds), any()) }
         assertEquals(1_353_280, seeker.seek(generatedQuote))
         verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), any(), any()) }
+    }
+
+    @Test
+    fun `a playback time that throws is retried on the next tap`() = runTest {
+        whenever(timingManager.resolvePlaybackTime(any(), any(), any()))
+            .thenThrow(IllegalStateException("decoder"))
+            .thenReturn(ChapterSeekResult.Resolved(31_000.milliseconds, usedPrior = false))
+        val seeker = seeker()
+        val quoteTime = ChatQuoteSeeker.QuoteTime(timeMs = 1_000, referenceTimeMs = 1_000)
+
+        assertNull(seeker.playbackTime(episode, quoteTime).await())
+        assertEquals(31_000, seeker.playbackTime(episode, quoteTime).await())
+    }
+
+    @Test
+    fun `prefetching keeps going after a quote fails to load`() = runTest {
+        whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenThrow(IllegalStateException("network"))
+        whenever(timingManager.resolvePlaybackTime(any(), eq(2_000.milliseconds), any()))
+            .thenReturn(ChapterSeekResult.Resolved(32_000.milliseconds, usedPrior = false))
+        val seeker = seeker(scope = CoroutineScope(backgroundScope.coroutineContext + SupervisorJob(backgroundScope.coroutineContext.job)))
+
+        seeker.prefetchQuote(episode, generatedQuote)
+        seeker.prefetchPlaybackTime(episode, ChatQuoteSeeker.QuoteTime(timeMs = 2_000, referenceTimeMs = 2_000))
+        runCurrent()
+
+        verifyBlocking(timingManager, times(1)) { resolvePlaybackTime(any(), eq(2_000.milliseconds), any()) }
+    }
+
+    @Test
+    fun `forgotten playback times are resolved again`() = runTest {
+        whenever(timingManager.resolvePlaybackTime(any(), any(), any()))
+            .thenReturn(ChapterSeekResult.Resolved(31_000.milliseconds, usedPrior = false))
+            .thenReturn(ChapterSeekResult.Resolved(45_000.milliseconds, usedPrior = false))
+        val seeker = seeker()
+        val quoteTime = ChatQuoteSeeker.QuoteTime(timeMs = 1_000, referenceTimeMs = 1_000)
+
+        assertEquals(31_000, seeker.playbackTime(episode, quoteTime).await())
+        seeker.forgetPlaybackTimes(EPISODE_UUID)
+
+        assertEquals(45_000, seeker.playbackTime(episode, quoteTime).await())
     }
 
     @Test

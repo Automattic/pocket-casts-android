@@ -92,6 +92,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
@@ -2056,7 +2057,6 @@ class ChatViewModelTest {
             assertEquals(ChatToast.QuoteJumping(startMs = 65_000), awaitItem())
 
             userSeeks.emit(Unit)
-            resolved.complete(80_000)
             runCurrent()
 
             assertEquals(ChatToast.QuoteJumpCancelled, awaitItem())
@@ -2227,6 +2227,51 @@ class ChatViewModelTest {
 
         verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
         verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(1_500), anyOrNull())
+    }
+
+    @Test
+    fun `undo keeps going back before the first quote when a jump is replaced while the next one is jumping`() = runTest {
+        val first = createQuote(startMs = 1_000, endMs = 3_000)
+        val second = createQuote(startMs = 5_000, endMs = 7_000, uuid = "second-quote-uuid")
+        val third = createQuote(startMs = 9_000, endMs = 11_000, uuid = "third-quote-uuid")
+        whenever(quoteSeeker.playbackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 5_000, referenceTimeMs = null)))).thenReturn(CompletableDeferred())
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        chatManager.messages.value = listOf(first, second, third)
+        setEpisodeInfo(123_000)
+        advanceUntilIdle()
+
+        viewModel.playQuote(first.uuid)
+        advanceUntilIdle()
+        val firstToast = quotePlayingToast()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 1_500)
+        viewModel.playQuote(second.uuid)
+        advanceTimeBy(1_000)
+        viewModel.onQuoteUndoExpired(firstToast.undoId)
+        viewModel.playQuote(third.uuid)
+        advanceUntilIdle()
+        viewModel.undoQuotePlay()
+        advanceUntilIdle()
+
+        verify(playbackManager).seekToTimeMsSuspend(org.mockito.kotlin.eq(10_000), anyOrNull())
+        verify(playbackManager, never()).seekToTimeMsSuspend(org.mockito.kotlin.eq(1_500), anyOrNull())
+    }
+
+    @Test
+    fun `switching to the chat's episode forgets its cached positions`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        whenever(playbackManager.playNowSuspend(any<BaseEpisode>(), any(), any(), any())).then {
+            playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID)
+            Unit
+        }
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID)
+        playableState(quote)
+
+        viewModel.playQuote(quote.uuid)
+        advanceUntilIdle()
+
+        verify(quoteSeeker, atLeastOnce()).forgetPlaybackTimes(EPISODE_UUID)
     }
 
     @Test

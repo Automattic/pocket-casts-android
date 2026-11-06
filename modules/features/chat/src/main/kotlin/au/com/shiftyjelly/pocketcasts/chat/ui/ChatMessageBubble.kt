@@ -205,7 +205,7 @@ internal fun AiQuoteBubble(
     onClickPlay: () -> Unit = {},
 ) {
     val timestampColor = if (isPlayable) theme.timestamp else theme.secondaryText
-    val text = remember(quote, timestampLabel, timestampColor, isLoading) {
+    val text = remember(quote, timestampLabel, theme.aiBubbleText, timestampColor, isLoading) {
         quoteText(quote, timestampLabel, theme.aiBubbleText, timestampColor, isLoading)
     }
     val wipe = remember { TextWipe() }
