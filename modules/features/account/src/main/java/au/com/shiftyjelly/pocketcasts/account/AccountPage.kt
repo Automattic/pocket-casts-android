@@ -191,7 +191,6 @@ private fun CarButtons(
     onCreateClick: () -> Unit,
     onSignInClick: () -> Unit,
 ) {
-    val colors = MaterialTheme.theme.colors
     val textSize = dimensionResource(CR.dimen.car_body2_size).value.sp
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
