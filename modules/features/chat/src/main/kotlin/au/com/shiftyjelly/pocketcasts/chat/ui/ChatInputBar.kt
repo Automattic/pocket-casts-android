@@ -1,16 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -20,6 +25,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -28,11 +34,19 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
+import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -41,6 +55,8 @@ internal fun ChatInputBar(
     text: String,
     onTextChange: (String) -> Unit,
     onSend: () -> Unit,
+    isAnswering: Boolean,
+    onStop: () -> Unit,
     isConnected: Boolean,
     canSend: Boolean,
     showBetaNote: Boolean,
@@ -68,6 +84,7 @@ internal fun ChatInputBar(
                 .alpha(if (isConnected) 1f else DISABLED_ALPHA)
                 .padding(
                     start = 16.dp,
+                    top = 8.dp,
                     end = 16.dp,
                     bottom = 8.dp,
                 ),
@@ -79,7 +96,7 @@ internal fun ChatInputBar(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                 keyboardActions = KeyboardActions(onSend = {
-                    if (canSend) {
+                    if (canSend && !isAnswering) {
                         onSend()
                         keyboardController?.hide()
                     }
@@ -112,28 +129,17 @@ internal fun ChatInputBar(
                 },
                 modifier = Modifier.weight(1f),
             )
-            IconButton(
-                onClick = {
+            SendOrStopButton(
+                isAnswering = isAnswering,
+                canSend = canSend,
+                onSend = {
                     onSend()
                     keyboardController?.hide()
                 },
-                enabled = canSend,
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (canSend) theme.sendButton else theme.inputBackground,
-                        CircleShape,
-                    ),
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = stringResource(LR.string.chat_send),
-                    tint = if (canSend) theme.sendButtonIcon else theme.inputHint,
-                    modifier = Modifier.size(24.dp),
-                )
-            }
+                onStop = onStop,
+                theme = theme,
+                modifier = Modifier.padding(start = 8.dp),
+            )
         }
         if (showBetaNote) {
             Text(
@@ -143,6 +149,55 @@ internal fun ChatInputBar(
                 lineHeight = 16.sp,
                 modifier = Modifier.padding(top = 10.dp, bottom = 8.dp),
             )
+        }
+    }
+}
+
+@Composable
+private fun SendOrStopButton(
+    isAnswering: Boolean,
+    canSend: Boolean,
+    onSend: () -> Unit,
+    onStop: () -> Unit,
+    theme: ChatTheme,
+    modifier: Modifier = Modifier,
+) {
+    val isEnabled = isAnswering || canSend
+    val stopLabel = stringResource(LR.string.stop)
+    IconButton(
+        onClick = if (isAnswering) onStop else onSend,
+        enabled = isEnabled,
+        modifier = modifier
+            .size(44.dp)
+            .clip(CircleShape)
+            .background(if (isEnabled) theme.sendButton else theme.inputBackground, CircleShape),
+    ) {
+        Crossfade(
+            targetState = isAnswering,
+            animationSpec = if (rememberIsReduceMotionEnabled()) snap() else tween(SEND_STOP_CROSSFADE_MS),
+            label = "sendOrStop",
+            modifier = Modifier.size(SendIconSize),
+        ) { showStop ->
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                if (showStop) {
+                    Box(
+                        modifier = Modifier
+                            .size(StopIconSize)
+                            .background(theme.sendButtonIcon, RoundedCornerShape(3.dp))
+                            .semantics { contentDescription = stopLabel },
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = stringResource(LR.string.chat_send),
+                        tint = if (canSend) theme.sendButtonIcon else theme.inputHint,
+                        modifier = Modifier.size(SendIconSize),
+                    )
+                }
+            }
         }
     }
 }
@@ -172,3 +227,32 @@ private fun ChatOfflineNote(
 }
 
 internal const val DISABLED_ALPHA = 0.4f
+private val SendIconSize = 24.dp
+private val StopIconSize = 14.dp
+private const val SEND_STOP_CROSSFADE_MS = 150
+
+@Preview
+@Composable
+private fun ChatInputBarPreview(
+    @PreviewParameter(AnsweringParameterProvider::class) isAnswering: Boolean,
+) {
+    AppTheme(Theme.ThemeType.DARK) {
+        CompositionLocalProvider(LocalPodcastColors provides PodcastColors.ForUserEpisode) {
+            ChatInputBar(
+                text = "",
+                onTextChange = {},
+                onSend = {},
+                isAnswering = isAnswering,
+                onStop = {},
+                isConnected = true,
+                canSend = false,
+                showBetaNote = true,
+                theme = rememberChatTheme(),
+            )
+        }
+    }
+}
+
+private class AnsweringParameterProvider : PreviewParameterProvider<Boolean> {
+    override val values = sequenceOf(false, true)
+}

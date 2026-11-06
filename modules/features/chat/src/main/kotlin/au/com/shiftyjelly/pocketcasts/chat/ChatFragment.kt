@@ -208,11 +208,14 @@ class ChatFragment : BaseDialogFragment() {
                     onOpenHistoryChat = viewModel::openHistoryChat,
                     onDeleteHistoryChat = viewModel::deleteHistoryChat,
                     onClickPlayPause = viewModel::onPlayPauseClick,
+                    onSeek = viewModel::onSeek,
                     onInputTextChange = viewModel::onInputTextChange,
                     onSend = viewModel::onSend,
-                    onClickSuggestion = viewModel::onSummarizeClick,
+                    onStopAnswer = viewModel::onStopAnswer,
+                    onClickSuggestion = viewModel::onSuggestionClick,
                     onRetry = viewModel::retry,
                     onPlayQuote = viewModel::playQuote,
+                    onPlayAnswerTimestamp = viewModel::playAnswerTimestamp,
                     onRateAnswer = ::rateAnswer,
                     snackbarHostState = snackbarHostState,
                     onDismissBetaSheet = viewModel::dismissBetaSheet,
@@ -234,6 +237,7 @@ class ChatFragment : BaseDialogFragment() {
             podcastColors = viewModel.uiState.value.podcastColors,
             trigger = ChatFeedbackFragment.Trigger.ResponseRating,
             messageIndex = viewModel.answerMessageIndex(answerUuid),
+            answerUuid = answerUuid,
         )
     }
 

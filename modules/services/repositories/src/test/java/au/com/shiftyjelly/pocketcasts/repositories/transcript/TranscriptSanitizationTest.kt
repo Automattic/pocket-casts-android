@@ -321,6 +321,255 @@ class TranscriptSanitizationTest {
                 output.withoutWords(),
             )
         }
+
+        @Test
+        fun `keep CJK sentences as separate entries`() {
+            val input = buildTranscript {
+                text("これはペンです。", startTimeMs = 0, endTimeMs = 1000)
+                text("今日はいい天気ですね！", startTimeMs = 1000, endTimeMs = 2000)
+                text("元気ですか？", startTimeMs = 2000, endTimeMs = 3000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("これはペンです。", startTimeMs = 0, endTimeMs = 1000)
+                    text("今日はいい天気ですね！", startTimeMs = 1000, endTimeMs = 2000)
+                    text("元気ですか？", startTimeMs = 2000, endTimeMs = 3000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `split CJK mid-sentence break to next entry`() {
+            val input = buildTranscript {
+                text("最初の文。続きは")
+                text("次の文。")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("最初の文。")
+                    text("続きは 次の文。")
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `split CJK mid-sentence preserves timing and word offsets`() {
+            val input = buildTranscript {
+                text("最初の文。続きは", startTimeMs = 0, endTimeMs = 1000)
+                text("次の文。", startTimeMs = 1000, endTimeMs = 2000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("最初の文。", startTimeMs = 0, endTimeMs = 625)
+                    text("続きは 次の文。", startTimeMs = 625, endTimeMs = 2000)
+                },
+                output.withoutWords(),
+            )
+
+            val secondEntry = output[1] as TranscriptEntry.Text
+            assertEquals(
+                listOf(
+                    TranscriptEntry.WordTiming("続きは", 625, 1000, 0, 3),
+                    TranscriptEntry.WordTiming("次の文。", 1000, 2000, 4, 8),
+                ),
+                secondEntry.words,
+            )
+        }
+
+        @Test
+        fun `do not treat a bare CJK closing mark as a sentence end`() {
+            val input = buildTranscript {
+                text("これは「AI」")
+                text("について話します。")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("これは「AI」 について話します。")
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `keep Devanagari sentences as separate entries`() {
+            val input = buildTranscript {
+                text("यह एक कलम है।", startTimeMs = 0, endTimeMs = 1000)
+                text("आज मौसम अच्छा है।", startTimeMs = 1000, endTimeMs = 2000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("यह एक कलम है।", startTimeMs = 0, endTimeMs = 1000)
+                    text("आज मौसम अच्छा है।", startTimeMs = 1000, endTimeMs = 2000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `split unpunctuated transcript into entries at cue boundaries`() {
+            val cue = "あ".repeat(20)
+            val input = buildTranscript {
+                repeat(8) { index -> text(cue, startTimeMs = index * 3000L, endTimeMs = (index + 1) * 3000L) }
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text(List(4) { cue }.joinToString(" "), startTimeMs = 0, endTimeMs = 12000)
+                    text(List(4) { cue }.joinToString(" "), startTimeMs = 12000, endTimeMs = 24000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `split unpunctuated transcript with long cues at cue boundaries`() {
+            val cue = "ก".repeat(80)
+            val input = buildTranscript {
+                repeat(4) { index -> text(cue, startTimeMs = index * 10_000L, endTimeMs = (index + 1) * 10_000L) }
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("$cue $cue", startTimeMs = 0, endTimeMs = 20_000)
+                    text("$cue $cue", startTimeMs = 20_000, endTimeMs = 40_000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `split long unpunctuated phrases before the time limit`() {
+            val cue = "ก".repeat(80)
+            val input = buildTranscript {
+                repeat(6) { index -> text(cue, startTimeMs = index * 5000L, endTimeMs = (index + 1) * 5000L) }
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("$cue $cue", startTimeMs = 0, endTimeMs = 10_000)
+                    text("$cue $cue", startTimeMs = 10_000, endTimeMs = 20_000)
+                    text("$cue $cue", startTimeMs = 20_000, endTimeMs = 30_000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `keep short unpunctuated phrases together past the time limit`() {
+            val cue = "あ".repeat(10)
+            val input = buildTranscript {
+                repeat(6) { index -> text(cue, startTimeMs = index * 15_000L, endTimeMs = (index + 1) * 15_000L) }
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text(List(6) { cue }.joinToString(" "), startTimeMs = 0, endTimeMs = 90_000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `split unpunctuated Devanagari transcript at cue boundaries`() {
+            val cue = "नमस्ते दोस्तों आज हम बात करेंगे ".repeat(3).trim()
+            val input = buildTranscript {
+                repeat(3) { index -> text(cue, startTimeMs = index * 10_000L, endTimeMs = (index + 1) * 10_000L) }
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("$cue $cue", startTimeMs = 0, endTimeMs = 20_000)
+                    text(cue, startTimeMs = 20_000, endTimeMs = 30_000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `do not split untimed unpunctuated transcript`() {
+            val cue = "あ".repeat(100)
+            val input = buildTranscript {
+                repeat(3) { text(cue) }
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text(List(3) { cue }.joinToString(" "))
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `do not split long sentences in punctuated transcript`() {
+            val cue = "and then we kept talking about it for a really long time"
+            val input = buildTranscript {
+                repeat(10) { index -> text("Short one.", startTimeMs = index * 2000L, endTimeMs = (index + 1) * 2000L) }
+                repeat(10) { index ->
+                    text(cue, startTimeMs = 20_000 + index * 3000L, endTimeMs = 20_000 + (index + 1) * 3000L)
+                }
+                text("the end.", startTimeMs = 50_000, endTimeMs = 51_000)
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    repeat(10) { index ->
+                        text("Short one.", startTimeMs = index * 2000L, endTimeMs = (index + 1) * 2000L)
+                    }
+                    text(List(10) { cue }.joinToString(" ") + " the end.", startTimeMs = 20_000, endTimeMs = 51_000)
+                },
+                output.withoutWords(),
+            )
+        }
+
+        @Test
+        fun `keep a Latin closing quote attached to a CJK sentence`() {
+            val input = buildTranscript {
+                text("彼は\"はい。\"それから")
+                text("帰った。")
+            }
+
+            val output = input.sanitize()
+
+            assertEquals(
+                buildTranscript {
+                    text("彼は\"はい。\"")
+                    text("それから 帰った。")
+                },
+                output.withoutWords(),
+            )
+        }
     }
 
     @RunWith(Parameterized::class)
@@ -355,11 +604,29 @@ class TranscriptSanitizationTest {
                 arrayOf("!", "exclamation mark"),
                 arrayOf("?", "question mark"),
                 arrayOf("…", "ellipsis"),
+                arrayOf("。", "ideographic full stop"),
+                arrayOf("！", "fullwidth exclamation mark"),
+                arrayOf("？", "fullwidth question mark"),
+                arrayOf("｡", "halfwidth ideographic full stop"),
+                arrayOf("؟", "arabic question mark"),
+                arrayOf("۔", "urdu full stop"),
+                arrayOf("।", "devanagari danda"),
+                arrayOf("॥", "devanagari double danda"),
+                arrayOf("။", "burmese section mark"),
+                arrayOf("។", "khmer khan"),
+                arrayOf("៕", "khmer bariyoosan"),
+                arrayOf("።", "ethiopic full stop"),
+                arrayOf("։", "armenian full stop"),
                 arrayOf("-", "hyphen"),
                 arrayOf(")", "parenthesis"),
                 arrayOf("]", "square bracket"),
                 arrayOf(">", "diamond bracket"),
                 arrayOf("}", "curly bracket"),
+                arrayOf("。」", "ideographic full stop with corner bracket"),
+                arrayOf("！」", "fullwidth exclamation mark with corner bracket"),
+                arrayOf("？」", "fullwidth question mark with corner bracket"),
+                arrayOf("。』", "ideographic full stop with white corner bracket"),
+                arrayOf("。）", "ideographic full stop with fullwidth parenthesis"),
                 arrayOf("\"", "double quote"),
                 arrayOf("”", "double styled quote"),
                 arrayOf("'", "single quote"),
@@ -399,6 +666,19 @@ class TranscriptSanitizationTest {
                 arrayOf("!", "exclamation mark"),
                 arrayOf("?", "question mark"),
                 arrayOf("…", "ellipsis"),
+                arrayOf("。", "ideographic full stop"),
+                arrayOf("！", "fullwidth exclamation mark"),
+                arrayOf("？", "fullwidth question mark"),
+                arrayOf("｡", "halfwidth ideographic full stop"),
+                arrayOf("؟", "arabic question mark"),
+                arrayOf("۔", "urdu full stop"),
+                arrayOf("।", "devanagari danda"),
+                arrayOf("॥", "devanagari double danda"),
+                arrayOf("။", "burmese section mark"),
+                arrayOf("។", "khmer khan"),
+                arrayOf("៕", "khmer bariyoosan"),
+                arrayOf("።", "ethiopic full stop"),
+                arrayOf("։", "armenian full stop"),
                 arrayOf(".\"", "dot double quote"),
                 arrayOf("!\"", "exclamation mark double quote"),
                 arrayOf("?\"", "question mark double quote"),
@@ -415,6 +695,13 @@ class TranscriptSanitizationTest {
                 arrayOf("!’", "exclamation mark with single styled quote"),
                 arrayOf("?’", "question mark with single styled quote"),
                 arrayOf("…’", "ellipsis with single styled quote"),
+                arrayOf("。」", "ideographic full stop with corner bracket"),
+                arrayOf("！」", "fullwidth exclamation mark with corner bracket"),
+                arrayOf("？」", "fullwidth question mark with corner bracket"),
+                arrayOf("。』", "ideographic full stop with white corner bracket"),
+                arrayOf("。\"", "ideographic full stop with double quote"),
+                arrayOf("。”", "ideographic full stop with double styled quote"),
+                arrayOf(".」", "dot with corner bracket"),
             )
         }
     }
@@ -450,6 +737,9 @@ class TranscriptSanitizationTest {
                 arrayOf("]", "square bracket"),
                 arrayOf(">", "diamond bracket"),
                 arrayOf("}", "curly bracket"),
+                arrayOf("）", "fullwidth parenthesis"),
+                arrayOf("」", "corner bracket"),
+                arrayOf("』", "white corner bracket"),
                 arrayOf("\"", "double quote"),
                 arrayOf("”", "double styled quote"),
                 arrayOf("'", "single quote"),

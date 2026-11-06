@@ -27,8 +27,10 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.delay
@@ -62,21 +64,33 @@ class ChaptersFragment : BaseFragment() {
             ChaptersTheme(state.podcast) {
                 val lazyListState = rememberLazyListState()
 
-                ChaptersPage(
-                    lazyListState = lazyListState,
-                    chapters = state.chapters,
-                    showHeader = state.showHeader,
-                    hasGeneratedChapters = state.hasGeneratedChapters,
-                    totalChaptersCount = state.chaptersCount,
-                    isTogglingChapters = state.isTogglingChapters,
-                    showSubscriptionIcon = state.showSubscriptionIcon,
-                    onChapterClick = viewModel::playChapter,
-                    onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
-                    onSelectionChange = viewModel::selectChapter,
-                    onUrlClick = ::openChapterUrl,
-                    resolvingChapterIndex = resolvingChapterIndex,
-                    modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
-                )
+                if (state.showUpsell) {
+                    ChaptersUpsell(
+                        onUpgradeClick = ::showGeneratedChaptersUpsell,
+                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+                    )
+                } else {
+                    ChaptersPage(
+                        lazyListState = lazyListState,
+                        chapters = state.chapters,
+                        showHeader = state.showHeader,
+                        hasGeneratedChapters = state.hasGeneratedChapters,
+                        totalChaptersCount = state.chaptersCount,
+                        isTogglingChapters = state.isTogglingChapters,
+                        showSubscriptionIcon = state.showSubscriptionIcon,
+                        onChapterClick = viewModel::playChapter,
+                        onSkipChaptersClick = viewModel::enableTogglingOrUpsell,
+                        onTurnOffGeneratedClick = ::turnOffGeneratedChapters,
+                        emptyState = state.emptyState,
+                        episodeUuid = state.episodeUuid,
+                        onTurnOnGeneratedClick = viewModel::turnOnGeneratedChapters,
+                        onGenerateClick = viewModel::generateChapters,
+                        onSelectionChange = viewModel::selectChapter,
+                        onUrlClick = ::openChapterUrl,
+                        resolvingChapterIndex = resolvingChapterIndex,
+                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+                    )
+                }
 
                 LaunchedEffect(Unit) {
                     viewModel.scrollToChapter.collect {
@@ -121,12 +135,28 @@ class ChaptersFragment : BaseFragment() {
         (parentFragment as? PlayerContainerFragment)?.openPlayer()
     }
 
+    private fun showGeneratedChaptersUpsell() {
+        OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(source = OnboardingUpgradeSource.GENERATED_CHAPTERS))
+    }
+
     private fun showUpsell() {
         val source = OnboardingUpgradeSource.SKIP_CHAPTERS
         val onboardingFlow = OnboardingFlow.Upsell(
             source = source,
         )
         OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
+    }
+
+    private fun turnOffGeneratedChapters() {
+        val viewModel = viewModel
+        viewModel.turnOffGeneratedChapters()
+        val snackBarView = when (val parent = parentFragment) {
+            is BaseDialogFragment -> parent.snackBarView()
+            else -> parent?.view
+        } ?: return
+        Snackbar.make(snackBarView, getString(LR.string.chapters_generated_turned_off), Snackbar.LENGTH_LONG)
+            .setAction(LR.string.chapters_generated_undo) { viewModel.undoTurnOffGeneratedChapters() }
+            .show()
     }
 
     private val ChaptersViewModel.Mode.themeType get() = when (this) {

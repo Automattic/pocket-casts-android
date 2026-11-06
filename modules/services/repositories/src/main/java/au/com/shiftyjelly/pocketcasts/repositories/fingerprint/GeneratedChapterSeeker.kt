@@ -2,11 +2,13 @@ package au.com.shiftyjelly.pocketcasts.repositories.fingerprint
 
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
 import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,6 +40,7 @@ class GeneratedChapterSeeker @Inject constructor(
     private val fingerprintTimingManager: Lazy<FingerprintTimingManager>,
     private val appPlatform: AppPlatform,
     private val decodePolicy: FingerprintDecodePolicy,
+    private val generatedChaptersAvailability: GeneratedChaptersAvailability,
 ) {
     data class ResolvingChapter(val episodeUuid: String, val chapterIndex: Int)
 
@@ -106,7 +109,7 @@ class GeneratedChapterSeeker @Inject constructor(
             _resolvingChapter.value = resolving
         }
         try {
-            return when (val result = manager.resolvePlaybackTime(episode, referenceTime)) {
+            return when (val result = manager.resolvePlaybackTime(episode, referenceTime, GeneratedChaptersDownloadTriggerType.ChapterTap)) {
                 is ChapterSeekResult.Resolved -> {
                     val playbackTime = ceil(result.playbackTime.toDouble(DurationUnit.SECONDS)).seconds
                     mutex.withLock {
@@ -146,5 +149,5 @@ class GeneratedChapterSeeker @Inject constructor(
         appPlatform == AppPlatform.Phone &&
         decodePolicy.current() != FingerprintPolicy.DISABLED &&
         FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS) &&
-        FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
+        generatedChaptersAvailability.isAllowed()
 }

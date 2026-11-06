@@ -13,6 +13,11 @@ android {
         viewBinding = true
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -50,24 +55,32 @@ dependencies {
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.viewpager)
+    implementation(libs.androidx.webkit)
+    implementation(libs.coil.compose)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
     implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
     implementation(libs.lifecycle.reactivestreams.ktx)
+    implementation(libs.lifecycle.runtime.compose)
     implementation(libs.okhttp)
     implementation(libs.rx2.android)
     implementation(libs.rx2.kotlin)
     implementation(libs.timber)
 
+    debugImplementation(libs.compose.ui.test.manifest)
+
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
 
+    testImplementation(libs.compose.ui.test.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.robolectric)
     testImplementation(libs.turbine)
 
     testImplementation(projects.modules.services.sharedtest)

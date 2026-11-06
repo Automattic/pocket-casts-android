@@ -43,8 +43,13 @@ fastlane/README.md
 # Downloaded dependencies such as 'configure' plugin: https://github.com/Automattic/configure
 /vendor
 
-# secrets
+# Leftover from before secrets moved out of the repo: `configure` decrypted here.
+# Keep ignored until stale copies are unlikely to linger in dev checkouts.
+#
+# See https://linear.app/a8c/issue/AINFRA-3485
 secret.properties
+
+# secrets
 .configure-files/firebase.secrets.json
 firebase.secrets.json
 *.keystore

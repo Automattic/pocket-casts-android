@@ -4,6 +4,7 @@ import kotlin.time.Duration
 
 data class Chapters(
     private val items: List<Chapter> = emptyList(),
+    val hasHiddenGeneratedChapters: Boolean = false,
 ) : List<Chapter> by items {
     val hasGeneratedChapters: Boolean
         get() = any { it.isGenerated }

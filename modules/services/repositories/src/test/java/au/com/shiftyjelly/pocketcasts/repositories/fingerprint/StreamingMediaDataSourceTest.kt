@@ -6,8 +6,10 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.TransferListener
+import java.io.IOException
 import java.util.concurrent.atomic.AtomicInteger
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -90,19 +92,32 @@ class StreamingMediaDataSourceTest {
         assertEquals(-1, source.readAt(10, buffer, 0, 10))
     }
 
-    private class FakeDataSourceFactory(private val data: ByteArray) : DataSource.Factory {
-        val createdSources = mutableListOf<FakeDataSource>()
+    @Test
+    fun `readAt closes a source that failed to open`() {
+        factory.failOpen = true
+        val source = StreamingMediaDataSource(factory, uri)
 
-        override fun createDataSource(): DataSource = FakeDataSource(data).also { createdSources += it }
+        assertThrows(IOException::class.java) { source.readAt(0, buffer, 0, 10) }
+
+        assertTrue(factory.createdSources.single().closed)
     }
 
-    private class FakeDataSource(private val data: ByteArray) : DataSource {
+    private class FakeDataSourceFactory(private val data: ByteArray) : DataSource.Factory {
+        val createdSources = mutableListOf<FakeDataSource>()
+        var failOpen = false
+
+        override fun createDataSource(): DataSource = FakeDataSource(data, failOpen).also { createdSources += it }
+    }
+
+    private class FakeDataSource(private val data: ByteArray, private val failOpen: Boolean) : DataSource {
         var openedAt = -1L
+        var closed = false
         private var readPosition = 0
 
         override fun addTransferListener(transferListener: TransferListener) = Unit
 
         override fun open(dataSpec: DataSpec): Long {
+            if (failOpen) throw IOException("open failed")
             openedAt = dataSpec.position
             readPosition = dataSpec.position.toInt()
             return data.size - dataSpec.position
@@ -118,6 +133,8 @@ class StreamingMediaDataSourceTest {
 
         override fun getUri(): Uri? = null
 
-        override fun close() = Unit
+        override fun close() {
+            closed = true
+        }
     }
 }

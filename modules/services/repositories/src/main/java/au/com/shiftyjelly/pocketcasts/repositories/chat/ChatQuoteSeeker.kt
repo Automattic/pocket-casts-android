@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
 import dagger.Lazy
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -116,7 +117,7 @@ class ChatQuoteSeeker @Inject constructor(
         val manager = fingerprintTimingManager.get()
         manager.densePlaybackTime(episode.uuid, referenceTime)?.let { return it }
         if (decodePolicy.current() != FingerprintPolicy.PLATFORM) return null
-        return (manager.resolvePlaybackTime(episode, referenceTime) as? ChapterSeekResult.Resolved)?.playbackTime
+        return (manager.resolvePlaybackTime(episode, referenceTime, GeneratedChaptersDownloadTriggerType.Chat) as? ChapterSeekResult.Resolved)?.playbackTime
     }
 
     private fun isFingerprintSeekEnabled() = appPlatform == AppPlatform.Phone &&

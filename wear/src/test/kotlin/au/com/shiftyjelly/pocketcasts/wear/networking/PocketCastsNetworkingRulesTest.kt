@@ -9,6 +9,8 @@ import com.google.android.horologist.networks.data.NetworkType.Wifi
 import com.google.android.horologist.networks.data.Networks
 import com.google.android.horologist.networks.data.RequestType
 import com.google.android.horologist.networks.data.Status
+import com.google.android.horologist.networks.rules.Allow
+import com.google.android.horologist.networks.rules.Fail
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
 
@@ -139,6 +141,32 @@ class PocketCastsNetworkingRulesTest {
         val networks = buildNetworksWithTypes(availableNetworkTypes)
         val resultNetworkStatus = PocketCastsNetworkingRules.getPreferredNetwork(networks, requestType)
         assertEquals(expectedNetworkType, resultNetworkStatus!!.networkInfo.type)
+    }
+
+    @Test
+    fun `wifi only downloads are high bandwidth and can't use cellular`() {
+        assertEquals(true, PocketCastsNetworkingRules.isHighBandwidthRequest(WifiOnlyDownloadRequest))
+        assertEquals(Allow, PocketCastsNetworkingRules.checkValidRequest(WifiOnlyDownloadRequest, NetworkInfo.Wifi(name = "")))
+        assertEquals(Allow, PocketCastsNetworkingRules.checkValidRequest(WifiOnlyDownloadRequest, NetworkInfo.Bluetooth(name = "")))
+        assertEquals(true, PocketCastsNetworkingRules.checkValidRequest(WifiOnlyDownloadRequest, NetworkInfo.Cellular(name = "")) is Fail)
+    }
+
+    @Test
+    fun `wifi only downloads prefer wifi then bluetooth and never cellular`() {
+        assertEquals(Wifi, preferredNetworkType(WifiOnlyDownloadRequest, listOf(Cell, BT, Wifi)))
+        assertEquals(BT, preferredNetworkType(WifiOnlyDownloadRequest, listOf(Cell, BT)))
+        assertEquals(null, preferredNetworkType(WifiOnlyDownloadRequest, listOf(Cell)))
+    }
+
+    @Test
+    fun `downloads on any network can use cellular`() {
+        assertEquals(Allow, PocketCastsNetworkingRules.checkValidRequest(RequestType.MediaRequest.DownloadRequest, NetworkInfo.Cellular(name = "")))
+        assertEquals(Wifi, preferredNetworkType(RequestType.MediaRequest.DownloadRequest, listOf(Cell, BT, Wifi)))
+        assertEquals(Cell, preferredNetworkType(RequestType.MediaRequest.DownloadRequest, listOf(BT, Cell)))
+    }
+
+    private fun preferredNetworkType(requestType: RequestType, networkTypes: List<NetworkType>): NetworkType? {
+        return PocketCastsNetworkingRules.getPreferredNetwork(buildNetworksWithTypes(networkTypes), requestType)?.networkInfo?.type
     }
 
     private fun buildNetworksWithTypes(networkTypes: List<NetworkType>) = Networks(

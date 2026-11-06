@@ -47,6 +47,7 @@ internal class EpisodeDownloader(
     private val httpClient: Lazy<Call.Factory>,
     private val progressCache: DownloadProgressCache,
     private val minContentLength: Long = SUSPICIOUS_FILE_SIZE,
+    private val waitForWifi: Boolean = false,
     private val onCall: (Call) -> Unit = {},
     private val onResponse: (Response) -> Unit = {},
     private val onComplete: (DownloadProgress?, fileSize: Long) -> Unit = { _, _ -> },
@@ -77,7 +78,10 @@ internal class EpisodeDownloader(
             return Result.InvalidDownloadUrl(episode.downloadUrl)
         }
 
-        val request = Request.Builder().url(downloadUrl).build()
+        val request = Request.Builder()
+            .url(downloadUrl)
+            .tag(EpisodeDownloadRequest::class.java, EpisodeDownloadRequest(waitForWifi))
+            .build()
         val call = httpClient.get().newCall(request)
         onCall(call)
 

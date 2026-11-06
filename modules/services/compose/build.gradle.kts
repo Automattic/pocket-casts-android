@@ -11,6 +11,11 @@ android {
         buildConfig = true
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -37,6 +42,7 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     debugProdImplementation(libs.compose.ui.tooling)
     implementation(libs.compose.ui.util)
+    debugImplementation(libs.compose.ui.test.manifest)
     implementation(libs.fragment.compose)
     implementation(libs.lottie)
     implementation(libs.lottie.compose)
@@ -47,6 +53,7 @@ dependencies {
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
 
+    testImplementation(libs.compose.ui.test.junit)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
 }

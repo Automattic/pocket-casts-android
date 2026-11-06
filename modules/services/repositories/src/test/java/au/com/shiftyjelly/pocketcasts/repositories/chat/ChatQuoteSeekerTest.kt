@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
 import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
@@ -90,13 +91,13 @@ class ChatQuoteSeekerTest {
         whenever(timingManager.densePlaybackTime(EPISODE_UUID, 1_383_380.milliseconds)).thenReturn(1_413_480.milliseconds)
 
         assertEquals(1_413_480, seeker().seek(generatedQuote))
-        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any(), any()) }
     }
 
     @Test
     fun `generated quote falls back to a bounded resolve`() = runTest {
         whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
-        whenever(timingManager.resolvePlaybackTime(eq(episode), eq(1_383_380.milliseconds)))
+        whenever(timingManager.resolvePlaybackTime(eq(episode), eq(1_383_380.milliseconds), eq(GeneratedChaptersDownloadTriggerType.Chat)))
             .thenReturn(ChapterSeekResult.Resolved(1_353_280.milliseconds, usedPrior = false))
 
         assertEquals(1_353_280, seeker().seek(generatedQuote))
@@ -105,7 +106,7 @@ class ChatQuoteSeekerTest {
     @Test
     fun `generated quote uses the transcript time when fingerprints cannot resolve it`() = runTest {
         whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
-        whenever(timingManager.resolvePlaybackTime(any(), any()))
+        whenever(timingManager.resolvePlaybackTime(any(), any(), any()))
             .thenReturn(ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE))
 
         assertEquals(1_383_380, seeker().seek(generatedQuote))
@@ -134,7 +135,7 @@ class ChatQuoteSeekerTest {
         whenever(transcriptManager.loadTranscript(EPISODE_UUID)).thenReturn(authorTranscript)
 
         assertEquals(1_390_200, seeker().seek(authorQuote))
-        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any(), any()) }
     }
 
     @Test
@@ -154,7 +155,7 @@ class ChatQuoteSeekerTest {
         whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
 
         assertEquals(1_383_380, seeker(appPlatform = AppPlatform.Automotive).seek(generatedQuote))
-        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any(), any()) }
     }
 
     @Test
@@ -170,13 +171,13 @@ class ChatQuoteSeekerTest {
         whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
 
         assertEquals(1_383_380, seeker(policy = FingerprintPolicy.TAP_ONLY).seek(generatedQuote))
-        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any()) }
+        verifyBlocking(timingManager, never()) { resolvePlaybackTime(any(), any(), any()) }
     }
 
     @Test
     fun `fingerprint lookups that take too long use the transcript time`() = runTest {
         whenever(transcriptManager.loadGeneratedTranscript(EPISODE_UUID)).thenReturn(generatedTranscript)
-        whenever(timingManager.resolvePlaybackTime(any(), any())).doSuspendableAnswer { awaitCancellation() }
+        whenever(timingManager.resolvePlaybackTime(any(), any(), any())).doSuspendableAnswer { awaitCancellation() }
 
         assertEquals(1_383_380, seeker().seek(generatedQuote))
     }

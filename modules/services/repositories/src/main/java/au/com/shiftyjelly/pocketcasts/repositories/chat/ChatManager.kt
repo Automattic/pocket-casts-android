@@ -17,11 +17,19 @@ interface ChatManager {
 
     suspend fun sendMessage(
         episodeUuid: String,
+        podcastUuid: String,
         message: ChatMessage.User,
         allMessages: List<ChatMessage>,
     )
 
+    suspend fun getStarterQuestions(
+        episodeUuid: String,
+        podcastUuid: String,
+    ): List<String>
+
     suspend fun discardMessage(uuid: String)
+
+    suspend fun stopMessage(episodeUuid: String, message: ChatMessage.User): Boolean
 
     suspend fun clearMessages(episodeUuid: String): ClearedChat
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.endofyear.playback2026.Playback2026
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
@@ -123,6 +124,11 @@ class MainActivityViewModel
     }
 
     suspend fun isEndOfYearStoriesEligible() = endOfYearManager.isEligibleForEndOfYear()
+
+    suspend fun shouldShowPlayback2026Sheet(): Boolean {
+        if (settings.getEndOfYearShowModal() && isEndOfYearStoriesEligible()) return false
+        return endOfYearManager.isEligibleForEndOfYear(Playback2026.YEAR)
+    }
 
     val hasUnseenWhatsNew: Flow<Boolean> get() = whatsNewManager.hasUnseenMessages
 

@@ -288,7 +288,7 @@ class PodcastsFragment :
 
                     folderAdapter?.setFolderItems(uiState.items)
 
-                    val isEmpty = uiState.items.isEmpty()
+                    val isEmpty = uiState.items.isEmpty() && !uiState.hasHiddenPodcasts
                     binding.emptyView.isVisible = isEmpty && !uiState.isLoadingItems
                     binding.swipeRefreshLayout.isGone = isEmpty
                 }

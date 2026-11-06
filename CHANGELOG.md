@@ -1,5 +1,19 @@
 8.25
 -----
+*   New Features
+    *   Add an option to hide played podcasts from the Podcasts tab, in the "…" menu
+        ([#6203](https://github.com/Automattic/pocket-casts-android/pull/6203))
+*   Bug Fixes
+    *   Fix Wear OS episode downloads not switching to WiFi
+        ([#6100](https://github.com/Automattic/pocket-casts-android/pull/6100))
+    *   Fix a rare crash when tapping with two fingers while a screen is changing
+        ([#6107](https://github.com/Automattic/pocket-casts-android/pull/6107))
+    *   Fix playback stopping right after it starts when another app removes the playback notification
+        ([#6217](https://github.com/Automattic/pocket-casts-android/pull/6217))
+    *   Fix a crash on Android 8 devices when the full-screen player loaded show notes containing remote images
+        ([#5847](https://github.com/Automattic/pocket-casts-android/pull/5847))
+    *   Fix the Settings menu showing through Subscription, Privacy policy and Terms of use in the TV app
+        ([#6284](https://github.com/Automattic/pocket-casts-android/pull/6284))
 
 
 8.24
@@ -24,6 +38,8 @@
         ([#6206](https://github.com/Automattic/pocket-casts-android/pull/6206))
     *   Fix downloads and streams from some hosts, such as Buzzsprout, failing for good after a single failed attempt
         ([#6212](https://github.com/Automattic/pocket-casts-android/pull/6212))
+    *   Fix synced transcripts not following along for Japanese, Chinese, Hindi and other transcripts without punctuation
+        ([#6221](https://github.com/Automattic/pocket-casts-android/pull/6221))
     *   Stop showing "Plus expires in X days" to subscribers whose subscription renews automatically
         ([#5329](https://github.com/Automattic/pocket-casts-android/pull/5329))
     *   Fix tapping a widget outside its controls not opening the app
@@ -34,6 +50,8 @@
         ([#6220](https://github.com/Automattic/pocket-casts-android/pull/6220))
     *   Fix Cast playback pausing by itself a couple of seconds after you start casting
         ([#6227](https://github.com/Automattic/pocket-casts-android/pull/6227))
+    *   Fix streamed episodes with dynamically inserted ads ending a little early, before the outro
+        ([#6213](https://github.com/Automattic/pocket-casts-android/pull/6213))
 
 8.23
 -----

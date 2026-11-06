@@ -12,6 +12,7 @@ sealed interface ChatMessage {
         val text: String,
         val failure: ChatSendFailure? = null,
         val inputType: ChatInputType = ChatInputType.Typed,
+        val isStopped: Boolean = false,
         override val uuid: String = UUID.randomUUID().toString(),
     ) : ChatMessage {
         override val role: ChatRole get() = ChatRole.User
@@ -20,13 +21,14 @@ sealed interface ChatMessage {
     data class Assistant(
         val text: String,
         val rating: ChatAnswerRating? = null,
+        val followUps: List<String> = emptyList(),
         override val uuid: String = UUID.randomUUID().toString(),
     ) : ChatMessage {
         override val role: ChatRole get() = ChatRole.Assistant
 
         // Replace `- ` / `* ` bullet markers from the model with a styled bullet glyph.
         val displayText: String by lazy {
-            Regex("""(?m)^[ \t]*[-*][ \t]+""").replace(text, "•  ")
+            Regex("""(?m)^[ \t]*[-*][ \t]+""").replace(text, "•  ").withChatTimestamps()
         }
     }
 
@@ -45,7 +47,11 @@ sealed interface ChatMessage {
 
         // Empty when there's nothing meaningful to display (both strings missing/blank).
         val timestampLabel: String
-            get() = if (start.isNotBlank() && end.isNotBlank()) "$start – $end" else ""
+            get() = when {
+                startMs >= 0 && endMs >= 0 -> formatChatTimestampRange(startMs, endMs)
+                start.isNotBlank() && end.isNotBlank() -> "$start - $end"
+                else -> ""
+            }
 
         // Strip any straight or smart quotes the model wrapped around the text and re-add curly quotes.
         val displayText: String by lazy {
@@ -78,10 +84,15 @@ internal fun ChatMessage.toEntity(
     episodeUuid: String,
     quoteMetadataAdapter: JsonAdapter<QuoteMetadata>,
     userMetadataAdapter: JsonAdapter<UserMessageMetadata>,
+    assistantMetadataAdapter: JsonAdapter<AssistantMessageMetadata>,
 ): EpisodeChatMessage {
     val (text, metadata) = when (this) {
         is ChatMessage.User -> text to userMetadataAdapter.toJsonOrNull(this)
-        is ChatMessage.Assistant -> text to null
+
+        is ChatMessage.Assistant -> text to followUps.takeIf { it.isNotEmpty() }?.let {
+            assistantMetadataAdapter.toJson(AssistantMessageMetadata(followUps = it))
+        }
+
         is ChatMessage.Quote -> text to quoteMetadataAdapter.toJson(QuoteMetadata(start, end, isFromGeneratedTranscript))
     }
     return EpisodeChatMessage(
@@ -96,13 +107,15 @@ internal fun ChatMessage.toEntity(
 
 private fun JsonAdapter<UserMessageMetadata>.toJsonOrNull(message: ChatMessage.User): String? {
     val inputType = message.inputType.takeUnless { it == ChatInputType.Typed }
-    if (message.failure == null && inputType == null) return null
-    return toJson(UserMessageMetadata(failure = message.failure?.value, inputType = inputType?.value))
+    val isStopped = message.isStopped.takeIf { it }
+    if (message.failure == null && inputType == null && isStopped == null) return null
+    return toJson(UserMessageMetadata(failure = message.failure?.value, inputType = inputType?.value, isStopped = isStopped))
 }
 
 internal fun List<EpisodeChatMessage>.toChatMessages(
     quoteMetadataAdapter: JsonAdapter<QuoteMetadata>,
     userMetadataAdapter: JsonAdapter<UserMessageMetadata>,
+    assistantMetadataAdapter: JsonAdapter<AssistantMessageMetadata>,
 ) = mapNotNull { entity ->
     when (entity.role) {
         ChatRole.User.value -> {
@@ -111,6 +124,7 @@ internal fun List<EpisodeChatMessage>.toChatMessages(
                 text = entity.text,
                 failure = ChatSendFailure.fromValue(metadata?.failure),
                 inputType = ChatInputType.fromValue(metadata?.inputType) ?: ChatInputType.Typed,
+                isStopped = metadata?.isStopped == true,
                 uuid = entity.uuid,
             )
         }
@@ -120,6 +134,10 @@ internal fun List<EpisodeChatMessage>.toChatMessages(
         else -> ChatMessage.Assistant(
             text = entity.text,
             rating = ChatAnswerRating.fromValue(entity.rating),
+            followUps = entity.metadata
+                ?.let { raw -> runCatching { assistantMetadataAdapter.fromJson(raw) }.getOrNull() }
+                ?.followUps
+                .orEmpty(),
             uuid = entity.uuid,
         )
     }

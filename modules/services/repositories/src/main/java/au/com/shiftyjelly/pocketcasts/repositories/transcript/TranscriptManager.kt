@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 interface TranscriptManager {
     fun observeIsTranscriptAvailable(episodeUuid: String): Flow<Boolean>
 
+    fun observeIsGeneratedTranscriptAvailable(episodeUuid: String): Flow<Boolean>
+
     suspend fun loadTranscript(
         episodeUuid: String,
     ): Transcript?
@@ -16,7 +18,7 @@ interface TranscriptManager {
 
     suspend fun loadGeneratedChapters(
         episodeUuid: String,
-    ): Boolean
+    ): GeneratedChaptersResult
 
     fun resetInvalidTranscripts(
         episodeUuid: String,

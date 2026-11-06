@@ -54,12 +54,17 @@ fun ShelfItemRow(
     modifier: Modifier = Modifier,
     isEditable: Boolean = true,
     isTranscriptAvailable: Boolean = false,
+    isEpisodeChatAvailable: Boolean = false,
     isVideoEnabled: Boolean = true,
     @StringRes badgeTextId: Int? = null,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
 ) {
     val subtitleResId = item.subtitleId(episode)
-    val isEnabled = isTranscriptAvailable || (item != ShelfItem.Transcript && item != ShelfItem.EpisodeChat)
+    val isEnabled = when (item) {
+        ShelfItem.Transcript -> isTranscriptAvailable
+        ShelfItem.EpisodeChat -> isEpisodeChatAvailable
+        else -> true
+    }
     val showVideoToggleLabel = item == ShelfItem.StreamSelector && !isEditable
     val titleResId = if (showVideoToggleLabel) {
         if (isVideoEnabled) LR.string.player_action_hide_video else LR.string.player_action_show_video

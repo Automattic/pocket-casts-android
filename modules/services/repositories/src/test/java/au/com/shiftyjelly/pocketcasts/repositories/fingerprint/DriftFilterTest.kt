@@ -8,9 +8,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.ExoPlayerDataSourceF
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
 import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
 import dagger.Lazy
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
@@ -50,6 +52,7 @@ class DriftFilterTest {
             dataSourceFactory = Lazy { mock(ExoPlayerDataSourceFactory::class.java) },
             pcmTap = FingerprintPcmTap(),
             decodePolicy = decodePolicy,
+            generatedChaptersAvailability = mock(GeneratedChaptersAvailability::class.java),
         )
     }
 
@@ -208,7 +211,7 @@ class DriftFilterTest {
         val restricted = buildManager(FingerprintPolicy.TAP_ONLY)
         val episode = PodcastEpisode(uuid = "episode-uuid", publishedDate = Date())
 
-        val result = restricted.resolvePlaybackTime(episode, 100.seconds)
+        val result = restricted.resolvePlaybackTime(episode, 100.seconds, GeneratedChaptersDownloadTriggerType.ChapterTap)
 
         assertEquals(
             ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_UNSUPPORTED_DEVICE),

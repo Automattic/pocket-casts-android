@@ -34,6 +34,14 @@ dependencyResolutionManagement {
                 includeGroupByRegex("org.wordpress.*")
             }
         }
+        maven {
+            // Prebuilt Pocket Casts client libraries, such as Playback (https://github.com/Automattic/pocket-casts-client-dependencies).
+            // Pinned to the commit that published the version in libs.versions.toml, so the artifacts can't change underneath us.
+            setUrl("https://raw.githubusercontent.com/Automattic/pocket-casts-client-dependencies/a921f837843ece1ca9826e2c02be5c1b6d2b1588/android/maven")
+            content {
+                includeGroup("com.automattic.pocketcasts")
+            }
+        }
     }
 }
 
@@ -94,11 +102,13 @@ include(":modules:services:views")
 include(":modules:services:sharedtest")
 
 val developerProperties = loadPropertiesFromFile(File("${rootDir.path}/developer.properties"))
-val secretsFile = File("${rootDir.path}/secret.properties")
+val decryptedSecretsDir = File(System.getProperty("user.home"), ".configure/pocket-casts-android/secrets")
+val secretsFile = File(decryptedSecretsDir, "secret.properties")
 val secretProperties = loadPropertiesFromFile(secretsFile)
 val useRemoteBuildCacheLocally = "use_remote_build_cache_locally"
 
 gradle.extra["isCi"] = System.getenv("CI")?.toBoolean() ?: false
+gradle.extra["decryptedSecretsDir"] = decryptedSecretsDir
 gradle.extra["develocityToken"] = secretProperties.getProperty("develocityToken")
 gradle.extra["measureBuildsEnabled"] = secretProperties.getProperty("measureBuildsEnabled")
 
@@ -147,7 +157,7 @@ private fun assertSecretsApplied() {
 private fun assertJava21Amazon() {
     val version = System.getProperty("java.version")
     val vendor = System.getProperty("java.vendor")
-    val expectedJdkVersion = "21.0.6"
+    val expectedJdkVersion = "21.0.13"
 
     if (!(version.contains(expectedJdkVersion) && vendor.contains("amazon", ignoreCase = true))) {
         logger.error("Java version: $version, vendor: $vendor")

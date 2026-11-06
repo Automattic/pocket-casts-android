@@ -501,7 +501,6 @@
     <string name="player_action_next_chapter">Next chapter</string>
     <string name="player_action_previous_chapter">Previous chapter</string>
     <string name="player_action_show_video">Show video</string>
-    <string name="player_actions">Episode actions</string>
     <string name="player_battery_warning_snackbar">Your battery restrictions may cause playback interruptions.</string>
     <string name="player_battery_warning_snackbar_action">update</string>
     <string name="player_chapter_url">Chapter URL</string>
@@ -521,13 +520,11 @@
     <string name="player_effects_voices_sound_louder">Voices sound louder</string>
     <string name="player_effects_volume_boost">Volume Boost</string>
     <string name="player_end_playback_clear_up_next">Close and clear Up Next</string>
-    <string name="player_full_screen">Full screen</string>
     <string name="player_more_actions">More actions</string>
     <string name="player_notification_skip_back">Back %d secs</string>
     <string name="player_notification_skip_back_seconds">Back %d seconds</string>
     <string name="player_notification_skip_forward">Forward %d secs</string>
     <string name="player_notification_skip_forward_seconds">Forward %d seconds</string>
-    <string name="player_pip">Enter Picture-in-picture</string>
     <string name="player_sleep_15_minutes">15 minutes</string>
     <string name="player_sleep_30_minutes">30 minutes</string>
     <string name="player_sleep_1_minute">1 minute</string>
@@ -621,7 +618,33 @@
     <string name="number_of_chapters_summary_plural">%1$d chapters &#x2022; %2$d hidden</string>
     <string name="number_of_chapters_summary_singular">1 chapter &#x2022; %d hidden</string>
     <string name="skip_chapters_plus_prompt">Preselect chapters and more with Pocket Casts Plus</string>
-    <string name="chapters_generated_disclaimer">These chapters are automatically generated and may not be perfectly accurate.</string>
+    <!-- Header of the chapters list when the chapters are generated. %d is the number of chapters. -->
+    <plurals name="chapters_generated_count">
+        <item quantity="one">%d Generated Chapter</item>
+        <item quantity="other">%d Generated Chapters</item>
+    </plurals>
+    <!-- %1$d is the number of generated chapters. %2$d is the number of hidden chapters. -->
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="one">%1$d Generated Chapter &#x2022; %2$d hidden</item>
+        <item quantity="other">%1$d Generated Chapters &#x2022; %2$d hidden</item>
+    </plurals>
+    <string name="chapters_generated_turn_off">Turn off generated chapters</string>
+    <string name="chapters_generated_turned_off">Turned off generated chapters</string>
+    <string name="chapters_generated_undo">Undo</string>
+    <string name="chapters_generated_off_title">Generated chapters are off</string>
+    <string name="chapters_generated_off_message">Turn them back on to jump straight to the part you came&#160;for.</string>
+    <string name="chapters_generated_turn_on">Turn on</string>
+    <string name="chapters_generated_upsell_title">Chapters automatically generated</string>
+    <string name="chapters_generated_upsell_message">With Pocket Casts Plus, no more scrubbing. Jump straight to the part you came&#160;for.</string>
+    <string name="chapters_generated_upsell_button">Get generated chapters</string>
+    <string name="chapters_generated_none_yet_title">No chapters yet</string>
+    <string name="chapters_generated_none_yet_message">Generate chapters and skip straight to the part you&#160;want.</string>
+    <string name="chapters_generated_generate">Generate chapters</string>
+    <string name="chapters_generated_ai_note">Chapters are generated using AI and may not be perfectly accurate.</string>
+    <string name="chapters_generated_generating">Generating chapters…</string>
+    <string name="chapters_generated_generating_note">This can take a minute for longer episodes. Chapters will show on the player when they\'re ready.</string>
+    <string name="chapters_generated_none_title">No chapters for this episode</string>
+    <string name="chapters_generated_none_message">We couldn\'t generate chapters for this&#160;one.</string>
     <!-- %1$d is the current selected chapter. %2$d is the total number of chapters. -->
     <string name="chapter_count_summary">%1$d of %2$d</string>
     <plurals name="chapter">
@@ -660,10 +683,14 @@
     <string name="podcasts_menu_layout_list">List view</string>
     <string name="podcasts_menu_layout_small_grid">Small grid</string>
     <string name="podcasts_menu_more_options">More options</string>
+    <string name="podcasts_menu_played_podcasts">Played podcasts</string>
     <string name="podcasts_menu_search_podcasts">Search podcasts</string>
     <string name="podcasts_menu_share_podcasts">Share podcasts</string>
     <string name="podcasts_menu_sort_by">Sort by</string>
     <string name="podcasts_no_subscriptions">No podcasts found</string>
+    <string name="podcasts_played_podcasts_description">Hides podcasts you\'ve fully listened to. They reappear when a new episode arrives.</string>
+    <string name="podcasts_played_podcasts_hide">Hide</string>
+    <string name="podcasts_played_podcasts_show">Show</string>
     <string name="podcasts_plural">%d Podcasts</string>
     <string name="podcasts_share">Share podcasts</string>
     <string name="podcasts_share_0_selected">0 selected</string>
@@ -676,7 +703,6 @@
     <string name="podcasts_share_failed">Sharing Failed</string>
     <string name="podcasts_share_failed_description">Something went wrong creating your share page.</string>
     <string name="podcasts_share_select_all">Select all</string>
-    <string name="podcasts_share_selected_podcasts">Share selected podcasts</string>
     <string name="podcasts_share_subscribe_to_all">FOLLOW ALL</string>
     <string name="podcasts_share_title">Title</string>
     <string name="podcasts_share_create_error">Oops unable to share</string>
@@ -1674,14 +1700,13 @@
     <string name="settings_fix_downloads_started_message">Downloads fix will start shortly. Check notifications for progress.</string>
     <string name="settings_fix_downloads_complete_title">Fixing downloads complete</string>
     <string name="settings_fix_downloads_complete_message">Fixed %d downloads</string>
-    <string name="settings_generated_chapters">Generated chapters</string>
-    <string name="settings_generated_chapters_summary">Show automatically generated chapters when available.</string>
+    <string name="settings_generated_chapters">Auto generate chapters</string>
+    <string name="settings_generated_chapters_summary">When an episode has no chapters of its own, Pocket Casts will automatically generate them for you.</string>
     <string name="settings_inactive_episodes">Inactive episodes</string>
     <string name="settings_instagram">instagram link</string>
     <string name="settings_keep_screen_awake">Keep screen awake</string>
     <string name="settings_keep_screen_awake_summary">If on, the screen won\'t lock while playing.</string>
     <string name="settings_learn_more">Learn More</string>
-    <string name="settings_licenses">Licenses</string>
     <string name="settings_lock_image">lock image</string>
     <string name="settings_manage_downloads_include_starred">Include starred</string>
     <string name="settings_manage_downloads_total">Total</string>
@@ -2217,6 +2242,14 @@
     <string name="end_of_year_prompt_card_title">Playback is here!</string>
     <string name="end_of_year_prompt_card_summary">See your listening&#160;stats,\ntop&#160;podcasts, and&#160;more.</string>
     <string name="end_of_year_share_via" translatable="false">@string/podcasts_share_via</string>
+    <!-- Title of the Playback 2026 banner in the Profile tab. Playback 2026 is a proper noun and shouldn't be translated -->
+    <string name="playback_2026_banner_title">Playback&#160;2026 is here!</string>
+    <!-- Description of the Playback 2026 banner in the Profile tab -->
+    <string name="playback_2026_banner_description">Discover your listening stats, which kind of listener you are, and more.</string>
+    <!-- Description in the Playback 2026 announcement sheet -->
+    <string name="playback_2026_sheet_description">What you listened to. The podcasts you loved. And what sets you apart as a listener. Your year in Pocket Casts is here.</string>
+    <!-- Label of the call to action button in the Playback 2026 announcement sheet. Playback 2026 is a proper noun and shouldn't be translated -->
+    <string name="playback_2026_sheet_button">View My Playback&#160;2026</string>
     <string name="end_of_year_replay">Play again</string>
     <string name="end_of_year_listening_time_title">This was your total time listening to podcasts</string>
     <string name="end_of_year_listening_time_title_english_only" translatable="false">This was your total time\nlistening to podcasts</string>
@@ -2568,8 +2601,6 @@
     <string name="chat_feedback_reason_offensive">It’s offensive</string>
     <string name="chat_feedback_reason_other">Other</string>
     <string name="chat_feedback_details_hint">Share details (optional)</string>
-    <string name="chat_feedback_sending">Sending feedback</string>
-    <string name="chat_feedback_send_failed">Couldn’t send your feedback. Check your connection.</string>
     <string name="chat_feedback_submit">Submit feedback</string>
     <string name="chat_feedback_legal">Submitting shares this conversation with us to help improve chat.</string>
     <string name="chat_feedback_learn_more">Learn more</string>
@@ -2590,8 +2621,13 @@
     <string name="chat_answering">Answering</string>
     <string name="chat_clear">Clear chat</string>
     <string name="chat_offline_note">You’re offline. Connect to ask a question.</string>
+    <string name="chat_playback_position">Playback position</string>
     <string name="chat_play_quote">Play quote</string>
     <string name="chat_quote_finding_moment">Finding the moment…</string>
+    <string name="chat_loading_reading_transcript">Reading the transcript</string>
+    <string name="chat_loading_finding_moments">Finding the right moments</string>
+    <string name="chat_loading_writing_answer">Writing your answer</string>
+    <string name="chat_loading_still_working">Still working on it…</string>
 
     <!--    Tasker Plugin-->
     <string name="must_provide_filter_name">Must provide playlist name</string>

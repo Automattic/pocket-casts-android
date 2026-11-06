@@ -1,7 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.repositories.notification
 
 import android.app.Notification
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
@@ -9,7 +11,6 @@ import android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE
 import android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY
 import android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_NEXT
 import android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.media.app.NotificationCompat.MediaStyle
@@ -24,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.isPlaying
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerBroadcastReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import coil3.executeBlocking
@@ -49,7 +51,12 @@ class NotificationDrawerImpl @Inject constructor(
     private val pauseAction = NotificationCompat.Action(IR.drawable.notification_pause, context.getString(LR.string.pause), MediaButtonReceiver.buildMediaButtonPendingIntent(context, ACTION_PAUSE))
     private val skipBackAction = NotificationCompat.Action(IR.drawable.notification_skipbackwards, context.getString(LR.string.player_notification_skip_back, settings.skipBackInSecs.value), MediaButtonReceiver.buildMediaButtonPendingIntent(context, ACTION_SKIP_TO_PREVIOUS))
     private val skipForwardAction = NotificationCompat.Action(IR.drawable.notification_skipforward, context.getString(LR.string.player_notification_skip_forward, settings.skipForwardInSecs.value), MediaButtonReceiver.buildMediaButtonPendingIntent(context, ACTION_SKIP_TO_NEXT))
-    private val stopPendingIntent = MediaButtonReceiver.buildMediaButtonPendingIntent(context, ACTION_STOP)
+    private val dismissPendingIntent = PendingIntent.getBroadcast(
+        context,
+        0,
+        Intent(context, PlayerBroadcastReceiver::class.java).setAction(PlayerBroadcastReceiver.INTENT_ACTION_NOTIFICATION_DISMISSED),
+        PendingIntent.FLAG_IMMUTABLE,
+    )
 
     private var notificationData: NotificationData? = null
 
@@ -76,7 +83,7 @@ class NotificationDrawerImpl @Inject constructor(
         builder.addAction(skipForwardAction)
 
         val mediaStyle = MediaStyle()
-            .setCancelButtonIntent(stopPendingIntent)
+            .setCancelButtonIntent(dismissPendingIntent)
             .setMediaSession(sessionToken)
             .setShowActionsInCompactView(0, 1, 2)
             .setShowCancelButton(true)
@@ -84,7 +91,7 @@ class NotificationDrawerImpl @Inject constructor(
         return builder.setContentIntent(controller.sessionActivity)
             .setContentText(data.text)
             .setContentTitle(data.title)
-            .setDeleteIntent(stopPendingIntent)
+            .setDeleteIntent(dismissPendingIntent)
             .setLargeIcon(data.icon)
             .setOnlyAlertOnce(true)
             .setShowWhen(false)
@@ -100,11 +107,11 @@ class NotificationDrawerImpl @Inject constructor(
         val mediaStyle = MediaStyle()
             .setMediaSession(sessionToken)
             .setShowCancelButton(true)
-            .setCancelButtonIntent(stopPendingIntent)
+            .setCancelButtonIntent(dismissPendingIntent)
 
         return notificationHelper.playbackChannelBuilder()
             .setContentTitle(context.getString(LR.string.loading))
-            .setDeleteIntent(stopPendingIntent)
+            .setDeleteIntent(dismissPendingIntent)
             .setOnlyAlertOnce(true)
             .setShowWhen(false)
             .setSmallIcon(IR.drawable.notification)
