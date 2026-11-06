@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-20 09:57:02+0000
+Translation-Revision-Date: 2026-11-04 09:58:06+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="settings_generated_chapters_summary">エピソードに独自のチャプターがない場合、Pocket Casts が自動的にチャプターを生成します。</string>
+    <string name="podcasts_played_podcasts_show">表示</string>
+    <string name="podcasts_played_podcasts_hide">非表示</string>
+    <string name="podcasts_played_podcasts_description">最後まで聴いたポッドキャストを非表示にします。 新しいエピソードが届くと再び表示されます。</string>
+    <string name="podcasts_menu_played_podcasts">再生済みポッドキャスト</string>
+    <string name="chapters_generated_upsell_button">生成チャプターを利用</string>
+    <string name="chapters_generated_upsell_message">Pocket Casts Plus ならシーク操作が不要です。 目的の部分に直接移動できます。</string>
+    <string name="chapters_generated_upsell_title">チャプターを自動で生成</string>
+    <string name="chapters_generated_turn_on">有効化</string>
+    <string name="chapters_generated_off_message">再び有効化すると、目的の部分に直接移動できます。</string>
+    <string name="chapters_generated_off_title">生成チャプターが無効です</string>
+    <string name="chapters_generated_undo">取り消す</string>
+    <string name="chapters_generated_turned_off">生成チャプターを無効化しました</string>
+    <string name="chapters_generated_turn_off">生成チャプターを無効化</string>
+    <string name="chat_loading_still_working">まだ進行中です…</string>
+    <string name="chat_loading_writing_answer">回答を作成しています</string>
+    <string name="chat_loading_finding_moments">該当する箇所を探しています</string>
+    <string name="chat_loading_reading_transcript">トランスクリプトを読んでいます</string>
+    <string name="automotive_nothing_playing_title">再生するエピソードを選択</string>
+    <string name="chat_quote_finding_moment">その瞬間を検索中…</string>
+    <string name="chat_quote_play_failed">エピソードのこの部分を再生できませんでした</string>
+    <string name="chat_history_empty_body">エピソードについて尋ねると、チャットがこちらに表示されます。</string>
+    <string name="chat_history_empty_title">まだチャットがありません</string>
     <string name="chat_about_episode">%1$s についてチャットする</string>
     <string name="chat_now_playing_episode">%1$s を再生中 </string>
     <string name="chat_undo">取り消す</string>
@@ -211,8 +234,7 @@ Language: ja_JP
     <string name="settings_audio_only_summary">オンにすると、動画のあるエピソードは音声のみとして再生され、データが節約されます。</string>
     <string name="settings_audio_only">音声のみ</string>
     <string name="profile_try_duration_for_free">無料で %1$s お試し</string>
-    <string name="settings_generated_chapters_summary">自動生成されたチャプターを表示します (利用可能な場合)。</string>
-    <string name="settings_generated_chapters">生成されたチャプター</string>
+    <string name="settings_generated_chapters">チャプターを自動生成</string>
     <string name="profile_stats_listening_activity_info_summary">再生履歴に基づいた再生タイミングの概算。  エピソードを数日にわたって完了した場合は、最終日に表示されます。</string>
     <string name="profile_stats_listening_activity_info_title">聴取アクティビティ</string>
     <string name="profile_stats_listening_activity_info_help">情報</string>
@@ -2471,6 +2493,12 @@ Language: ja_JP
     </plurals>
     <plurals name="chapter">
         <item quantity="other">チャプター</item>
+    </plurals>
+    <plurals name="chapters_generated_count">
+        <item quantity="other">%d件の生成チャプター</item>
+    </plurals>
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="other">%1$d件の生成チャプター • %2$d件が非表示</item>
     </plurals>
     <plurals name="day">
         <item quantity="other">日</item>

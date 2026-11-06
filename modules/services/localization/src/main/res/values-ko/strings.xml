@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-20 09:56:15+0000
+Translation-Revision-Date: 2026-11-04 09:58:42+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="settings_generated_chapters_summary">에피소드에 자체 챕터가 없으면 Pocket Casts에서 자동으로 챕터를 생성합니다.</string>
+    <string name="podcasts_played_podcasts_show">표시</string>
+    <string name="podcasts_played_podcasts_hide">숨기기</string>
+    <string name="podcasts_played_podcasts_description">청취가 끝난 팟캐스트를 숨깁니다. 새 에피소드가 나오면 해당 팟캐스트가 다시 표시됩니다.</string>
+    <string name="podcasts_menu_played_podcasts">재생한 팟캐스트</string>
+    <string name="chapters_generated_upsell_button">생성된 챕터 가져오기</string>
+    <string name="chapters_generated_upsell_message">Pocket Casts Plus를 사용하면 더 이상 앞뒤로 탐색할 필요가 없습니다. 원하는 구간으로 바로 이동하세요.</string>
+    <string name="chapters_generated_upsell_title">챕터가 자동으로 생성됨</string>
+    <string name="chapters_generated_turn_on">켜기</string>
+    <string name="chapters_generated_off_message">다시 켜서 원하는 부분으로 바로 이동하세요.</string>
+    <string name="chapters_generated_off_title">생성된 챕터가 꺼졌음</string>
+    <string name="chapters_generated_undo">실행 취소</string>
+    <string name="chapters_generated_turned_off">생성된 챕터 껐음</string>
+    <string name="chapters_generated_turn_off">생성된 챕터 끄기</string>
+    <string name="chat_loading_still_working">아직 처리 중…</string>
+    <string name="chat_loading_writing_answer">답변 쓰기</string>
+    <string name="chat_loading_finding_moments">적절한 순간 찾기</string>
+    <string name="chat_loading_reading_transcript">대본 읽기</string>
+    <string name="automotive_nothing_playing_title">재생할 에피소드 선택</string>
+    <string name="chat_quote_finding_moment">장면을 찾는 중…</string>
+    <string name="chat_quote_play_failed">에피소드의 이 부분을 재생할 수 없음</string>
+    <string name="chat_history_empty_body">에피소드에 대해 질문하면 여기에 채팅창이 표시됩니다.</string>
+    <string name="chat_history_empty_title">아직 채팅 없음</string>
     <string name="chat_about_episode">%1$s에 대해 채팅하기</string>
     <string name="chat_now_playing_episode">지금 %1$s 재생 중</string>
     <string name="chat_undo">실행 취소</string>
@@ -211,8 +234,7 @@ Language: ko_KR
     <string name="settings_audio_only_summary">켜면 비디오가 포함된 에피소드가 오디오로만 재생되어 데이터를 절약할 수 있습니다.</string>
     <string name="settings_audio_only">오디오만 재생</string>
     <string name="profile_try_duration_for_free">%1$s 무료 체험</string>
-    <string name="settings_generated_chapters_summary">자동 생성된 챕터가 있으면 표시합니다.</string>
-    <string name="settings_generated_chapters">생성된 챕터</string>
+    <string name="settings_generated_chapters">챕터 자동 생성</string>
     <string name="profile_stats_listening_activity_info_summary">재생 기록을 바탕으로 청취 시간을 추정해 표시합니다. 에피소드를 며칠에 걸쳐 들은 경우에는 마지막으로 재생을 완료한 날짜에 표시됩니다.</string>
     <string name="profile_stats_listening_activity_info_title">청취 활동</string>
     <string name="profile_stats_listening_activity_info_help">정보</string>
@@ -2471,6 +2493,12 @@ Language: ko_KR
     </plurals>
     <plurals name="chapter">
         <item quantity="other">챕터</item>
+    </plurals>
+    <plurals name="chapters_generated_count">
+        <item quantity="other">생성된 챕터 %d개</item>
+    </plurals>
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="other">생성된 챕터 %1$d개 • %2$d개 숨김</item>
     </plurals>
     <plurals name="day">
         <item quantity="other">일</item>

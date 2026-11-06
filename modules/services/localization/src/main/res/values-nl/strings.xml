@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-21 09:56:17+0000
+Translation-Revision-Date: 2026-11-05 09:57:57+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="settings_generated_chapters_summary">Wanneer een aflevering geen eigen hoofdstukken heeft, worden deze automatisch door Pocket Casts voor je gegenereerd.</string>
+    <string name="podcasts_played_podcasts_hide">Verbergen</string>
+    <string name="podcasts_played_podcasts_description">Verbergt podcasts waar je volledig naar hebt geluisterd. Ze verschijnen opnieuw wanneer een nieuwe aflevering arriveert.</string>
+    <string name="chapters_generated_upsell_title">Hoofdstukken automatisch gegenereerd</string>
+    <string name="podcasts_played_podcasts_show">Tonen</string>
+    <string name="podcasts_menu_played_podcasts">Afgespeelde podcasts</string>
+    <string name="chapters_generated_upsell_button">Gegenereerde hoofdstukken downloaden</string>
+    <string name="chapters_generated_upsell_message">Met Pocket Casts Plus hoef je niet meer te zoeken. Ga direct naar het onderdeel waarvoor je bent gekomen.</string>
+    <string name="chapters_generated_turn_on">Inschakelen</string>
+    <string name="chapters_generated_off_message">Zet ze weer aan om direct naar het deel te springen waarvoor je bent gekomen.</string>
+    <string name="chapters_generated_off_title">Gegenereerde hoofdstukken staan uit</string>
+    <string name="chapters_generated_undo">Ongedaan maken</string>
+    <string name="chapters_generated_turned_off">Gegenereerde hoofdstukken uitgeschakeld</string>
+    <string name="chapters_generated_turn_off">Gegenereerde hoofdstukken uitschakelen</string>
+    <string name="chat_loading_still_working">We zijn er mee bezig…</string>
+    <string name="chat_loading_writing_answer">Je antwoord aan het schrijven</string>
+    <string name="chat_loading_finding_moments">De juiste momenten vinden</string>
+    <string name="chat_loading_reading_transcript">De transcriptie lezen</string>
+    <string name="automotive_nothing_playing_title">Kies een aflevering om af te spelen</string>
+    <string name="chat_quote_finding_moment">Het moment vinden…</string>
+    <string name="chat_quote_play_failed">Kan dit deel van de aflevering niet afspelen</string>
+    <string name="chat_history_empty_body">Vraag naar een aflevering en je chat wordt hier weergegeven.</string>
+    <string name="chat_history_empty_title">Nog geen chats</string>
     <string name="chat_about_episode">Chat over %1$s</string>
     <string name="chat_undo">Ongedaan maken</string>
     <string name="chat_history_older">Ouder</string>
@@ -211,8 +234,7 @@ Language: nl
     <string name="settings_audio_only_summary">Indien ingeschakeld, worden afleveringen met video alleen als audio afgespeeld, waardoor gegevens worden opgeslagen.</string>
     <string name="settings_audio_only">Alleen audio</string>
     <string name="profile_try_duration_for_free">Probeer %1$s gratis</string>
-    <string name="settings_generated_chapters_summary">Automatisch gegenereerde hoofdstukken weergeven indien beschikbaar.</string>
-    <string name="settings_generated_chapters">Gegenereerde hoofdstukken</string>
+    <string name="settings_generated_chapters">Hoofdstukken automatisch genereren</string>
     <string name="profile_stats_listening_activity_info_summary">Een schatting van wanneer je hebt geluisterd, op basis van je afspeelgeschiedenis. Als je een aflevering over een paar dagen luistert, wordt deze op de laatste dag weergegeven.</string>
     <string name="profile_stats_listening_activity_info_title">Luisteractiviteit</string>
     <string name="profile_stats_listening_activity_info_help">Informatie</string>
@@ -2473,6 +2495,14 @@ Language: nl
     <plurals name="chapter">
         <item quantity="one">hoofdstuk</item>
         <item quantity="other">hoofdstukken</item>
+    </plurals>
+    <plurals name="chapters_generated_count">
+        <item quantity="one">%d Gegenereerd hoofdstuk</item>
+        <item quantity="other">%d Gegenereerde hoofdstukken</item>
+    </plurals>
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="one">%1$d Gegenereerd hoofdstuk • %2$d verborgen</item>
+        <item quantity="other">%1$d Gegenereerde hoofdstukken • %2$d verborgen</item>
     </plurals>
     <plurals name="day">
         <item quantity="one">dag</item>

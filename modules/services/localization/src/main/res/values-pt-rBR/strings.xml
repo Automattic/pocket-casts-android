@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-19 17:56:40+0000
+Translation-Revision-Date: 2026-11-05 09:55:33+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="settings_generated_chapters_summary">Quando um episódio não possui capítulos próprios, o Pocket Casts os gera automaticamente para você.</string>
+    <string name="podcasts_played_podcasts_hide">Ocultar</string>
+    <string name="chapters_generated_upsell_button">Obter capítulos gerados</string>
+    <string name="chapters_generated_upsell_title">Capítulos gerados automaticamente</string>
+    <string name="podcasts_played_podcasts_show">Mostrar</string>
+    <string name="podcasts_played_podcasts_description">Oculta podcasts que você ouviu por inteiro. Eles reaparecem quando um novo episódio chega.</string>
+    <string name="podcasts_menu_played_podcasts">Podcasts reproduzidos</string>
+    <string name="chapters_generated_upsell_message">Com o Pocket Casts Plus, chega de avançar ou retroceder manualmente. Vá direto para a parte que você procura.</string>
+    <string name="chapters_generated_turn_on">Habilitar</string>
+    <string name="chapters_generated_off_message">Ative-os novamente para ir direto ao que interessa.</string>
+    <string name="chapters_generated_off_title">Os capítulos gerados estão desativados</string>
+    <string name="chapters_generated_undo">Desfazer</string>
+    <string name="chapters_generated_turned_off">Capítulos gerados desativados</string>
+    <string name="chapters_generated_turn_off">Desativar capítulos gerados</string>
+    <string name="chat_loading_still_working">Ainda processando…</string>
+    <string name="chat_loading_writing_answer">Escrevendo sua resposta</string>
+    <string name="chat_loading_finding_moments">Encontrando os momentos certos</string>
+    <string name="chat_loading_reading_transcript">Lendo a transcrição</string>
+    <string name="automotive_nothing_playing_title">Escolha um episódio para reproduzir</string>
+    <string name="chat_quote_finding_moment">Encontrando o momento…</string>
+    <string name="chat_quote_play_failed">Não foi possível reproduzir esta parte do episódio</string>
+    <string name="chat_history_empty_body">Pergunte sobre um episódio e seu chat aparecerá aqui.</string>
+    <string name="chat_history_empty_title">Ainda sem chats</string>
     <string name="chat_about_episode">Conversar sobre %1$s</string>
     <string name="chat_now_playing_episode">Reproduzindo %1$s</string>
     <string name="chat_undo">Desfazer</string>
@@ -211,8 +234,7 @@ Language: pt_BR
     <string name="settings_audio_only_summary">Se ativado, os episódios com vídeo serão reproduzidos apenas como áudio, economizando dados.</string>
     <string name="settings_audio_only">Somente áudio</string>
     <string name="profile_try_duration_for_free">Experimente %1$s gratuitamente</string>
-    <string name="settings_generated_chapters_summary">Mostre capítulos gerados automaticamente quando disponíveis.</string>
-    <string name="settings_generated_chapters">Capítulos gerados</string>
+    <string name="settings_generated_chapters">Gerar capítulos automaticamente</string>
     <string name="profile_stats_listening_activity_info_summary">Uma estimativa de quando você deu play, com base no seu histórico de reprodução. Se você terminar um episódio após alguns dias, ele será exibido no último dia.</string>
     <string name="profile_stats_listening_activity_info_title">Atividade de streaming</string>
     <string name="profile_stats_listening_activity_info_help">Informações</string>
@@ -2474,6 +2496,14 @@ Language: pt_BR
     <plurals name="chapter">
         <item quantity="one">capítulo</item>
         <item quantity="other">capítulos</item>
+    </plurals>
+    <plurals name="chapters_generated_count">
+        <item quantity="one">%d capítulo gerado</item>
+        <item quantity="other">%d capítulos gerados</item>
+    </plurals>
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="one">%1$d capítulo gerado • %2$d oculto(s)</item>
+        <item quantity="other">%1$d capítulos gerados • %2$d oculto(s)</item>
     </plurals>
     <plurals name="day">
         <item quantity="one">dia</item>
