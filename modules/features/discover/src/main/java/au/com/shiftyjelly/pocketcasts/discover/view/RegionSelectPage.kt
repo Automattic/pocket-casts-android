@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,15 +24,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.compose.bars.AppCompatTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
-import au.com.shiftyjelly.pocketcasts.compose.text.rememberTextAppearanceColor
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
@@ -40,7 +40,6 @@ import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 internal fun RegionSelectPage(
@@ -53,17 +52,16 @@ internal fun RegionSelectPage(
     toolbarModifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
-        AppCompatTopAppBar(
+        ThemedTopAppBar(
             title = stringResource(LR.string.discover_select_a_region),
-            navigationButton = NavigationButton.Drawable(IR.drawable.ic_arrow_back, LR.string.back),
+            navigationButton = NavigationButton.Back,
             onNavigationClick = onNavigationClick,
             iconColor = MaterialTheme.theme.colors.secondaryIcon01,
-            titleColor = MaterialTheme.theme.colors.secondaryText01,
+            textColor = MaterialTheme.theme.colors.secondaryText01,
             backgroundColor = MaterialTheme.theme.colors.secondaryUi01,
-            bottomShadow = false,
             modifier = toolbarModifier,
         )
-        val titleColor = rememberTextAppearanceColor(UR.attr.textSubtitle1)
+        val titleColor = MaterialTheme.theme.colors.primaryText01
         LazyColumn(
             contentPadding = bottomInset,
             modifier = Modifier.fillMaxWidth().weight(1f),
@@ -117,8 +115,8 @@ private fun RegionRow(
             )
         }
         if (isSelected) {
-            DrawableImage(
-                drawableId = IR.drawable.ic_tick,
+            Icon(
+                painter = painterResource(IR.drawable.ic_tick),
                 contentDescription = null,
                 tint = MaterialTheme.theme.colors.primaryIcon01,
                 modifier = Modifier.size(24.dp),

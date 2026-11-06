@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
@@ -34,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -45,9 +47,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
 import androidx.core.graphics.drawable.toDrawable
-import au.com.shiftyjelly.pocketcasts.compose.bars.AppCompatTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import kotlin.math.roundToInt
@@ -90,14 +91,13 @@ internal fun AppearanceSettingsPage(
 ) {
     val colors = MaterialTheme.theme.colors
     Column(modifier = modifier.fillMaxSize()) {
-        AppCompatTopAppBar(
+        ThemedTopAppBar(
             title = stringResource(LR.string.settings_title_appearance),
-            navigationButton = NavigationButton.Drawable(IR.drawable.ic_arrow_back, LR.string.back),
+            navigationButton = NavigationButton.Back,
             onNavigationClick = listener::onNavigationClick,
             iconColor = colors.secondaryIcon01,
-            titleColor = colors.secondaryText01,
+            textColor = colors.secondaryText01,
             backgroundColor = colors.secondaryUi01,
-            bottomShadow = false,
             modifier = toolbarModifier,
         )
         Column(
@@ -376,8 +376,8 @@ private fun UpgradeBanner(listener: AppearanceListener) {
                 .size(32.dp)
                 .clickable(interactionSource = null, indication = ripple(bounded = false), role = Role.Button, onClick = listener::onCloseUpgradeClick),
         ) {
-            DrawableImage(
-                drawableId = IR.drawable.ic_close,
+            Icon(
+                painter = painterResource(IR.drawable.ic_close),
                 contentDescription = stringResource(LR.string.settings_close_upgrade_offer),
                 tint = colors.primaryText02,
             )

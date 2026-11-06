@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,6 +40,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -49,7 +51,6 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.use
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.player.R
 import kotlin.math.ceil
@@ -102,8 +103,8 @@ internal fun NotesPage(
             verticalAlignment = FloorCenterVertically,
             modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp),
         ) {
-            DrawableImage(
-                drawableId = IR.drawable.ic_calendar,
+            Icon(
+                painter = painterResource(IR.drawable.ic_calendar),
                 contentDescription = null,
                 tint = colors.contrast02,
                 modifier = Modifier.size(width = 17.dp, height = 18.dp),
@@ -118,8 +119,8 @@ internal fun NotesPage(
                 modifier = Modifier.width(rememberTextViewWidth(date, 15.sp, -0.01f)),
             )
             Spacer(Modifier.width(8.dp))
-            DrawableImage(
-                drawableId = R.drawable.ic_duration,
+            Icon(
+                painter = painterResource(R.drawable.ic_duration),
                 contentDescription = null,
                 tint = colors.contrast02,
             )

@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.Switch
 import androidx.annotation.DrawableRes
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,8 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,12 +32,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -46,7 +48,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
+import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
@@ -58,7 +60,6 @@ import com.google.android.material.shape.ShapeAppearanceModel
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
-import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 internal data class EffectsColors(
     val background: Color,
@@ -88,11 +89,10 @@ internal fun EffectsPage(
     val isTrimOn = trimMode != TrimMode.OFF
     Column(modifier = modifier.fillMaxWidth()) {
         Box(modifier = Modifier.fillMaxWidth()) {
-            DrawableBox(
-                drawableId = VR.drawable.background_dragger_player,
+            Pill(
+                backgroundColor = colors.contrast01,
                 modifier = Modifier
                     .padding(top = 12.dp)
-                    .size(width = 48.dp, height = 4.dp)
                     .align(Alignment.TopCenter),
             )
             TextViewText(
@@ -126,7 +126,7 @@ internal fun EffectsPage(
                 contentAlignment = TextViewAlignment.Center,
                 modifier = Modifier
                     .wrapContentHeight(unbounded = true)
-                    .drawableBackground(VR.drawable.background_speed_label)
+                    .border(1.dp, colors.contrast05, RoundedCornerShape(4.dp))
                     .clickable(interactionSource = null, indication = null, onClick = onSpeedClick)
                     .padding(horizontal = 16.dp, vertical = 4.dp),
             ) {
@@ -223,8 +223,8 @@ private fun EffectSection(
 
 @Composable
 private fun EffectIcon(@DrawableRes iconId: Int, tint: Color) {
-    DrawableImage(
-        drawableId = iconId,
+    Icon(
+        painter = painterResource(iconId),
         contentDescription = null,
         tint = tint,
         modifier = Modifier
@@ -242,7 +242,7 @@ private fun IconButton(@DrawableRes iconId: Int, contentDescription: String, tin
             .clickable(interactionSource = null, indication = ripple(bounded = false), role = Role.Button, onClick = onClick)
             .semantics { this.contentDescription = contentDescription },
     ) {
-        DrawableImage(drawableId = iconId, contentDescription = null, tint = tint)
+        Icon(painter = painterResource(iconId), contentDescription = null, tint = tint)
     }
 }
 
@@ -347,18 +347,3 @@ private fun createTrimToggleGroup(context: Context, labels: List<String>): Mater
 }
 
 private fun Context.playerContext(): Context = ContextThemeWrapper(this, R.style.PlayerTheme)
-
-@Composable
-private fun DrawableBox(@DrawableRes drawableId: Int, modifier: Modifier = Modifier) {
-    Box(modifier = modifier.drawableBackground(drawableId))
-}
-
-@Composable
-private fun Modifier.drawableBackground(@DrawableRes drawableId: Int): Modifier {
-    val context = LocalContext.current
-    val drawable = remember(context, drawableId) { ContextCompat.getDrawable(context.playerContext(), drawableId)?.mutate() }
-    return drawBehind {
-        drawable?.setBounds(0, 0, size.width.toInt(), size.height.toInt())
-        drawable?.draw(drawContext.canvas.nativeCanvas)
-    }
-}

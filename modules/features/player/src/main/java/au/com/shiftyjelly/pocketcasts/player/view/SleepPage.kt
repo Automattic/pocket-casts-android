@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Icon
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontFamily
@@ -36,10 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.withTranslation
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.bottomsheet.Pill
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.NumberStepper
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
-import au.com.shiftyjelly.pocketcasts.compose.images.drawableBackground
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -54,7 +55,6 @@ import com.airbnb.lottie.model.KeyPath
 import kotlin.math.floor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 internal sealed interface SleepState {
     data class Setup(
@@ -106,11 +106,10 @@ internal fun SleepPage(
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Box(modifier = Modifier.fillMaxWidth()) {
-            Box(
+            Pill(
+                backgroundColor = colors.contrast01,
                 modifier = Modifier
                     .padding(top = 12.dp)
-                    .size(width = 48.dp, height = 4.dp)
-                    .drawableBackground(VR.drawable.background_dragger_player)
                     .align(Alignment.TopCenter),
             )
             when (state) {
@@ -139,8 +138,8 @@ private fun SleepSetup(state: SleepState.Setup, colors: SleepColors, listener: S
                         .clickable(interactionSource = null, indication = ripple(bounded = false), role = Role.Button, onClick = listener::onSettingsClick)
                         .padding(horizontal = 12.dp, vertical = 8.dp),
                 ) {
-                    DrawableImage(
-                        drawableId = IR.drawable.sleep_timer_cog,
+                    Icon(
+                        painter = painterResource(IR.drawable.sleep_timer_cog),
                         contentDescription = stringResource(LR.string.player_sleep_timer_settings),
                         tint = colors.contrast01,
                     )

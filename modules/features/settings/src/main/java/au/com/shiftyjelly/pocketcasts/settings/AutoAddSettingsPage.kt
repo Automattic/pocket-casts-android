@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -34,9 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.core.content.res.use
-import au.com.shiftyjelly.pocketcasts.compose.bars.AppCompatTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
-import au.com.shiftyjelly.pocketcasts.compose.images.DrawableImage
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewAlignment
 import au.com.shiftyjelly.pocketcasts.compose.text.TextViewText
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -45,7 +46,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import coil3.compose.AsyncImage
 import kotlin.math.ceil
 import kotlin.math.cos
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal data class AutoAddOption(
@@ -72,14 +72,13 @@ internal fun AutoAddSettingsPage(
             .fillMaxSize()
             .background(colors.primaryUi02),
     ) {
-        AppCompatTopAppBar(
+        ThemedTopAppBar(
             title = stringResource(LR.string.settings_auto_up_next_title),
-            navigationButton = NavigationButton.Drawable(IR.drawable.ic_arrow_back, LR.string.back),
+            navigationButton = NavigationButton.Back,
             onNavigationClick = onNavigationClick,
             iconColor = colors.secondaryIcon01,
-            titleColor = colors.secondaryText01,
+            textColor = colors.secondaryText01,
             backgroundColor = colors.secondaryUi01,
-            bottomShadow = false,
             modifier = toolbarModifier,
         )
         LazyColumn(
@@ -137,8 +136,8 @@ private fun OptionRow(option: AutoAddOption) {
     ) {
         Box(modifier = Modifier.size(24.dp)) {
             if (option.iconResId != null) {
-                DrawableImage(
-                    drawableId = option.iconResId,
+                Icon(
+                    painter = painterResource(option.iconResId),
                     contentDescription = null,
                     tint = colors.primaryIcon01,
                     modifier = Modifier.size(24.dp),
