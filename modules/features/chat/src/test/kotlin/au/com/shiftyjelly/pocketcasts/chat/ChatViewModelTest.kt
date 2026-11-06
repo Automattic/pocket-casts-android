@@ -2641,6 +2641,52 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `the latest answer's timestamps and quotes are prefetched when its episode is loaded`() = runTest {
+        val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        playableState(quote)
+
+        chatManager.messages.value = listOf(
+            ChatMessage.User("Earlier"),
+            ChatMessage.Assistant("Earlier at 00:00:30.", uuid = "earlier-answer-uuid"),
+            ChatMessage.User("Question"),
+            ChatMessage.Assistant("It comes up at 00:01:05.", uuid = ANSWER_UUID),
+            quote,
+        )
+        advanceUntilIdle()
+
+        verify(quoteSeeker).prefetchPlaybackTime(org.mockito.kotlin.eq(episode.value), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 65_000, referenceTimeMs = 65_000)))
+        verify(quoteSeeker).prefetchQuote(org.mockito.kotlin.eq(episode.value), org.mockito.kotlin.argThat { uuid == quote.uuid })
+        verify(quoteSeeker, never()).prefetchPlaybackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 30_000, referenceTimeMs = 30_000)))
+    }
+
+    @Test
+    fun `timestamps are not prefetched while another episode is loaded`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = OTHER_EPISODE_UUID)
+        answerState()
+
+        verify(quoteSeeker, never()).prefetchPlaybackTime(any(), any())
+    }
+
+    @Test
+    fun `a new answer is prefetched once when it arrives`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)
+        answerState()
+        val second = ChatMessage.Assistant("Later at 00:02:00.", uuid = "second-answer-uuid")
+
+        chatManager.messages.value = listOf(ChatMessage.Assistant("It comes up at 00:01:05.", uuid = ANSWER_UUID), ChatMessage.User("Next"), second)
+        advanceUntilIdle()
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 2_000)
+        advanceUntilIdle()
+
+        verify(quoteSeeker, times(1)).prefetchPlaybackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 65_000, referenceTimeMs = 65_000)))
+        verify(quoteSeeker, times(1)).prefetchPlaybackTime(any(), org.mockito.kotlin.eq(ChatQuoteSeeker.QuoteTime(timeMs = 120_000, referenceTimeMs = 120_000)))
+    }
+
+    @Test
     fun `a playable quote of the loaded episode warms up once`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID)

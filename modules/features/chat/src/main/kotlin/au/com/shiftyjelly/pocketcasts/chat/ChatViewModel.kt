@@ -138,6 +138,7 @@ class ChatViewModel @Inject constructor(
     private val quoteLoadId = AtomicInteger()
     private val warmedUpEpisodeUuids = mutableSetOf<String>()
     private val warmedUpQuoteUuids = mutableSetOf<String>()
+    private val prefetchedMessageUuids = mutableSetOf<String>()
     private var lastQuotePlaybackUndoId = 0
     private var transientUserMessage: ChatMessage.User? = null
     private var replyRequestedAt: TimeMark? = null
@@ -382,6 +383,34 @@ class ChatViewModel @Inject constructor(
                 val hasAnswerTimestamps = messages.any { it is ChatMessage.Assistant && findChatTimestamps(it.displayText).isNotEmpty() }
                 Triple(chatEpisodeUuid, quotes.takeIf { isLoaded }.orEmpty(), isLoaded && hasAnswerTimestamps)
             }.collect { (chatEpisodeUuid, quotes, hasAnswerTimestamps) -> warmUpQuotes(chatEpisodeUuid, quotes, hasAnswerTimestamps) }
+        }
+        viewModelScope.launch(ioDispatcher) {
+            combine(
+                _uiState.map { it.episodeUuid to it.messages }.distinctUntilChanged(),
+                playbackManager.playbackStateFlow.map { it.loadedEpisodeUuid }.distinctUntilChanged(),
+            ) { (chatEpisodeUuid, messages), loadedEpisodeUuid ->
+                chatEpisodeUuid to messages.latestAnswerGroup().takeIf { chatEpisodeUuid == loadedEpisodeUuid }.orEmpty()
+            }.collect { (chatEpisodeUuid, answerGroup) -> prefetchPlaybackTimes(chatEpisodeUuid, answerGroup) }
+        }
+    }
+
+    private suspend fun prefetchPlaybackTimes(episodeUuid: String, answerGroup: List<ChatMessage>) {
+        val messages = answerGroup.filter { it.uuid !in prefetchedMessageUuids }
+        if (messages.isEmpty()) return
+        val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return
+        messages.forEach { message ->
+            prefetchedMessageUuids.add(message.uuid)
+            when (message) {
+                is ChatMessage.Assistant -> findChatTimestamps(message.displayText)
+                    .filter { isWithinEpisode(it.startMs, episode.durationMs) }
+                    .forEach { timestamp ->
+                        quoteSeeker.prefetchPlaybackTime(episode, ChatQuoteSeeker.QuoteTime(timeMs = timestamp.startMs, referenceTimeMs = timestamp.startMs))
+                    }
+
+                is ChatMessage.Quote -> if (message.canPlay) quoteSeeker.prefetchQuote(episode, message)
+
+                is ChatMessage.User -> Unit
+            }
         }
     }
 
@@ -1198,6 +1227,8 @@ sealed interface ChatNavigation {
     data object SignIn : ChatNavigation
     data object Close : ChatNavigation
 }
+
+private fun List<ChatMessage>.latestAnswerGroup() = takeLastWhile { it !is ChatMessage.User }
 
 sealed interface ChatToast {
     data object FeedbackThanks : ChatToast
