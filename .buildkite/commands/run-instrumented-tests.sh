@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-if "$(dirname "${BASH_SOURCE[0]}")/should-skip-job.sh" --job-type validation; then
+if "$(dirname "${BASH_SOURCE[0]}")/should-skip-job.sh" --job-type instrumented-tests; then
   exit 0
 fi
 
