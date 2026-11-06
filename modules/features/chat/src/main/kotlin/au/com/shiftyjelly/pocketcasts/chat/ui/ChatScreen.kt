@@ -913,7 +913,7 @@ private fun ChatScreenEmptyPreview(
                     starterQuestions = listOf(
                         "Who is the guest?",
                         "How do recommendations work?",
-                        "What changed this year?",
+                        "What did the hosts say about the new recommendations feature?",
                     ),
                 ),
                 onClickClose = {},

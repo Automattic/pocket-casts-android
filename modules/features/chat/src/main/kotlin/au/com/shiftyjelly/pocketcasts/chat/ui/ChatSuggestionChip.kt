@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
@@ -195,18 +195,24 @@ private fun ChatSuggestionChip(
     modifier: Modifier = Modifier,
 ) {
     val position = remember { PlacedCoordinates() }
+    val widestLine = remember { WidestLine() }
     Text(
         text = text,
         color = theme.primaryText,
         fontSize = 15.sp,
         lineHeight = 20.sp,
+        onTextLayout = widestLine::onTextLayout,
         modifier = modifier
+            .chipMaxWidth()
             .onPlaced(position::onPlaced)
             .alpha(if (enabled) 1f else DISABLED_ALPHA)
-            .clip(CircleShape)
-            .border(1.dp, theme.chipBorder, CircleShape)
+            .clip(ChipShape)
+            .border(1.dp, theme.chipBorder, ChipShape)
             .clickable(enabled = enabled, role = Role.Button, onClick = { onClick(position.topInRoot()) })
             .defaultMinSize(minHeight = 44.dp)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .hugWidestLine(widestLine),
     )
 }
+
+private val ChipShape = RoundedCornerShape(ChipCornerRadius)
