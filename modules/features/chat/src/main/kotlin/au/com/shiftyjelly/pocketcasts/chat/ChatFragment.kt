@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
+import au.com.shiftyjelly.pocketcasts.repositories.chat.formatChatTimestamp
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
@@ -316,9 +317,16 @@ class ChatFragment : BaseDialogFragment() {
 
     private fun ChatToast.message(resources: Resources) = when (this) {
         ChatToast.FeedbackThanks -> resources.getString(LR.string.chat_feedback_thank_you)
+
         ChatToast.ChatCleared -> resources.getString(LR.string.chat_cleared)
+
         ChatToast.ChatDeleted -> resources.getString(LR.string.chat_deleted)
-        is ChatToast.QuotePlaying -> resources.getString(LR.string.chat_now_playing_episode, episodeTitle)
+
+        is ChatToast.QuotePlaying ->
+            jumpedToMs
+                ?.let { resources.getString(LR.string.chat_jumped_to_time, formatChatTimestamp(it)) }
+                ?: resources.getString(LR.string.chat_now_playing_episode, episodeTitle)
+
         ChatToast.QuotePlayFailed -> resources.getString(LR.string.chat_quote_play_failed)
     }
 

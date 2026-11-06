@@ -108,9 +108,9 @@ internal fun AiMessageBubble(
     val styledText = remember(text, bulletIndent) { text.withHangingBullets(bulletIndent) }
     val currentOnClickTimestamp by rememberUpdatedState(onClickTimestamp)
     val isRevealed = revealProgress == null
-    val linkedText = remember(styledText, theme.link, isRevealed, episodeDurationMs, loadingTimestampMs) {
+    val linkedText = remember(styledText, theme.timestamp, isRevealed, episodeDurationMs, loadingTimestampMs) {
         styledText.withTimestampLinks(
-            linkColor = theme.link,
+            linkColor = theme.timestamp,
             isEnabled = isRevealed,
             episodeDurationMs = episodeDurationMs,
             loadingStartMs = loadingTimestampMs,
@@ -205,7 +205,7 @@ internal fun AiQuoteBubble(
     revealProgress: (() -> Float)? = null,
     onClickPlay: () -> Unit = {},
 ) {
-    val timestampColor = if (isPlayable) theme.link else theme.secondaryText
+    val timestampColor = if (isPlayable) theme.timestamp else theme.secondaryText
     val quoteColor = if (isLoading) theme.aiBubbleText.copy(alpha = LOADING_QUOTE_ALPHA) else theme.aiBubbleText
     val text = remember(quote, timestampLabel, timestampColor, quoteColor, isLoading) {
         quoteText(quote, timestampLabel, quoteColor, timestampColor, isLoading)
