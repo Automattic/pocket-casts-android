@@ -2000,8 +2000,9 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `playing a quote in the loaded episode says where it jumped to`() = runTest {
+    fun `playing a quote in the loaded episode says the tapped time it jumped to`() = runTest {
         val quote = createQuote(startMs = 1_000, endMs = 3_000)
+        whenever(quoteSeeker.playbackTimeMs(any(), any())).thenReturn(31_500)
         whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
         playbackState.value = PlaybackState(state = PlaybackState.State.PAUSED, episodeUuid = EPISODE_UUID, positionMs = 10_000)
         playableState(quote)
@@ -2011,6 +2012,20 @@ class ChatViewModelTest {
             advanceUntilIdle()
 
             assertEquals(1_000, (awaitItem() as ChatToast.QuotePlaying).jumpedToMs)
+        }
+    }
+
+    @Test
+    fun `playing an answer timestamp in the playing episode says where it jumped to`() = runTest {
+        whenever(episodeManager.findEpisodeByUuid(EPISODE_UUID)).thenReturn(episode.value)
+        playbackState.value = PlaybackState(state = PlaybackState.State.PLAYING, episodeUuid = EPISODE_UUID, positionMs = 10_000)
+        answerState()
+
+        viewModel.toasts.test {
+            viewModel.playAnswerTimestamp(ANSWER_UUID, 65_000)
+            advanceUntilIdle()
+
+            assertEquals(65_000, (awaitItem() as ChatToast.QuotePlaying).jumpedToMs)
         }
     }
 
