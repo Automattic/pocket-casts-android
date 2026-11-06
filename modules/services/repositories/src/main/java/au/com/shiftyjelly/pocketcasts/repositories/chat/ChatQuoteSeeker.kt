@@ -19,11 +19,16 @@ import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
 
 @Singleton
 class ChatQuoteSeeker @Inject constructor(
@@ -34,6 +39,22 @@ class ChatQuoteSeeker @Inject constructor(
     @ApplicationScope private val scope: CoroutineScope,
 ) {
     private val pendingTranscripts = ConcurrentHashMap<Pair<String, Boolean>, Deferred<Transcript.Text?>>()
+    private val playbackTimes = ConcurrentHashMap<PlaybackTimeKey, Deferred<Int?>>()
+    private val prefetches = Channel<PlaybackTimePrefetch>(Channel.UNLIMITED)
+
+    init {
+        scope.launch {
+            for (prefetch in prefetches) {
+                try {
+                    prefetch.load().join()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Timber.w(e, "ChatQuoteSeeker: playback time prefetch failed")
+                }
+            }
+        }
+    }
 
     data class QuoteTime(
         val timeMs: Int,
@@ -87,12 +108,45 @@ class ChatQuoteSeeker @Inject constructor(
     }
 
     suspend fun playbackTimeMs(episode: BaseEpisode, quoteTime: QuoteTime): Int {
+        return playbackTime(episode, quoteTime).await() ?: quoteTime.timeMs
+    }
+
+    fun playbackTime(episode: BaseEpisode, quoteTime: QuoteTime): Deferred<Int?> {
+        return pendingPlaybackTime(episode, quoteTime).also { it.start() }
+    }
+
+    fun prefetchPlaybackTime(episode: BaseEpisode, quoteTime: QuoteTime) {
+        val playbackTime = pendingPlaybackTime(episode, quoteTime)
+        prefetches.trySend(PlaybackTimePrefetch { playbackTime })
+    }
+
+    fun prefetchQuote(episode: BaseEpisode, quote: ChatMessage.Quote) {
+        prefetches.trySend(PlaybackTimePrefetch { pendingPlaybackTime(episode, quoteTime(episode.uuid, quote)) })
+    }
+
+    private fun pendingPlaybackTime(episode: BaseEpisode, quoteTime: QuoteTime): Deferred<Int?> {
         val referenceTimeMs = quoteTime.referenceTimeMs?.takeIf { it >= 0 && isFingerprintSeekEnabled() }
-            ?: return quoteTime.timeMs
-        val playbackTime = withTimeoutOrNull(FINGERPRINT_RESOLVE_TIMEOUT) {
-            playbackTime(episode, referenceTimeMs.milliseconds)
+            ?: return CompletableDeferred(value = null)
+        val key = PlaybackTimeKey(episode.uuid, episode.downloadedFilePath ?: episode.downloadUrl, referenceTimeMs)
+        return playbackTimes.computeIfAbsent(key) {
+            scope.async(start = CoroutineStart.LAZY) {
+                val playbackTimeMs = withTimeoutOrNull(FINGERPRINT_RESOLVE_TIMEOUT) {
+                    playbackTime(episode, referenceTimeMs.milliseconds)
+                }?.inWholeMilliseconds?.toInt()
+                if (playbackTimeMs == null) playbackTimes.remove(key)
+                playbackTimeMs
+            }
         }
-        return playbackTime?.inWholeMilliseconds?.toInt() ?: quoteTime.timeMs
+    }
+
+    private data class PlaybackTimeKey(
+        val episodeUuid: String,
+        val audioSource: String?,
+        val referenceTimeMs: Int,
+    )
+
+    private fun interface PlaybackTimePrefetch {
+        suspend fun load(): Deferred<Int?>
     }
 
     private suspend fun loadTextTranscript(episodeUuid: String, isGenerated: Boolean): Transcript.Text? {
