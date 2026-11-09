@@ -18,6 +18,9 @@ steps:
   # Wait for Gradle Wrapper to be validated before running any other jobs
   - wait
 
+  # TODO: Block manual retries like the release-pipelines steps once code freeze no longer starts this build.
+  # Until then, retrying here is the only way to recover a failed first build without using up a beta version.
+  # https://linear.app/a8c/issue/AINFRA-3633
   - label: "🛠 Release Build"
     command: .buildkite/commands/release-build.sh "${RELEASE_VERSION}"
     priority: 1
@@ -27,7 +30,3 @@ steps:
       - "artifacts/**"
     notify:
       - slack: "#build-and-ship"
-    retry:
-      manual:
-        reason: If release jobs fail, you should always re-trigger the task from Releases V2 rather than retrying the individual job from Buildkite
-        allowed: false
