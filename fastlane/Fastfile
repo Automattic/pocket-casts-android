@@ -596,15 +596,18 @@ platform :android do
     aab_artifact_path = aab_artifact_path(app, version)
     build_dir = 'artifacts/'
     gradle_properties = gradle_properties_for_app(app: app)
+    # Workaround: remove once the remote build cache stops breaking `:app:compileReleaseJavaWithJavac`.
+    gradle_flags = '--no-build-cache'
 
     gradle(task: 'clean')
     UI.message('Running lint...')
-    gradle(task: ":#{app}:lintRelease", properties: gradle_properties)
+    gradle(task: ":#{app}:lintRelease", properties: gradle_properties, flags: gradle_flags)
     UI.message("Building #{version} / #{build_code} - #{aab_artifact_path}...")
     gradle(
       task: ":#{app}:bundle",
       build_type: 'Release',
-      properties: gradle_properties
+      properties: gradle_properties,
+      flags: gradle_flags
     )
 
     aab_file = File.join(PROJECT_ROOT_FOLDER, bundle_output_path(app))
