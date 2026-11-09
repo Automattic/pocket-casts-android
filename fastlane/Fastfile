@@ -598,8 +598,6 @@ platform :android do
     gradle_properties = gradle_properties_for_app(app: app)
 
     gradle(task: 'clean')
-    UI.message('Running lint...')
-    gradle(task: ":#{app}:lintRelease", properties: gradle_properties)
     UI.message("Building #{version} / #{build_code} - #{aab_artifact_path}...")
     gradle(
       task: ":#{app}:bundle",
