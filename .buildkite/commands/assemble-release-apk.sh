@@ -26,4 +26,4 @@ bundle exec fastlane run configure_apply
 
 echo "--- ⚙️ Building release variant"
 
-./gradlew "$APP:assembleRelease" "${GRADLE_PROPERTIES[@]}"
+./gradlew "$APP:assembleRelease" "${GRADLE_PROPERTIES[@]}" --no-build-cache

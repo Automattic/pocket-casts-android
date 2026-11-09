@@ -14,10 +14,10 @@ bundle exec fastlane run configure_apply
 
 echo "--- 🧹 Linting"
 # Run lint on app module first, to make sure that the lint-results-debug.sarif file is always generated
-./gradlew :app:lintRelease
+./gradlew :app:lintRelease --no-build-cache
 app_lint_exit_code=$?
 
-./gradlew --continue :automotive:lintRelease :tv:lintRelease :wear:lintRelease
+./gradlew --continue :automotive:lintRelease :tv:lintRelease :wear:lintRelease --no-build-cache
 other_lint_exit_code=$?
 
 if [ $app_lint_exit_code -ne 0 ] || [ $other_lint_exit_code -ne 0 ]; then
