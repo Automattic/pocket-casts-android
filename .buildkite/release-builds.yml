@@ -27,3 +27,7 @@ steps:
       - "artifacts/**"
     notify:
       - slack: "#build-and-ship"
+    retry:
+      manual:
+        reason: If release jobs fail, you should always re-trigger the task from Releases V2 rather than retrying the individual job from Buildkite
+        allowed: false
