@@ -52,15 +52,17 @@ object AuthWatchModule {
 
     @Provides
     fun provideCredentialsRequest(): GetCredentialRequest {
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
-            .setRequestVerifiedPhoneNumber(false)
-            .setServerClientId(Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID)
-            .setNonce(UUID.randomUUID().toString())
-            .build()
-
-        return GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
+        val builder = GetCredentialRequest.Builder()
+        if (Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID.isNotEmpty()) {
+            val googleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setRequestVerifiedPhoneNumber(false)
+                .setServerClientId(Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID)
+                .setNonce(UUID.randomUUID().toString())
+                .build()
+            builder.addCredentialOption(googleIdOption)
+        }
+        return builder
             .addCredentialOption(GetPasswordOption())
             .build()
     }
