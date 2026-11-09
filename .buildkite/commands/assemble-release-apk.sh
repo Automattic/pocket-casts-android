@@ -24,6 +24,19 @@ echo "--- :closed_lock_with_key: Installing Secrets"
 
 bundle exec fastlane run configure_apply
 
+print_player_hilt_outputs() {
+  local build_dir=modules/features/player/build
+  local jar
+
+  echo "+++ Player Hilt outputs"
+  find "$build_dir" -name 'Hilt_PlayerBottomSheet*' -print || true
+  find "$build_dir" -path '*compile_library_classes_jar*' -name classes.jar -print | while read -r jar; do
+    ls -l "$jar"
+    { unzip -l "$jar" || jar tf "$jar"; } | grep -E 'view/(Hilt_)?PlayerBottomSheet' || echo "No PlayerBottomSheet entries in $jar"
+  done
+}
+trap print_player_hilt_outputs EXIT
+
 echo "--- ⚙️ Building release variant"
 
-./gradlew "$APP:assembleRelease" "${GRADLE_PROPERTIES[@]}"
+./gradlew "$APP:assembleRelease" "${GRADLE_PROPERTIES[@]}" --no-build-cache
