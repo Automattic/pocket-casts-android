@@ -4,14 +4,11 @@ import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
-import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ProgressBar
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.addCallback
@@ -24,7 +21,6 @@ import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import com.automattic.pocketcasts.playback.PlaybackController
 import com.automattic.pocketcasts.playback.PlaybackEvent
-import com.automattic.pocketcasts.playback.PlaybackPayload
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +32,10 @@ import timber.log.Timber
 
 /**
  * Hosts the Playback experience full screen and turns its events into app behavior.
+ *
+ * The story opens before its data is there: [Playback2026ViewModel] syncs and reads the listening
+ * history while the intro plays, and the payload is handed to the page when it is ready. If the
+ * user moves on from the intro first, the page shows a spinner until then.
  *
  * The manifest declares `configChanges` for this activity: a rotation, font size or dark mode change
  * would otherwise recreate it, and with it the web view and the user's place in the story.
@@ -61,16 +61,7 @@ class Playback2026Activity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
         )
 
-        container = FrameLayout(this).apply {
-            setBackgroundColor(BACKGROUND_COLOR)
-            addView(
-                ProgressBar(context).apply {
-                    isIndeterminate = true
-                    indeterminateTintList = ColorStateList.valueOf(Color.WHITE)
-                },
-                FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER),
-            )
-        }
+        container = FrameLayout(this).apply { setBackgroundColor(BACKGROUND_COLOR) }
         setContentView(container)
 
         // Android web views report env(safe-area-inset-*) as zero, so measure and push.
@@ -90,14 +81,17 @@ class Playback2026Activity : ComponentActivity() {
             }
         }
 
+        show()
         lifecycleScope.launch {
-            show(viewModel.payload.filterNotNull().first())
+            val payload = viewModel.payload.filterNotNull().first()
+            controller?.setPayload(payload)
         }
     }
 
-    private fun show(payload: PlaybackPayload) {
+    /** Opens the story at once, without its payload: the intro plays while the view model reads it. */
+    private fun show() {
         val controller = try {
-            PlaybackController(this, payload)
+            PlaybackController(this)
         } catch (e: Exception) {
             // The web view can fail to start, for example while the system WebView is being updated.
             Timber.e(e, "Playback 2026: failed to start")
@@ -111,7 +105,6 @@ class Playback2026Activity : ComponentActivity() {
         }
         this.controller = controller
 
-        container.removeAllViews()
         container.addView(
             controller.webView,
             FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT),
