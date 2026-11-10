@@ -243,6 +243,33 @@ class PocketCastsForwardingPlayerTest {
     }
 
     @Test
+    fun `automotive reports seek to next and previous available when the wrapped player does not`() {
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn mock<Timeline>()
+            on { isCommandAvailable(any()) } doReturn false
+        }
+        val forwarding = PocketCastsForwardingPlayer(player, isAutomotive = true)
+
+        assertTrue(forwarding.isCommandAvailable(Player.COMMAND_SEEK_TO_NEXT))
+        assertTrue(forwarding.isCommandAvailable(Player.COMMAND_SEEK_TO_PREVIOUS))
+        assertFalse(forwarding.isCommandAvailable(Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM))
+    }
+
+    @Test
+    fun `non-automotive leaves seek to next availability to the wrapped player`() {
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn mock<Timeline>()
+            on { isCommandAvailable(any()) } doReturn false
+        }
+        val forwarding = PocketCastsForwardingPlayer(player, isAutomotive = false)
+
+        assertFalse(forwarding.isCommandAvailable(Player.COMMAND_SEEK_TO_NEXT))
+        assertFalse(forwarding.isCommandAvailable(Player.COMMAND_SEEK_TO_PREVIOUS))
+    }
+
+    @Test
     fun `automotive empty timeline reports null current media item`() {
         val player = mock<Player> {
             on { applicationLooper } doReturn Looper.getMainLooper()
