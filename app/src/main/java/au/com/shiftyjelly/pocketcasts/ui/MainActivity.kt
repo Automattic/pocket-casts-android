@@ -1149,8 +1149,17 @@ class MainActivity :
                         AppTheme(theme.activeTheme) {
                             Playback2026LaunchBottomSheet(
                                 parent = viewGroup,
-                                onClick = { Playback2026.start(this@MainActivity) },
-                                onExpand = { settings.playback2026SheetShown.set(true, updateModifiedAt = false) },
+                                onClick = {
+                                    eventHorizon.track(EndOfYearModalTappedEvent(currentYear = Playback2026.YEAR.value.toLong()))
+                                    Playback2026.start(this@MainActivity, Playback2026.Source.Modal)
+                                },
+                                onExpand = {
+                                    eventHorizon.track(EndOfYearModalShownEvent(currentYear = Playback2026.YEAR.value.toLong()))
+                                    settings.playback2026SheetShown.set(true, updateModifiedAt = false)
+                                },
+                                onCollapse = {
+                                    eventHorizon.track(EndOfYearModalDismissedEvent(currentYear = Playback2026.YEAR.value.toLong()))
+                                },
                             )
                         }
                     }

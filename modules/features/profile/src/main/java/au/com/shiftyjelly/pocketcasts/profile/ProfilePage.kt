@@ -79,6 +79,7 @@ internal fun ProfilePage(
     onDismissCreateFreeAccountBannerClick: () -> Unit,
     onEndOfYearCardShow: () -> Unit,
     onPlaybackClick: () -> Unit,
+    onPlayback2026Show: () -> Unit,
     onPlayback2026Click: () -> Unit,
     onClaimReferralsClick: () -> Unit,
     onHideReferralsCardClick: () -> Unit,
@@ -127,7 +128,7 @@ internal fun ProfilePage(
                     item {
                         EndOfYearPromptCard(
                             onClick = onPlayback2026Click,
-                            onShow = {},
+                            onShow = onPlayback2026Show,
                             imageId = R.drawable.playback_2026_banner,
                             title = stringResource(LR.string.playback_2026_banner_title),
                             summary = stringResource(LR.string.playback_2026_banner_description),
@@ -473,6 +474,7 @@ private fun ProfilePageStub(
         onDismissCreateFreeAccountBannerClick = {},
         onEndOfYearCardShow = {},
         onPlaybackClick = {},
+        onPlayback2026Show = {},
         onPlayback2026Click = {},
         onSendReferralsClick = {},
         onHideReferralsCardClick = {},
