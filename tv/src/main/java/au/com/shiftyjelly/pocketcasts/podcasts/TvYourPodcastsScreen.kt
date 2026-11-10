@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.component.TvDetailOverlay
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvFolderCard
@@ -54,18 +56,45 @@ fun TvYourPodcastsScreen(
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
     var gridRestoreTrigger by remember { mutableIntStateOf(0) }
     var folderRestoreTrigger by remember { mutableIntStateOf(0) }
+    var podcastsListShownTracked by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(uiState) {
+        if (!podcastsListShownTracked) {
+            when (val state = uiState) {
+                is TvYourPodcastsUiState.Loaded -> {
+                    viewModel.trackPodcastsListShown(state.items)
+                    podcastsListShownTracked = true
+                }
+
+                is TvYourPodcastsUiState.Empty -> {
+                    viewModel.trackPodcastsListShown(emptyList())
+                    podcastsListShownTracked = true
+                }
+
+                is TvYourPodcastsUiState.Loading -> Unit
+            }
+        }
+    }
 
     val podcastUuid = openedPodcastUuid
     val folder = openedFolder
     Box(modifier = modifier.fillMaxSize()) {
         TvYourPodcastsContent(
             uiState = uiState,
-            onNavigateToHome = onNavigateToHome,
-            onOpenFolder = { openedFolder = OpenedFolder(it.uuid, it.name) },
-            onOpenPodcast = { openedPodcastUuid = it },
+            onNavigateToHome = {
+                viewModel.trackDiscoverButtonTapped()
+                onNavigateToHome()
+            },
+            onOpenFolder = {
+                viewModel.trackFolderTapped()
+                openedFolder = OpenedFolder(it.uuid, it.name, it.podcastsSortType)
+            },
+            onOpenPodcast = {
+                viewModel.trackPodcastTapped()
+                openedPodcastUuid = it
+            },
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = TvTopBarHeight)
                 .tvFocusInactiveWhen(folder != null || podcastUuid != null),
             restoreFocusTrigger = gridRestoreTrigger,
         )
@@ -80,6 +109,7 @@ fun TvYourPodcastsScreen(
                 folderName = openFolder.name,
                 getFolderPodcasts = viewModel::folderPodcasts,
                 onOpenPodcast = { openedPodcastUuid = it },
+                onFolderImpression = { podcastCount -> viewModel.trackFolderShown(podcastCount, openFolder.sortType) },
                 onClose = { openedFolder = null },
                 restoreFocusTrigger = folderRestoreTrigger,
             )
@@ -91,17 +121,22 @@ fun TvYourPodcastsScreen(
         ) { uuid ->
             TvPodcastDetailsScreen(
                 podcastUuid = uuid,
+                source = SourceView.PODCAST_LIST,
                 onClose = { openedPodcastUuid = null },
             )
         }
     }
 }
 
-private data class OpenedFolder(val uuid: String, val name: String)
+private data class OpenedFolder(val uuid: String, val name: String, val sortType: PodcastsSortType)
 
 private val OpenedFolderSaver = listSaver<OpenedFolder?, String>(
-    save = { folder -> folder?.let { listOf(it.uuid, it.name) }.orEmpty() },
-    restore = { saved -> saved.takeIf { it.size == 2 }?.let { (uuid, name) -> OpenedFolder(uuid, name) } },
+    save = { folder -> folder?.let { listOf(it.uuid, it.name, it.sortType.name) }.orEmpty() },
+    restore = { saved ->
+        saved.takeIf { it.size == 3 }?.let { (uuid, name, sortType) ->
+            PodcastsSortType.entries.firstOrNull { it.name == sortType }?.let { OpenedFolder(uuid, name, it) }
+        }
+    },
 )
 
 @Composable
@@ -129,7 +164,9 @@ private fun TvYourPodcastsContent(
         when (state) {
             is TvYourPodcastsUiState.Loading -> LoadingView(
                 color = MaterialTheme.tvColors.textPrimary,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = TvTopBarHeight),
             )
 
             is TvYourPodcastsUiState.Empty -> TvEmptyState(
@@ -137,7 +174,9 @@ private fun TvYourPodcastsContent(
                 subtitle = stringResource(LR.string.tv_your_podcasts_empty_subtitle),
                 actionLabel = stringResource(LR.string.tv_your_podcasts_empty_action_title),
                 onAction = onNavigateToHome,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = TvTopBarHeight),
             )
 
             is TvYourPodcastsUiState.Loaded -> TvYourPodcastsGrid(
@@ -164,6 +203,7 @@ private fun TvYourPodcastsGrid(
         itemKeys = items.map(FolderItem::uuid),
         modifier = modifier,
         restoreFocusTrigger = restoreFocusTrigger,
+        scrollsTopBar = true,
     ) { index, itemModifier ->
         when (val item = items[index]) {
             is FolderItem.Podcast -> TvPodcastTile(

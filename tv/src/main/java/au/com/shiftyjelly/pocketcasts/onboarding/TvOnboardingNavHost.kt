@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,11 +14,15 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.component.LocalTvModalBackdrop
 import au.com.shiftyjelly.pocketcasts.component.LocalTvToastHostState
+import au.com.shiftyjelly.pocketcasts.component.TvModalBackdrop
+import au.com.shiftyjelly.pocketcasts.component.TvModalBackdropState
 import au.com.shiftyjelly.pocketcasts.component.TvToastHost
 import au.com.shiftyjelly.pocketcasts.component.TvToastHostState
 import au.com.shiftyjelly.pocketcasts.home.TvScaffold
 import au.com.shiftyjelly.pocketcasts.onboarding.createaccount.TvCreateAccountScreen
+import au.com.shiftyjelly.pocketcasts.onboarding.signedout.TvSignedOutScreen
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSignInScreen
 import au.com.shiftyjelly.pocketcasts.onboarding.signin.TvSyncingScreen
 import au.com.shiftyjelly.pocketcasts.onboarding.welcome.TvWelcomeScreen
@@ -28,62 +33,88 @@ fun TvOnboardingNavHost(
     viewModel: TvOnboardingViewModel = hiltViewModel(),
 ) {
     val navController = rememberNavController()
+    val navigateClearingBackStack: (String) -> Unit = { route ->
+        navController.navigate(route) {
+            popUpTo(navController.graph.id) { inclusive = true }
+        }
+    }
+    LaunchedEffect(Unit) {
+        if (viewModel.startDestination == TvOnboardingRoutes.HOME) {
+            viewModel.refreshOnLaunch()
+        }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.onServerSignOut.collect {
+            if (navController.currentDestination?.route != TvOnboardingRoutes.SIGNED_OUT) {
+                navigateClearingBackStack(TvOnboardingRoutes.SIGNED_OUT)
+            }
+        }
+    }
     val toastHostState = remember { TvToastHostState() }
-    CompositionLocalProvider(LocalTvToastHostState provides toastHostState) {
+    val modalBackdropState = remember { TvModalBackdropState() }
+    CompositionLocalProvider(
+        LocalTvToastHostState provides toastHostState,
+        LocalTvModalBackdrop provides modalBackdropState,
+    ) {
         Box(modifier = modifier.fillMaxSize()) {
-            NavHost(
-                navController = navController,
-                startDestination = viewModel.startDestination,
+            TvModalBackdrop(
+                state = modalBackdropState,
                 modifier = Modifier.fillMaxSize(),
             ) {
-                composable(TvOnboardingRoutes.LANDING) {
-                    TvWelcomeScreen(
-                        onSignIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
-                        onCreateAccount = { navController.navigate(TvOnboardingRoutes.CREATE_ACCOUNT) },
-                        onContinueWithoutAccount = {
-                            viewModel.completeOnboarding()
-                            navController.navigate(TvOnboardingRoutes.HOME) {
-                                popUpTo(TvOnboardingRoutes.LANDING) { inclusive = true }
-                            }
-                        },
-                    )
-                }
-                composable(TvOnboardingRoutes.CREATE_ACCOUNT) {
-                    TvCreateAccountScreen(
-                        onSignIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
-                    )
-                }
-                composable(TvOnboardingRoutes.SIGN_IN) {
-                    TvSignInScreen(
-                        onSignInComplete = {
-                            navController.navigate(TvOnboardingRoutes.SYNCING) {
-                                popUpTo(navController.graph.id) { inclusive = true }
-                            }
-                        },
-                    )
-                }
-                composable(TvOnboardingRoutes.SYNCING) {
-                    TvSyncingScreen(
-                        onSyncComplete = {
-                            viewModel.completeOnboarding()
-                            navController.navigate(TvOnboardingRoutes.HOME) {
-                                popUpTo(TvOnboardingRoutes.SYNCING) { inclusive = true }
-                            }
-                        },
-                    )
-                }
-                composable(TvOnboardingRoutes.HOME) {
-                    TvScaffold(
-                        onLogIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
-                        onCreateAccount = { navController.navigate(TvOnboardingRoutes.CREATE_ACCOUNT) },
-                    )
+                NavHost(
+                    navController = navController,
+                    startDestination = viewModel.startDestination,
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    composable(TvOnboardingRoutes.LANDING) {
+                        TvWelcomeScreen(
+                            onSignIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
+                            onCreateAccount = { navController.navigate(TvOnboardingRoutes.CREATE_ACCOUNT) },
+                            onContinueWithoutAccount = {
+                                navController.navigate(TvOnboardingRoutes.HOME) {
+                                    popUpTo(TvOnboardingRoutes.LANDING) { inclusive = true }
+                                }
+                            },
+                        )
+                    }
+                    composable(TvOnboardingRoutes.CREATE_ACCOUNT) {
+                        TvCreateAccountScreen(
+                            onCreateAccountComplete = { navigateClearingBackStack(TvOnboardingRoutes.SYNCING) },
+                        )
+                    }
+                    composable(TvOnboardingRoutes.SIGN_IN) {
+                        TvSignInScreen(
+                            onSignInComplete = { navigateClearingBackStack(TvOnboardingRoutes.SYNCING) },
+                        )
+                    }
+                    composable(TvOnboardingRoutes.SYNCING) {
+                        TvSyncingScreen(
+                            onSyncComplete = {
+                                navController.navigate(TvOnboardingRoutes.HOME) {
+                                    popUpTo(TvOnboardingRoutes.SYNCING) { inclusive = true }
+                                }
+                            },
+                        )
+                    }
+                    composable(TvOnboardingRoutes.SIGNED_OUT) {
+                        TvSignedOutScreen(
+                            onLogIn = { navigateClearingBackStack(TvOnboardingRoutes.LANDING) },
+                        )
+                    }
+                    composable(TvOnboardingRoutes.HOME) {
+                        TvScaffold(
+                            onLogIn = { navController.navigate(TvOnboardingRoutes.SIGN_IN) },
+                            onCreateAccount = { navController.navigate(TvOnboardingRoutes.CREATE_ACCOUNT) },
+                            onSignedOut = { navigateClearingBackStack(TvOnboardingRoutes.LANDING) },
+                        )
+                    }
                 }
             }
             TvToastHost(
                 state = toastHostState,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 80.dp, end = 48.dp),
+                    .padding(top = 44.dp, end = 42.dp),
             )
         }
     }

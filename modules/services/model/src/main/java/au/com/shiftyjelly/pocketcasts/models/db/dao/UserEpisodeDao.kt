@@ -14,9 +14,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.DownloadStatusUpdate
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
-import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Maybe
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
@@ -28,7 +25,7 @@ abstract class UserEpisodeDao {
     abstract suspend fun insert(userEpisode: UserEpisode)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertRxCompletable(userEpisode: UserEpisode): Completable
+    abstract suspend fun insertOrReplace(userEpisode: UserEpisode)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract suspend fun insertAll(userEpisodes: List<UserEpisode>)
@@ -46,37 +43,28 @@ abstract class UserEpisodeDao {
     abstract suspend fun findAllUuids(): List<String>
 
     @Query("SELECT * FROM user_episodes ORDER BY added_date DESC")
-    abstract fun findUserEpisodesDescRxFlowable(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesDescFlow(): Flow<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY added_date DESC")
     abstract suspend fun findUserEpisodesDesc(): List<UserEpisode>
 
     @Query("SELECT * FROM user_episodes ORDER BY added_date ASC")
-    abstract fun findUserEpisodesAscRxFlowable(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesAscFlow(): Flow<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY title ASC")
-    abstract fun findUserEpisodesTitleAscRxFlowable(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesTitleAscFlow(): Flow<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY title DESC")
-    abstract fun findUserEpisodesTitleDescRxFlowable(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesTitleDescFlow(): Flow<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY duration ASC")
-    abstract fun findUserEpisodesDurationAscRxFlowable(): Flowable<List<UserEpisode>>
+    abstract fun findUserEpisodesDurationAscFlow(): Flow<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes ORDER BY duration DESC")
-    abstract fun findUserEpisodesDurationDescRxFlowable(): Flowable<List<UserEpisode>>
-
-    @Query("SELECT * FROM user_episodes WHERE download_task_id IS NOT NULL")
-    abstract fun findDownloadingUserEpisodesRxFlowable(): Flowable<List<UserEpisode>>
-
-    @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
-    abstract fun findEpisodeRxFlowable(uuid: String): Flowable<UserEpisode>
+    abstract fun findUserEpisodesDurationDescFlow(): Flow<List<UserEpisode>>
 
     @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
     abstract fun findEpisodeFlow(uuid: String): Flow<UserEpisode?>
-
-    @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
-    abstract fun findEpisodeByUuidRxMaybe(uuid: String): Maybe<UserEpisode>
 
     @Query("SELECT * FROM user_episodes WHERE uuid = :uuid")
     abstract suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
@@ -114,9 +102,6 @@ abstract class UserEpisodeDao {
     }
 
     @Query("UPDATE user_episodes SET server_status = :serverStatus WHERE uuid = :uuid")
-    abstract fun updateServerStatusRxCompletable(uuid: String, serverStatus: UserEpisodeServerStatus): Completable
-
-    @Query("UPDATE user_episodes SET server_status = :serverStatus WHERE uuid = :uuid")
     abstract suspend fun updateServerStatus(uuid: String, serverStatus: UserEpisodeServerStatus)
 
     @Query("UPDATE user_episodes SET downloaded_file_path = :downloadPath WHERE uuid = :uuid")
@@ -139,9 +124,6 @@ abstract class UserEpisodeDao {
 
     @Query("UPDATE user_episodes SET download_task_id = :taskId WHERE uuid = :uuid")
     abstract suspend fun updateDownloadTaskId(uuid: String, taskId: String?)
-
-    @Query("UPDATE user_episodes SET upload_error_details = :uploadError WHERE uuid = :uuid")
-    abstract fun updateUploadErrorRxCompetable(uuid: String, uploadError: String?): Completable
 
     @Query("UPDATE user_episodes SET upload_error_details = :uploadError WHERE uuid = :uuid")
     abstract suspend fun updateUploadError(uuid: String, uploadError: String?)

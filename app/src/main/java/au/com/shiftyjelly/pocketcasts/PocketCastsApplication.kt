@@ -4,19 +4,24 @@ import android.app.Application
 import android.os.Environment
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.Configuration
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsController
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.discover.worker.CuratedPodcastsSyncWorker
+import au.com.shiftyjelly.pocketcasts.endofyear.playback2026.Playback2026
 import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewExceptionHandler
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManager
+import au.com.shiftyjelly.pocketcasts.repositories.di.ProcessLifecycle
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
@@ -36,6 +41,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsSyncWorker
 import au.com.shiftyjelly.pocketcasts.repositories.support.DatabaseExportHelper
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
@@ -51,6 +57,7 @@ import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import com.google.firebase.FirebaseApp
 import com.squareup.moshi.Moshi
+import dagger.Lazy
 import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import java.util.concurrent.Executors
@@ -104,6 +111,9 @@ class PocketCastsApplication :
 
     @Inject lateinit var appIcon: AppIcon
 
+    @Inject @ProcessLifecycle
+    lateinit var processLifecycleOwner: LifecycleOwner
+
     @Inject lateinit var coilImageLoader: ImageLoader
 
     @Inject lateinit var userManager: UserManager
@@ -142,6 +152,8 @@ class PocketCastsApplication :
     @Inject lateinit var appReviewManager: AppReviewManager
 
     @Inject lateinit var appReviewExceptionHandler: AppReviewExceptionHandler
+
+    @Inject lateinit var whatsNewManager: Lazy<WhatsNewManager>
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -200,9 +212,39 @@ class PocketCastsApplication :
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
+            // Since WorkManager 2.10 CoroutineWorkers default to the executor below, where downloads starve them
+            .setWorkerCoroutineContext(Dispatchers.IO)
             .setExecutor(Executors.newFixedThreadPool(3))
             .setJobSchedulerJobIdRange(1000, 20000)
             .build()
+
+    private fun refreshWhatsNewWhenForegrounded() {
+        processLifecycleOwner.lifecycle.addObserver(
+            object : DefaultLifecycleObserver {
+                override fun onStart(owner: LifecycleOwner) {
+                    applicationScope.launch {
+                        try {
+                            whatsNewManager.get().refreshIfNeeded()
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Failed to refresh the What's New catalog")
+                        }
+                    }
+                }
+            },
+        )
+    }
+
+    private fun applySelectedAppIconWhenBackgrounded() {
+        processLifecycleOwner.lifecycle.addObserver(
+            object : DefaultLifecycleObserver {
+                override fun onStop(owner: LifecycleOwner) {
+                    appIcon.enableSelectedAlias(appIcon.activeAppIcon)
+                }
+            },
+        )
+    }
 
     private fun setupApp() {
         LogBuffer.i("Application", "App started. ${settings.getVersion()} (${settings.getVersionCode()})")
@@ -218,7 +260,8 @@ class PocketCastsApplication :
         }
 
         runBlocking {
-            appIcon.enableSelectedAlias(appIcon.activeAppIcon)
+            applySelectedAppIconWhenBackgrounded()
+            refreshWhatsNewWhenForegrounded()
 
             notificationHelper.setupNotificationChannels()
             notificationManager.setupOnboardingNotifications()
@@ -284,6 +327,10 @@ class PocketCastsApplication :
                     Timber.e(e, "Unable to create opml folder.")
                 }
 
+                if (settings.getMigratedVersionCode() == 0) {
+                    applicationScope.launch { whatsNewManager.get().startFeed() }
+                }
+
                 VersionMigrationsWorker.performMigrations(
                     context = this@PocketCastsApplication,
                     settings = settings,
@@ -314,7 +361,8 @@ class PocketCastsApplication :
         keepPlayerWidgetsUpdated()
 
         if (FeatureFlag.isEnabled(Feature.SYNC_EOY_DATA_ON_STARTUP)) {
-            applicationScope.launch { endOfYearSync.sync() }
+            val year = if (FeatureFlag.isEnabled(Feature.PLAYBACK_2026)) Playback2026.YEAR else EndOfYearManager.YEAR_TO_SYNC
+            applicationScope.launch { endOfYearSync.sync(year) }
         }
 
         PlaybackStatsSyncWorker.scheduleOneTimeWork(this)

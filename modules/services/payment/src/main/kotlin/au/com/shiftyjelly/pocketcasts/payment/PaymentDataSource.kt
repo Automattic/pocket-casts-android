@@ -16,6 +16,8 @@ interface PaymentDataSource {
 
     suspend fun acknowledgePurchase(purchase: Purchase): PaymentResult<Purchase>
 
+    suspend fun showInAppMessages(activity: Activity): PaymentResult<InAppMessageResult>
+
     companion object {
         fun billing(
             context: Context,

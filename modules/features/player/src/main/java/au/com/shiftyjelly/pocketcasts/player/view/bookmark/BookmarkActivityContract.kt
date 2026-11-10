@@ -20,13 +20,15 @@ class BookmarkActivityContract : ActivityResultContract<Intent, BookmarkActivity
         const val RESULT_TITLE = "RESULT_TITLE"
         const val RESULT_TINT_COLOR = "RESULT_TINT_COLOR"
         const val RESULT_EXISTING_BOOKMARK = "RESULT_EXISTING_BOOKMARK"
+        const val RESULT_FROM_EPISODE = "RESULT_FROM_EPISODE"
 
-        fun createIntent(bookmarkUuid: String, title: String, tintColor: Color, isExistingBookmark: Boolean): Intent {
+        fun createIntent(bookmarkUuid: String, title: String, tintColor: Color, isExistingBookmark: Boolean, fromEpisode: Boolean): Intent {
             return Intent().apply {
                 putExtra(RESULT_BOOKMARK_UUID, bookmarkUuid)
                 putExtra(RESULT_TITLE, title)
                 putExtra(RESULT_TINT_COLOR, tintColor.toArgb())
                 putExtra(RESULT_EXISTING_BOOKMARK, isExistingBookmark)
+                putExtra(RESULT_FROM_EPISODE, fromEpisode)
             }
         }
     }
@@ -36,6 +38,7 @@ class BookmarkActivityContract : ActivityResultContract<Intent, BookmarkActivity
         val title: String,
         val tintColor: Int,
         val isExistingBookmark: Boolean,
+        val fromEpisode: Boolean = false,
     )
 
     override fun createIntent(context: Context, input: Intent): Intent = input
@@ -46,8 +49,9 @@ class BookmarkActivityContract : ActivityResultContract<Intent, BookmarkActivity
             val title = intent.getStringExtra(RESULT_TITLE)
             val tintColor = intent.getIntExtra(RESULT_TINT_COLOR, Color.White.toArgb())
             val existingBookmark = intent.getBooleanExtra(RESULT_EXISTING_BOOKMARK, false)
+            val fromEpisode = intent.getBooleanExtra(RESULT_FROM_EPISODE, false)
             if (bookmarkUuid != null) {
-                return BookmarkResult(bookmarkUuid = bookmarkUuid, title = title ?: "", tintColor = tintColor, isExistingBookmark = existingBookmark)
+                return BookmarkResult(bookmarkUuid = bookmarkUuid, title = title ?: "", tintColor = tintColor, isExistingBookmark = existingBookmark, fromEpisode = fromEpisode)
             }
         }
         return null

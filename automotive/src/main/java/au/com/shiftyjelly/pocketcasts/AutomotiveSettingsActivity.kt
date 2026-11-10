@@ -2,18 +2,23 @@ package au.com.shiftyjelly.pocketcasts
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
-import androidx.activity.OnBackPressedCallback
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
+import au.com.shiftyjelly.pocketcasts.account.CarHeaderView
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.time.Duration
 import au.com.shiftyjelly.pocketcasts.images.R as IR
-import au.com.shiftyjelly.pocketcasts.profile.R as PR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class AutomotiveSettingsActivity :
@@ -22,14 +27,13 @@ class AutomotiveSettingsActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_automotive_settings)
-
-        onBackPressedDispatcher.addCallback(
-            this,
-            object : OnBackPressedCallback(false) {
-                override fun handleOnBackPressed() {
-                    handleBackPressed()
-                }
+        val header = CarHeaderView(this)
+        setContentView(
+            LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setBackgroundColor(getThemeColor(UR.attr.primary_ui_04))
+                addView(header, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT))
+                addView(FragmentContainerView(context).apply { id = R.id.frameMain }, LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
             },
         )
 
@@ -38,9 +42,8 @@ class AutomotiveSettingsActivity :
             supportFragmentManager.beginTransaction().replace(R.id.frameMain, settingsFragment).commitNowAllowingStateLoss()
         }
 
-        val btnClose = findViewById<ImageView>(PR.id.btnClose)
-        btnClose?.setImageResource(IR.drawable.ic_arrow_back)
-        btnClose?.setOnClickListener { handleBackPressed() }
+        header.closeButton.setImageResource(IR.drawable.ic_arrow_back)
+        header.closeButton.setOnClickListener { handleBackPressed() }
     }
 
     override fun setSupportActionBar(toolbar: Toolbar?) {
@@ -63,7 +66,9 @@ class AutomotiveSettingsActivity :
 
     private fun handleBackPressed() {
         if (supportFragmentManager.backStackEntryCount > 0) {
-            supportFragmentManager.popBackStack()
+            if (!supportFragmentManager.isStateSaved) {
+                supportFragmentManager.popBackStack()
+            }
             return
         }
         onBackPressedDispatcher.onBackPressed()
@@ -116,7 +121,21 @@ class AutomotiveSettingsActivity :
     override fun closeFiltersToRoot() {
     }
 
+    override fun closeProfileToRoot() {
+    }
+
+    override fun openCreatePlaylist() {
+    }
+
+    override fun openNetworks() {
+    }
+
+    override fun openInAppDeepLink(url: String) = false
+
     override fun openPodcastPage(uuid: String, sourceView: String?) {
+    }
+
+    override fun openNetworkPage(listId: String, title: String?, sourceView: SourceView?) {
     }
 
     override fun openCloudFiles() {

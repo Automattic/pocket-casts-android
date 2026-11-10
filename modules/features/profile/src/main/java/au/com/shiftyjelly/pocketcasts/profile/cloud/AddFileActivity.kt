@@ -4,23 +4,27 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.OpenableColumns
-import android.view.MenuItem
-import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.IntentCompat
-import androidx.core.view.isVisible
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.Tracks
@@ -32,17 +36,14 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivity
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.profile.R
-import au.com.shiftyjelly.pocketcasts.profile.databinding.ActivityAddFileBinding
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EpisodeFileMetadata
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -53,9 +54,6 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
-import au.com.shiftyjelly.pocketcasts.views.extensions.setup
-import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import coil3.Image
 import coil3.imageLoader
@@ -81,7 +79,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val ACTION_PICK_IMAGE = 1
@@ -90,13 +87,13 @@ private const val EXTRA_EXISTING_EPISODE_UUID = "fileUUID"
 private const val EXTRA_FILE_CHOOSER = "filechooser"
 private const val STATE_LAUNCHED_FILE_CHOOSER = "LAUNCHED_FILE_CHOOSER"
 private const val STATE_DATAURI = "DATAURI"
+private const val STATE_NAME = "NAME"
 
 @AndroidEntryPoint
 class AddFileActivity :
     AppCompatActivity(),
     CoroutineScope,
-    OnboardingLauncher,
-    Toolbar.OnMenuItemClickListener {
+    OnboardingLauncher {
     companion object {
 
         fun newFileChooser(context: Context): Intent {
@@ -112,26 +109,26 @@ class AddFileActivity :
         }
 
         fun darkThemeColors() = listOf(
-            AddFileColourAdapter.Item.Colour(1, ThemeColor.primaryText02Dark, false),
-            AddFileColourAdapter.Item.Colour(2, ThemeColor.filter01Dark, true),
-            AddFileColourAdapter.Item.Colour(3, ThemeColor.filter05Dark, true),
-            AddFileColourAdapter.Item.Colour(4, ThemeColor.filter04Dark, true),
-            AddFileColourAdapter.Item.Colour(5, ThemeColor.filter03Dark, true),
-            AddFileColourAdapter.Item.Colour(6, ThemeColor.filter02Dark, true),
-            AddFileColourAdapter.Item.Colour(7, ThemeColor.filter06Dark, true),
-            AddFileColourAdapter.Item.Colour(8, ThemeColor.filter07Dark, true),
+            AddFileColour(1, ThemeColor.primaryText02Dark, false),
+            AddFileColour(2, ThemeColor.filter01Dark, true),
+            AddFileColour(3, ThemeColor.filter05Dark, true),
+            AddFileColour(4, ThemeColor.filter04Dark, true),
+            AddFileColour(5, ThemeColor.filter03Dark, true),
+            AddFileColour(6, ThemeColor.filter02Dark, true),
+            AddFileColour(7, ThemeColor.filter06Dark, true),
+            AddFileColour(8, ThemeColor.filter07Dark, true),
         )
 
         private fun lightThemeColors() = listOf(
 
-            AddFileColourAdapter.Item.Colour(1, ThemeColor.primaryText02Light, false),
-            AddFileColourAdapter.Item.Colour(2, ThemeColor.filter01Light, true),
-            AddFileColourAdapter.Item.Colour(3, ThemeColor.filter05Light, true),
-            AddFileColourAdapter.Item.Colour(4, ThemeColor.filter04Light, true),
-            AddFileColourAdapter.Item.Colour(5, ThemeColor.filter03Light, true),
-            AddFileColourAdapter.Item.Colour(6, ThemeColor.filter02Light, true),
-            AddFileColourAdapter.Item.Colour(7, ThemeColor.filter06Light, true),
-            AddFileColourAdapter.Item.Colour(8, ThemeColor.filter07Light, true),
+            AddFileColour(1, ThemeColor.primaryText02Light, false),
+            AddFileColour(2, ThemeColor.filter01Light, true),
+            AddFileColour(3, ThemeColor.filter05Light, true),
+            AddFileColour(4, ThemeColor.filter04Light, true),
+            AddFileColour(5, ThemeColor.filter03Light, true),
+            AddFileColour(6, ThemeColor.filter02Light, true),
+            AddFileColour(7, ThemeColor.filter06Light, true),
+            AddFileColour(8, ThemeColor.filter07Light, true),
         )
     }
 
@@ -153,11 +150,7 @@ class AddFileActivity :
     private val viewModel: AddFileViewModel by viewModels()
 
     val uuid = UUID.randomUUID().toString()
-    var bitmap: Bitmap? = null
-        set(value) {
-            field = value
-            updateColorItems()
-        }
+    var bitmap: Bitmap? by mutableStateOf(null)
 
     var player: ExoPlayer? = null
     var length: Long? = null
@@ -168,8 +161,8 @@ class AddFileActivity :
     var tintColor: Int = 0
         set(value) {
             field = value
-            binding.imgFile.imageTintList = ColorStateList.valueOf(value)
-            binding.mainConstraintView.requestFocus() // Without this the name field will grab focus when changing colour
+            fileTint = value
+            contentView.requestFocus()
 
             if (value == 0) {
                 showImageView()
@@ -180,8 +173,21 @@ class AddFileActivity :
 
     private var launchedFileChooser = false
 
-    private lateinit var colorAdapter: AddFileColourAdapter
-    private lateinit var binding: ActivityAddFileBinding
+    private var toolbarTitle by mutableStateOf<Int?>(null)
+    private var name by mutableStateOf("")
+    private var fileName by mutableStateOf("")
+    private var fileSize by mutableStateOf("")
+    private var fileTint by mutableStateOf<Int?>(null)
+    private var isArtworkVisible by mutableStateOf(true)
+    private var artworkImage by mutableStateOf<Bitmap?>(null)
+    private var imageButtonRes by mutableIntStateOf(LR.string.profile_files_add_custom_image)
+    private var isLoading by mutableStateOf(false)
+    private var isReadOnly by mutableStateOf(false)
+    private var isUpgradeVisible by mutableStateOf(false)
+    private var isImageClickable by mutableStateOf(false)
+    private var selectedIndex by mutableIntStateOf(1)
+    private var colours = emptyList<AddFileColour>()
+    private lateinit var contentView: ComposeView
 
     val existingUuid: String?
         get() = intent.getStringExtra(EXTRA_EXISTING_EPISODE_UUID)
@@ -192,10 +198,9 @@ class AddFileActivity :
     var dataUri: Uri? = null
 
     fun updateForm(readOnly: Boolean, loading: Boolean) {
-        binding.progress.isVisible = loading
-        binding.imgLock.isVisible = readOnly
-        colorAdapter.locked = readOnly
-        binding.upgradeLayout.root.isVisible = readOnly && !settings.getUpgradeClosedAddFile() && !loading
+        isLoading = loading
+        isReadOnly = readOnly
+        isUpgradeVisible = readOnly && !settings.getUpgradeClosedAddFile() && !loading
     }
 
     @UnstableApi
@@ -205,64 +210,62 @@ class AddFileActivity :
         enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
         theme.updateWindowStatusBarIcons(window = window)
 
-        binding = ActivityAddFileBinding.inflate(layoutInflater)
-        val view = binding.root
-        view.setSystemWindowInsetToPadding(right = true, left = true)
-        setContentView(view)
-
-        colorAdapter = AddFileColourAdapter(
-            onSelectedChange = {
-                tintColor = if (it is AddFileColourAdapter.Item.Colour) {
-                    it.color
-                } else {
-                    0
-                }
-            },
-            onLockedItemTapped = ::openOnboardingFlow,
-        )
+        colours = if (Theme.isDark(this)) darkThemeColors() else lightThemeColors()
+        contentView = ComposeView(this)
+        contentView.isFocusableInTouchMode = true
+        contentView.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
+        setContentView(contentView)
+        contentView.setContent {
+            AppTheme(theme.activeTheme) {
+                AddFilePage(
+                    state = AddFilePageState(
+                        titleRes = toolbarTitle,
+                        name = name,
+                        fileName = fileName,
+                        fileSize = fileSize,
+                        fileTint = fileTint,
+                        isArtworkVisible = isArtworkVisible,
+                        artwork = artworkImage,
+                        imageButtonRes = imageButtonRes,
+                        isLoading = isLoading,
+                        isReadOnly = isReadOnly,
+                        isUpgradeVisible = isUpgradeVisible,
+                        imageItem = bitmap,
+                        colours = colours,
+                        selectedIndex = selectedIndex,
+                    ),
+                    onNavigationClick = { onBackPressedDispatcher.onBackPressed() },
+                    onSaveClick = {
+                        eventHorizon.track(UserFileEditSaveEvent)
+                        saveFile()
+                    },
+                    onNameChange = { name = it },
+                    onImageClick = if (isImageClickable) ::onImageClick else null,
+                    onImageButtonClick = ::onImageClick,
+                    onColourClick = ::selectColour,
+                    onLockedColourClick = ::openOnboardingFlow,
+                    onUpgradeClick = ::openOnboardingFlow,
+                    onUpgradeCloseClick = {
+                        eventHorizon.track(
+                            UpgradeBannerDismissedEvent(
+                                source = SourceView.FILES.analyticsValue,
+                            ),
+                        )
+                        settings.setUpgradeClosedAddFile(true)
+                        isUpgradeVisible = false
+                    },
+                    toolbarModifier = Modifier.pointerInput(Unit) {
+                        detectTapGestures(onLongPress = { theme.toggleDarkLightThemeActivity(this@AddFileActivity) })
+                    },
+                )
+            }
+        }
 
         updateForm(readOnly = true, loading = true)
         viewModel.signInState.observe(this) { signInState ->
             freeSubscription = signInState.isNoAccountOrFree
             updateForm(freeSubscription, false)
-
-            if (!freeSubscription) {
-                binding.imgFile.setOnClickListener {
-                    startImagePicker()
-                }
-            } else {
-                binding.imgFile.setOnClickListener {
-                    openOnboardingFlow()
-                }
-            }
-        }
-
-        val upgradeLayout = binding.upgradeLayout.root
-        upgradeLayout.findViewById<View>(R.id.btnClose).setOnClickListener {
-            eventHorizon.track(
-                UpgradeBannerDismissedEvent(
-                    source = SourceView.FILES.analyticsValue,
-                ),
-            )
-            settings.setUpgradeClosedAddFile(true)
-            upgradeLayout.isVisible = false
-        }
-        upgradeLayout.setOnClickListener {
-            openOnboardingFlow()
-        }
-
-        val colorLayoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
-        binding.recyclerColor.layoutManager = colorLayoutManager
-        binding.recyclerColor.adapter = colorAdapter
-
-        updateColorItems()
-
-        binding.btnImage.setOnClickListener {
-            if (!freeSubscription) {
-                startImagePicker()
-            } else {
-                openOnboardingFlow()
-            }
+            isImageClickable = true
         }
 
         val existingUuid = this.existingUuid
@@ -293,12 +296,12 @@ class AddFileActivity :
                     return@launch
                 }
 
-                binding.lblFilename.text = ""
-                binding.lblFilesize.text = Util.formattedBytes(bytes = userEpisode.sizeInBytes, context = binding.lblFilesize.context)
+                fileName = ""
+                fileSize = Util.formattedBytes(bytes = userEpisode.sizeInBytes, context = this@AddFileActivity)
 
-                binding.txtFilename.setText(userEpisode.title)
-                colorAdapter.selectedIndex = max(userEpisode.tintColorIndex, 0)
-                binding.imgFileArtwork.isVisible = userEpisode.tintColorIndex == 0
+                name = userEpisode.title
+                selectColour(max(userEpisode.tintColorIndex, 0))
+                isArtworkVisible = userEpisode.tintColorIndex == 0
 
                 val artworkUrl = userEpisode.artworkUrl
                 if (artworkUrl != null) {
@@ -308,8 +311,6 @@ class AddFileActivity :
                         loadImageFromUri(Uri.parse(artworkUrl), false)
                     }
                 }
-
-                updateColorItems()
             }
         }
 
@@ -317,6 +318,7 @@ class AddFileActivity :
         if (savedInstanceState != null) {
             dataUri = savedInstanceState.getParcelable(STATE_DATAURI)
             setupForNewFile(dataUri)
+            savedInstanceState.getString(STATE_NAME)?.let { name = it }
         }
     }
 
@@ -324,6 +326,22 @@ class AddFileActivity :
         super.onSaveInstanceState(outState)
         outState.putBoolean(STATE_LAUNCHED_FILE_CHOOSER, launchedFileChooser)
         outState.putParcelable(STATE_DATAURI, dataUri)
+        outState.putString(STATE_NAME, name)
+    }
+
+    private fun onImageClick() {
+        if (!freeSubscription) {
+            startImagePicker()
+        } else {
+            openOnboardingFlow()
+        }
+    }
+
+    private fun selectColour(index: Int) {
+        selectedIndex = index
+        if (index <= colours.size) {
+            tintColor = colours.getOrNull(index - 1)?.color ?: 0
+        }
     }
 
     private fun openOnboardingFlow() {
@@ -351,57 +369,34 @@ class AddFileActivity :
         setupToolbar(title = LR.string.profile_cloud_add_file)
 
         val filename = getFilenameOfContent(fileUri)
-        binding.txtFilename.setText(filename?.substringBeforeLast("."))
-        binding.lblFilename.text = filename
+        name = filename?.substringBeforeLast(".").orEmpty()
+        fileName = filename.orEmpty()
         val bytes = getFilesizeOfContent(fileUri)
-        binding.lblFilesize.text = Util.formattedBytes(bytes, context = binding.lblFilesize.context)
+        fileSize = Util.formattedBytes(bytes, context = this)
         sizeInBytes = bytes
 
-        colorAdapter.selectedIndex = 1
+        selectColour(1)
     }
 
     private fun setupToolbar(@StringRes title: Int) {
-        val toolbar = binding.toolbar
-        toolbar.setup(
-            title = getString(title),
-            navigationIcon = NavigationIcon.BackArrow,
-            activity = this,
-            theme = theme,
-            menu = R.menu.menu_addfile,
-        )
-        toolbar.setOnMenuItemClickListener(this)
-    }
-
-    private fun updateColorItems() {
-        val listItems = mutableListOf<AddFileColourAdapter.Item>()
-        listItems.add(AddFileColourAdapter.Item.Image(bitmap))
-        listItems.addAll(
-            if (Theme.isDark(this)) {
-                darkThemeColors()
-            } else {
-                lightThemeColors()
-            },
-        )
-        colorAdapter.submitList(listItems)
+        toolbarTitle = title
     }
 
     private fun showImageView() {
+        val bitmap = bitmap
         if (bitmap != null) {
-            val imgFileArtwork = binding.imgFileArtwork
-            imgFileArtwork.isVisible = true
-            imgFileArtwork.imageTintList = null
-            imgFileArtwork.setImageBitmap(bitmap)
-            binding.btnImage.text = getString(LR.string.profile_files_remove_image)
+            isArtworkVisible = true
+            artworkImage = bitmap
+            imageButtonRes = LR.string.profile_files_remove_image
         } else {
             clearImageView()
         }
     }
 
     private fun clearImageView() {
-        binding.imgFileArtwork.isVisible = false
-        binding.imgFile.setImageResource(IR.drawable.ic_uploadedfile)
-        binding.imgFile.imageTintList = ColorStateList.valueOf(tintColor)
-        binding.btnImage.text = getString(LR.string.profile_files_add_custom_image)
+        isArtworkVisible = false
+        fileTint = tintColor
+        imageButtonRes = LR.string.profile_files_add_custom_image
     }
 
     @UnstableApi
@@ -412,7 +407,7 @@ class AddFileActivity :
         val uri = data?.data
         if (requestCode == ACTION_PICK_IMAGE && resultCode == Activity.RESULT_OK && uri != null) {
             tintColor = 0
-            colorAdapter.selectedIndex = 0
+            selectColour(0)
             loadImageFromUri(uri)
         } else if (requestCode == ACTION_PICK_FILE) {
             if (resultCode == Activity.RESULT_OK && uri != null) {
@@ -432,16 +427,17 @@ class AddFileActivity :
             }
 
             override fun onSuccess(result: Image) {
-                binding.btnImage.text = getString(LR.string.profile_files_remove_image)
-                bitmap = result.toBitmap()
-                binding.imgFileArtwork.setImageBitmap(bitmap)
+                imageButtonRes = LR.string.profile_files_remove_image
+                val loaded = result.toBitmap()
+                bitmap = loaded
+                artworkImage = loaded
                 if (tintColor == 0) {
-                    binding.imgFileArtwork.isVisible = true
+                    isArtworkVisible = true
                 }
             }
         }
 
-        binding.imgFileArtwork.setImageResource(IR.drawable.defaultartwork)
+        artworkImage = null
 
         if (isFile) {
             val path = uri.path
@@ -464,7 +460,7 @@ class AddFileActivity :
 
     override fun onPause() {
         super.onPause()
-        UiUtil.hideKeyboard(binding.txtFilename)
+        UiUtil.hideKeyboard(window.decorView)
     }
 
     override fun onDestroy() {
@@ -472,20 +468,8 @@ class AddFileActivity :
         player?.release()
     }
 
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_save -> {
-                eventHorizon.track(UserFileEditSaveEvent)
-                saveFile()
-                true
-            }
-
-            else -> false
-        }
-    }
-
     private fun saveFile() {
-        if (binding.txtFilename.text.isNullOrEmpty()) {
+        if (name.isEmpty()) {
             return
         }
 
@@ -494,9 +478,8 @@ class AddFileActivity :
             return
         }
 
-        binding.layoutLoading.isVisible = true
         val uri = dataUri ?: return
-        val intentType = intent.type ?: getMimetypeOfContent(uri) ?: uriToFileType(binding.lblFilename.text.toString())
+        val intentType = intent.type ?: getMimetypeOfContent(uri) ?: uriToFileType(fileName)
         if (!(intentType.startsWith("audio/") || intentType.startsWith("video/"))) {
             return
         }
@@ -526,7 +509,7 @@ class AddFileActivity :
 
                     userEpisode.downloadedFilePath = outFile.absolutePath
                     userEpisode.downloadStatus = EpisodeDownloadStatus.Downloaded
-                    userEpisode.title = binding.txtFilename.text.toString()
+                    userEpisode.title = name
                     userEpisode.durationMs = length?.toInt() ?: 0
                     userEpisode.fileType = intentType
                     userEpisode.sizeInBytes = sizeInBytes ?: 0
@@ -535,7 +518,7 @@ class AddFileActivity :
                         userEpisode.artworkUrl = imageFile.absolutePath
                         userEpisode.hasCustomImage = true
                     } else {
-                        userEpisode.tintColorIndex = colorAdapter.selectedIndex
+                        userEpisode.tintColorIndex = selectedIndex
                         userEpisode.hasCustomImage = false
                     }
 
@@ -568,8 +551,6 @@ class AddFileActivity :
     }
 
     private fun handleErrorWhenLoadingFile(errorMessage: String) {
-        binding.layoutLoading.isVisible = false
-
         AlertDialog.Builder(this)
             .setTitle(LR.string.error)
             .setMessage(errorMessage)
@@ -597,7 +578,6 @@ class AddFileActivity :
     private fun updateFile() {
         launch {
             try {
-                binding.layoutLoading.isVisible = true
                 val existingUuid = existingUuid ?: return@launch
                 val userEpisode = getUserEpisode(existingUuid) ?: return@launch
                 if (bitmap != null && isCustomImageSelected()) {
@@ -617,8 +597,8 @@ class AddFileActivity :
                     userEpisode.artworkUrl = null
                 }
 
-                userEpisode.title = binding.txtFilename.text.toString()
-                userEpisode.tintColorIndex = colorAdapter.selectedIndex
+                userEpisode.title = name
+                userEpisode.tintColorIndex = selectedIndex
                 if (userEpisode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
                     viewModel.updateFileMetadataOnServer(userEpisode)
                 }
@@ -631,7 +611,6 @@ class AddFileActivity :
                     .setMessage(getString(LR.string.profile_cloud_update_file_error) + "\n\n" + e.message)
                     .setPositiveButton(LR.string.ok, null)
                     .show()
-                binding.layoutLoading.isVisible = false
                 return@launch
             }
         }
@@ -747,10 +726,10 @@ class AddFileActivity :
                     val artworkUri = Uri.parse(it)
                     loadImageFromUri(artworkUri, isFile = true)
                     tintColor = 0
-                    colorAdapter.selectedIndex = 0
+                    selectColour(0)
                 }
                 episodeMetadata.embeddedTitle?.let {
-                    binding.txtFilename.setText(it)
+                    name = it
                 }
                 episodeMetadata.embeddedLength?.let {
                     length = it

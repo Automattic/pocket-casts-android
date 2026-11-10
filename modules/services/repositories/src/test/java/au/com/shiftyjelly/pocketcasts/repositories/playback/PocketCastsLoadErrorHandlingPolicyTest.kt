@@ -312,11 +312,11 @@ class PocketCastsLoadErrorHandlingPolicyTest {
         dataType: Int,
     ): LoadErrorInfo {
         val dataSpec = DataSpec(Uri.parse("https://example.com/episode.mp3"))
-        val loadEventInfo = LoadEventInfo(
+        val loadEventInfo = LoadEventInfo.Builder(
             0L,
             dataSpec,
             SystemClock.elapsedRealtime(),
-        )
+        ).build()
         val mediaLoadData = MediaLoadData(dataType)
         return LoadErrorInfo(
             loadEventInfo,

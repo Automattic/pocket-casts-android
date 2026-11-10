@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvail
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.LoginIdentityType
+import com.automattic.eventhorizon.OnboardingFlowType
 import com.automattic.eventhorizon.SetupAccountButtonTappedEvent
 import com.automattic.eventhorizon.SetupAccountButtonType
 import com.automattic.eventhorizon.SsoStartedEvent
@@ -102,6 +103,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
 
                     signInWithGoogleToken(
                         idToken = googleIdTokenCredential.idToken,
+                        flow = flow,
                         onSuccess = onSuccess,
                         onError = onError,
                     )
@@ -137,13 +139,19 @@ class GoogleSignInButtonViewModel @Inject constructor(
     /**
      * Handle the response from the legacy Google Sign-In intent.
      */
-    fun onGoogleLegacySignInResult(result: ActivityResult, onSuccess: (GoogleSignInState, Subscription?) -> Unit, onError: () -> Unit) {
+    fun onGoogleLegacySignInResult(
+        result: ActivityResult,
+        flow: OnboardingFlow?,
+        onSuccess: (GoogleSignInState, Subscription?) -> Unit,
+        onError: () -> Unit,
+    ) {
         viewModelScope.launch {
             try {
                 val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
                 val idToken = credential.googleIdToken ?: throw Exception("Unable to sign in because no token was returned.")
                 signInWithGoogleToken(
                     idToken = idToken,
+                    flow = flow,
                     onSuccess = onSuccess,
                     onError = onError,
                 )
@@ -160,17 +168,26 @@ class GoogleSignInButtonViewModel @Inject constructor(
 
     private suspend fun signInWithGoogleToken(
         idToken: String,
+        flow: OnboardingFlow?,
         onSuccess: (GoogleSignInState, Subscription?) -> Unit,
         onError: suspend () -> Unit,
-    ) = when (val authResult = syncManager.loginWithGoogle(idToken = idToken, signInSource = SignInSource.UserInitiated.Onboarding)) {
-        is LoginResult.Success -> {
-            podcastManager.refreshPodcastsAfterSignIn()
-            val subscription = subscriptionManager.fetchFreshSubscription()
-            onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount), subscription)
-        }
+    ) {
+        val authResult = syncManager.loginWithGoogle(
+            idToken = idToken,
+            signInSource = SignInSource.UserInitiated.Onboarding,
+            flow = flow?.analyticsValue ?: OnboardingFlowType.Unknown,
+        )
 
-        is LoginResult.Failed -> {
-            onError()
+        when (authResult) {
+            is LoginResult.Success -> {
+                podcastManager.refreshPodcastsAfterSignIn()
+                val subscription = subscriptionManager.fetchFreshSubscription()
+                onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount), subscription)
+            }
+
+            is LoginResult.Failed -> {
+                onError()
+            }
         }
     }
 }

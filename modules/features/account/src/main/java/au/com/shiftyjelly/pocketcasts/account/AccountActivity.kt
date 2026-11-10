@@ -6,25 +6,32 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.View
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.IntentCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
+import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import au.com.shiftyjelly.pocketcasts.account.databinding.AccountActivityBinding
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.CreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.SubscriptionType
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
@@ -39,9 +46,11 @@ import com.automattic.eventhorizon.SetupAccountDismissedLegacyEvent
 import com.automattic.eventhorizon.SetupAccountShownLegacyEvent
 import com.automattic.eventhorizon.SigninDismissedEvent
 import com.automattic.eventhorizon.SigninShownEvent
+import com.google.android.material.appbar.AppBarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class AccountActivity : AppCompatActivity() {
@@ -52,19 +61,30 @@ class AccountActivity : AppCompatActivity() {
 
     private val viewModel: CreateAccountViewModel by viewModels()
 
-    private lateinit var binding: AccountActivityBinding
+    private lateinit var root: View
+    private var toolbar: Toolbar? = null
+    private var carHeader: CarHeaderView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
         enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
 
-        binding = AccountActivityBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
-            binding.root.updatePadding(
+        root = createContentView()
+        setContentView(root)
+        if (savedInstanceState == null) {
+            val fragment = NavHostFragment.create(R.navigation.account_nav_graph)
+            supportFragmentManager.beginTransaction()
+                .add(R.id.nav_host_fragment, fragment)
+                .setPrimaryNavigationFragment(fragment)
+                .commitNow()
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(root) { _, windowInsets ->
+            val insetTypes = WindowInsetsCompat.Type.systemBars() or
+                WindowInsetsCompat.Type.displayCutout() or
+                WindowInsetsCompat.Type.ime()
+            val insets = windowInsets.getInsets(insetTypes)
+            root.updatePadding(
                 left = insets.left,
                 right = insets.right,
                 bottom = insets.bottom,
@@ -73,8 +93,8 @@ class AccountActivity : AppCompatActivity() {
             windowInsets
         }
 
-        val navController = findNavController(R.id.nav_host_fragment)
-        binding.carHeader?.btnClose?.setOnClickListener {
+        val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
+        carHeader?.closeButton?.setOnClickListener {
             if (!navController.popBackStack()) {
                 finish()
             }
@@ -114,8 +134,8 @@ class AccountActivity : AppCompatActivity() {
             navController.setGraph(graph, arguments)
 
             val navConfiguration = AppBarConfiguration(navController.graph)
-            binding.toolbar?.setupWithNavController(navController, navConfiguration)
-            binding.toolbar?.setNavigationOnClickListener { _ ->
+            toolbar?.setupWithNavController(navController, navConfiguration)
+            toolbar?.setNavigationOnClickListener { _ ->
                 handleBackNavigation(navController)
             }
 
@@ -124,11 +144,11 @@ class AccountActivity : AppCompatActivity() {
                 if (!Util.isCarUiMode(this)) {
                     when (destination.id) {
                         R.id.createDoneFragment, R.id.accountFragment, R.id.promoCodeFragment -> {
-                            binding.toolbar?.isVisible = false
+                            toolbar?.isVisible = false
                         }
 
                         else -> {
-                            binding.toolbar?.isVisible = true
+                            toolbar?.isVisible = true
                         }
                     }
                 } else {
@@ -141,17 +161,46 @@ class AccountActivity : AppCompatActivity() {
                             IR.drawable.ic_arrow_back
                         }
                     }
-                    binding.carHeader?.btnClose?.setImageResource(resource)
+                    carHeader?.closeButton?.setImageResource(resource)
                 }
             }
         }
+    }
+
+    private fun createContentView(): View {
+        val navHost = FragmentContainerView(this).apply { id = R.id.nav_host_fragment }
+        val content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        if (Util.isCarUiMode(this)) {
+            content.setBackgroundColor(getThemeColor(UR.attr.primary_ui_01))
+            content.addView(CarHeaderView(this).also { carHeader = it }, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT))
+        } else {
+            val toolbar = Toolbar(this).apply {
+                id = R.id.toolbar
+                setBackgroundColor(getThemeColor(UR.attr.secondary_ui_01))
+                minimumHeight = actionBarSize()
+            }
+            this.toolbar = toolbar
+            val appBar = AppBarLayout(this).apply {
+                id = R.id.toolbarLayout
+                addView(toolbar, AppBarLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT))
+            }
+            content.addView(appBar, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT))
+        }
+        content.addView(navHost, LinearLayout.LayoutParams(MATCH_PARENT, 0, 1f))
+        return content
+    }
+
+    private fun actionBarSize(): Int {
+        val value = TypedValue()
+        getTheme().resolveAttribute(android.R.attr.actionBarSize, value, true)
+        return TypedValue.complexToDimensionPixelSize(value.data, resources.displayMetrics)
     }
 
     private fun handleBackNavigation(navController: NavController) {
         val currentFragment = navController.currentDestination
         currentFragment?.trackDismissed()
 
-        UiUtil.hideKeyboard(binding.root)
+        UiUtil.hideKeyboard(root)
         if (currentFragment?.id == R.id.createDoneFragment || !navController.popBackStack()) {
             finish()
         }
@@ -161,7 +210,7 @@ class AccountActivity : AppCompatActivity() {
         val analyticsEvent = when (id) {
             R.id.accountFragment -> SetupAccountShownLegacyEvent
 
-            R.id.signInFragment -> SigninShownEvent
+            R.id.signInFragment -> SigninShownEvent(redirectPath = "none")
 
             R.id.createEmailFragment -> CreateAccountShownLegacyEvent
 

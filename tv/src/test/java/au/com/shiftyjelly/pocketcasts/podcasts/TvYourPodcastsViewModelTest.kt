@@ -8,6 +8,15 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FolderShownEvent
+import com.automattic.eventhorizon.PodcastListBadgeType
+import com.automattic.eventhorizon.PodcastListLayoutType
+import com.automattic.eventhorizon.PodcastListSortType
+import com.automattic.eventhorizon.PodcastsListDiscoverButtonTappedEvent
+import com.automattic.eventhorizon.PodcastsListFolderTappedEvent
+import com.automattic.eventhorizon.PodcastsListPodcastTappedEvent
+import com.automattic.eventhorizon.PodcastsListShownEvent
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,6 +28,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvYourPodcastsViewModelTest {
@@ -40,6 +50,7 @@ class TvYourPodcastsViewModelTest {
             folderPodcasts[invocation.getArgument<String>(0)].orEmpty()
         }
     }
+    private val eventHorizon = mock<EventHorizon>()
 
     @Test
     fun `no podcasts or folders map to the empty state`() = runTest {
@@ -134,9 +145,49 @@ class TvYourPodcastsViewModelTest {
         }
     }
 
+    @Test
+    fun `tracks the podcasts list shown with counts`() = runTest {
+        val items = listOf(podcastItem("a"), podcastItem("b"), folderItem("f"))
+
+        createViewModel().trackPodcastsListShown(items)
+
+        verify(eventHorizon).track(
+            PodcastsListShownEvent(
+                numberOfPodcasts = 2,
+                numberOfFolders = 1,
+                badgeType = PodcastListBadgeType.Off,
+                layout = PodcastListLayoutType.LargeArtwork,
+                sortOrder = PodcastListSortType.Name,
+            ),
+        )
+    }
+
+    @Test
+    fun `tracks podcast and folder taps and the discover button`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.trackPodcastTapped()
+        viewModel.trackFolderTapped()
+        viewModel.trackDiscoverButtonTapped()
+
+        verify(eventHorizon).track(PodcastsListPodcastTappedEvent)
+        verify(eventHorizon).track(PodcastsListFolderTappedEvent)
+        verify(eventHorizon).track(PodcastsListDiscoverButtonTappedEvent)
+    }
+
+    @Test
+    fun `tracks the folder shown with the folder sort order`() = runTest {
+        createViewModel().trackFolderShown(numberOfPodcasts = 4, sortType = PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST)
+
+        verify(eventHorizon).track(
+            FolderShownEvent(numberOfPodcasts = 4, sortOrder = PodcastListSortType.EpisodeReleaseDate),
+        )
+    }
+
     private fun createViewModel() = TvYourPodcastsViewModel(
         podcastManager = podcastManager,
         folderManager = folderManager,
+        eventHorizon = eventHorizon,
         defaultDispatcher = coroutineRule.testDispatcher,
     )
 

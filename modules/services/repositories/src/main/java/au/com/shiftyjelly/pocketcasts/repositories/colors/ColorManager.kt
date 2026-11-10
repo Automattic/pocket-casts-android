@@ -4,8 +4,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
-import au.com.shiftyjelly.pocketcasts.utils.Optional
-import io.reactivex.Single
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.abs
@@ -22,8 +20,8 @@ class ColorManager @Inject constructor(
         private const val MIN_TIME_BETWEEN_REFRESH_ATTEMPTS = (30 * 60 * 1000).toLong()
     }
 
-    fun downloadColors(podcastUuid: String): Single<Optional<ArtworkColors>> {
-        return staticServiceManager.getColorsSingle(podcastUuid)
+    suspend fun downloadColors(podcastUuid: String): ArtworkColors? {
+        return staticServiceManager.getColors(podcastUuid)
     }
 
     suspend fun updateColors(podcasts: List<Podcast>) {

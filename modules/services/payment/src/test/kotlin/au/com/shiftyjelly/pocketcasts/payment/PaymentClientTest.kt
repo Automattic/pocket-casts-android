@@ -451,6 +451,26 @@ class PaymentClientTest {
         )
     }
 
+    @Test
+    fun `show in-app messages`() = runTest {
+        dataSource.inAppMessageResult = InAppMessageResult.SubscriptionStatusUpdated
+
+        val result = client.showInAppMessages(mock<Activity>())
+
+        assertEquals(InAppMessageResult.SubscriptionStatusUpdated, result.getOrNull())
+        listener.assertEvents(Event.ShowInAppMessagesSuccess)
+    }
+
+    @Test
+    fun `show in-app messages with failure`() = runTest {
+        dataSource.inAppMessageResultCode = PaymentResultCode.ServiceUnavailable
+
+        val result = client.showInAppMessages(mock<Activity>())
+
+        assertNull(result.getOrNull())
+        listener.assertEvents(Event.ShowInAppMessagesFailure)
+    }
+
     private suspend fun PaymentClient.purchaseSubscriptionPlan(key: SubscriptionPlan.Key): PurchaseResult {
         return purchaseSubscriptionPlan(key, purchaseSource = "source", mock<Activity>())
     }

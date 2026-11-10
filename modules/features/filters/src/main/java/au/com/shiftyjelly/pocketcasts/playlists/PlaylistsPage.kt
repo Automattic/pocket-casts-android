@@ -11,8 +11,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.AnchoredDraggableState
-import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -36,7 +34,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -56,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.reorderable.rememberReorderableLazyListDataSource
+import au.com.shiftyjelly.pocketcasts.compose.swipe.SwipeRowState
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -63,7 +61,6 @@ import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.PlaylistsStat
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistPreviewRow
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistTooltip
-import au.com.shiftyjelly.pocketcasts.playlists.component.SwipeToDeleteAnchor
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
@@ -172,8 +169,6 @@ private fun PlaylistsContent(
     onShowPlaylists: (List<PlaylistPreview>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scope = rememberCoroutineScope()
-
     AnimatedContent(
         targetState = playlistsState,
         transitionSpec = { ContentTransitionSpec },
@@ -199,9 +194,9 @@ private fun PlaylistsContent(
                         onDismissTooltip = onDismissTooltip,
                         listState = listState,
                         contentPadding = contentPadding,
-                        onDelete = { preview, draggableState ->
+                        onDelete = { preview, swipeState ->
                             onDeletePlaylist(preview) {
-                                scope.launch { draggableState.animateTo(SwipeToDeleteAnchor.Resting) }
+                                swipeState.settle()
                             }
                         },
                         onOpen = onOpenPlaylist,
@@ -237,7 +232,7 @@ private fun PlaylistsColumn(
     onDismissTooltip: (PlaylistTooltip) -> Unit,
     listState: LazyListState,
     contentPadding: PaddingValues,
-    onDelete: (PlaylistPreview, AnchoredDraggableState<SwipeToDeleteAnchor>) -> Unit,
+    onDelete: (PlaylistPreview, SwipeRowState) -> Unit,
     onOpen: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
@@ -287,7 +282,7 @@ private fun PlaylistsColumn(
                     onDismissTooltip = onDismissTooltip,
                     showDivider = index != displayItems.lastIndex,
                     backgroundColor = backgroundColor,
-                    onDelete = { anchor -> onDelete(playlist, anchor) },
+                    onDelete = { swipeState -> onDelete(playlist, swipeState) },
                     onClick = { onOpen(playlist) },
                     modifier = Modifier
                         .longPressDraggableHandle(

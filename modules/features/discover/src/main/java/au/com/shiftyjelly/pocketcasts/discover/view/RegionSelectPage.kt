@@ -1,0 +1,114 @@
+package au.com.shiftyjelly.pocketcasts.discover.view
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+@Composable
+internal fun RegionSelectPage(
+    regions: List<DiscoverRegion>,
+    selectedRegionCode: String?,
+    bottomInset: PaddingValues,
+    onRegionClick: (DiscoverRegion) -> Unit,
+    onNavigationClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    toolbarModifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier.fillMaxSize()) {
+        ThemedTopAppBar(
+            title = stringResource(LR.string.discover_select_a_region),
+            navigationButton = NavigationButton.Back,
+            onNavigationClick = onNavigationClick,
+            iconColor = MaterialTheme.theme.colors.secondaryIcon01,
+            textColor = MaterialTheme.theme.colors.secondaryText01,
+            backgroundColor = MaterialTheme.theme.colors.secondaryUi01,
+            modifier = toolbarModifier,
+        )
+        LazyColumn(
+            contentPadding = bottomInset,
+            modifier = Modifier.fillMaxWidth().weight(1f),
+        ) {
+            items(regions, key = { it.code }) { region ->
+                RegionRow(
+                    region = region,
+                    isSelected = region.code == selectedRegionCode,
+                    modifier = Modifier.clickable { onRegionClick(region) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RegionRow(
+    region: DiscoverRegion,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .padding(horizontal = 16.dp),
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(context).data(region.flag).allowHardware(false).build(),
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.size(40.dp),
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        TextP40(
+            text = region.name.tryToLocalise(LocalResources.current),
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 16.dp),
+        )
+        if (isSelected) {
+            Icon(
+                painter = painterResource(IR.drawable.ic_tick),
+                contentDescription = null,
+                tint = MaterialTheme.theme.colors.primaryIcon01,
+                modifier = Modifier.size(24.dp),
+            )
+        }
+    }
+}

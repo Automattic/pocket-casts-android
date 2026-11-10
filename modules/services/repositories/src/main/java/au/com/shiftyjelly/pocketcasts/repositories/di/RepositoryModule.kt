@@ -94,6 +94,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserSettingsCrashReportPermission
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManagerImpl
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.squareup.moshi.Moshi
@@ -126,6 +128,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAutoCompleteSearchManager(impl: ImprovedSearchManagerImpl): ImprovedSearchManager
+
+    @Binds
+    @Singleton
+    abstract fun bindWhatsNewManager(impl: WhatsNewManagerImpl): WhatsNewManager
 
     @Binds
     @Singleton

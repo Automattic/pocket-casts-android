@@ -211,19 +211,72 @@ abstract class BookmarkDao {
 
     @Query(
         """UPDATE bookmarks SET
-            ai_title = COALESCE(:aiTitle, ai_title),
-            ai_summary = COALESCE(:aiSummary, ai_summary),
-            ai_title_modified = COALESCE(:aiTitleModified, ai_title_modified),
-            ai_summary_modified = COALESCE(:aiSummaryModified, ai_summary_modified),
+            title = CASE WHEN :title IS NOT NULL AND (title_modified IS NULL OR title_modified <= created_at) THEN :title ELSE title END,
+            clean_title = CASE WHEN :title IS NOT NULL AND (title_modified IS NULL OR title_modified <= created_at) THEN :cleanTitle ELSE clean_title END,
+            title_modified = CASE WHEN :title IS NOT NULL AND (title_modified IS NULL OR title_modified <= created_at) THEN :titleModified ELSE title_modified END,
+            passage = :passage,
+            passage_location = :passageLocation,
+            passage_modified = :passageModified,
+            reference_time = :referenceTime,
+            reference_time_modified = :referenceTimeModified,
             sync_status = :syncStatus
             WHERE uuid = :bookmarkUuid""",
     )
-    abstract suspend fun updateAiData(
+    protected abstract suspend fun updateGeneratedDataInternal(
         bookmarkUuid: String,
-        aiTitle: String?,
-        aiSummary: String?,
-        aiTitleModified: Long?,
-        aiSummaryModified: Long?,
+        title: String?,
+        cleanTitle: String?,
+        titleModified: Long?,
+        passage: String?,
+        passageLocation: Int?,
+        passageModified: Long?,
+        referenceTime: Int?,
+        referenceTimeModified: Long?,
+        syncStatus: SyncStatus,
+    )
+
+    suspend fun updateGeneratedData(
+        bookmarkUuid: String,
+        title: String?,
+        titleModified: Long?,
+        passage: String?,
+        passageLocation: Int?,
+        passageModified: Long?,
+        referenceTime: Int?,
+        referenceTimeModified: Long?,
+        syncStatus: SyncStatus,
+    ) {
+        updateGeneratedDataInternal(
+            bookmarkUuid = bookmarkUuid,
+            title = title,
+            cleanTitle = title?.unidecode(),
+            titleModified = titleModified,
+            passage = passage,
+            passageLocation = passageLocation,
+            passageModified = passageModified,
+            referenceTime = referenceTime,
+            referenceTimeModified = referenceTimeModified,
+            syncStatus = syncStatus,
+        )
+    }
+
+    @Query(
+        """UPDATE bookmarks SET
+            passage = :passage,
+            passage_location = :passageLocation,
+            passage_modified = :passageModified,
+            reference_time = CASE WHEN :referenceTime IS NOT NULL THEN :referenceTime ELSE reference_time END,
+            reference_time_modified = CASE WHEN :referenceTime IS NOT NULL THEN :referenceTimeModified ELSE reference_time_modified END,
+            sync_status = :syncStatus
+            WHERE uuid = :bookmarkUuid""",
+    )
+    abstract suspend fun updatePassage(
+        bookmarkUuid: String,
+        passage: String,
+        passageLocation: Int,
+        passageModified: Long,
+        referenceTime: Int?,
+        referenceTimeModified: Long?,
         syncStatus: SyncStatus,
     )
 
@@ -243,14 +296,6 @@ abstract class BookmarkDao {
         }
     }
 
-    @Query(
-        """SELECT bookmarks.*
-            FROM bookmarks
-            JOIN user_episodes ON bookmarks.episode_uuid = user_episodes.uuid 
-            AND deleted = :deleted""",
-    )
-    abstract fun findUserEpisodesBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
-
-    @Query("SELECT EXISTS(SELECT 1 FROM bookmarks WHERE episode_uuid IS :episodeUuid)")
-    abstract fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean>
+    @Query("SELECT EXISTS(SELECT 1 FROM bookmarks WHERE episode_uuid = :episodeUuid AND deleted = :deleted)")
+    abstract fun hasBookmarksFlow(episodeUuid: String, deleted: Boolean = false): Flow<Boolean>
 }

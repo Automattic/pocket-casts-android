@@ -1,30 +1,41 @@
 package au.com.shiftyjelly.pocketcasts.transcripts
 
+import android.content.Context
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
+import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.GeneratedChaptersResult
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
 import com.automattic.eventhorizon.SyncedTranscriptsAutoScrollResumedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekFailedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekUsedEvent
+import com.automattic.eventhorizon.TranscriptShownEvent
 import com.automattic.eventhorizon.TranscriptSourceType
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
@@ -62,6 +73,9 @@ class TranscriptViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
     private val transcriptManager = TestTranscriptManager()
     private val signInStateFlow = MutableStateFlow<SignInState>(SignInState.SignedOut)
     private val playbackStateFlow = MutableStateFlow(PlaybackState(episodeUuid = ""))
@@ -77,29 +91,193 @@ class TranscriptViewModelTest {
         on { userSeeks } doReturn userSeeksFlow
     }
     private val episodeManager = mock<EpisodeManager>()
+    private val bookmarkManager = mock<BookmarkManager>()
+    private val chatManager = mock<ChatManager>()
+    private val context = mock<Context> {
+        on { getString(any()) } doReturn "Bookmark"
+    }
 
     lateinit var viewModel: TranscriptViewModel
 
     @Before
     fun setUp() {
-        viewModel = TranscriptViewModel(
-            transcriptManager = transcriptManager,
-            episodeManager = episodeManager,
-            userManager = mock {
-                on { getSignInState() } doReturn signInStateFlow.asFlowable()
-            },
-            paymentClient = PaymentClient.test(),
-            eventHorizon = EventHorizon(eventSink),
-            source = TranscriptViewModel.Source.Player,
-            sharingClient = object : TranscriptSharingClient {
-                override suspend fun shareTranscript(request: SharingRequest): SharingResponse {
-                    Timber.i("Sharing transcript with request: $request")
-                    return SharingResponse(isSuccessful = true, feedbackMessage = null, error = null)
-                }
-            },
-            fingerprintTimingManager = fingerprintTimingManager,
-            playbackManager = playbackManager,
+        viewModel = createViewModel()
+    }
+
+    private fun createViewModel(source: TranscriptViewModel.Source = TranscriptViewModel.Source.Player) = TranscriptViewModel(
+        context = context,
+        transcriptManager = transcriptManager,
+        episodeManager = episodeManager,
+        userManager = mock {
+            on { getSignInState() } doReturn signInStateFlow.asFlowable()
+        },
+        paymentClient = PaymentClient.test(),
+        eventHorizon = EventHorizon(eventSink),
+        source = source,
+        sharingClient = object : TranscriptSharingClient {
+            override suspend fun shareTranscript(request: SharingRequest): SharingResponse {
+                Timber.i("Sharing transcript with request: $request")
+                return SharingResponse(isSuccessful = true, feedbackMessage = null, error = null)
+            }
+        },
+        bookmarkManager = bookmarkManager,
+        chatManager = chatManager,
+        fingerprintTimingManager = fingerprintTimingManager,
+        playbackManager = playbackManager,
+    )
+
+    @Test
+    fun `create bookmark from a transcript selection`() = runTest {
+        val selected = "The AI revolution is underhyped."
+        transcriptManager.avaiableTranscript = Transcript.Text(
+            entries = listOf(TranscriptEntry.Text(selected, startTimeMs = 10_000)),
+            type = TranscriptType.Vtt,
+            url = "https://example.com/transcript.vtt",
+            isGenerated = true,
+            episodeUuid = "episode-id",
+            podcastUuid = "podcast-id",
         )
+        whenever(episodeManager.findByUuid("episode-id"))
+            .thenReturn(PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date()))
+        whenever(fingerprintTimingManager.playbackTimeMs(any())).thenReturn(12_000)
+        whenever(
+            bookmarkManager.add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()),
+        ).thenReturn(Bookmark(uuid = "bookmark-id"))
+
+        viewModel.loadTranscript("episode-id")
+        runCurrent()
+
+        viewModel.messages.test {
+            viewModel.createBookmarkFromSelection(selected)
+            assertEquals(TranscriptMessage.OpenBookmarkEditor("bookmark-id", isNewBookmark = true, fromEpisode = false), awaitItem())
+        }
+
+        // Generated transcript: reference time (10s) is mapped to the 12s playback time and kept.
+        verify(bookmarkManager).add(
+            episode = any(),
+            timeSecs = eq(12),
+            title = any(),
+            creationSource = any(),
+            addedAt = any(),
+            passage = eq(selected),
+            passageLocation = eq(0),
+            referenceTime = eq(10),
+        )
+    }
+
+    @Test
+    fun `flag the editor as existing when a bookmark already sits at that time`() = runTest {
+        val selected = "The AI revolution is underhyped."
+        transcriptManager.avaiableTranscript = Transcript.Text(
+            entries = listOf(TranscriptEntry.Text(selected, startTimeMs = 10_000)),
+            type = TranscriptType.Vtt,
+            url = "https://example.com/transcript.vtt",
+            isGenerated = true,
+            episodeUuid = "episode-id",
+            podcastUuid = "podcast-id",
+        )
+        whenever(episodeManager.findByUuid("episode-id"))
+            .thenReturn(PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date()))
+        whenever(fingerprintTimingManager.playbackTimeMs(any())).thenReturn(12_000)
+        whenever(bookmarkManager.findByEpisodeTime(any(), eq(12))).thenReturn(Bookmark(uuid = "bookmark-id"))
+        whenever(
+            bookmarkManager.add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()),
+        ).thenReturn(Bookmark(uuid = "bookmark-id"))
+
+        viewModel.loadTranscript("episode-id")
+        runCurrent()
+
+        viewModel.messages.test {
+            viewModel.createBookmarkFromSelection(selected)
+            assertEquals(TranscriptMessage.OpenBookmarkEditor("bookmark-id", isNewBookmark = false, fromEpisode = false), awaitItem())
+        }
+    }
+
+    @Test
+    fun `flag the bookmark as created from the episode when the transcript is shown there`() = runTest {
+        viewModel = createViewModel(TranscriptViewModel.Source.Episode)
+        val selected = "The AI revolution is underhyped."
+        transcriptManager.avaiableTranscript = Transcript.Text(
+            entries = listOf(TranscriptEntry.Text(selected, startTimeMs = 10_000)),
+            type = TranscriptType.Vtt,
+            url = "https://example.com/transcript.vtt",
+            isGenerated = true,
+            episodeUuid = "episode-id",
+            podcastUuid = "podcast-id",
+        )
+        whenever(episodeManager.findByUuid("episode-id"))
+            .thenReturn(PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date()))
+        whenever(fingerprintTimingManager.playbackTimeMs(any())).thenReturn(12_000)
+        whenever(
+            bookmarkManager.add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull()),
+        ).thenReturn(Bookmark(uuid = "bookmark-id"))
+
+        viewModel.loadTranscript("episode-id")
+        runCurrent()
+
+        viewModel.messages.test {
+            viewModel.createBookmarkFromSelection(selected)
+            assertEquals(TranscriptMessage.OpenBookmarkEditor("bookmark-id", isNewBookmark = true, fromEpisode = true), awaitItem())
+        }
+    }
+
+    @Test
+    fun `emit bookmark failed when the selection cannot be located`() = runTest {
+        transcriptManager.avaiableTranscript = Transcript.Text(
+            entries = listOf(TranscriptEntry.Text("The AI revolution is underhyped.", startTimeMs = 10_000)),
+            type = TranscriptType.Vtt,
+            url = "https://example.com/transcript.vtt",
+            isGenerated = true,
+            episodeUuid = "episode-id",
+            podcastUuid = "podcast-id",
+        )
+
+        viewModel.loadTranscript("episode-id")
+        runCurrent()
+
+        viewModel.messages.test {
+            viewModel.createBookmarkFromSelection("text that is not in the transcript")
+            assertEquals(TranscriptMessage.BookmarkFailed, awaitItem())
+        }
+
+        verify(bookmarkManager, never()).add(any(), any(), any(), any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun `bookmark from selection is unavailable for an author transcript`() = runTest {
+        setUpTapToSeek()
+        transcriptManager.avaiableTranscript = Transcript.TextPreview
+        syncedStateFlow.value = FingerprintTimingManager.State.Active(coverage = 1)
+
+        viewModel.uiState.test {
+            viewModel.loadTranscript("episode-uuid")
+            var state = awaitItem()
+            while (!state.isSyncedActive) {
+                state = awaitItem()
+            }
+            assertFalse(state.isBookmarkFromSelectionAvailable)
+        }
+    }
+
+    @Test
+    fun `bookmark from selection becomes available when playback starts after the transcript is loaded`() = runTest {
+        transcriptManager.avaiableTranscript = Transcript.TextPreview.copy(isGenerated = true)
+        signInStateFlow.value = SignInState.SignedIn("email", Subscription.PlusPreview)
+
+        viewModel.uiState.test {
+            viewModel.loadTranscript("episode-uuid")
+            runCurrent()
+
+            whenever(playbackManager.getCurrentEpisode()).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date()))
+            playbackStateFlow.value = PlaybackState(episodeUuid = "episode-uuid", positionMs = 10_000)
+            syncedStateFlow.value = FingerprintTimingManager.State.Active(coverage = 1)
+
+            var state = awaitItem()
+            while (!state.isBookmarkFromSelectionAvailable) {
+                state = awaitItem()
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -139,6 +317,51 @@ class TranscriptViewModelTest {
             viewModel.loadTranscript("episode-uuid")
             assertEquals(TranscriptState.Loaded(transcriptManager.avaiableTranscript), awaitItem().transcriptState)
         }
+    }
+
+    @Test
+    fun `track transcript shown on an episode with a chat`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT, true)
+        whenever(chatManager.hasChatWithMessages("episode-uuid")).thenReturn(true)
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertEquals(true, (eventSink.pollEvent() as TranscriptShownEvent).hasEpisodeChat)
+    }
+
+    @Test
+    fun `track transcript shown on an episode without a chat`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT, true)
+        whenever(chatManager.hasChatWithMessages("episode-uuid")).thenReturn(false)
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertEquals(false, (eventSink.pollEvent() as TranscriptShownEvent).hasEpisodeChat)
+    }
+
+    @Test
+    fun `omit the episode chat from transcript shown when the lookup fails`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT, true)
+        whenever(chatManager.hasChatWithMessages("episode-uuid")).thenThrow(IllegalStateException())
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertNull((eventSink.pollEvent() as TranscriptShownEvent).hasEpisodeChat)
+    }
+
+    @Test
+    fun `omit the episode chat from transcript shown when episode chat is disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.EPISODE_CHAT, false)
+        whenever(chatManager.hasChatWithMessages("episode-uuid")).thenReturn(true)
+
+        viewModel.loadTranscript("episode-uuid")
+        runCurrent()
+
+        assertNull((eventSink.pollEvent() as TranscriptShownEvent).hasEpisodeChat)
+        verify(chatManager, never()).hasChatWithMessages(any())
     }
 
     @Test
@@ -353,7 +576,7 @@ class TranscriptViewModelTest {
     fun `track synced transcript seek failed event when preparing`() = runTest {
         setUpTapToSeek()
         whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"))
-        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any()))
+        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any(), eq(GeneratedChaptersDownloadTriggerType.TranscriptView)))
             .thenReturn(ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH))
         syncedStateFlow.value = FingerprintTimingManager.State.Preparing
 
@@ -383,7 +606,7 @@ class TranscriptViewModelTest {
     fun `resolve and seek follows a bounded resolve outside the dense mapping`() = runTest {
         setUpTapToSeek()
         whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"))
-        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any()))
+        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any(), any()))
             .thenReturn(ChapterSeekResult.Resolved(playbackTime = 45.seconds, usedPrior = false))
         syncedStateFlow.value = FingerprintTimingManager.State.Preparing
 
@@ -411,7 +634,7 @@ class TranscriptViewModelTest {
     fun `user seek cancels an active tap resolve`() = runTest {
         setUpTapToSeek()
         whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"))
-        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any())).doSuspendableAnswer { awaitCancellation() }
+        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any(), any())).doSuspendableAnswer { awaitCancellation() }
         syncedStateFlow.value = FingerprintTimingManager.State.Preparing
 
         awaitTapToSeekAvailable()
@@ -432,7 +655,7 @@ class TranscriptViewModelTest {
     fun `track synced transcript seek failed event when failed`() = runTest {
         setUpTapToSeek()
         whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"))
-        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any()))
+        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any(), any()))
             .thenReturn(ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH))
         syncedStateFlow.value = FingerprintTimingManager.State.Failed(
             RuntimeException("no match"),
@@ -464,7 +687,7 @@ class TranscriptViewModelTest {
     fun `track synced transcript seek failed event without message when unavailable`() = runTest {
         setUpTapToSeek()
         whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date(), podcastUuid = "podcast-uuid"))
-        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any()))
+        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any(), any()))
             .thenReturn(ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_REFERENCE))
         syncedStateFlow.value = FingerprintTimingManager.State.Unavailable(episodeUuid = "episode-uuid")
 
@@ -499,7 +722,7 @@ class TranscriptViewModelTest {
             downloadStatus = EpisodeDownloadStatus.Downloaded,
         )
         whenever(episodeManager.findByUuid("episode-uuid")).thenReturn(episode)
-        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any()))
+        whenever(fingerprintTimingManager.resolvePlaybackTime(any(), any(), any()))
             .thenReturn(ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_MATCH))
         syncedStateFlow.value = FingerprintTimingManager.State.Preparing
 
@@ -635,14 +858,21 @@ private class TestTranscriptManager : TranscriptManager {
 
     override fun observeIsTranscriptAvailable(episodeUuid: String) = emptyFlow<Boolean>()
 
+    override fun observeIsGeneratedTranscriptAvailable(episodeUuid: String) = emptyFlow<Boolean>()
+
     override suspend fun loadTranscript(episodeUuid: String): Transcript? {
         yield()
         return avaiableTranscript.takeIf { shouldLoadTranscripts }
+    }
+
+    override suspend fun loadGeneratedTranscript(episodeUuid: String): Transcript.Text? {
+        yield()
+        return (avaiableTranscript as? Transcript.Text).takeIf { shouldLoadTranscripts }
     }
 
     override fun resetInvalidTranscripts(episodeUuid: String) {
         shouldLoadTranscripts = true
     }
 
-    override suspend fun loadSummaryText(episodeUuid: String): String? = null
+    override suspend fun loadGeneratedChapters(episodeUuid: String) = GeneratedChaptersResult.Unavailable
 }

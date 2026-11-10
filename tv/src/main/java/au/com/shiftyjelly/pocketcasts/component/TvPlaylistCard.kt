@@ -85,7 +85,7 @@ fun TvPlaylistCard(
 
     TvTile(
         onClick = onClick,
-        scale = CardDefaults.scale(focusedScale = 1.05f),
+        scale = CardDefaults.scale(focusedScale = TvFocusedCardScale),
         shape = CardDefaults.shape(RoundedCornerShape(11.dp)),
         colors = CardDefaults.colors(
             containerColor = Color.Transparent,
@@ -106,11 +106,11 @@ fun TvPlaylistCard(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                    .padding(horizontal = 18.dp, vertical = 12.dp),
             ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.tvTypography.callout,
+                    style = MaterialTheme.tvTypography.headline,
                     color = titleColor,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,

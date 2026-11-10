@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SimplePlayer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.VideoSurfaceState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -42,7 +43,7 @@ class VideoActivity : AppCompatActivity() {
 
     private var pipActionsPlaying: List<RemoteAction>? = null
     private var pipActionsPaused: List<RemoteAction>? = null
-    private var wasInPiP: Boolean = false
+    private var lastPipAspectRatio: Rational? = null
 
     companion object {
         const val EXTRA_PIP = "EXTRA_PIP"
@@ -83,6 +84,9 @@ class VideoActivity : AppCompatActivity() {
         setTheme(Theme.ThemeType.EXTRA_DARK.resourceId)
         setContentView(R.layout.activity_video)
 
+        // Seed the surface owner even on recreation (uiMode/font-scale changes) so a live PiP keeps its state.
+        playbackManager.setVideoSurfaceState(if (isInPictureInPictureMode) VideoSurfaceState.PIP else VideoSurfaceState.FULLSCREEN)
+
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.container, VideoFragment())
@@ -91,14 +95,13 @@ class VideoActivity : AppCompatActivity() {
             // Enter Picture-in-Picture
             if (intent.getBooleanExtra(EXTRA_PIP, false)) {
                 enterPictureInPicture()
-            } else {
-                playbackManager.player?.isPip = false
             }
         }
 
         playbackManager.playbackStateLive.observe(this) { playbackState ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 updatePictureInPictureActions(playbackState.isPlaying)
+                updatePictureInPictureAspectRatio()
             }
             finishIfNotVideo()
         }
@@ -123,15 +126,33 @@ class VideoActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        // Backgrounding from fullscreen (not PiP, not a config change) hands the surface back to the inline player.
+        if (!isInPictureInPictureMode && !isChangingConfigurations) {
+            playbackManager.setVideoSurfaceState(VideoSurfaceState.NONE)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        // Closing the PiP delivers onPictureInPictureModeChanged(false) before the finish is visible, so
+        // hand the surface back here where isFinishing is reliably set.
+        if (isFinishing) {
+            playbackManager.setVideoSurfaceState(VideoSurfaceState.NONE)
+        }
         unregisterReceiver(pipReceiver)
     }
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
 
-        playbackManager.player?.isPip = isInPictureInPictureMode
+        val state = when {
+            isInPictureInPictureMode -> VideoSurfaceState.PIP
+            isFinishing -> VideoSurfaceState.NONE
+            else -> VideoSurfaceState.FULLSCREEN
+        }
+        playbackManager.setVideoSurfaceState(state)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -140,15 +161,13 @@ class VideoActivity : AppCompatActivity() {
         // Enter Picture-in-Picture
         if (intent.getBooleanExtra(EXTRA_PIP, false)) {
             enterPictureInPicture()
-        } else {
-            playbackManager.player?.isPip = false
         }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
-        if (newConfig.orientation != Configuration.ORIENTATION_LANDSCAPE && !wasInPiP) {
+        if (newConfig.orientation != Configuration.ORIENTATION_LANDSCAPE && !isInPictureInPictureMode) {
             finish()
         }
     }
@@ -157,9 +176,6 @@ class VideoActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return
         }
-
-        wasInPiP = true
-        playbackManager.player?.isPip = true
 
         // create PiP actions
         if (pipActionsPlaying == null) {
@@ -177,8 +193,12 @@ class VideoActivity : AppCompatActivity() {
         val height = player.videoHeight
         val aspectRatio = if (width == 0 || height == 0) Rational(16, 9) else Rational(width, height)
         val params = PictureInPictureParams.Builder().setAspectRatio(aspectRatio)
-        enterPictureInPictureMode(params.build())
-        updatePictureInPictureActions(isPlaying = playbackManager.isPlaying())
+        // Only claim PiP when the system actually entered it; the permission can be revoked.
+        if (enterPictureInPictureMode(params.build())) {
+            lastPipAspectRatio = null
+            playbackManager.setVideoSurfaceState(VideoSurfaceState.PIP)
+            updatePictureInPictureActions(isPlaying = playbackManager.isPlaying())
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -186,6 +206,25 @@ class VideoActivity : AppCompatActivity() {
         val actions = if (isPlaying) pipActionsPlaying else pipActionsPaused
         val params = PictureInPictureParams.Builder().setActions(actions)
         setPictureInPictureParams(params.build())
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun updatePictureInPictureAspectRatio() {
+        if (!isInPictureInPictureMode) {
+            return
+        }
+        val player = playbackManager.player as? SimplePlayer ?: return
+        val width = player.videoWidth
+        val height = player.videoHeight
+        if (width == 0 || height == 0) {
+            return
+        }
+        val aspectRatio = Rational(width, height)
+        if (aspectRatio == lastPipAspectRatio) {
+            return
+        }
+        lastPipAspectRatio = aspectRatio
+        setPictureInPictureParams(PictureInPictureParams.Builder().setAspectRatio(aspectRatio).build())
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

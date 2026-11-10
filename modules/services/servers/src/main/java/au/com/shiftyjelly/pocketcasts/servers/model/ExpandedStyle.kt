@@ -10,6 +10,7 @@ sealed class ExpandedStyle(val stringValue: String) {
         private const val DESCRIPTIVE_LIST = "descriptive_list"
         private const val GRID_LIST = "grid"
         private const val POPOVER = "popover"
+        private const val NETWORK_GRID = "network_grid"
 
         fun fromString(value: String?): ExpandedStyle? {
             return when (value) {
@@ -18,16 +19,21 @@ sealed class ExpandedStyle(val stringValue: String) {
                 DESCRIPTIVE_LIST -> DescriptiveList()
                 GRID_LIST -> GridList()
                 POPOVER -> Popover()
+                NETWORK_GRID -> NetworkGrid()
                 else -> PlainList()
             }
         }
     }
+
+    /** `network_grid` renders the same page as `grid`, so both open the podcast grid screen. */
+    val usePodcastGrid get() = this is GridList || this is NetworkGrid
 
     class RankedList : ExpandedStyle(RANKED_LIST)
     class PlainList : ExpandedStyle(PLAIN_LIST)
     class DescriptiveList : ExpandedStyle(DESCRIPTIVE_LIST)
     class GridList : ExpandedStyle(GRID_LIST)
     class Popover : ExpandedStyle(POPOVER)
+    class NetworkGrid : ExpandedStyle(NETWORK_GRID)
 }
 
 class ExpandedStyleMoshiAdapter {

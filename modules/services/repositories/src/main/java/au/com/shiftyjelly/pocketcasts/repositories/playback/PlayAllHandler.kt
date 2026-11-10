@@ -30,6 +30,10 @@ class PlayAllHandler @AssistedInject constructor(
         return handlePlayAllAction(episodes, PlaylistEpisode::toPodcastEpisode)
     }
 
+    suspend fun handlePlayAllEpisodes(episodes: List<BaseEpisode>): PlayAllResponse {
+        return handlePlayAllAction(episodes) { it }
+    }
+
     private suspend fun <T> handlePlayAllAction(
         episodes: List<T>,
         toBaseEpisode: (T) -> BaseEpisode?,
@@ -54,8 +58,8 @@ class PlayAllHandler @AssistedInject constructor(
         }
     }
 
-    suspend fun saveUpNextAsPlaylist(upNextTranslation: String) {
-        val episodes = pendingEpisodes?.episodeInQueue ?: return
+    suspend fun saveUpNextAsPlaylist(upNextTranslation: String): Boolean {
+        val episodes = pendingEpisodes?.episodeInQueue ?: return false
         val baseName = buildString {
             append(upNextTranslation)
             runCatching {
@@ -75,15 +79,18 @@ class PlayAllHandler @AssistedInject constructor(
             val name = if (index == 0) baseName else "$baseName (${index + 1})"
             playlistManager.createManualPlaylistWithEpisodes(name, episodes)
         }
+        return playlistEpisodes.isNotEmpty()
     }
 
-    suspend fun playAllPendingEpisodes() {
-        val episodes = pendingEpisodes?.episodesToPlay ?: return
+    suspend fun playAllPendingEpisodes(): Boolean {
+        val episodes = pendingEpisodes?.episodesToPlay ?: return false
 
         withContext(Dispatchers.Default) {
             playbackManager.upNextQueue.removeAll()
             playbackManager.playEpisodes(episodes, source)
         }
+        pendingEpisodes = null
+        return true
     }
 
     private suspend fun appendToQueueAndPlay(episodes: List<BaseEpisode>) {

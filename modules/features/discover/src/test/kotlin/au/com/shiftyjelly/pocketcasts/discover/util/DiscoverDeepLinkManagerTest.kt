@@ -15,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -88,6 +90,48 @@ class DiscoverDeepLinkManagerTest {
         val result = manager.getDiscoverList("staff-picks", mockResources)
 
         assert(result == null)
+    }
+
+    @Test
+    fun `getNetworksList returns the region's networks row`() = runTest {
+        val networksRow = createDiscoverRow(
+            type = ListType.ListsList,
+            displayStyle = DisplayStyle.LargeList(),
+            title = "Networks",
+            source = "networks_{region_code}",
+            listUuid = "networks",
+        )
+        val discover = createTestDiscover(layout = listOf(createDiscoverRow(), networksRow))
+        whenever(mockRepository.getDiscoverFeed()).thenReturn(discover)
+        stubRegion("UK")
+
+        val result = manager.getNetworksList(mockResources)
+
+        assertEquals("networks", result?.listUuid)
+        assertEquals("networks_UK", result?.source)
+    }
+
+    @Test
+    fun `getNetworksList returns null without a networks row`() = runTest {
+        val listsWithoutSource = createDiscoverRow(type = ListType.ListsList, displayStyle = DisplayStyle.LargeList(), source = "")
+        val discover = createTestDiscover(layout = listOf(createDiscoverRow(), listsWithoutSource))
+        whenever(mockRepository.getDiscoverFeed()).thenReturn(discover)
+        stubRegion("US")
+
+        assertNull(manager.getNetworksList(mockResources))
+    }
+
+    @Test
+    fun `getNetworksList returns null when the discover feed fails to load`() = runTest {
+        whenever(mockRepository.getDiscoverFeed()).thenThrow(RuntimeException("offline"))
+
+        assertNull(manager.getNetworksList(mockResources))
+    }
+
+    private fun stubRegion(code: String) {
+        val discoverCountryCodeMock: UserSetting<String> = mock()
+        whenever(discoverCountryCodeMock.value).thenReturn(code)
+        whenever(mockSettings.discoverCountryCode).thenReturn(discoverCountryCodeMock)
     }
 
     private fun createTestDiscover(

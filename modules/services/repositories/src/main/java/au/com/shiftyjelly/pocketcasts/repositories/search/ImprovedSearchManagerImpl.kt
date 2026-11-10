@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteResult
 import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteSearchService
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedResult
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedSearchRequest
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -16,7 +18,7 @@ class ImprovedSearchManagerImpl @Inject constructor(
 ) : ImprovedSearchManager {
     override suspend fun autoCompleteSearch(term: String): List<SearchAutoCompleteItem> {
         val response = autoCompleteSearchService.autoCompleteSearch(query = term, termsLimit = null, podcastsLimit = null)
-        return response.results.map {
+        return response.results.mapNotNull {
             when (it) {
                 is AutoCompleteResult.TermResult -> SearchAutoCompleteItem.Term(term = it.value)
 
@@ -26,6 +28,8 @@ class ImprovedSearchManagerImpl @Inject constructor(
                     author = it.value.author.orEmpty(),
                     isExplicit = it.value.explicit == true,
                 )
+
+                AutoCompleteResult.Unknown -> null
             }
         }
     }
@@ -49,9 +53,25 @@ class ImprovedSearchManagerImpl @Inject constructor(
                     uuid = it.uuid,
                     title = it.title,
                     podcastUuid = it.podcastUuid,
+                    podcastTitle = it.podcastTitle,
                     publishedDate = it.publishedDate,
                     duration = it.duration.seconds,
+                    hasVideo = it.hasVideo == true,
                 )
+
+                is CombinedResult.NetworkResult -> {
+                    if (!FeatureFlag.isEnabled(Feature.NETWORK_DISCOVERY)) return@mapNotNull null
+                    val uuid = it.uuid ?: return@mapNotNull null
+                    val title = it.title?.takeIf { title -> title.isNotBlank() } ?: return@mapNotNull null
+                    ImprovedSearchResultItem.NetworkItem(
+                        uuid = uuid,
+                        title = title,
+                        description = it.shortDescription,
+                        imageUrl = it.collectionImage,
+                    )
+                }
+
+                CombinedResult.Unknown -> null
             }
         }
     }

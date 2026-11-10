@@ -163,6 +163,7 @@ fun ThemedTopAppBar(
                     text = title,
                     color = textColor,
                     overflow = titleOverflow,
+                    maxLines = 1,
                 )
             }
         },

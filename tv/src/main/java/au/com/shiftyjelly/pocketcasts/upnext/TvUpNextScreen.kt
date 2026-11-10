@@ -33,18 +33,24 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.component.LocalOpenNowPlaying
+import au.com.shiftyjelly.pocketcasts.component.ScrollToTopEffect
+import au.com.shiftyjelly.pocketcasts.component.TopBarScrollReporter
 import au.com.shiftyjelly.pocketcasts.component.TvEmptyState
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionContext
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeActionsModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeInfoModal
 import au.com.shiftyjelly.pocketcasts.component.TvEpisodeListItem
 import au.com.shiftyjelly.pocketcasts.component.rememberTvEpisodeListFocus
+import au.com.shiftyjelly.pocketcasts.component.scrollAwayTopBar
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.TvPodcastDetailsScreen
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
+import au.com.shiftyjelly.pocketcasts.theme.TvTopBarHeight
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
 import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.util.Date
@@ -60,6 +66,7 @@ fun TvUpNextScreen(
     var openedPodcastUuid by rememberSaveable { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
+        viewModel.trackUpNextShown()
         viewModel.onShown()
     }
 
@@ -68,14 +75,23 @@ fun TvUpNextScreen(
         BackHandler { openedPodcastUuid = null }
         TvPodcastDetailsScreen(
             podcastUuid = podcastUuid,
+            source = SourceView.UP_NEXT,
             onClose = { openedPodcastUuid = null },
             modifier = modifier,
         )
     } else {
+        val openNowPlaying = LocalOpenNowPlaying.current
         TvUpNextContent(
             uiState = uiState,
-            onNavigateToHome = onNavigateToHome,
+            onNavigateToHome = {
+                viewModel.trackDiscoverButtonTapped()
+                onNavigateToHome()
+            },
             onOpenPodcast = { openedPodcastUuid = it },
+            onPlayEpisode = { episode ->
+                viewModel.play(episode)
+                openNowPlaying()
+            },
             modifier = modifier,
         )
     }
@@ -86,18 +102,26 @@ private fun TvUpNextContent(
     uiState: TvUpNextUiState,
     onNavigateToHome: () -> Unit,
     onOpenPodcast: (String) -> Unit,
+    onPlayEpisode: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         when (uiState) {
             is TvUpNextUiState.Loading -> {
-                LoadingView(color = MaterialTheme.tvColors.textPrimary, modifier = Modifier.fillMaxSize())
+                LoadingView(
+                    color = MaterialTheme.tvColors.textPrimary,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = TvTopBarHeight),
+                )
             }
 
             is TvUpNextUiState.Empty -> {
                 UpNextEmpty(
                     onNavigateToHome = onNavigateToHome,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = TvTopBarHeight),
                 )
             }
 
@@ -105,6 +129,7 @@ private fun TvUpNextContent(
                 UpNextList(
                     episodes = uiState.episodes,
                     onOpenPodcast = onOpenPodcast,
+                    onPlayEpisode = onPlayEpisode,
                 )
             }
         }
@@ -115,44 +140,47 @@ private fun TvUpNextContent(
 private fun UpNextList(
     episodes: List<PodcastEpisode>,
     onOpenPodcast: (String) -> Unit,
+    onPlayEpisode: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val dateFormatter = remember(context) { RelativeDateFormatter(context) }
     val listState = rememberLazyListState()
+    ScrollToTopEffect { listState.scrollToItem(0) }
+    TopBarScrollReporter(listState)
     val focus = rememberTvEpisodeListFocus(episodes, listState, requestInitialFocus = false)
     var actionsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
     var detailsEpisode by remember { mutableStateOf<PodcastEpisode?>(null) }
 
-    Column(
+    LazyColumn(
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        contentPadding = PaddingValues(bottom = 32.dp),
         modifier = modifier
             .fillMaxHeight()
             .fillMaxWidth(ROW_WIDTH_FRACTION)
-            .padding(start = 32.dp, top = 8.dp),
+            .scrollAwayTopBar()
+            .padding(start = 42.dp),
     ) {
-        UpNextHeader(episodes = episodes)
-        Spacer(Modifier.height(26.dp))
-        LazyColumn(
-            state = listState,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = 32.dp),
-            modifier = Modifier.weight(1f),
-        ) {
-            itemsIndexed(
-                items = episodes,
-                key = { _, episode -> episode.uuid },
-            ) { index, episode ->
-                TvEpisodeListItem(
-                    episode = episode,
-                    dateFormatter = dateFormatter,
-                    onClick = {},
-                    onOpenActions = {
-                        focus.watchForRemoval(episodes, index)
-                        actionsEpisode = episode
-                    },
-                    episodeFocusRequester = focus.requesterFor(episode.uuid),
-                )
+        item {
+            Column(modifier = Modifier.padding(top = 40.dp, bottom = 16.dp)) {
+                UpNextHeader(episodes = episodes)
             }
+        }
+        itemsIndexed(
+            items = episodes,
+            key = { _, episode -> episode.uuid },
+        ) { index, episode ->
+            TvEpisodeListItem(
+                episode = episode,
+                dateFormatter = dateFormatter,
+                onClick = { onPlayEpisode(episode) },
+                onOpenActions = {
+                    focus.watchForRemoval(episodes, index)
+                    actionsEpisode = episode
+                },
+                episodeFocusRequester = focus.requesterFor(episode.uuid),
+            )
         }
     }
 
@@ -171,6 +199,7 @@ private fun UpNextList(
     detailsEpisode?.let { episode ->
         TvEpisodeInfoModal(
             episode = episode,
+            actionContext = TvEpisodeActionContext.UpNext,
             onDismissRequest = { detailsEpisode = null },
         )
     }
@@ -187,7 +216,7 @@ private fun UpNextHeader(
     ) {
         Text(
             text = stringResource(LR.string.up_next),
-            style = MaterialTheme.tvTypography.title3,
+            style = MaterialTheme.tvTypography.title2,
             color = MaterialTheme.tvColors.textPrimary,
         )
         Text(
@@ -223,7 +252,7 @@ private fun UpNextEmpty(
     )
 }
 
-private const val ROW_WIDTH_FRACTION = 0.75f
+private const val ROW_WIDTH_FRACTION = 0.65f
 
 @Preview(device = Devices.TV_1080p)
 @Composable
@@ -244,6 +273,7 @@ private fun TvUpNextLoadedPreview() {
                 ),
                 onNavigateToHome = {},
                 onOpenPodcast = {},
+                onPlayEpisode = {},
             )
         }
     }
@@ -258,6 +288,7 @@ private fun TvUpNextEmptyPreview() {
                 uiState = TvUpNextUiState.Empty,
                 onNavigateToHome = {},
                 onOpenPodcast = {},
+                onPlayEpisode = {},
             )
         }
     }

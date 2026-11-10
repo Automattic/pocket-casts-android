@@ -18,10 +18,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncHistoryTask
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncWorker
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.SyncUpdateRequest
@@ -55,6 +58,7 @@ class DataSyncProcess(
     private val statsManager: StatsManager,
     private val subscriptionManager: SubscriptionManager,
     private val ratingsManager: RatingsManager,
+    private val whatsNewManager: WhatsNewManager,
     private val appDatabase: AppDatabase,
     private val settings: Settings,
     private val fileStorage: FileStorage,
@@ -83,6 +87,7 @@ class DataSyncProcess(
                     syncBrokenFiles()
                     syncPlaybackHistory()
                     syncPodcastRatings()
+                    syncWhatsNewReadState()
                 }
             }.onFailure { settings.recordErrorSession() }
         }
@@ -123,11 +128,33 @@ class DataSyncProcess(
             logProcess("playlists-data-full") {
                 playlistSync.fullSync()
             }
-            logProcess("bookmarks-data-full") {
+            val hasBookmarks = logProcess("bookmarks-data-full") {
                 bookmarkSync.fullSync()
+            }
+            if (hasBookmarks) {
+                logProcess("bookmarks-passages-full") {
+                    runCatching { rehydrateBookmarkPassages() }
+                        .onFailure { error ->
+                            if (error is CancellationException) throw error
+                            logError("bookmark passage rehydration failed", error)
+                        }
+                }
             }
             runCatching { Instant.parse(lastSyncAt) }.getOrDefault(Instant.now())
         }
+    }
+
+    // The full-sync bookmark list omits the passage fields; they only travel on the incremental
+    // sync records, so pull them once with a since-zero update after the initial full sync.
+    private suspend fun rehydrateBookmarkPassages() {
+        if (!FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) return
+        val request = syncUpdateRequest {
+            deviceUtcTimeMs = System.currentTimeMillis()
+            lastModified = Instant.EPOCH.toEpochMilli()
+            deviceId = settings.getUniqueDeviceId()
+        }
+        val response = syncManager.syncUpdateOrThrow(request)
+        bookmarkSync.processIncrementalResponse(response.recordsList.mapNotNull(Record::bookmarkOrNull))
     }
 
     private suspend fun syncIncrementalData(lastSyncTime: Instant): Instant {
@@ -203,6 +230,14 @@ class DataSyncProcess(
             logProcess("playback-history") {
                 val operation = SyncHistoryTask.scheduleToRun(context)
                 operation.awaitOperation("Playback History", timeoutDuration = 5.minutes)
+            }
+        }
+    }
+
+    private suspend fun syncWhatsNewReadState() {
+        if (Util.getAppPlatform(context) == AppPlatform.Phone) {
+            logProcess("whats-new") {
+                whatsNewManager.refreshIfNeeded()
             }
         }
     }

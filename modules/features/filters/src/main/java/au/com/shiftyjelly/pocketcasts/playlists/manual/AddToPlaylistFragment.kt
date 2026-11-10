@@ -26,8 +26,8 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeUuidPair
-import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
+import au.com.shiftyjelly.pocketcasts.playlists.manual.AddToPlaylistViewModel.PlaylistChangeFeedback
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -102,10 +102,16 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                         if (playlist.canAddOrRemoveEpisodes(uiState.episodeLimit, newEpisodeUuids)) {
                             if (playlist.hasAllEpisodes(newEpisodeUuids)) {
                                 viewModel.trackEpisodeRemoveTapped(playlist)
-                                viewModel.removeFromPlaylist(playlist.uuid)
+                                viewModel.removeFromPlaylist(
+                                    playlistUuid = playlist.uuid,
+                                    playlistTitle = playlist.title,
+                                )
                             } else {
                                 viewModel.trackEpisodeAddTapped(playlist, isPlaylistFull = false)
-                                viewModel.addToPlaylist(playlist.uuid)
+                                viewModel.addToPlaylist(
+                                    playlistUuid = playlist.uuid,
+                                    playlistTitle = playlist.title,
+                                )
                             }
                         } else {
                             viewModel.trackEpisodeAddTapped(playlist, isPlaylistFull = true)
@@ -160,27 +166,31 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         if (!requireActivity().isChangingConfigurations && isDoneTapped) {
-            showDoneSnackbar(viewModel.getPlaylistsAddedTo())
+            showDoneSnackbar(viewModel.getPlaylistChangeFeedback())
         }
     }
 
-    private fun showDoneSnackbar(playlistsAddedTo: Set<PlaylistPreviewForEpisode>) {
+    private fun showDoneSnackbar(feedback: PlaylistChangeFeedback) {
         val hostListener = requireActivity() as FragmentHostListener
         val snackbarView = hostListener.snackBarView()
-        val snackbar = when (val size = playlistsAddedTo.size) {
-            0 -> return
-
-            1 -> {
-                val playlist = playlistsAddedTo.first()
-                val message = getString(LR.string.added_to_playlist_single, playlist.title)
+        val snackbar = when (feedback) {
+            is PlaylistChangeFeedback.SinglePlaylistAddition -> {
+                val playlist = feedback.playlist
+                val message = getString(feedback.resourceId, playlist.title)
                 Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG)
                     .setAction(LR.string.view) { hostListener.openManualPlaylist(playlist.uuid) }
             }
 
-            else -> {
-                val message = resources.getQuantityString(LR.plurals.added_to_playlist_single_multiple, size, size)
+            is PlaylistChangeFeedback.StringResource -> {
+                Snackbar.make(snackbarView, getString(feedback.resourceId), Snackbar.LENGTH_LONG)
+            }
+
+            is PlaylistChangeFeedback.PluralResource -> {
+                val message = resources.getQuantityString(feedback.resourceId, feedback.quantity, feedback.quantity)
                 Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG)
             }
+
+            PlaylistChangeFeedback.None -> return
         }
         snackbar.show()
     }

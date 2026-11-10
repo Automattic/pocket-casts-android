@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -28,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.Icon
@@ -36,6 +38,8 @@ import androidx.tv.material3.Text
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.theme.TvTheme
 import au.com.shiftyjelly.pocketcasts.theme.tvColors
@@ -43,15 +47,23 @@ import au.com.shiftyjelly.pocketcasts.theme.tvTypography
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
+/** Whether episode rows render episode artwork over podcast artwork; mirrors the shared appearance setting. */
+val LocalUseEpisodeArtwork = staticCompositionLocalOf { false }
+
 @Composable
 fun TvEpisodeRow(
     episode: PodcastEpisode,
     onClick: () -> Unit,
     dateFormatter: RelativeDateFormatter,
     modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null,
+    isRowFocused: Boolean = false,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
+    val isTileFocused by interactionSource.collectIsFocusedAsState()
+    // Focus can sit on a sibling control (e.g. the "…" button) that logically belongs to this row,
+    // so keep the row lit for that too rather than fading it back to its resting appearance.
+    val isFocused = isTileFocused || isRowFocused
     val titleColor = if (isFocused) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.textPrimary
     val captionColor = if (isFocused) {
         MaterialTheme.tvColors.textSecondaryActive
@@ -61,10 +73,15 @@ fun TvEpisodeRow(
 
     TvTile(
         onClick = onClick,
-        scale = CardDefaults.scale(focusedScale = 1.02f),
+        onLongClick = onLongClick,
+        scale = CardDefaults.scale(focusedScale = TvFocusedWideCardScale),
         shape = CardDefaults.shape(RoundedCornerShape(8.dp)),
         colors = CardDefaults.colors(
-            containerColor = MaterialTheme.tvColors.backgroundBase,
+            containerColor = if (isRowFocused) {
+                MaterialTheme.tvColors.backgroundActive
+            } else {
+                MaterialTheme.tvColors.backgroundBase
+            },
             focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
         ),
         interactionSource = interactionSource,
@@ -72,12 +89,12 @@ fun TvEpisodeRow(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
         ) {
-            EpisodeArtwork(podcastUuid = episode.podcastUuid)
+            EpisodeArtwork(episode = episode)
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -117,6 +134,7 @@ fun TvEpisodeRow(
                         EpisodeProgressBar(
                             progress = (episode.playedUpTo / episode.duration).toFloat().coerceIn(0f, 1f),
                             color = captionColor,
+                            modifier = Modifier.width(48.dp),
                         )
                     } else if (episode.isFinished) {
                         Icon(
@@ -133,15 +151,99 @@ fun TvEpisodeRow(
 }
 
 @Composable
-private fun EpisodeArtwork(
-    podcastUuid: String,
+fun TvResumeCard(
+    episode: PodcastEpisode,
+    onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
+    dateFormatter: RelativeDateFormatter,
     modifier: Modifier = Modifier,
 ) {
-    TvArtworkImage(
-        model = PodcastImage.getMediumArtworkUrl(podcastUuid),
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+    val titleColor = if (isFocused) MaterialTheme.tvColors.textPrimaryActive else MaterialTheme.tvColors.textPrimary
+    val captionColor = if (isFocused) {
+        MaterialTheme.tvColors.textSecondaryActive
+    } else {
+        MaterialTheme.tvColors.textSecondary
+    }
+
+    TvTile(
+        onClick = onClick,
+        onLongClick = onLongClick,
+        scale = CardDefaults.scale(focusedScale = TvFocusedWideCardScale),
+        shape = CardDefaults.shape(RoundedCornerShape(8.dp)),
+        colors = CardDefaults.colors(
+            containerColor = MaterialTheme.tvColors.backgroundBase,
+            focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
+        ),
+        interactionSource = interactionSource,
         modifier = modifier
-            .size(82.dp)
-            .clip(RoundedCornerShape(4.dp)),
+            .width(621.dp)
+            .alpha(if (episode.isArchived && !isFocused) 0.3f else 1f),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        ) {
+            EpisodeArtwork(episode = episode, size = 136.dp, cornerRadius = 6.dp)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    text = episode.rememberPublishedDateText(dateFormatter),
+                    style = MaterialTheme.tvTypography.body,
+                    color = captionColor,
+                )
+                Text(
+                    text = episode.title,
+                    style = MaterialTheme.tvTypography.title3,
+                    color = titleColor,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                if (episode.isInProgress && episode.duration > 0.0) {
+                    EpisodeProgressBar(
+                        progress = (episode.playedUpTo / episode.duration).toFloat().coerceIn(0f, 1f),
+                        color = captionColor,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                Text(
+                    text = episode.rememberPlaybackTimeText(),
+                    style = MaterialTheme.tvTypography.body,
+                    color = captionColor,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun EpisodeArtwork(
+    episode: PodcastEpisode,
+    modifier: Modifier = Modifier,
+    size: Dp = 62.dp,
+    cornerRadius: Dp = 4.dp,
+) {
+    val useEpisodeArtwork = LocalUseEpisodeArtwork.current
+    val context = LocalContext.current
+    val model = if (useEpisodeArtwork) {
+        remember(episode.uuid) {
+            PocketCastsImageRequestFactory(context, placeholderType = PlaceholderType.None)
+                .create(episode, useEpisodeArtwork = true)
+        }
+    } else {
+        PodcastImage.getMediumArtworkUrl(episode.podcastUuid)
+    }
+    TvArtworkImage(
+        model = model,
+        modifier = modifier
+            .size(size)
+            .clip(RoundedCornerShape(cornerRadius)),
     )
 }
 
@@ -153,8 +255,7 @@ private fun EpisodeProgressBar(
 ) {
     Box(
         modifier = modifier
-            .width(120.dp)
-            .height(4.dp)
+            .height(3.dp)
             .clip(CircleShape)
             .background(color.copy(alpha = 0.3f)),
     ) {

@@ -19,7 +19,6 @@ Language: en_GB
     <string name="notification_channel_description_playback_error">Errors during playback</string>
     <string name="notification_channel_description_episode">Shows when a new episode comes out</string>
     <string name="notification_channel_description_download">Shows while Pocket Casts is downloading episodes</string>
-    <string name="change_bookmark_title_hint">Change the title that identifies this bookmark</string>
     <string name="bookmark">Bookmark</string>
     <string name="details">Details</string>
     <string name="episode">Episode</string>
@@ -36,7 +35,6 @@ Language: en_GB
     <string name="add_bookmark_title">Add Bookmark</string>
     <string name="bookmark_added">Bookmark \"%s\" added</string>
     <string name="add_bookmark">Add bookmark</string>
-    <string name="add_bookmark_title_hint">Add an optional title to identify this bookmark</string>
     <string name="bookmarks_sort_timestamp">Timestamp</string>
     <string name="bookmarks_select_option">Select bookmarks</string>
     <string name="bookmarks_delete_summary_singular">This bookmark will be deleted. This cannot be undone.</string>
@@ -737,7 +735,6 @@ Language: en_GB
     <string name="settings_manage_downloads_total">Total</string>
     <string name="settings_manage_downloads_include_starred">Include starred</string>
     <string name="settings_lock_image">lock image</string>
-    <string name="settings_licenses">Licenses</string>
     <string name="settings_learn_more">Learn More</string>
     <string name="settings_keep_screen_awake_summary">If on, the screen won\'t lock while playing.</string>
     <string name="settings_keep_screen_awake">Keep screen awake</string>
@@ -799,7 +796,6 @@ Language: en_GB
     <string name="settings_apply_group_by">Would you like to change all your existing podcasts to be grouped by %s?</string>
     <string name="settings_apply_archived_show">Would you like to change all your existing podcasts to show archived?</string>
     <string name="settings_apply_archived_hide">Would you like to change all your existing podcasts to hide archived?</string>
-    <string name="settings_app_icon_updated_message">This new icon may take a few minutes to appear and you will see two icons in your all apps screen. This is normal. Drag the new one onto your home screen and you should be good to go!</string>
     <string name="settings_app_icon_updated">Icon updated</string>
     <string name="settings_app_icon_title">Title</string>
     <string name="settings_app_icon_image">icon image</string>
@@ -930,10 +926,10 @@ Language: en_GB
     <string name="profile_navigation_listening_history">Listening History</string>
     <string name="profile_navigation_files">Files</string>
     <string name="profile_monthly">Monthly</string>
-    <string name="profile_license_agreement">Pocket Casts values your privacy. This Privacy Policy explains what information we collect about you and why, what we may do with that information and how we handle it. It applies to the iOS and Android Pocket Casts apps, and the Pocket Casts web service with associated macOS and Windows apps (jointly and severally, the Service). By using the Service, you agree to this Privacy Policy. If you turn on push notifications in the app, we store the push token Apple provides us in order to deliver those push notifications to your device. If you buy the web app we store a transaction id for your purchase. If you choose not to create an account and don’t use push notifications, no data is stored about you on our servers. Pocket Casts web service also uses cookies and like technologies to keep you logged in. Should you choose to generate a support request from within the Service, we may generate an attachment containing additional data to assist in addressing your support request which you’re welcome to view prior to submission.</string>
     <string name="profile_last_refresh">Last refresh: %s ago</string>
     <string name="profile_joined">Joined:</string>
     <string name="profile_get_plus">Get Pocket Casts Plus to unlock this feature, plus lots more!</string>
+    <string name="profile_license_agreement">Pocket Casts values your privacy. This Privacy Policy explains what information we collect about you and why, what we may do with that information and how we handle it. It applies to the iOS and Android Pocket Casts apps, and the Pocket Casts web service with associated macOS and Windows apps (jointly and severally, the Service). By using the Service, you agree to this Privacy Policy. If you turn on push notifications in the app, we store the push token Apple provides us in order to deliver those push notifications to your device. If you buy the web app we store a transaction id for your purchase. If you choose not to create an account and don’t use push notifications, no data is stored about you on our servers. Pocket Casts web service also uses cookies and like technologies to keep you logged in. Should you choose to generate a support request from within the Service, we may generate an attachment containing additional data to assist in addressing your support request which you’re welcome to view prior to submission.</string>
     <string name="profile_free_account">Free Account</string>
     <string name="profile_forgot_your_password">I forgot my password</string>
     <string name="profile_files_remove_image">Replace Image</string>
@@ -1188,7 +1184,6 @@ Language: en_GB
     <string name="podcasts_share_missing_title">Please enter a title for your list.</string>
     <string name="podcasts_share_create_error">Oops! Unable to share</string>
     <string name="podcasts_share_title">Title</string>
-    <string name="podcasts_share_selected_podcasts">Share selected podcasts</string>
     <string name="podcasts_share_select_all">Select all</string>
     <string name="podcasts_share_list">Shared list</string>
     <string name="podcasts_share_description">Description (optional)</string>
@@ -1250,11 +1245,9 @@ Language: en_GB
     <string name="player_sleep_60_minutes">60 minutes</string>
     <string name="player_sleep_30_minutes">30 minutes</string>
     <string name="player_sleep_15_minutes">15 minutes</string>
-    <string name="player_pip">Enter Picture-in-picture</string>
     <string name="player_notification_skip_forward">Forward %d secs</string>
     <string name="player_notification_skip_back">Back %d secs</string>
     <string name="player_more_actions">More actions</string>
-    <string name="player_full_screen">Full screen</string>
     <string name="player_effects_volume_boost">Volume Boost</string>
     <string name="player_effects_voices_sound_louder">Voices sound louder</string>
     <string name="player_effects_trim_silence">Trim Silence</string>
@@ -1268,7 +1261,6 @@ Language: en_GB
     <string name="player_effects">Player effects</string>
     <string name="player_close">Close player</string>
     <string name="player_chapter_url">Chapter URL</string>
-    <string name="player_actions">Episode actions</string>
     <string name="player_action_previous_chapter">Previous chapter</string>
     <string name="player_action_next_chapter">Next chapter</string>
     <string name="time_left">%s left</string>

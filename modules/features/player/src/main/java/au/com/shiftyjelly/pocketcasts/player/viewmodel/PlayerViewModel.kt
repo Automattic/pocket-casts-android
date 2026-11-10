@@ -582,6 +582,7 @@ class PlayerViewModel @Inject constructor(
             episodeUuid = episode.uuid,
             timeSecs = timeSecs,
             podcastColors = podcast?.let(::PodcastColors) ?: PodcastColors.ForUserEpisode,
+            source = source,
         )
     }
 

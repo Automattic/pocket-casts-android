@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.TAG_TRENDING_RECOMMENDATIONS
@@ -26,11 +27,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.UserSignedOutEvent
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -42,6 +45,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -53,6 +59,9 @@ import timber.log.Timber
 interface UserManager {
     fun beginMonitoringAccountManager(playbackManager: PlaybackManager)
     fun getSignInState(): Flowable<SignInState>
+
+    /** Emits when the user is signed out by the server rather than by their own action. */
+    val onServerSignOut: SharedFlow<Unit>
 
     /** Returns the job for the async credential sign out, or null when the sign out is skipped. */
     fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean): Job?
@@ -78,6 +87,8 @@ class UserManagerImpl @Inject constructor(
     private val experimentProvider: ExperimentProvider,
     private val endOfYearSync: EndOfYearSync,
     private val notificationScheduler: NotificationScheduler,
+    private val whatsNewManager: Lazy<WhatsNewManager>,
+    private val chatManager: Lazy<ChatManager>,
 ) : UserManager,
     CoroutineScope {
 
@@ -90,6 +101,9 @@ class UserManagerImpl @Inject constructor(
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
+
+    private val _onServerSignOut = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    override val onServerSignOut: SharedFlow<Unit> = _onServerSignOut.asSharedFlow()
 
     override fun beginMonitoringAccountManager(playbackManager: PlaybackManager) {
         val accountListener = OnAccountsUpdateListener {
@@ -126,10 +140,10 @@ class UserManagerImpl @Inject constructor(
                                 rxSingle { Optional.of(fetchSubscriptionForSignIn()) }
                             }
                         }
-                        .combineLatest(syncManager.emailFlowable())
-                        .map { (maybeSubscription, maybeEmail) ->
+                        .combineLatest(syncManager.emailFlow().map { it.orEmpty() }.asFlowable())
+                        .map { (maybeSubscription, email) ->
                             analyticsController.refreshMetadata()
-                            SignInState.SignedIn(email = maybeEmail.get() ?: "", subscription = maybeSubscription.get())
+                            SignInState.SignedIn(email = email, subscription = maybeSubscription.get())
                         }
                         .onErrorReturn {
                             Timber.e(it, "Error getting subscription state")
@@ -162,11 +176,18 @@ class UserManagerImpl @Inject constructor(
 
     override fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean): Job? {
         var signOutJob: Job? = null
-        if (wasInitiatedByUser || !settings.getFullySignedOut()) {
+        val isSigningOut = wasInitiatedByUser || !settings.getFullySignedOut()
+        if (isSigningOut) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
             signOutJob = applicationScope.launch {
                 syncManager.signOut {
+                    whatsNewManager.get().forgetReadMessages()
+                    settings.showWhatsNewDot.reset()
                     settings.clearPlusPreferences()
+                    if (wasInitiatedByUser) {
+                        runCatching { chatManager.get().deleteAllChats() }
+                            .onFailure { LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, it, "Failed to delete episode chats on sign out") }
+                    }
 
                     userEpisodeManager.removeCloudStatusFromFiles(playbackManager)
 
@@ -191,6 +212,9 @@ class UserManagerImpl @Inject constructor(
             }
         }
         settings.setFullySignedOut(true)
+        if (isSigningOut && !wasInitiatedByUser) {
+            _onServerSignOut.tryEmit(Unit)
+        }
         return signOutJob
     }
 

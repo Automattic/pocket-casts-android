@@ -54,20 +54,16 @@ import java.util.Date
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.rx2.asFlow
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel()
 class ImprovedEpisodeRowViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
@@ -87,11 +83,10 @@ class ImprovedEpisodeRowViewModel @Inject constructor(
     fun getEpisodeFlow(episodeUuid: String, podcastUuid: String): StateFlow<RowState> {
         return episodeFlowCache.getOrPut(EpisodeKey(episodeUuid, podcastUuid)) {
             val flow = combine<PodcastEpisode, PlaybackState, RowState>(
-                podcastManager.findOrDownloadPodcastRxSingle(podcastUuid)
-                    .toObservable().asFlow()
-                    .flatMapLatest { ep ->
-                        flow { emit(checkNotNull(episodeManager.findByUuid(episodeUuid))) }
-                    },
+                flow {
+                    podcastManager.findOrDownloadPodcast(podcastUuid)
+                    emit(checkNotNull(episodeManager.findByUuid(episodeUuid)))
+                },
                 episodePlaybackFlow.map {
                     if (it.episodeUuid == episodeUuid) {
                         it

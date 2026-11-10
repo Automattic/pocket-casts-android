@@ -109,6 +109,7 @@ class FingerprintTimingManagerTest {
     @Test
     fun `computeEager runs for downloaded episode with generated chapters`() {
         val eager = FingerprintTimingManager.computeEager(
+            isGeneratedChaptersAllowed = true,
             hasGeneratedChapters = true,
             isDownloaded = true,
         )
@@ -120,6 +121,7 @@ class FingerprintTimingManagerTest {
         // Streaming episodes never eager-decode the whole file; the PCM tap plus the bounded
         // on-demand resolver cover them without pulling the whole file.
         val eager = FingerprintTimingManager.computeEager(
+            isGeneratedChaptersAllowed = true,
             hasGeneratedChapters = true,
             isDownloaded = false,
         )
@@ -129,7 +131,18 @@ class FingerprintTimingManagerTest {
     @Test
     fun `computeEager skips episode without generated chapters`() {
         val eager = FingerprintTimingManager.computeEager(
+            isGeneratedChaptersAllowed = true,
             hasGeneratedChapters = false,
+            isDownloaded = true,
+        )
+        assertFalse(eager)
+    }
+
+    @Test
+    fun `computeEager skips episode when generated chapters are not allowed`() {
+        val eager = FingerprintTimingManager.computeEager(
+            isGeneratedChaptersAllowed = false,
+            hasGeneratedChapters = true,
             isDownloaded = true,
         )
         assertFalse(eager)
@@ -173,6 +186,62 @@ class FingerprintTimingManagerTest {
             isUnmetered = { true },
         )
         assertFalse(blocked)
+    }
+
+    @Test
+    fun `shouldPrepareOnPlayback prepares when generated chapters are allowed and present`() {
+        val prepare = FingerprintTimingManager.shouldPrepareOnPlayback(
+            isGeneratedChaptersAllowed = true,
+            hasGeneratedChapters = true,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { false },
+        )
+        assertTrue(prepare)
+    }
+
+    @Test
+    fun `shouldPrepareOnPlayback skips when generated chapters are not allowed`() {
+        val prepare = FingerprintTimingManager.shouldPrepareOnPlayback(
+            isGeneratedChaptersAllowed = false,
+            hasGeneratedChapters = true,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { true },
+        )
+        assertFalse(prepare)
+    }
+
+    @Test
+    fun `shouldPrepareOnPlayback skips episodes without generated chapters`() {
+        val prepare = FingerprintTimingManager.shouldPrepareOnPlayback(
+            isGeneratedChaptersAllowed = true,
+            hasGeneratedChapters = false,
+            warnOnMeteredNetwork = false,
+            isUnmetered = { true },
+        )
+        assertFalse(prepare)
+    }
+
+    @Test
+    fun `shouldPrepareOnPlayback skips metered network when user warns on data use`() {
+        val prepare = FingerprintTimingManager.shouldPrepareOnPlayback(
+            isGeneratedChaptersAllowed = true,
+            hasGeneratedChapters = true,
+            warnOnMeteredNetwork = true,
+            isUnmetered = { false },
+        )
+        assertFalse(prepare)
+    }
+
+    @Test
+    fun `failed preparation retries when the transcript or a chat quote is shown`() {
+        assertTrue(FingerprintTimingManager.canRetryFailedPreparation(FingerprintTimingManager.PrepareTrigger.TRANSCRIPT_VIEW))
+        assertTrue(FingerprintTimingManager.canRetryFailedPreparation(FingerprintTimingManager.PrepareTrigger.CHAT))
+    }
+
+    @Test
+    fun `failed preparation does not retry on playback or bookmarks`() {
+        assertFalse(FingerprintTimingManager.canRetryFailedPreparation(FingerprintTimingManager.PrepareTrigger.PLAYBACK))
+        assertFalse(FingerprintTimingManager.canRetryFailedPreparation(FingerprintTimingManager.PrepareTrigger.BOOKMARK))
     }
 
     @Test

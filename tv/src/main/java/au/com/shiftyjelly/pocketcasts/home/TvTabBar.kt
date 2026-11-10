@@ -17,11 +17,12 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -46,17 +47,33 @@ fun TvTabBar(
     selectedTabIndex: Int,
     onTabSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    onTabClick: (Int) -> Unit = {},
     autoFocusSelectedTab: Boolean = true,
     onSelectedTabFocus: () -> Unit = {},
+    focusSelectedTab: Boolean = false,
+    onConsumeFocusRequest: () -> Unit = {},
 ) {
     val focusRequester = remember { FocusRequester() }
+    val requestSelectedTabFocus = remember { { runCatching { focusRequester.requestFocus() }.isSuccess } }
     val currentOnSelectedTabFocus by rememberUpdatedState(onSelectedTabFocus)
     LaunchedEffect(autoFocusSelectedTab) {
         if (autoFocusSelectedTab) {
-            runCatching { focusRequester.requestFocus() }
-            // Always report the request so the once-only flag flips even if the requester was
-            // detached, otherwise it would re-arm and retry on every re-entry.
+            requestSelectedTabFocus()
             currentOnSelectedTabFocus()
+        }
+    }
+    val currentOnConsumeFocusRequest by rememberUpdatedState(onConsumeFocusRequest)
+    LaunchedEffect(focusSelectedTab) {
+        if (focusSelectedTab) {
+            // Retry across frames so the request is not consumed before the revealed tab bar has attached.
+            repeat(FOCUS_REQUEST_MAX_FRAMES) {
+                withFrameNanos { }
+                if (requestSelectedTabFocus()) {
+                    currentOnConsumeFocusRequest()
+                    return@LaunchedEffect
+                }
+            }
+            currentOnConsumeFocusRequest()
         }
     }
 
@@ -67,7 +84,9 @@ fun TvTabBar(
     ) {
         TabRow(
             selectedTabIndex = selectedTabIndex,
-            modifier = Modifier.focusRestorer(),
+            modifier = Modifier.focusProperties {
+                onEnter = { requestSelectedTabFocus() }
+            },
             containerColor = Color.Transparent,
             indicator = @Composable { tabPositions, doesTabRowHaveFocus ->
                 tabPositions.getOrNull(selectedTabIndex)?.let { currentTabPosition ->
@@ -75,7 +94,7 @@ fun TvTabBar(
                         currentTabPosition = currentTabPosition,
                         doesTabRowHaveFocus = doesTabRowHaveFocus,
                         activeColor = MaterialTheme.tvColors.backgroundActive,
-                        inactiveColor = MaterialTheme.tvColors.backgroundActive,
+                        inactiveColor = MaterialTheme.tvColors.backgroundBase,
                     )
                 }
             },
@@ -84,13 +103,14 @@ fun TvTabBar(
                 Tab(
                     selected = index == selectedTabIndex,
                     onFocus = { onTabSelect(index) },
+                    onClick = { onTabClick(index) },
                     modifier = Modifier
-                        .height(44.dp)
-                        .padding(horizontal = 21.dp)
+                        .height(33.dp)
+                        .padding(horizontal = 19.dp)
                         .then(if (index == selectedTabIndex) Modifier.focusRequester(focusRequester) else Modifier),
                     colors = TabDefaults.pillIndicatorTabColors(
                         contentColor = MaterialTheme.tvColors.textPrimary,
-                        selectedContentColor = MaterialTheme.tvColors.textPrimaryActive,
+                        selectedContentColor = MaterialTheme.tvColors.textPrimary,
                         focusedContentColor = MaterialTheme.tvColors.textPrimary,
                         focusedSelectedContentColor = MaterialTheme.tvColors.textPrimaryActive,
                         inactiveContentColor = MaterialTheme.tvColors.textPrimary,
@@ -139,6 +159,8 @@ fun TvTabBar(
         }
     }
 }
+
+private const val FOCUS_REQUEST_MAX_FRAMES = 10
 
 @Preview(device = Devices.TV_1080p, showBackground = true)
 @Composable

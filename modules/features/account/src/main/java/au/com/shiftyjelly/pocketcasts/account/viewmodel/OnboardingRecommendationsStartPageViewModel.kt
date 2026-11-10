@@ -32,10 +32,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -104,12 +102,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
 
             val sectionsFlow = MutableStateFlow<List<SectionInternal>>(emptyList())
             launch {
-                val subscriptionsFlow = podcastManager
-                    .subscribedRxFlowable()
-                    .asFlow()
-                    .map { subscribed ->
-                        subscribed.map { it.uuid }
-                    }
+                val subscriptionsFlow = podcastManager.podcastSubscriptionsFlow()
                 combine(sectionsFlow, subscriptionsFlow) { sections, subscriptions ->
                     sections.map { section ->
 

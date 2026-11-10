@@ -33,7 +33,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.collect
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -96,7 +95,7 @@ class StorageSettingsViewModel @Inject constructor(
         this.permissionGranted = permissionGranted
         this.sdkVersion = sdkVersion
         viewModelScope.launch {
-            episodeManager.findDownloadedEpisodesRxFlowable()
+            episodeManager.findDownloadedEpisodesFlow()
                 .collect { downloadedEpisodes ->
                     val downloadSize = downloadedEpisodes.sumOf { it.sizeInBytes }
                     mutableState.value = mutableState.value.copy(

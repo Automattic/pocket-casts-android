@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.transcript
 
+import android.content.Context
+import android.net.ConnectivityManager
+import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.ChapterOrigin
 import au.com.shiftyjelly.pocketcasts.models.to.Chapters
@@ -7,24 +10,39 @@ import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersFixture
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.testSubscription
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.HtmlParser.ScriptDetectedException
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
+import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
+import com.automattic.eventhorizon.GeneratedChaptersFileDownloadedEvent
+import com.automattic.eventhorizon.GeneratedChaptersFileType
 import com.squareup.moshi.Moshi
 import java.util.Date
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import okhttp3.CacheControl
+import okhttp3.Protocol
+import okhttp3.Request
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import okio.BufferedSource
@@ -32,15 +50,17 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import retrofit2.Response
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript as DbTranscript
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -48,20 +68,36 @@ class TranscriptManagerTest {
     @get:Rule
     val featureFlagRule = InMemoryFeatureFlagRule()
 
+    @get:Rule
+    val coroutineRule = MainCoroutineRule()
+
     private val localTranscriptsFlow = MutableStateFlow(emptyList<DbTranscript>())
     private val service = TestTranscriptService()
     private val parsers = TranscriptType.entries.associateWith { TestParser(it) }
     private val chapterManager: ChapterManager = mock<ChapterManager> {
         on { observerChaptersForEpisode(any()) } doReturn flowOf(Chapters(emptyList()))
     }.also { runBlocking { whenever(it.hasChapters(any())).thenReturn(false) } }
+    private val generatedChapters = GeneratedChaptersFixture()
+    private val applicationScope = CoroutineScope(coroutineRule.testDispatcher)
+    private val eventSink = TestEventSink()
+    private val connectivityManager = mock<ConnectivityManager>()
+    private val context = mock<Context> {
+        on { getSystemService(Context.CONNECTIVITY_SERVICE) } doReturn connectivityManager
+    }
 
     private val vttDbTranscript = createDbTranscript("text/vtt")
     private val srtDbTranscript = createDbTranscript("application/srt")
     private val subripDbTranscript = createDbTranscript("application/x-subrip")
     private val jsonDbTranscript = createDbTranscript("application/json")
     private val htmlDbTranscript = createDbTranscript("text/html")
-    private val generatedVttDbTranscript = createDbTranscript("text/vtt", episodeUuid = "summary-episode-id", url = "transcript.vtt", isGenerated = true)
     private val generatedVttTranscript = createDbTranscript("text/vtt", isGenerated = true, url = "transcript-url.vtt")
+
+    private val podcastEpisode = PodcastEpisode(
+        uuid = "episode-id",
+        podcastUuid = "podcast-id",
+        publishedDate = Date(),
+        hasGeneratedTranscript = true,
+    )
 
     private val transcriptManager = TranscriptManagerImpl(
         transcriptDao = mock {
@@ -69,15 +105,15 @@ class TranscriptManagerTest {
         },
         transcriptService = service,
         episodeManager = mock {
-            on { findByUuid(any()) } doReturn PodcastEpisode(
-                uuid = "episode-id",
-                podcastUuid = "podcast-id",
-                publishedDate = Date(),
-            )
+            on { findByUuid(any()) } doAnswer { podcastEpisode }
         },
         chapterManager = chapterManager,
+        applicationScope = applicationScope,
+        generatedChaptersAvailability = generatedChapters.availability,
         moshi = Moshi.Builder().build(),
         parsers = parsers,
+        eventHorizon = EventHorizon(eventSink),
+        context = context,
     )
 
     @Test
@@ -230,6 +266,17 @@ class TranscriptManagerTest {
     }
 
     @Test
+    fun `generated transcript is available only when one is stored`() = runTest {
+        localTranscriptsFlow.value = listOf(vttDbTranscript)
+
+        assertFalse(transcriptManager.observeIsGeneratedTranscriptAvailable("episode-id").first())
+
+        localTranscriptsFlow.value = listOf(vttDbTranscript, generatedVttTranscript)
+
+        assertTrue(transcriptManager.observeIsGeneratedTranscriptAvailable("episode-id").first())
+    }
+
+    @Test
     fun `do not load unknown transcript format`() = runTest {
         localTranscriptsFlow.value = listOf(createDbTranscript(type = "unknown"))
 
@@ -325,6 +372,18 @@ class TranscriptManagerTest {
     }
 
     @Test
+    fun `cache recently parsed generated transcript`() = runTest {
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        val transcript1 = transcriptManager.loadGeneratedTranscript("episode-id")
+
+        parsers.getValue(TranscriptType.Vtt).parsingException = RuntimeException()
+        val transcript2 = transcriptManager.loadGeneratedTranscript("episode-id")
+
+        assertNotNull(transcript2)
+        assertEquals(transcript1, transcript2)
+    }
+
+    @Test
     fun `do not use cached transcript for a different episode`() = runTest {
         localTranscriptsFlow.value = listOf(vttDbTranscript)
         transcriptManager.loadTranscript("episode-id")
@@ -378,60 +437,12 @@ class TranscriptManagerTest {
     }
 
     @Test
-    fun `load summary text from generated transcript meta`() = runTest {
-        service.metaJsonResponse = """{"summary": "Episode summary text"}"""
-        localTranscriptsFlow.value = listOf(generatedVttDbTranscript)
-
-        val summary = transcriptManager.loadSummaryText("summary-episode-id")
-
-        assertEquals("Episode summary text", summary)
-    }
-
-    @Test
-    fun `return null summary when no generated transcript exists`() = runTest {
-        localTranscriptsFlow.value = listOf(generatedVttDbTranscript.copy(isGenerated = false))
-
-        val summary = transcriptManager.loadSummaryText("summary-episode-id")
-
-        assertNull(summary)
-    }
-
-    @Test
-    fun `return null summary when summary field is blank`() = runTest {
-        service.metaJsonResponse = """{"summary": ""}"""
-        localTranscriptsFlow.value = listOf(generatedVttDbTranscript)
-
-        val summary = transcriptManager.loadSummaryText("summary-episode-id")
-
-        assertNull(summary)
-    }
-
-    @Test
-    fun `return null summary on service failure`() = runTest {
-        service.shouldThrow = true
-        localTranscriptsFlow.value = listOf(generatedVttDbTranscript)
-
-        val summary = transcriptManager.loadSummaryText("summary-episode-id")
-
-        assertNull(summary)
-    }
-
-    @Test
-    fun `return null summary when transcripts not loaded in time`() = runTest {
-        val summary = async { transcriptManager.loadSummaryText("summary-episode-id") }
-
-        advanceTimeBy(1.minutes)
-
-        assertNull(summary.await())
-    }
-
-    @Test
     fun `save ai chapters when no existing chapters`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_WITH_CHAPTERS
 
-        transcriptManager.loadSummaryText("episode-id")
+        assertEquals(GeneratedChaptersResult.Loaded, transcriptManager.loadGeneratedChapters("episode-id"))
 
         verify(chapterManager).updateChapters(
             "episode-id",
@@ -444,7 +455,7 @@ class TranscriptManagerTest {
     }
 
     @Test
-    fun `do not save ai chapters when existing chapters present`() = runTest {
+    fun `do not fetch meta when existing chapters present`() = runTest {
         FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_WITH_CHAPTERS
@@ -463,27 +474,314 @@ class TranscriptManagerTest {
             transcriptDao = mock { on { observeTranscripts(any()) } doReturn localTranscriptsFlow },
             transcriptService = service,
             episodeManager = mock {
-                on { findByUuid(any()) } doReturn PodcastEpisode(uuid = "episode-id", podcastUuid = "podcast-id", publishedDate = Date())
+                on { findByUuid(any()) } doReturn podcastEpisode
             },
             chapterManager = chapterManagerWithExisting,
+            applicationScope = applicationScope,
+            generatedChaptersAvailability = generatedChapters.availability,
             moshi = Moshi.Builder().build(),
             parsers = parsers,
+            eventHorizon = EventHorizon(eventSink),
+            context = context,
         )
 
-        managerWithChapters.loadSummaryText("episode-id")
+        assertEquals(GeneratedChaptersResult.Loaded, managerWithChapters.loadGeneratedChapters("episode-id"))
 
+        assertEquals(0, service.metaRequestCount)
         verify(chapterManagerWithExisting, never()).updateChapters(any(), any())
     }
 
     @Test
-    fun `return summary even when chapters are empty`() = runTest {
+    fun `do not save generated chapters when the meta has none`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_NO_CHAPTERS
 
-        val summary = transcriptManager.loadSummaryText("episode-id")
+        assertEquals(GeneratedChaptersResult.Unavailable, transcriptManager.loadGeneratedChapters("episode-id"))
 
-        assertEquals("This is a summary.", summary)
         verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `do not fetch meta when generated chapters are disabled`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        transcriptManager.loadGeneratedChapters("episode-id")
+
+        assertEquals(0, service.metaRequestCount)
+        verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `do not fetch meta for free users`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        generatedChapters.subscriptionFlow.value = null
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        assertEquals(GeneratedChaptersResult.Unavailable, transcriptManager.loadGeneratedChapters("episode-id"))
+
+        assertEquals(0, service.metaRequestCount)
+        verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `do not fetch meta when the generated chapters setting is off`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        generatedChapters.showGeneratedChaptersFlow.value = false
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        assertEquals(GeneratedChaptersResult.Unavailable, transcriptManager.loadGeneratedChapters("episode-id"))
+
+        assertEquals(0, service.metaRequestCount)
+    }
+
+    @Test
+    fun `fetch meta for Patron users`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        generatedChapters.subscriptionFlow.value = testSubscription(SubscriptionTier.Patron)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        assertEquals(GeneratedChaptersResult.Loaded, transcriptManager.loadGeneratedChapters("episode-id"))
+
+        assertEquals(1, service.metaRequestCount)
+    }
+
+    @Test
+    fun `stop fetching meta after Plus lapses`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        transcriptManager.loadGeneratedChapters("episode-id")
+        generatedChapters.subscriptionFlow.value = null
+        transcriptManager.loadGeneratedChapters("episode-id")
+
+        assertEquals(1, service.metaRequestCount)
+    }
+
+    @Test
+    fun `report no generated chapters right away when the episode has no generated transcript`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        podcastEpisode.hasGeneratedTranscript = false
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        val result = transcriptManager.loadGeneratedChapters("episode-id")
+
+        assertEquals(GeneratedChaptersResult.Unavailable, result)
+        assertEquals(0, service.metaRequestCount)
+        assertEquals(0, testScheduler.currentTime)
+    }
+
+    @Test
+    fun `fetch meta without waiting for the generated transcript row`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        val result = transcriptManager.loadGeneratedChapters("episode-id")
+
+        assertEquals(GeneratedChaptersResult.Loaded, result)
+        assertTrue(service.metaRequestUrls.single().endsWith("/generated_transcripts/podcast-id/episode-id-meta.json"))
+        assertEquals(0, testScheduler.currentTime)
+    }
+
+    @Test
+    fun `report no generated chapters when the meta is missing`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaErrorCode = 404
+
+        assertEquals(GeneratedChaptersResult.Unavailable, transcriptManager.loadGeneratedChapters("episode-id"))
+    }
+
+    @Test
+    fun `report a failure when the meta request fails with a server error`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaErrorCode = 503
+
+        assertEquals(GeneratedChaptersResult.Failed, transcriptManager.loadGeneratedChapters("episode-id"))
+    }
+
+    @Test
+    fun `report a failure when the meta request fails`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.shouldThrow = true
+
+        assertEquals(GeneratedChaptersResult.Failed, transcriptManager.loadGeneratedChapters("episode-id"))
+
+        verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `share one meta request between concurrent loads of the same episode`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+        service.metaGate = CompletableDeferred()
+
+        val loads = List(3) { async { transcriptManager.loadGeneratedChapters("episode-id") } }
+        runCurrent()
+        service.metaGate?.complete(Unit)
+
+        assertEquals(List(3) { GeneratedChaptersResult.Loaded }, loads.awaitAll())
+        assertEquals(1, service.metaRequestCount)
+    }
+
+    @Test
+    fun `reuse a failed load for a few seconds and fetch meta again after that`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaErrorCode = 503
+
+        assertEquals(GeneratedChaptersResult.Failed, transcriptManager.loadGeneratedChapters("episode-id"))
+        service.metaErrorCode = null
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        advanceTimeBy(2.seconds)
+        assertEquals(GeneratedChaptersResult.Failed, transcriptManager.loadGeneratedChapters("episode-id"))
+        assertEquals(0, service.metaRequestCount)
+
+        advanceTimeBy(2.seconds)
+        assertEquals(GeneratedChaptersResult.Loaded, transcriptManager.loadGeneratedChapters("episode-id"))
+        assertEquals(1, service.metaRequestCount)
+    }
+
+    @Test
+    fun `do not reuse a successful load`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaJsonResponse = META_JSON_NO_CHAPTERS
+
+        assertEquals(GeneratedChaptersResult.Unavailable, transcriptManager.loadGeneratedChapters("episode-id"))
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        assertEquals(GeneratedChaptersResult.Loaded, transcriptManager.loadGeneratedChapters("episode-id"))
+        assertEquals(2, service.metaRequestCount)
+    }
+
+    @Test
+    fun `do not save generated chapters that finish loading after they were turned off`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+        service.metaGate = CompletableDeferred()
+
+        val load = async { transcriptManager.loadGeneratedChapters("episode-id") }
+        runCurrent()
+        generatedChapters.showGeneratedChaptersFlow.value = false
+        service.metaGate?.complete(Unit)
+
+        assertEquals(GeneratedChaptersResult.Unavailable, load.await())
+        verify(chapterManager, never()).updateChapters(any(), any())
+    }
+
+    @Test
+    fun `keep a shared meta request running when one caller is cancelled`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+        service.metaGate = CompletableDeferred()
+
+        val cancelled = async { transcriptManager.loadGeneratedChapters("episode-id") }
+        val kept = async { transcriptManager.loadGeneratedChapters("episode-id") }
+        runCurrent()
+        cancelled.cancel()
+        service.metaGate?.complete(Unit)
+
+        assertEquals(GeneratedChaptersResult.Loaded, kept.await())
+        assertEquals(1, service.metaRequestCount)
+    }
+
+    @Test
+    fun `track the meta download`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(connectivityManager.isActiveNetworkMetered).thenReturn(true)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+        service.metaContentLength = 123
+
+        transcriptManager.loadGeneratedChapters("episode-id")
+
+        assertEquals(
+            GeneratedChaptersFileDownloadedEvent(
+                file = GeneratedChaptersFileType.Meta,
+                bytes = 123,
+                isMetered = true,
+                trigger = GeneratedChaptersDownloadTriggerType.ChaptersTab,
+                success = true,
+                episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
+            ),
+            eventSink.pollEvent(),
+        )
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `track the decoded meta size when the content length is unknown`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        transcriptManager.loadGeneratedChapters("episode-id")
+
+        val event = eventSink.pollEvent() as GeneratedChaptersFileDownloadedEvent
+        assertEquals(META_JSON_WITH_CHAPTERS.toByteArray().size.toLong(), event.bytes)
+    }
+
+    @Test
+    fun `do not track a meta file served from the cache`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+        service.metaFromCache = true
+
+        assertEquals(GeneratedChaptersResult.Loaded, transcriptManager.loadGeneratedChapters("episode-id"))
+
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `track a meta download the server answered with an error`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.metaErrorCode = 500
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+
+        transcriptManager.loadGeneratedChapters("episode-id")
+
+        assertEquals(
+            GeneratedChaptersFileDownloadedEvent(
+                file = GeneratedChaptersFileType.Meta,
+                bytes = 0,
+                isMetered = false,
+                trigger = GeneratedChaptersDownloadTriggerType.ChaptersTab,
+                success = false,
+                episodeUuid = "episode-id",
+                podcastUuid = "podcast-id",
+            ),
+            eventSink.pollEvent(),
+        )
+    }
+
+    @Test
+    fun `do not track a meta download that never reached the server`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        service.shouldThrow = true
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+
+        transcriptManager.loadGeneratedChapters("episode-id")
+
+        assertTrue(eventSink.isEmpty())
+    }
+
+    @Test
+    fun `do not track a meta download when chapters already exist`() = runTest {
+        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
+        whenever(chapterManager.hasChapters(any())).thenReturn(true)
+        localTranscriptsFlow.value = listOf(generatedVttTranscript)
+        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
+
+        transcriptManager.loadGeneratedChapters("episode-id")
+
+        assertTrue(eventSink.isEmpty())
     }
 
     @Test
@@ -492,7 +790,7 @@ class TranscriptManagerTest {
         localTranscriptsFlow.value = listOf(generatedVttTranscript)
         service.metaJsonResponse = META_JSON_INVALID_CHAPTERS
 
-        transcriptManager.loadSummaryText("episode-id")
+        transcriptManager.loadGeneratedChapters("episode-id")
 
         verify(chapterManager).updateChapters(
             "episode-id",
@@ -500,90 +798,6 @@ class TranscriptManagerTest {
                 DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 60000, title = "Valid Chapter", origin = ChapterOrigin.Generated),
             ),
         )
-    }
-
-    @Test
-    fun `return summary when meta json has no chapters field`() = runTest {
-        localTranscriptsFlow.value = listOf(generatedVttTranscript)
-        service.metaJsonResponse = """{"summary": "Just a summary"}"""
-
-        val summary = transcriptManager.loadSummaryText("episode-id")
-
-        assertEquals("Just a summary", summary)
-        verify(chapterManager, never()).updateChapters(any(), any())
-    }
-
-    @Test
-    fun `save ai chapters but withhold summary when only generated chapters enabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, false)
-        localTranscriptsFlow.value = listOf(generatedVttTranscript)
-        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
-
-        val summary = transcriptManager.loadSummaryText("episode-id")
-
-        assertNull(summary)
-        verify(chapterManager).updateChapters(
-            "episode-id",
-            listOf(
-                DbChapter(index = 0, episodeUuid = "episode-id", startTimeMs = 15000, title = "Introduction", origin = ChapterOrigin.Generated),
-                DbChapter(index = 1, episodeUuid = "episode-id", startTimeMs = 73000, title = "Main Topic", origin = ChapterOrigin.Generated),
-                DbChapter(index = 2, episodeUuid = "episode-id", startTimeMs = 180000, title = "Wrap Up", origin = ChapterOrigin.Generated),
-            ),
-        )
-    }
-
-    @Test
-    fun `do not return summary when summaries disabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, false)
-        localTranscriptsFlow.value = listOf(generatedVttTranscript)
-        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
-
-        val summary = transcriptManager.loadSummaryText("episode-id")
-
-        assertNull(summary)
-    }
-
-    @Test
-    fun `do not save ai chapters when generated chapters disabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
-        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, true)
-        localTranscriptsFlow.value = listOf(generatedVttTranscript)
-        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
-
-        val summary = transcriptManager.loadSummaryText("episode-id")
-
-        assertEquals("A great episode.", summary)
-        verify(chapterManager, never()).updateChapters(any(), any())
-    }
-
-    @Test
-    fun `do not fetch meta when both ai features disabled`() = runTest {
-        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, false)
-        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, false)
-        localTranscriptsFlow.value = listOf(generatedVttTranscript)
-        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
-
-        val summary = transcriptManager.loadSummaryText("episode-id")
-
-        assertNull(summary)
-        assertEquals(0, service.metaRequestCount)
-        verify(chapterManager, never()).updateChapters(any(), any())
-    }
-
-    @Test
-    fun `fetch meta only once for chapters and summary`() = runTest {
-        FeatureFlag.setEnabled(Feature.GENERATED_CHAPTERS, true)
-        FeatureFlag.setEnabled(Feature.AI_SUMMARIES, true)
-        localTranscriptsFlow.value = listOf(generatedVttTranscript)
-        service.metaJsonResponse = META_JSON_WITH_CHAPTERS
-
-        val summary = transcriptManager.loadSummaryText("episode-id")
-
-        assertEquals("A great episode.", summary)
-        assertEquals(1, service.metaRequestCount)
-        verify(chapterManager).updateChapters(eq("episode-id"), any())
     }
 }
 
@@ -608,6 +822,46 @@ private class TestTranscriptService : TranscriptService {
     var responseBody: String = "Ok"
     var metaJsonResponse: String? = null
     var metaRequestCount = 0
+    var metaContentLength: Long? = null
+    var metaFromCache = false
+    var metaErrorCode: Int? = null
+    var metaGate: CompletableDeferred<Unit>? = null
+    val metaRequestUrls = mutableListOf<String>()
+
+    override suspend fun getTranscriptResponse(url: String): Response<ResponseBody> {
+        metaGate?.await()
+        if (shouldThrow) error("Test exception")
+        val request = Request.Builder().url("https://example.com/$url").build()
+        metaErrorCode?.let { code ->
+            val errorResponse = okhttp3.Response.Builder()
+                .request(request)
+                .protocol(Protocol.HTTP_1_1)
+                .code(code)
+                .message("Error")
+                .build()
+            val rawErrorResponse = errorResponse.newBuilder().networkResponse(errorResponse).build()
+            return Response.error("".toResponseBody(), rawErrorResponse)
+        }
+        val body = metaJsonResponse?.also {
+            metaRequestCount++
+            metaRequestUrls += url
+        } ?: responseBody
+        val networkResponse = okhttp3.Response.Builder()
+            .request(request)
+            .protocol(Protocol.HTTP_1_1)
+            .code(200)
+            .message("OK")
+            .apply { metaContentLength?.let { header("Content-Length", it.toString()) } }
+            .build()
+        val rawResponse = okhttp3.Response.Builder()
+            .request(request)
+            .protocol(Protocol.HTTP_1_1)
+            .code(200)
+            .message("OK")
+            .apply { if (!metaFromCache) networkResponse(networkResponse) }
+            .build()
+        return Response.success(body.toResponseBody(), rawResponse)
+    }
 
     override suspend fun getTranscriptOrThrow(url: String, cacheControl: CacheControl?): ResponseBody {
         return if (shouldThrow) {
@@ -636,7 +890,6 @@ private fun createDbTranscript(
 
 private val META_JSON_WITH_CHAPTERS = """
     {
-        "summary": "A great episode.",
         "chapters": [
             {"title": "Introduction", "timestamp": "00:15", "startTime": 15},
             {"title": "Main Topic", "timestamp": "01:13", "startTime": 73},
@@ -647,14 +900,12 @@ private val META_JSON_WITH_CHAPTERS = """
 
 private val META_JSON_NO_CHAPTERS = """
     {
-        "summary": "This is a summary.",
         "chapters": []
     }
 """.trimIndent()
 
 private val META_JSON_INVALID_CHAPTERS = """
     {
-        "summary": "Summary with bad chapters.",
         "chapters": [
             {"title": "", "startTime": 30},
             {"title": "Valid Chapter", "startTime": 60},

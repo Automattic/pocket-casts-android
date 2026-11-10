@@ -44,7 +44,6 @@ internal fun PodcastRow(
     podcast: DiscoverPodcast,
     onClickSubscribe: () -> Unit,
     modifier: Modifier = Modifier,
-    showExplicitIndicator: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
 ) {
     Box(
@@ -66,7 +65,6 @@ internal fun PodcastRow(
 
             Labels(
                 podcast = podcast,
-                showExplicitIndicator = showExplicitIndicator,
                 modifier = Modifier.weight(1f),
             )
 
@@ -103,7 +101,6 @@ internal fun PodcastRowPlaceholder(
 @Composable
 private fun Labels(
     podcast: DiscoverPodcast,
-    showExplicitIndicator: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -114,7 +111,7 @@ private fun Labels(
         if (title != null) {
             PodcastTitle(
                 title = title,
-                isExplicit = podcast.explicit == true && showExplicitIndicator,
+                isExplicit = podcast.explicit == true,
             )
         }
 

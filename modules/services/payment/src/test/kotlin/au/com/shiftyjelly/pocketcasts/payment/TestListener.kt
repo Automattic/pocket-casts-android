@@ -51,6 +51,13 @@ class TestListener : PaymentClient.Listener {
         }
     }
 
+    override fun onInAppMessagesShown(result: PaymentResult<InAppMessageResult>) {
+        events += when (result) {
+            is PaymentResult.Success -> Event.ShowInAppMessagesSuccess
+            is PaymentResult.Failure -> Event.ShowInAppMessagesFailure
+        }
+    }
+
     override fun onMessage(message: String) {
         messages += message
     }
@@ -77,5 +84,7 @@ class TestListener : PaymentClient.Listener {
         ConfirmPurchase,
         ConfirmPurchaseSuccess,
         ConfirmPurchaseFailure,
+        ShowInAppMessagesSuccess,
+        ShowInAppMessagesFailure,
     }
 }

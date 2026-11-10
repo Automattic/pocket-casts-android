@@ -28,10 +28,11 @@ data class Bookmark(
     @ColumnInfo(name = "title_modified") var titleModified: Long? = null,
     @ColumnInfo(name = "deleted") var deleted: Boolean = false,
     @ColumnInfo(name = "deleted_modified") var deletedModified: Long? = null,
-    @ColumnInfo(name = "ai_title") var aiTitle: String? = null,
-    @ColumnInfo(name = "ai_summary") var aiSummary: String? = null,
-    @ColumnInfo(name = "ai_title_modified") var aiTitleModified: Long? = null,
-    @ColumnInfo(name = "ai_summary_modified") var aiSummaryModified: Long? = null,
+    @ColumnInfo(name = "passage") var passage: String? = null,
+    @ColumnInfo(name = "passage_location") var passageLocation: Int? = null,
+    @ColumnInfo(name = "passage_modified") var passageModified: Long? = null,
+    @ColumnInfo(name = "reference_time") var referenceTime: Int? = null,
+    @ColumnInfo(name = "reference_time_modified") var referenceTimeModified: Long? = null,
     @ColumnInfo(name = "sync_status") var syncStatus: SyncStatus = SyncStatus.NOT_SYNCED,
     @Ignore val episodeTitle: String = "",
     @Ignore val podcastTitle: String = "",
@@ -45,13 +46,6 @@ data class Bookmark(
 
     val adapterId: Long
         get() = UUID.nameUUIDFromBytes(uuid.toByteArray()).mostSignificantBits
-
-    val displayTitle: String
-        get() {
-            val aiTitleValue = aiTitle ?: return title
-            val userEditedAt = titleModified ?: return aiTitleValue
-            return if (userEditedAt > createdAt.time) title else aiTitleValue
-        }
 
     fun createdAtDatePattern(): String {
         val calendar = Calendar.getInstance()

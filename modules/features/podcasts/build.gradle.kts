@@ -13,6 +13,11 @@ android {
         viewBinding = true
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -30,7 +35,6 @@ dependencies {
     api(libs.dagger.hilt.android)
     api(libs.material)
     api(libs.rx2.java)
-    api(libs.rx2.relay)
 
     api(projects.modules.features.player)
     api(projects.modules.features.transcripts)
@@ -72,16 +76,19 @@ dependencies {
 
     implementation(projects.modules.features.ads)
     implementation(projects.modules.features.account)
-    implementation(projects.modules.features.chat)
     implementation(projects.modules.features.reimagine)
     implementation(projects.modules.features.search)
     implementation(projects.modules.features.settings)
     implementation(projects.modules.services.compose)
     implementation(projects.modules.services.images)
 
+    debugImplementation(libs.compose.ui.test.manifest)
+
+    testImplementation(libs.compose.ui.test.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.robolectric)
     testImplementation(libs.turbine)
 
     testImplementation(projects.modules.services.sharedtest)

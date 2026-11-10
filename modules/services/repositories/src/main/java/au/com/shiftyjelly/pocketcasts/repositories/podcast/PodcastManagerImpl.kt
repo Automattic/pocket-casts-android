@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getUrlForArtwork
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -32,26 +33,29 @@ import au.com.shiftyjelly.pocketcasts.servers.refresh.UpdatePodcastResponse.Retr
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.Maybe
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.rx2.asFlowable
+import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.await
-import kotlinx.coroutines.rx2.rxMaybe
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class PodcastManagerImpl @Inject constructor(
@@ -64,6 +68,7 @@ class PodcastManagerImpl @Inject constructor(
     private val podcastRefresher: PodcastRefresher,
     private val downloadQueue: DownloadQueue,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     appDatabase: AppDatabase,
 ) : PodcastManager,
     CoroutineScope {
@@ -117,22 +122,16 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override suspend fun subscribeToPodcastOrThrow(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean): Podcast {
-        return addPodcastRxSingle(podcastUuid = podcastUuid, sync = sync, subscribed = true, shouldAutoDownload = shouldAutoDownload).await()
+        return addPodcast(podcastUuid = podcastUuid, sync = sync, subscribed = true, shouldAutoDownload = shouldAutoDownload)
     }
 
-    /**
-     * If the podcast isn't already in the database add it as unsubscribed.
-     */
-    override fun findOrDownloadPodcastRxSingle(podcastUuid: String, waitForSubscribe: Boolean): Single<Podcast> {
-        return rxMaybe {
-            if (waitForSubscribe) {
-                findPodcastOrWaitForSubscribe(podcastUuid)
-            } else {
-                findPodcastByUuid(podcastUuid)
-            }
+    override suspend fun findOrDownloadPodcast(podcastUuid: String, waitForSubscribe: Boolean): Podcast {
+        val existingPodcast = if (waitForSubscribe) {
+            findPodcastOrWaitForSubscribe(podcastUuid)
+        } else {
+            findPodcastByUuid(podcastUuid)
         }
-            .switchIfEmpty(subscribeManager.addPodcastRxSingle(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false).toMaybe())
-            .toSingle()
+        return existingPodcast ?: addPodcast(podcastUuid, sync = false, subscribed = false, shouldAutoDownload = false)
     }
 
     private suspend fun findPodcastOrWaitForSubscribe(
@@ -160,8 +159,8 @@ class PodcastManagerImpl @Inject constructor(
         return null
     }
 
-    override fun addPodcastRxSingle(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
-        return subscribeManager.addPodcastRxSingle(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed, shouldAutoDownload = shouldAutoDownload)
+    override suspend fun addPodcast(podcastUuid: String, sync: Boolean, subscribed: Boolean, shouldAutoDownload: Boolean): Podcast = withContext(ioDispatcher) {
+        subscribeManager.addPodcastRxSingle(podcastUuid = podcastUuid, sync = sync, subscribed = subscribed, shouldAutoDownload = shouldAutoDownload).await()
     }
 
     override fun isSubscribingToPodcast(podcastUuid: String): Boolean {
@@ -172,26 +171,18 @@ class PodcastManagerImpl @Inject constructor(
         return subscribeManager.getSubscribingPodcastUuids().isNotEmpty()
     }
 
-    override fun getSubscribedPodcastUuidsRxSingle(): Single<List<String>> {
-        // get the podcasts from the database
-        val databasePodcasts = podcastDao.findSubscribedRxSingle()
-        // use just the uuids
-        val databaseUuids = databasePodcasts.map { podcasts -> podcasts.map { it.uuid } }
-        // add the uuids of podcasts currently being added
-        val addQueuedUuids = databaseUuids.map { uuids ->
-            val allUuids = HashSet(uuids)
-            allUuids.addAll(subscribeManager.getSubscribingPodcastUuids())
-            allUuids.toList()
-        }
-        return addQueuedUuids
+    override fun podcastSubscriptionsFlow(): Flow<List<String>> {
+        val subscriptionChanges = merge(subscribeManager.subscriptionChangedRelay.asFlow(), unsubscribeRelay.asFlow())
+        // The first load is merged in rather than added with onStart so the relays are attached concurrently with it.
+        return merge(flowOf(Unit), subscriptionChanges.map {})
+            .conflate()
+            .map { subscribedPodcastUuids() }
+            .flowOn(ioDispatcher)
     }
 
-    override fun podcastSubscriptionsRxFlowable(): Flowable<List<String>> {
-        return subscribeManager.subscriptionChangedRelay
-            .mergeWith(unsubscribeRelay)
-            .flatMap { getSubscribedPodcastUuidsRxSingle().toObservable() } // Every time the subscriptions change, reload the subscribed list and pass it on
-            .subscribeOn(Schedulers.io())
-            .toFlowable(BackpressureStrategy.LATEST)
+    // The subscribed uuids as an unordered set: the ones in the database plus any subscribe not yet written to it.
+    private suspend fun subscribedPodcastUuids(): List<String> {
+        return (podcastDao.findSubscribedUuids() + subscribeManager.getSubscribingPodcastUuids()).distinct()
     }
 
     override suspend fun findPodcastsToSync(): List<Podcast> {
@@ -299,10 +290,6 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.findPodcastByUuid(uuid)
     }
 
-    override fun findPodcastByUuidRxMaybe(uuid: String): Maybe<Podcast> {
-        return Maybe.fromCallable { findPodcastByUuidBlocking(uuid) }
-    }
-
     override fun podcastByUuidRxFlowable(uuid: String): Flowable<Podcast> {
         return podcastDao.findByUuidRxFlowable(uuid)
     }
@@ -322,10 +309,6 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun findPodcastsInFolder(folderUuid: String): List<Podcast> {
         return podcastDao.findPodcastsInFolder(folderUuid)
-    }
-
-    override fun findPodcastsInFolderRxSingle(folderUuid: String): Single<List<Podcast>> {
-        return podcastDao.findPodcastsInFolderRxSingle(folderUuid)
     }
 
     override suspend fun findPodcastsNotInFolder(): List<Podcast> {
@@ -352,10 +335,6 @@ class PodcastManagerImpl @Inject constructor(
         }
     }
 
-    override fun findSubscribedRxSingle(): Single<List<Podcast>> {
-        return Single.fromCallable { findSubscribedBlocking() }
-    }
-
     override fun findSubscribedFlow(searchTerm: String?): Flow<List<Podcast>> {
         return podcastDao.findSubscribedFlow(searchTerm.orEmpty())
     }
@@ -368,16 +347,12 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.observePodcastsOrderByRecentlyPlayedEpisode()
     }
 
+    override fun observePlayedPodcastUuids(): Flow<Set<String>> {
+        return podcastDao.observePlayedPodcastUuids().map { it.toSet() }.distinctUntilChanged()
+    }
+
     override fun observeSubscribedWebFeedPodcasts(): Flow<List<Podcast>> {
         return podcastDao.observeSubscribedWebFeedPodcasts()
-    }
-
-    override fun podcastsOrderByLatestEpisodeRxFlowable(): Flowable<List<Podcast>> {
-        return observePodcastsSortedByLatestEpisode().asFlowable()
-    }
-
-    override fun podcastsOrderByRecentlyPlayedEpisodeRxFlowable(): Flowable<List<Podcast>> {
-        return observePodcastsBySortedRecentlyPlayed().asFlowable()
     }
 
     override fun observePodcastsSortedByUserChoice(folder: Folder): Flow<List<Podcast>> {
@@ -391,8 +366,8 @@ class PodcastManagerImpl @Inject constructor(
         }
     }
 
-    override fun subscribedRxFlowable(): Flowable<List<Podcast>> {
-        return podcastDao.findSubscribedRxFlowable()
+    override fun findSubscribedNoOrderFlow(): Flow<List<Podcast>> {
+        return podcastDao.findSubscribedNoOrderFlow()
     }
 
     override suspend fun findPodcastsOrderByLatestEpisode(orderAsc: Boolean): List<Podcast> {
@@ -632,8 +607,8 @@ class PodcastManagerImpl @Inject constructor(
         return Podcast.userPodcast.copy(thumbnailUrl = episode.getUrlForArtwork())
     }
 
-    override fun autoAddToUpNextPodcastsRxFlowable(): Flowable<List<Podcast>> {
-        return podcastDao.findAutoAddToUpNextPodcastsRxFlowable()
+    override fun autoAddToUpNextPodcastsFlow(): Flow<List<Podcast>> {
+        return podcastDao.findAutoAddToUpNextPodcastsFlow()
     }
 
     override suspend fun findAutoAddToUpNextPodcasts(): List<Podcast> {

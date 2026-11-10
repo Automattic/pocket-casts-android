@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.toEpochMillis
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.Clock
+import java.time.Instant
 import java.time.Year
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -23,7 +24,13 @@ class EndOfYearManagerImpl @Inject constructor(
     override suspend fun isEligibleForEndOfYear(year: Year): Boolean {
         val epochStart = year.toEpochMillis(clock.zone)
         val epochEnd = year.plusYears(1).toEpochMillis(clock.zone)
-        return FeatureFlag.isEnabled(Feature.END_OF_YEAR_2025) && getTotalPlaybackTime(epochStart, epochEnd) > 5.minutes
+        return isFeatureEnabled(year) && getTotalPlaybackTime(epochStart, epochEnd) > 5.minutes
+    }
+
+    private fun isFeatureEnabled(year: Year) = when (year.value) {
+        2025 -> FeatureFlag.isEnabled(Feature.END_OF_YEAR_2025)
+        2026 -> FeatureFlag.isEnabled(Feature.PLAYBACK_2026)
+        else -> false
     }
 
     override suspend fun getStats(year: Year): EndOfYearStats = coroutineScope {
@@ -49,6 +56,32 @@ class EndOfYearManagerImpl @Inject constructor(
             topPodcasts = topPodcasts.await(),
             longestEpisode = longestPlayedEpisode.await(),
             ratingStats = ratingStats.await(),
+        )
+    }
+
+    override suspend fun getPlaybackStats(year: Year): PlaybackStats = coroutineScope {
+        val thisYearStart = year.toEpochMillis(clock.zone)
+        val thisYearEnd = year.plusYears(1).toEpochMillis(clock.zone)
+        val lastYearStart = year.minusYears(1).toEpochMillis(clock.zone)
+
+        val podcasts = async { endOfYearDao.getPlaybackPodcastStats(thisYearStart, thisYearEnd) }
+        val listeningTimes = async { endOfYearDao.getPlaybackListeningTimes(thisYearStart, thisYearEnd) }
+        val completion = async { endOfYearDao.getPlaybackCompletion(thisYearStart, thisYearEnd) }
+        val lastYearSeconds = async { endOfYearDao.getTotalPlaybackTime(lastYearStart, thisYearStart) }
+
+        val monthlySeconds = DoubleArray(12)
+        listeningTimes.await().forEach { time ->
+            val month = Instant.ofEpochMilli(time.interactionEpochMs).atZone(clock.zone).monthValue
+            monthlySeconds[month - 1] += time.playedSeconds
+        }
+        val (started, completed) = completion.await()
+
+        PlaybackStats(
+            podcasts = podcasts.await(),
+            monthlySeconds = monthlySeconds.asList(),
+            lastYearSeconds = lastYearSeconds.await(),
+            startedEpisodeCount = started,
+            completedEpisodeCount = completed,
         )
     }
 

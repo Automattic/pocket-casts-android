@@ -77,6 +77,9 @@ enum class OnboardingUpgradeSource(
     UP_NEXT_SHUFFLE(
         analyticsValue = OnboardingSourceType.UpNextShuffle,
     ),
+    GENERATED_CHAPTERS(
+        analyticsValue = OnboardingSourceType.GeneratedChapters,
+    ),
     GENERATED_TRANSCRIPTS(
         analyticsValue = OnboardingSourceType.GeneratedTranscripts,
     ),
@@ -89,8 +92,8 @@ enum class OnboardingUpgradeSource(
     EPISODE_CHAT(
         analyticsValue = OnboardingSourceType.EpisodeChat,
     ),
-    AI_SUMMARIES(
-        analyticsValue = OnboardingSourceType.Unknown,
+    WHATS_NEW(
+        analyticsValue = OnboardingSourceType.WhatsNew,
     ),
     FINISHED_ONBOARDING(
         analyticsValue = OnboardingSourceType.AccountCreated,

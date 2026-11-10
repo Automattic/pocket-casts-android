@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.player.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.chat.ChatEntryPoint
+import au.com.shiftyjelly.pocketcasts.chat.EpisodeChatAccess
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -11,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
+import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.StreamVideoState
@@ -18,6 +21,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -25,28 +30,38 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
+import com.automattic.eventhorizon.EpisodeChatTooltipDismissedEvent
+import com.automattic.eventhorizon.EpisodeChatTooltipShownEvent
+import com.automattic.eventhorizon.EpisodeChatTooltipTappedEvent
+import com.automattic.eventhorizon.EpisodeChatUnavailableTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerShelfActionTappedEvent
 import com.automattic.eventhorizon.PlayerShelfOverflowMenuShownEvent
 import com.automattic.eventhorizon.ShelfActionSourceType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.Observable
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -60,16 +75,13 @@ class ShelfSharedViewModel @Inject constructor(
     private val settings: Settings,
     private val userEpisodeManager: UserEpisodeManager,
     private val transcriptManager: TranscriptManager,
+    private val showNotesManager: ShowNotesManager,
     private val downloadQueue: DownloadQueue,
+    private val syncManager: SyncManager,
+    @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
-    private val upNextStateObservable: Observable<UpNextQueue.State> =
-        playbackManager.upNextQueue.getChangesObservableWithLiveCurrentEpisode(
-            episodeManager,
-            podcastManager,
-        )
-            .observeOn(Schedulers.io())
-
-    private val shelfUpNextObservable = upNextStateObservable
+    private val shelfUpNextFlow: SharedFlow<UpNextQueue.State> = playbackManager.upNextQueue
+        .getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
         .distinctUntilChanged { oldState, newState ->
             val oldLoaded = oldState as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
             val newLoaded = newState as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
@@ -81,6 +93,9 @@ class ShelfSharedViewModel @Inject constructor(
                 oldLoaded.episode.downloadStatus == newLoaded.episode.downloadStatus &&
                 oldLoaded.podcast?.isUsingEffects == newLoaded.podcast?.isUsingEffects
         }
+        .flowOn(ioDispatcher)
+        // replay = 1 caches the last state so a collector that subscribes later starts from it rather than waiting for the next Up Next change
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
 
     private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
     val navigationState = _navigationState.asSharedFlow()
@@ -100,13 +115,53 @@ class ShelfSharedViewModel @Inject constructor(
         VideoState(streamVideoState, hlsAvailable, renderingEnabled, audioOnly)
     }
 
-    val uiState = combine(
+    private val playerOpenState = MutableStateFlow(false)
+    private var hasTrackedEpisodeChatTooltipShown = false
+    private val overflowMenuOpenState = MutableStateFlow(false)
+
+    private val smartBookmarksPromoActiveFlow = combine(
+        settings.showSmartBookmarksTooltip.flow,
+        playerOpenState,
+        settings.smartBookmarksTooltipDismissed.flow,
+        FeatureFlag.isEnabledFlow(Feature.SMART_BOOKMARKS),
+    ) { showTooltip, isPlayerOpen, isDismissed, isSmartBookmarksEnabled ->
+        showTooltip && isPlayerOpen && !isDismissed && isSmartBookmarksEnabled
+    }
+
+    private val episodeChatPromoActiveFlow = combine(
+        playerOpenState,
+        settings.episodeChatTooltipDismissed.flow,
+    ) { isPlayerOpen, isDismissed ->
+        isPlayerOpen && !isDismissed
+    }
+
+    private val promoStateFlow = combine(
+        smartBookmarksPromoActiveFlow,
+        episodeChatPromoActiveFlow,
+        ::PromoState,
+    )
+
+    private val shelfItemsFlow = combine(
         settings.shelfItems.flow,
-        shelfUpNextObservable.asFlow(),
-        shelfUpNextObservable.asFlow()
+        FeatureFlag.isEnabledFlow(Feature.EPISODE_CHAT),
+    ) { shelfItems, isEpisodeChatEnabled ->
+        if (isEpisodeChatEnabled) shelfItems else shelfItems - ShelfItem.EpisodeChat
+    }
+
+    val uiState = combine(
+        shelfItemsFlow,
+        shelfUpNextFlow,
+        shelfUpNextFlow
             .mapNotNull { state -> (state as? UpNextQueue.State.Loaded)?.episode?.uuid }
-            .flatMapLatest { episodeUuid -> transcriptManager.observeIsTranscriptAvailable(episodeUuid) },
+            .flatMapLatest { episodeUuid ->
+                combine(
+                    transcriptManager.observeIsTranscriptAvailable(episodeUuid),
+                    transcriptManager.observeIsGeneratedTranscriptAvailable(episodeUuid),
+                    ::TranscriptAvailability,
+                )
+            },
         videoStateFlow,
+        promoStateFlow,
         ::createUiState,
     ).stateIn(
         viewModelScope,
@@ -114,11 +169,49 @@ class ShelfSharedViewModel @Inject constructor(
         UiState(),
     )
 
+    init {
+        loadMissingTranscriptsWhenPlayerOpen()
+    }
+
+    // Transcripts are only saved when show notes are processed, so load them once the Transcript button is visible
+    private fun loadMissingTranscriptsWhenPlayerOpen() {
+        viewModelScope.launch {
+            combine(playerOpenState, overflowMenuOpenState, ::Pair)
+                .flatMapLatest { (isPlayerOpen, isOverflowMenuOpen) ->
+                    if (!isPlayerOpen) {
+                        flowOf(null)
+                    } else {
+                        uiState.map { state ->
+                            val isTranscriptButtonVisible = (ShelfItem.Transcript in state.playerShelfItems) ||
+                                (isOverflowMenuOpen && ShelfItem.Transcript in state.playerBottomSheetShelfItems)
+                            val needsGeneratedTranscript = ShelfItem.EpisodeChat in state.shelfItems
+                            val needsTranscript = isTranscriptButtonVisible || needsGeneratedTranscript
+                            (state.episode as? PodcastEpisode)
+                                ?.takeIf { needsTranscript }
+                                ?.let { episode -> episode to needsGeneratedTranscript }
+                        }
+                    }
+                }
+                .distinctUntilChangedBy { it?.first?.uuid to it?.second }
+                .collect { request ->
+                    val (episode, needsGeneratedTranscript) = request ?: return@collect
+                    val availability = if (needsGeneratedTranscript) {
+                        transcriptManager.observeIsGeneratedTranscriptAvailable(episode.uuid)
+                    } else {
+                        transcriptManager.observeIsTranscriptAvailable(episode.uuid)
+                    }
+                    if (availability.first()) return@collect
+                    showNotesManager.loadShowNotes(podcastUuid = episode.podcastUuid, episodeUuid = episode.uuid)
+                }
+        }
+    }
+
     private fun createUiState(
         shelfItems: List<ShelfItem>,
         shelfUpNext: UpNextQueue.State,
-        isTranscriptAvailable: Boolean,
+        transcriptAvailability: TranscriptAvailability,
         videoState: VideoState,
+        promoState: PromoState,
     ): UiState {
         val episode = (shelfUpNext as? UpNextQueue.State.Loaded)?.episode
         val streamHasVideo = videoState.streamVideoState == StreamVideoState.HasVideo || videoState.streamVideoState == StreamVideoState.Unknown
@@ -129,10 +222,23 @@ class ShelfSharedViewModel @Inject constructor(
         return uiState.value.copy(
             shelfItems = shelfItems.filter { it.showIf(episode) && (it != ShelfItem.StreamSelector || canToggleVideo) },
             episode = episode,
-            isTranscriptAvailable = isTranscriptAvailable,
+            isTranscriptAvailable = transcriptAvailability.isTranscriptAvailable,
+            isEpisodeChatAvailable = transcriptAvailability.isGeneratedTranscriptAvailable,
             isVideoRenderingEnabled = videoState.renderingEnabled && streamHasVideo,
+            isSmartBookmarksPromoActive = promoState.isSmartBookmarksPromoActive,
+            isEpisodeChatPromoActive = promoState.isEpisodeChatPromoActive,
         )
     }
+
+    private data class TranscriptAvailability(
+        val isTranscriptAvailable: Boolean,
+        val isGeneratedTranscriptAvailable: Boolean,
+    )
+
+    private data class PromoState(
+        val isSmartBookmarksPromoActive: Boolean,
+        val isEpisodeChatPromoActive: Boolean,
+    )
 
     private data class VideoState(
         val streamVideoState: StreamVideoState,
@@ -262,10 +368,40 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
+    fun dismissBookmarkTooltip() {
+        settings.smartBookmarksTooltipDismissed.set(true, updateModifiedAt = false)
+    }
+
+    fun onEpisodeChatTooltipShown() {
+        if (hasTrackedEpisodeChatTooltipShown) return
+        hasTrackedEpisodeChatTooltipShown = true
+        eventHorizon.track(EpisodeChatTooltipShownEvent)
+    }
+
+    fun onEpisodeChatTooltipTapped() {
+        eventHorizon.track(EpisodeChatTooltipTappedEvent)
+        dismissEpisodeChatTooltip()
+    }
+
+    private fun dismissEpisodeChatTooltip() {
+        settings.episodeChatTooltipDismissed.set(true, updateModifiedAt = false)
+    }
+
+    fun setPlayerOpen(isOpen: Boolean) {
+        playerOpenState.value = isOpen
+    }
+
+    fun setOverflowMenuOpen(isOpen: Boolean) {
+        overflowMenuOpenState.value = isOpen
+    }
+
     fun onAddBookmarkClick(
         onboardingUpgradeSource: OnboardingUpgradeSource,
         source: ShelfItemSource,
     ) {
+        if (FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+            settings.showSmartBookmarksTooltip.set(false, updateModifiedAt = false)
+        }
         trackShelfAction(ShelfItem.Bookmark, source)
         viewModelScope.launch {
             val isPaidUser = settings.cachedSubscription.value != null
@@ -334,8 +470,54 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
+    fun onEpisodeChatClick(
+        podcast: Podcast,
+        episode: PodcastEpisode,
+        isEpisodeChatAvailable: Boolean,
+        source: ShelfItemSource,
+    ) {
+        if (!isEpisodeChatAvailable) {
+            eventHorizon.track(
+                EpisodeChatUnavailableTappedEvent(
+                    episodeUuid = episode.uuid,
+                    podcastUuid = episode.podcastUuid,
+                    entryPoint = source.chatEntryPoint.analyticsValue,
+                ),
+            )
+            viewModelScope.launch { _snackbarMessages.emit(SnackbarMessage.EpisodeChatNeedsTranscript) }
+            return
+        }
+        trackShelfAction(ShelfItem.EpisodeChat, source)
+        if (uiState.value.showEpisodeChatTooltip) {
+            eventHorizon.track(EpisodeChatTooltipDismissedEvent)
+        }
+        dismissEpisodeChatTooltip()
+        showEpisodeChat(podcast, episode, source.chatEntryPoint)
+    }
+
+    private fun showEpisodeChat(podcast: Podcast, episode: PodcastEpisode, entryPoint: ChatEntryPoint) {
+        viewModelScope.launch {
+            val access = EpisodeChatAccess.from(
+                isPlusUser = settings.cachedSubscription.value != null,
+                isSignedIn = syncManager.isLoggedIn(),
+            )
+            _navigationState.emit(NavigationState.ShowEpisodeChat(podcast, episode, access, entryPoint))
+        }
+    }
+
+    fun onEpisodeChatSignInClick() {
+        viewModelScope.launch { _navigationState.emit(NavigationState.StartEpisodeChatSignIn) }
+    }
+
     fun onMoreClick() {
         eventHorizon.track(PlayerShelfOverflowMenuShownEvent)
+        if (uiState.value.isSmartBookmarksPromoActive) {
+            dismissBookmarkTooltip()
+        }
+        if (uiState.value.showEpisodeChatTooltip) {
+            eventHorizon.track(EpisodeChatTooltipDismissedEvent)
+            dismissEpisodeChatTooltip()
+        }
         viewModelScope.launch {
             _navigationState.emit(NavigationState.ShowMoreActions)
         }
@@ -360,12 +542,25 @@ class ShelfSharedViewModel @Inject constructor(
         val shelfItems: List<ShelfItem> = emptyList(),
         val episode: BaseEpisode? = null,
         val isTranscriptAvailable: Boolean = false,
+        val isEpisodeChatAvailable: Boolean = false,
         val isVideoRenderingEnabled: Boolean = true,
+        val isSmartBookmarksPromoActive: Boolean = false,
+        val isEpisodeChatPromoActive: Boolean = false,
     ) {
         val playerShelfItems: List<ShelfItem>
             get() = shelfItems.take(MIN_SHELF_ITEMS_SIZE)
         val playerBottomSheetShelfItems: List<ShelfItem>
             get() = shelfItems.drop(MIN_SHELF_ITEMS_SIZE)
+        val showBookmarkTooltip: Boolean
+            get() = isSmartBookmarksPromoActive && ShelfItem.Bookmark in playerShelfItems
+        val showBookmarkOverflowTooltip: Boolean
+            get() = isSmartBookmarksPromoActive && ShelfItem.Bookmark in playerBottomSheetShelfItems
+        val showEpisodeChatTooltip: Boolean
+            get() = isEpisodeChatPromoActive &&
+                isEpisodeChatAvailable &&
+                ShelfItem.EpisodeChat in playerBottomSheetShelfItems &&
+                !showBookmarkTooltip &&
+                !showBookmarkOverflowTooltip
     }
 
     data class PlayerShelfData(
@@ -412,23 +607,34 @@ class ShelfSharedViewModel @Inject constructor(
         data object ShowAddBookmark : NavigationState
         data class StartUpsellFlow(val source: OnboardingUpgradeSource) : NavigationState
         data class AddEpisodeToPlaylist(val episodeUuid: String, val podcastUuid: String) : NavigationState
+        data class ShowEpisodeChat(
+            val podcast: Podcast,
+            val episode: PodcastEpisode,
+            val access: EpisodeChatAccess,
+            val entryPoint: ChatEntryPoint,
+        ) : NavigationState
+        data object StartEpisodeChatSignIn : NavigationState
     }
 
     sealed interface SnackbarMessage {
         data object EpisodeDownloadStarted : SnackbarMessage
         data object EpisodeRemoved : SnackbarMessage
         data object TranscriptNotAvailable : SnackbarMessage
+        data object EpisodeChatNeedsTranscript : SnackbarMessage
         data object ShareNotAvailable : SnackbarMessage
     }
 
     enum class ShelfItemSource(
         val analyticsValue: ShelfActionSourceType,
+        val chatEntryPoint: ChatEntryPoint,
     ) {
         Shelf(
             analyticsValue = ShelfActionSourceType.Shelf,
+            chatEntryPoint = ChatEntryPoint.PlayerShelf,
         ),
         OverflowMenu(
             analyticsValue = ShelfActionSourceType.OverflowMenu,
+            chatEntryPoint = ChatEntryPoint.MoreActions,
         ),
     }
 

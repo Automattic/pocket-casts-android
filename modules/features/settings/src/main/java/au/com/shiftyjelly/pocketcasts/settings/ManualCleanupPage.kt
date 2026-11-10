@@ -15,9 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -46,7 +43,6 @@ fun ManualCleanupPage(
     modifier: Modifier = Modifier,
 ) {
     val state: ManualCleanupViewModel.State by viewModel.state.collectAsState()
-    var includeStarredSwitchState: Boolean by remember { mutableStateOf(false) }
     val context = LocalContext.current
     Column(
         modifier = modifier,
@@ -58,14 +54,10 @@ fun ManualCleanupPage(
         )
         ManageDownloadsView(
             state = state,
-            includeStarredSwitchState = includeStarredSwitchState,
             onDiskSpaceCheckedChange = { isChecked, diskSpaceView ->
                 viewModel.onDiskSpaceCheckedChanged(isChecked, diskSpaceView)
             },
-            onStarredSwitchClick = {
-                viewModel.onStarredSwitchClicked(it)
-                includeStarredSwitchState = it
-            },
+            onStarredSwitchClick = { viewModel.onStarredSwitchClicked(it) },
             onDeleteButtonClick = { viewModel.onDeleteButtonClicked() },
         )
         LaunchedEffect(Unit) {
@@ -80,7 +72,6 @@ fun ManualCleanupPage(
 @Composable
 private fun ManageDownloadsView(
     state: ManualCleanupViewModel.State,
-    includeStarredSwitchState: Boolean,
     onDiskSpaceCheckedChange: (Boolean, diskSpaceView: ManualCleanupViewModel.State.DiskSpaceView) -> Unit,
     onStarredSwitchClick: (Boolean) -> Unit,
     onDeleteButtonClick: () -> Unit,
@@ -94,7 +85,7 @@ private fun ManageDownloadsView(
             .verticalScroll(rememberScrollState()),
     ) {
         state.diskSpaceViews.forEach { DiskSpaceSizeRow(it, onDiskSpaceCheckedChange) }
-        IncludeStarredRow(includeStarredSwitchState, onStarredSwitchClick)
+        IncludeStarredRow(state.includeStarred, onStarredSwitchClick)
         TotalSelectedDownloadSizeRow(state.totalSelectedDownloadSize)
         RowButton(
             text = stringResource(LR.string.settings_downloads_clean_up),
@@ -188,7 +179,6 @@ private fun ManualCleanupPagePreview(
     AppThemeWithBackground(themeType) {
         ManageDownloadsView(
             state = ManualCleanupViewModel.State(),
-            includeStarredSwitchState = false,
             onDiskSpaceCheckedChange = { _, _ -> },
             onStarredSwitchClick = {},
             onDeleteButtonClick = {},

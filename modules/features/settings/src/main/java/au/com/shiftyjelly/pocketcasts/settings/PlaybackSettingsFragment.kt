@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.notification.MediaActionsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -55,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import com.automattic.eventhorizon.ArchivedEpisodeBehaviorType
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersToggleSourceType
 import com.automattic.eventhorizon.RowActionType
 import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesApplyToExistingEvent
 import com.automattic.eventhorizon.SettingsGeneralArchivedEpisodesChangedEvent
@@ -76,6 +78,7 @@ import com.automattic.eventhorizon.SettingsGeneralShownEvent
 import com.automattic.eventhorizon.SettingsGeneralSkipBackChangedEvent
 import com.automattic.eventhorizon.SettingsGeneralSkipForwardChangedEvent
 import com.automattic.eventhorizon.SettingsGeneralUpNextSwipeChangedEvent
+import com.automattic.eventhorizon.SettingsGeneralWhatsNewUnreadDotToggledEvent
 import com.automattic.eventhorizon.SettingsUseRealTimeForPlaybackRemainingTimeEvent
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -95,6 +98,8 @@ class PlaybackSettingsFragment : BaseFragment() {
     @Inject lateinit var podcastManager: PodcastManager
 
     @Inject lateinit var eventHorizon: EventHorizon
+
+    @Inject lateinit var generatedChaptersAvailability: GeneratedChaptersAvailability
 
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
@@ -310,13 +315,16 @@ class PlaybackSettingsFragment : BaseFragment() {
                         }
 
                         SettingsItems.SETTINGS_GENERATED_CHAPTERS -> {
-                            if (FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)) {
+                            val isGeneratedChaptersAvailable by generatedChaptersAvailability.isAvailableFlow
+                                .collectAsStateWithLifecycle(initialValue = generatedChaptersAvailability.isAvailable())
+                            if (isGeneratedChaptersAvailable) {
                                 GeneratedChapters(
                                     saved = settings.showGeneratedChapters.flow.collectAsState().value,
                                     onSave = { isGeneratedChaptersEnabled ->
                                         eventHorizon.track(
                                             SettingsGeneralGeneratedChaptersToggledEvent(
                                                 enabled = isGeneratedChaptersEnabled,
+                                                source = GeneratedChaptersToggleSourceType.Settings,
                                             ),
                                         )
                                         settings.showGeneratedChapters.set(isGeneratedChaptersEnabled, updateModifiedAt = true)
@@ -395,6 +403,20 @@ class PlaybackSettingsFragment : BaseFragment() {
                             )
                         }
 
+                        SettingsItems.SETTINGS_HEADER_CHAPTERS -> {
+                            val isGeneratedChaptersAvailable by generatedChaptersAvailability.isAvailableFlow
+                                .collectAsStateWithLifecycle(initialValue = generatedChaptersAvailability.isAvailable())
+                            if (isGeneratedChaptersAvailable) {
+                                Column {
+                                    Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
+                                    SettingSectionHeader(
+                                        text = stringResource(LR.string.chapters),
+                                        indent = false,
+                                    )
+                                }
+                            }
+                        }
+
                         SettingsItems.SETTINGS_HEADER_SLEEP_TIMER -> {
                             Column {
                                 Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
@@ -431,6 +453,34 @@ class PlaybackSettingsFragment : BaseFragment() {
                                     settings.shakeToResetSleepTimer.set(isShakeEnabled, updateModifiedAt = true)
                                 },
                             )
+                        }
+
+                        SettingsItems.SETTINGS_HEADER_WHATS_NEW -> {
+                            if (FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED)) {
+                                Column {
+                                    Spacer(modifier = Modifier.height(SettingsSection.verticalPadding))
+                                    SettingSectionHeader(
+                                        text = stringResource(LR.string.settings_whats_new),
+                                        indent = false,
+                                    )
+                                }
+                            }
+                        }
+
+                        SettingsItems.SETTINGS_WHATS_NEW_UNREAD_DOT -> {
+                            if (FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED)) {
+                                WhatsNewUnreadDot(
+                                    saved = settings.showWhatsNewDot.flow.collectAsState().value,
+                                    onSave = { isDotEnabled ->
+                                        eventHorizon.track(
+                                            SettingsGeneralWhatsNewUnreadDotToggledEvent(
+                                                enabled = isDotEnabled,
+                                            ),
+                                        )
+                                        settings.showWhatsNewDot.set(isDotEnabled, updateModifiedAt = true)
+                                    },
+                                )
+                            }
                         }
                     }
                 }
@@ -611,6 +661,15 @@ class PlaybackSettingsFragment : BaseFragment() {
     )
 
     @Composable
+    private fun WhatsNewUnreadDot(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(LR.string.settings_general_whats_new_unread_dot),
+        secondaryText = stringResource(LR.string.settings_general_whats_new_unread_dot_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
+
+    @Composable
     private fun IntelligentPlaybackResumption(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
         primaryText = stringResource(LR.string.settings_playback_resumption),
         secondaryText = stringResource(LR.string.settings_playback_resumption_summary),
@@ -726,13 +785,16 @@ private enum class SettingsItems {
     SETTINGS_SKIP_BACK_TIME,
     SETTINGS_KEEP_SCREEN_AWAKE,
     SETTINGS_OPEN_PLAYER_AUTOMATICALLY,
-    SETTINGS_GENERATED_CHAPTERS,
     SETTINGS_INTELLIGENT_PLAYBACK,
     SETTINGS_PLAY_UP_NEXT_EPISODE,
     SETTINGS_ADJUST_REMAINING_TIME,
     SETTINGS_GENERAL_AUTOPLAY,
     SETTINGS_AUDIO_ONLY,
+    SETTINGS_HEADER_CHAPTERS,
+    SETTINGS_GENERATED_CHAPTERS,
     SETTINGS_HEADER_SLEEP_TIMER,
     SETTINGS_SLEEP_TIMER_RESTART,
     SETTINGS_SLEEP_TIMER_SHAKE,
+    SETTINGS_HEADER_WHATS_NEW,
+    SETTINGS_WHATS_NEW_UNREAD_DOT,
 }

@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
@@ -83,12 +84,8 @@ abstract class PodcastDao {
     abstract fun findUnsubscribedBlocking(): List<Podcast>
 
     @Transaction
-    @Query("SELECT podcasts.uuid FROM podcasts WHERE subscribed = 0")
-    abstract fun findUnsubscribedUuidRxFlowable(): Flowable<List<String>>
-
-    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1")
-    abstract fun findSubscribedRxFlowable(): Flowable<List<Podcast>>
+    abstract fun findSubscribedNoOrderFlow(): Flow<List<Podcast>>
 
     @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND folder_uuid = :folderUuid ORDER BY CASE WHEN LOWER(SUBSTR(title,1,4)) = 'the ' THEN LOWER(SUBSTR(title,5)) ELSE LOWER(title) END ASC")
@@ -116,7 +113,7 @@ abstract class PodcastDao {
 
     @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND auto_add_to_up_next > 0 ORDER BY LOWER(title) ASC")
-    abstract fun findAutoAddToUpNextPodcastsRxFlowable(): Flowable<List<Podcast>>
+    abstract fun findAutoAddToUpNextPodcastsFlow(): Flow<List<Podcast>>
 
     @Transaction
     @Query("SELECT * FROM podcasts WHERE auto_add_to_up_next > 0")
@@ -133,6 +130,30 @@ abstract class PodcastDao {
     fun observeSubscribedOrderByLatestEpisode(orderAsc: Boolean): Flow<List<Podcast>> {
         return if (orderAsc) observeSubscribedOrderByLatestEpisodeAsc() else observeSubscribedOrderByLatestEpisodeDesc()
     }
+
+    @Query(
+        """
+        SELECT podcasts.uuid
+        FROM podcasts
+        WHERE podcasts.subscribed = 1
+          AND EXISTS (
+            SELECT 1 FROM podcast_episodes
+            WHERE podcast_episodes.podcast_id = podcasts.uuid
+              AND podcast_episodes.playing_status = :playingStatusCompleted
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM podcast_episodes
+            WHERE podcast_episodes.podcast_id = podcasts.uuid
+              AND podcast_episodes.archived = 0
+              AND podcast_episodes.playing_status IN (:playingStatusNotPlayed, :playingStatusInProgress)
+          )
+        """,
+    )
+    abstract fun observePlayedPodcastUuids(
+        playingStatusNotPlayed: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal,
+        playingStatusInProgress: Int = EpisodePlayingStatus.IN_PROGRESS.ordinal,
+        playingStatusCompleted: Int = EpisodePlayingStatus.COMPLETED.ordinal,
+    ): Flow<List<String>>
 
     @Query(
         """
@@ -237,10 +258,6 @@ abstract class PodcastDao {
     abstract suspend fun findPodcastsInFolder(folderUuid: String): List<Podcast>
 
     @Transaction
-    @Query("SELECT * FROM podcasts WHERE folder_uuid = :folderUuid")
-    abstract fun findPodcastsInFolderRxSingle(folderUuid: String): Single<List<Podcast>>
-
-    @Transaction
     @Query("SELECT * FROM podcasts WHERE folder_uuid IS NULL")
     abstract suspend fun findPodcastsNotInFolder(): List<Podcast>
 
@@ -292,8 +309,8 @@ abstract class PodcastDao {
     @Update
     abstract suspend fun updateSuspend(podcast: Podcast)
 
-    @Query("UPDATE podcasts SET title = :title, author = :author, podcast_category = :podcastCategory, podcast_description = :podcastDescription, estimated_next_episode = :estimatedNextEpisode, episode_frequency = :episodeFrequency, refresh_available = :refreshAvailable, funding_url = :fundingUrl, explicit = :explicit, web_feed = :webFeed WHERE uuid = :uuid")
-    abstract suspend fun updateRefresh(uuid: String, title: String, author: String, podcastCategory: String, podcastDescription: String, estimatedNextEpisode: Date?, episodeFrequency: String?, refreshAvailable: Boolean, fundingUrl: String?, explicit: Boolean?, webFeed: Boolean)
+    @Query("UPDATE podcasts SET title = :title, author = :author, podcast_category = :podcastCategory, podcast_description = :podcastDescription, estimated_next_episode = :estimatedNextEpisode, episode_frequency = :episodeFrequency, refresh_available = :refreshAvailable, funding_url = :fundingUrl, explicit = :explicit, web_feed = :webFeed, network_list_id = :networkListId WHERE uuid = :uuid")
+    abstract suspend fun updateRefresh(uuid: String, title: String, author: String, podcastCategory: String, podcastDescription: String, estimatedNextEpisode: Date?, episodeFrequency: String?, refreshAvailable: Boolean, fundingUrl: String?, explicit: Boolean?, webFeed: Boolean, networkListId: String?)
 
     @Query("DELETE FROM podcasts WHERE uuid = :uuid")
     abstract fun deleteByUuidBlocking(uuid: String)
@@ -368,8 +385,8 @@ abstract class PodcastDao {
         }
     }
 
-    @Query("UPDATE podcasts SET auto_add_to_up_next = :newValue WHERE uuid = :uuid AND auto_add_to_up_next = :onlyIfValue")
-    abstract suspend fun updateAutoAddToUpNextIf(uuid: String, newValue: Int, onlyIfValue: Int)
+    @Query("UPDATE podcasts SET auto_add_to_up_next = :newValue, auto_add_to_up_next_modified = :modified WHERE uuid = :uuid AND auto_add_to_up_next = :onlyIfValue")
+    abstract suspend fun updateAutoAddToUpNextIf(uuid: String, newValue: Int, onlyIfValue: Int, modified: Date = Date())
 
     @Transaction
     open suspend fun updateAutoAddToUpNextsIf(podcastUuids: List<String>, newValue: Int, onlyIfValue: Int) {
@@ -442,10 +459,6 @@ abstract class PodcastDao {
 
     @Query("UPDATE podcasts SET latest_episode_uuid = :episodeUuid, latest_episode_date = :publishedDate WHERE uuid = :podcastUuid")
     abstract fun updateLatestEpisodeBlocking(episodeUuid: String, publishedDate: Date, podcastUuid: String)
-
-    fun updateLatestEpisodeRxCompletable(episodeUuid: String, publishedDate: Date, podcastUuid: String): Completable {
-        return Completable.fromAction { updateLatestEpisodeBlocking(episodeUuid, publishedDate, podcastUuid) }
-    }
 
     @Query("UPDATE podcasts SET show_notifications = :showNotifications, show_notifications_modified = :modified, sync_status = 0")
     abstract suspend fun updateAllShowNotifications(showNotifications: Boolean, modified: Date = Date())

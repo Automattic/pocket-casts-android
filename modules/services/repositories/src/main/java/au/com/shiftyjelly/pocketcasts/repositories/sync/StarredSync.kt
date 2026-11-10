@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import com.pocketcasts.service.api.StarredEpisode
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 
 /**
@@ -59,7 +58,7 @@ class StarredSync @Inject constructor(
         val episodeUuid = serverEpisode.uuid
 
         // Import missing podcast
-        val podcast = podcastManager.findOrDownloadPodcastRxSingle(podcastUuid).await() ?: return
+        val podcast = podcastManager.findOrDownloadPodcast(podcastUuid)
 
         // Import missing episodes
         var localEpisode = episodeManager.findByUuid(episodeUuid)

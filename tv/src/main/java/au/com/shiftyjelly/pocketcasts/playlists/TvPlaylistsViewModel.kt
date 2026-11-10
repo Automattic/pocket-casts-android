@@ -7,6 +7,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FilterCreateButtonTappedEvent
+import com.automattic.eventhorizon.FilterListShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -20,6 +23,7 @@ import kotlinx.coroutines.flow.stateIn
 class TvPlaylistsViewModel @Inject constructor(
     private val playlistManager: PlaylistManager,
     private val podcastManager: PodcastManager,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
     val uiState: StateFlow<TvPlaylistsUiState> = playlistManager.playlistPreviewsFlow()
@@ -46,6 +50,14 @@ class TvPlaylistsViewModel @Inject constructor(
 
     suspend fun findPodcastTint(podcastUuid: String): Int? {
         return podcastManager.findPodcastByUuid(podcastUuid)?.tintColorForLightBg?.takeIf { it != 0 }
+    }
+
+    fun trackPlaylistsListShown(filterCount: Int) {
+        eventHorizon.track(FilterListShownEvent(filterCount = filterCount.toLong()))
+    }
+
+    fun trackCreateButtonTapped() {
+        eventHorizon.track(FilterCreateButtonTappedEvent)
     }
 
     private fun isDownloadPlaylist(preview: PlaylistPreview): Boolean {

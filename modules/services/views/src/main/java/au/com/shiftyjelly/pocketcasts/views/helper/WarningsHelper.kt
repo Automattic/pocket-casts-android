@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadQueue
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -16,7 +15,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.Network
-import au.com.shiftyjelly.pocketcasts.utils.SystemBatteryRestrictions
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BatteryRestrictionsSettingsFragment
 import com.automattic.eventhorizon.EpisodeUploadQueuedEvent
@@ -32,11 +30,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class WarningsHelper @Inject constructor(
     @ActivityContext private val activity: Context,
+    private val batteryWarningPolicy: BatteryWarningPolicy,
     private val downloadQueue: DownloadQueue,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
-    private val settings: Settings,
-    private val systemBatteryRestrictions: SystemBatteryRestrictions,
     private val userEpisodeManager: UserEpisodeManager,
     private val eventHorizon: EventHorizon,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -128,17 +125,15 @@ class WarningsHelper @Inject constructor(
     }
 
     fun showBatteryWarningSnackbarIfAppropriate(snackbarParentView: View? = null) {
-        val timesToShow = settings.getTimesToShowBatteryWarning()
-        val shouldShow = timesToShow > 0 && !systemBatteryRestrictions.isUnrestricted()
-        if (shouldShow) {
-            settings.setTimesToShowBatteryWarning(timesToShow - 1)
-
-            val fragmentHostListener = activity as FragmentHostListener
-            showBatteryWarningSnackbar(
-                snackbarParentView = snackbarParentView ?: fragmentHostListener.snackBarView(),
-                openFragment = { fragmentHostListener.showBottomSheet(it) },
-            )
+        if (!batteryWarningPolicy.shouldShowWarning()) {
+            return
         }
+        batteryWarningPolicy.onWarningShown()
+        val fragmentHostListener = activity as FragmentHostListener
+        showBatteryWarningSnackbar(
+            snackbarParentView = snackbarParentView ?: fragmentHostListener.snackBarView(),
+            openFragment = { fragmentHostListener.showBottomSheet(it) },
+        )
     }
 
     // Even though the Snackbar javadocs explicitly say that a custom duration is allowed, lint prohibits it

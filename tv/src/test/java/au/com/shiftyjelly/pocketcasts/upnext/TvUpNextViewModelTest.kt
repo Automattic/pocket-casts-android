@@ -2,14 +2,21 @@ package au.com.shiftyjelly.pocketcasts.upnext
 
 import android.content.Context
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import io.reactivex.subjects.BehaviorSubject
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.UpNextDiscoverButtonTappedEvent
+import com.automattic.eventhorizon.UpNextShownEvent
+import com.automattic.eventhorizon.UpNextSourceType
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -17,6 +24,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvUpNextViewModelTest {
@@ -24,12 +33,17 @@ class TvUpNextViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val changes = BehaviorSubject.create<UpNextQueue.State>()
+    private val changes = MutableSharedFlow<UpNextQueue.State>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
     private val upNextQueue = mock<UpNextQueue> {
-        on { changesObservable } doReturn changes
+        on { changesFlow } doReturn changes
     }
     private val syncManager = mock<SyncManager>()
     private val context = mock<Context>()
+    private val playbackManager = mock<PlaybackManager>()
+    private val eventHorizon = mock<EventHorizon>()
 
     private val currentEpisode = episode("current")
 
@@ -40,7 +54,7 @@ class TvUpNextViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvUpNextUiState.Loading, awaitItem())
 
-            changes.onNext(UpNextQueue.State.Empty)
+            changes.tryEmit(UpNextQueue.State.Empty)
 
             assertEquals(TvUpNextUiState.Empty, awaitItem())
         }
@@ -55,7 +69,7 @@ class TvUpNextViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvUpNextUiState.Loading, awaitItem())
 
-            changes.onNext(UpNextQueue.State.Loaded(currentEpisode, null, listOf(first, second)))
+            changes.tryEmit(UpNextQueue.State.Loaded(currentEpisode, null, listOf(first, second)))
 
             assertEquals(TvUpNextUiState.Loaded(listOf(first, second)), awaitItem())
         }
@@ -70,7 +84,7 @@ class TvUpNextViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvUpNextUiState.Loading, awaitItem())
 
-            changes.onNext(UpNextQueue.State.Loaded(currentEpisode, null, listOf(podcastEpisode, userEpisode)))
+            changes.tryEmit(UpNextQueue.State.Loaded(currentEpisode, null, listOf(podcastEpisode, userEpisode)))
 
             assertEquals(TvUpNextUiState.Loaded(listOf(podcastEpisode)), awaitItem())
         }
@@ -84,7 +98,7 @@ class TvUpNextViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvUpNextUiState.Loading, awaitItem())
 
-            changes.onNext(UpNextQueue.State.Loaded(currentEpisode, null, listOf(userEpisode)))
+            changes.tryEmit(UpNextQueue.State.Loaded(currentEpisode, null, listOf(userEpisode)))
 
             assertEquals(TvUpNextUiState.Empty, awaitItem())
         }
@@ -98,7 +112,7 @@ class TvUpNextViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvUpNextUiState.Loading, awaitItem())
 
-            changes.onNext(UpNextQueue.State.Loaded(currentEpisode, null, listOf(queued)))
+            changes.tryEmit(UpNextQueue.State.Loaded(currentEpisode, null, listOf(queued)))
 
             val loaded = awaitItem() as TvUpNextUiState.Loaded
             assertFalse(loaded.episodes.contains(currentEpisode))
@@ -114,18 +128,43 @@ class TvUpNextViewModelTest {
         viewModel.uiState.test {
             assertEquals(TvUpNextUiState.Loading, awaitItem())
 
-            changes.onNext(UpNextQueue.State.Loaded(currentEpisode, null, listOf(queued)))
+            changes.tryEmit(UpNextQueue.State.Loaded(currentEpisode, null, listOf(queued)))
             assertEquals(TvUpNextUiState.Loaded(listOf(queued)), awaitItem())
 
-            changes.onNext(UpNextQueue.State.Empty)
+            changes.tryEmit(UpNextQueue.State.Empty)
             assertEquals(TvUpNextUiState.Empty, awaitItem())
         }
+    }
+
+    @Test
+    fun `play starts playback of the episode`() = runTest {
+        val episode = episode("episode")
+
+        createViewModel().play(episode)
+
+        verifyBlocking(playbackManager) { playNowSuspend(episode = episode, sourceView = SourceView.UP_NEXT) }
+    }
+
+    @Test
+    fun `showing the screen tracks the up next shown event`() = runTest {
+        createViewModel().trackUpNextShown()
+
+        verify(eventHorizon).track(UpNextShownEvent(source = UpNextSourceType.TabBar))
+    }
+
+    @Test
+    fun `tapping the empty state discover button tracks the discover button event`() = runTest {
+        createViewModel().trackDiscoverButtonTapped()
+
+        verify(eventHorizon).track(UpNextDiscoverButtonTappedEvent(source = UpNextSourceType.TabBar))
     }
 
     private fun createViewModel() = TvUpNextViewModel(
         context = context,
         syncManager = syncManager,
         upNextQueue = upNextQueue,
+        playbackManager = playbackManager,
+        eventHorizon = eventHorizon,
     )
 
     private fun episode(uuid: String) = PodcastEpisode(uuid = uuid, publishedDate = Date(0))

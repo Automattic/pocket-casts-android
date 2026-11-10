@@ -107,6 +107,24 @@ class DurationUtilTest {
     }
 
     @Test
+    fun `duration with millis rounding to ten carries into seconds`() {
+        val duration = 1.seconds + 950.milliseconds
+
+        val text = duration.toSecondsWithSingleMilli()
+
+        assertEquals("2", text)
+    }
+
+    @Test
+    fun `duration with millis rounding to ten carries into seconds, no trailing fraction`() {
+        val duration = 5.seconds + 960.milliseconds
+
+        val text = duration.toSecondsWithSingleMilli()
+
+        assertEquals("6", text)
+    }
+
+    @Test
     fun `duration with micros to seconds with single milli`() {
         val duration = 1.seconds + 234.microseconds
 

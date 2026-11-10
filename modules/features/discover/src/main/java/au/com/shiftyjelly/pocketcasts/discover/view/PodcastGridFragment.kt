@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
@@ -13,6 +14,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.discover.databinding.PodcastGridFragmentBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastListViewState
@@ -32,6 +34,12 @@ class PodcastGridFragment : PodcastGridListFragment() {
         fun newInstance(networkLoadableList: NetworkLoadableList): PodcastGridFragment {
             return PodcastGridFragment().apply {
                 arguments = newInstanceBundle(networkLoadableList)
+            }
+        }
+
+        fun newInstance(listId: String, title: String? = null, sourceView: SourceView? = null): PodcastGridFragment {
+            return PodcastGridFragment().apply {
+                arguments = newInstanceBundle(listId, title, sourceView)
             }
         }
     }
@@ -54,12 +62,22 @@ class PodcastGridFragment : PodcastGridListFragment() {
             Observer { state ->
                 val binding = binding ?: return@Observer
                 when (state) {
-                    is PodcastListViewState.Loading -> {}
+                    is PodcastListViewState.Loading -> {
+                        binding.loading.isVisible = true
+                        binding.errorLayout.isVisible = false
+                        binding.mainNestedScrollView.isVisible = false
+                    }
 
                     is PodcastListViewState.ListLoaded -> {
+                        binding.loading.isVisible = false
+                        binding.errorLayout.isVisible = false
+                        binding.mainNestedScrollView.isVisible = true
+
                         feed = state.feed
                         feed?.let {
-                            if (displayStyle.toString() != DisplayStyle.CollectionList().toString()) {
+                            // a network page always gets the header, whatever summary_style its Discover row carried
+                            val showHeader = isNetworkPage || displayStyle.toString() == DisplayStyle.CollectionList().toString()
+                            if (!showHeader) {
                                 binding.headerLayout.visibility = View.GONE
                             } else {
                                 binding.headerLayout.visibility = View.VISIBLE
@@ -84,6 +102,12 @@ class PodcastGridFragment : PodcastGridListFragment() {
 
                     is PodcastListViewState.Error -> {
                         Timber.e("Could not load feed ${state.error.message}")
+                        // a refresh that fails leaves the already rendered list alone rather than replacing it
+                        val hasContent = feed != null
+                        binding.loading.isVisible = false
+                        binding.errorLayout.isVisible = !hasContent
+                        binding.mainNestedScrollView.isVisible = hasContent
+                        binding.btnRetry.setOnClickListener { viewModel.retry() }
                     }
                 }
             },
@@ -103,6 +127,8 @@ class PodcastGridFragment : PodcastGridListFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+        // the fragment outlives its view on the back stack, so a stale feed must not pass for rendered content
+        feed = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -110,7 +136,12 @@ class PodcastGridFragment : PodcastGridListFragment() {
 
         val binding = binding ?: return
 
-        val title = if (displayStyle.toString() != DisplayStyle.CollectionList().toString()) arguments?.getString(ARG_TITLE) else ""
+        // a network's header title only arrives with the feed, so the caller's title fills the nav bar until then
+        val title = when {
+            isNetworkPage -> arguments?.getString(ARG_TITLE).orEmpty()
+            displayStyle.toString() != DisplayStyle.CollectionList().toString() -> arguments?.getString(ARG_TITLE)
+            else -> ""
+        }
 
         val toolbar = binding.toolbar
         setupToolbarAndStatusBar(

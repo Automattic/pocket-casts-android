@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SignInSyncShownEvent
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -62,6 +64,7 @@ private const val MAX_TOTAL_CHECKS = 100 // 30 seconds max wait
 class TvSyncingViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val syncCompletionWaiter: SyncCompletionWaiter,
+    private val eventHorizon: EventHorizon,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TvSyncingUiState())
@@ -70,6 +73,10 @@ class TvSyncingViewModel @Inject constructor(
     init {
         observePodcasts()
         startSync()
+    }
+
+    fun trackShown() {
+        eventHorizon.track(SignInSyncShownEvent)
     }
 
     private fun observePodcasts() {

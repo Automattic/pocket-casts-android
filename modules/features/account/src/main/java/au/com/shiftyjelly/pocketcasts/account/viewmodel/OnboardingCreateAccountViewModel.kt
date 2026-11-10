@@ -118,7 +118,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
         _stateFlow.update { it.copy(password = password) }
     }
 
-    fun createAccount(onAccountCreated: () -> Unit) {
+    fun createAccount(flow: OnboardingFlow, onAccountCreated: () -> Unit) {
         _stateFlow.update { it.copy(hasAttemptedLogIn = true, isNetworkAvailable = Network.isConnected(getApplication())) }
 
         val state = stateFlow.value
@@ -140,6 +140,7 @@ class OnboardingCreateAccountViewModel @Inject constructor(
                 email = state.email,
                 password = state.password,
                 signInSource = SignInSource.UserInitiated.Onboarding,
+                flow = flow.analyticsValue,
             )
             when (result) {
                 is LoginResult.Success -> {

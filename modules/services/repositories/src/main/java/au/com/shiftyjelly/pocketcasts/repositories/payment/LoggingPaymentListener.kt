@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.payment
 
 import au.com.shiftyjelly.pocketcasts.payment.AcknowledgedSubscription
+import au.com.shiftyjelly.pocketcasts.payment.InAppMessageResult
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
 import au.com.shiftyjelly.pocketcasts.payment.Purchase
@@ -55,6 +56,14 @@ internal class LoggingPaymentListener : PaymentClient.Listener {
         val message = when (result) {
             is PaymentResult.Success -> "Loaded subscription plans"
             is PaymentResult.Failure -> "Failed to load subscription plans. ${result.code}, ${result.message}"
+        }
+        log(message)
+    }
+
+    override fun onInAppMessagesShown(result: PaymentResult<InAppMessageResult>) {
+        val message = when (result) {
+            is PaymentResult.Success -> "Shown in-app messages: ${result.value}"
+            is PaymentResult.Failure -> "Failed to show in-app messages. ${result.code}, ${result.message}"
         }
         log(message)
     }

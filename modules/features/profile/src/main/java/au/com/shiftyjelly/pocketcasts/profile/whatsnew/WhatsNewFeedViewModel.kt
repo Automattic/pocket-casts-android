@@ -1,0 +1,142 @@
+package au.com.shiftyjelly.pocketcasts.profile.whatsnew
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessage
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.WhatsNewFeedShownEvent
+import com.automattic.eventhorizon.WhatsNewReadAllTappedEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.Instant
+import javax.inject.Inject
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+
+@HiltViewModel
+class WhatsNewFeedViewModel @Inject constructor(
+    private val manager: WhatsNewManager,
+    private val eventHorizon: EventHorizon,
+    settings: Settings,
+) : ViewModel() {
+    private val loadState = MutableStateFlow(LoadState.Loading)
+    private val isRefreshing = MutableStateFlow(false)
+
+    private var loadJob: Job? = null
+
+    internal val uiState: StateFlow<UiState> = combine(
+        manager.feedMessages,
+        manager.readState,
+        manager.catalog,
+        loadState,
+        isRefreshing,
+    ) { messages, readState, catalog, loadState, isRefreshing ->
+        UiState(
+            items = messages.distinctBy(WhatsNewMessage::id).map { message ->
+                WhatsNewFeedItem(
+                    id = message.id,
+                    type = message.type,
+                    title = message.title,
+                    publishedAt = message.publishedAt,
+                    isUnread = !readState.isRead(message),
+                )
+            },
+            loadState = if (catalog != null) LoadState.Loaded else loadState,
+            isRefreshing = isRefreshing,
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState())
+
+    val bottomInset: StateFlow<Int> = settings.bottomInset
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
+
+    init {
+        load()
+    }
+
+    fun refresh() {
+        if (isRefreshing.value) return
+        isRefreshing.value = true
+        viewModelScope.launch {
+            try {
+                manager.refresh()
+            } finally {
+                isRefreshing.value = false
+            }
+            failIfNothingLoaded()
+        }
+    }
+
+    fun retry() {
+        if (loadJob?.isActive == true) return
+        loadState.value = LoadState.Loading
+        load()
+    }
+
+    fun onMessagesShown(ids: List<String>) {
+        manager.markAsListed(ids)
+    }
+
+    fun onMessageClick(id: String) {
+        manager.markAsRead(listOf(id))
+    }
+
+    fun onToggleReadClick(id: String) {
+        val item = uiState.value.items.firstOrNull { it.id == id } ?: return
+        if (item.isUnread) {
+            manager.markAsRead(listOf(id))
+        } else {
+            manager.markAsUnread(listOf(id))
+        }
+    }
+
+    fun onScreenShown() {
+        eventHorizon.track(WhatsNewFeedShownEvent)
+    }
+
+    fun onReadAllClick() {
+        eventHorizon.track(WhatsNewReadAllTappedEvent)
+        manager.markAsRead(uiState.value.items.map { it.id })
+    }
+
+    private fun load() {
+        loadJob = viewModelScope.launch {
+            manager.refreshIfNeeded()
+            failIfNothingLoaded()
+        }
+    }
+
+    private fun failIfNothingLoaded() {
+        if (manager.catalog.value == null) {
+            loadState.value = LoadState.Failed
+        }
+    }
+
+    internal data class UiState(
+        val items: List<WhatsNewFeedItem> = emptyList(),
+        val loadState: LoadState = LoadState.Loading,
+        val isRefreshing: Boolean = false,
+    ) {
+        val hasUnread get() = items.any { it.isUnread }
+    }
+
+    internal enum class LoadState {
+        Loading,
+        Loaded,
+        Failed,
+    }
+}
+
+internal data class WhatsNewFeedItem(
+    val id: String,
+    val type: WhatsNewMessageType,
+    val title: String,
+    val publishedAt: Instant,
+    val isUnread: Boolean,
+)

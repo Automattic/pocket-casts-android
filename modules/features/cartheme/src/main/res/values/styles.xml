@@ -571,12 +571,18 @@ limitations under the License.
     </style>
 
     <!-- The style for dialog buttons. -->
-    <style name="Widget.Car.Dialog.Button" parent="Widget.Car.Button.Borderless.Colored">
+    <style name="Widget.Car.Dialog.Button" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
         <item name="android:textAppearance">@style/TextAppearance.Car.Body3.Medium</item>
         <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:minHeight">@dimen/car_button_height</item>
         <item name="android:minWidth">@dimen/car_dialog_button_min_width</item>
         <item name="android:paddingStart">@dimen/car_padding_2</item>
         <item name="android:paddingEnd">@dimen/car_padding_2</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?android:attr/colorButtonNormal</item>
     </style>
 
     <!-- ================= -->
@@ -616,11 +622,6 @@ limitations under the License.
     <style name="CarPreference.SwitchPreferenceCompat">
         <item name="android:layout">@layout/preference_material_car</item>
         <item name="android:widgetLayout">@layout/preference_car_switch_compat_widget</item>
-    </style>
-
-    <style name="CarPreference.SwitchPreference">
-        <item name="android:layout">@layout/preference_material_car</item>
-        <item name="android:widgetLayout">@layout/preference_car_switch_widget</item>
     </style>
 
     <style name="CarPreference.SeekBarPreference">

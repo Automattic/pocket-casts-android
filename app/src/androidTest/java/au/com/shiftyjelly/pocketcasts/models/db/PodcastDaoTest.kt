@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import com.squareup.moshi.Moshi
 import java.util.Date
 import java.util.UUID
@@ -19,6 +20,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -44,6 +46,26 @@ class PodcastDaoTest {
     @After
     fun closeDb() {
         testDb.close()
+    }
+
+    @Test
+    fun updateRefreshPersistsTheNetworkListId() = runTest {
+        val uuid = UUID.randomUUID().toString()
+        podcastDao.insertSuspend(Podcast(uuid = uuid, isSubscribed = true))
+
+        podcastDao.updateRefreshFor(uuid, networkListId = "cdb75bc0-9f5a-4217-b1ca-f573821a7913")
+
+        assertEquals("cdb75bc0-9f5a-4217-b1ca-f573821a7913", podcastDao.findByUuidBlocking(uuid)?.networkListId)
+    }
+
+    @Test
+    fun updateRefreshClearsTheNetworkListIdWhenThePodcastLeavesItsNetwork() = runTest {
+        val uuid = UUID.randomUUID().toString()
+        podcastDao.insertSuspend(Podcast(uuid = uuid, isSubscribed = true, networkListId = "cdb75bc0-9f5a-4217-b1ca-f573821a7913"))
+
+        podcastDao.updateRefreshFor(uuid, networkListId = null)
+
+        assertNull(podcastDao.findByUuidBlocking(uuid)?.networkListId)
     }
 
     @Test
@@ -161,6 +183,44 @@ class PodcastDaoTest {
         assertFalse("Unsubscribed podcast should be left alone", podcastDao.findPodcastByUuid(unsubscribed.uuid)!!.isShowNotifications)
     }
 
+    @Test
+    fun testObservePlayedPodcastUuids() = runTest {
+        val played = insertSubscribedPodcastWithEpisodes(EpisodePlayingStatus.COMPLETED to false)
+        val archivedUnplayed = insertSubscribedPodcastWithEpisodes(EpisodePlayingStatus.COMPLETED to false, EpisodePlayingStatus.NOT_PLAYED to true)
+        val inProgress = insertSubscribedPodcastWithEpisodes(EpisodePlayingStatus.COMPLETED to false, EpisodePlayingStatus.IN_PROGRESS to false)
+        val unplayed = insertSubscribedPodcastWithEpisodes(EpisodePlayingStatus.NOT_PLAYED to false)
+        val allArchivedUnplayed = insertSubscribedPodcastWithEpisodes(EpisodePlayingStatus.NOT_PLAYED to true)
+        val withoutEpisodes = insertSubscribedPodcastWithEpisodes()
+        val unsubscribed = Podcast(uuid = UUID.randomUUID().toString(), isSubscribed = false)
+        podcastDao.insertSuspend(unsubscribed)
+        episodeDao.insert(PodcastEpisode(uuid = UUID.randomUUID().toString(), publishedDate = Date(), podcastUuid = unsubscribed.uuid, playingStatus = EpisodePlayingStatus.COMPLETED))
+
+        val playedUuids = podcastDao.observePlayedPodcastUuids().first().toSet()
+
+        assertEquals(setOf(played.uuid, archivedUnplayed.uuid), playedUuids)
+        assertFalse(inProgress.uuid in playedUuids)
+        assertFalse(unplayed.uuid in playedUuids)
+        assertFalse(allArchivedUnplayed.uuid in playedUuids)
+        assertFalse(withoutEpisodes.uuid in playedUuids)
+    }
+
+    private suspend fun insertSubscribedPodcastWithEpisodes(vararg episodes: Pair<EpisodePlayingStatus, Boolean>): Podcast {
+        val podcast = Podcast(uuid = UUID.randomUUID().toString(), isSubscribed = true)
+        podcastDao.insertSuspend(podcast)
+        episodes.forEach { (playingStatus, isArchived) ->
+            episodeDao.insert(
+                PodcastEpisode(
+                    uuid = UUID.randomUUID().toString(),
+                    publishedDate = Date(),
+                    podcastUuid = podcast.uuid,
+                    playingStatus = playingStatus,
+                    isArchived = isArchived,
+                ),
+            )
+        }
+        return podcast
+    }
+
     private suspend fun insertTestPodcastsAndEpisodes(folderId: String? = null): Triple<Podcast, Podcast, Podcast> {
         val podcast1 = Podcast(uuid = UUID.randomUUID().toString(), rawFolderUuid = folderId, isSubscribed = true)
         val podcast2 = Podcast(uuid = UUID.randomUUID().toString(), rawFolderUuid = folderId, isSubscribed = true)
@@ -195,4 +255,19 @@ class PodcastDaoTest {
 
         return Triple(podcast1, podcast2, unsubscribed)
     }
+
+    private suspend fun PodcastDao.updateRefreshFor(uuid: String, networkListId: String?) = updateRefresh(
+        uuid = uuid,
+        title = "Analog(ue)",
+        author = "Relay",
+        podcastCategory = "Technology",
+        podcastDescription = "",
+        estimatedNextEpisode = null,
+        episodeFrequency = null,
+        refreshAvailable = false,
+        fundingUrl = null,
+        explicit = null,
+        webFeed = false,
+        networkListId = networkListId,
+    )
 }

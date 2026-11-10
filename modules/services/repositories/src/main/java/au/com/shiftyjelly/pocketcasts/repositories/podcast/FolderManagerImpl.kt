@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import io.reactivex.Single
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
@@ -112,10 +111,6 @@ class FolderManagerImpl @Inject constructor(
 
     override fun observeFolders(): Flow<List<Folder>> {
         return folderDao.findFoldersFlow()
-    }
-
-    override fun findFoldersSingle(): Single<List<Folder>> {
-        return folderDao.findFoldersRxSingle()
     }
 
     override suspend fun updatePositions(folders: List<Folder>) {

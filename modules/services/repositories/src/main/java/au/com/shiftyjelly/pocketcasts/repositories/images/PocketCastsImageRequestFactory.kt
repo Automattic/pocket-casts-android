@@ -4,7 +4,7 @@ import android.content.Context
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.models.entity.userEpisodePlaceholderArtworkUrl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EpisodeFileMetadata
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -114,13 +114,12 @@ data class PocketCastsImageRequestFactory(
         return if (tintColorIndex == 0 && artworkUrl != null) {
             artworkUrl
         } else {
-            val themeType = if (isDarkTheme) "dark" else "light"
             val urlSize = when {
                 actualSize == null -> 960
                 actualSize > 280 -> 960
                 else -> 280
             }
-            "${Settings.SERVER_STATIC_URL}/discover/images/artwork/$themeType/$urlSize/$tintColorIndex.png"
+            userEpisodePlaceholderArtworkUrl(tintColorIndex, isDarkTheme = isDarkTheme, size = urlSize)
         }
     }
 

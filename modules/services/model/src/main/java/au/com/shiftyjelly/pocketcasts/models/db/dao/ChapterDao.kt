@@ -40,6 +40,9 @@ abstract class ChapterDao {
                 insertAll(newEpisodeChapters)
             }
 
+            newEpisodeChapters.all { it.origin == ChapterOrigin.Generated } &&
+                findEpisodeChapters(episodeUuid).any { it.origin != ChapterOrigin.Generated } -> Unit
+
             findEpisodeChapters(episodeUuid).let { currentChapters ->
                 currentChapters.none { it.origin == ChapterOrigin.NativeMedia } && (currentChapters.size <= chapters.size || currentChapters.all { it.origin == ChapterOrigin.Generated })
             } -> {

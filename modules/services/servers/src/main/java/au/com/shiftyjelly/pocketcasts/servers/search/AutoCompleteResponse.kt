@@ -19,10 +19,13 @@ sealed class AutoCompleteResult {
         val value: PodcastResultValue,
     ) : AutoCompleteResult()
 
+    data object Unknown : AutoCompleteResult()
+
     companion object {
         val jsonAdapter = PolymorphicJsonAdapterFactory.of(AutoCompleteResult::class.java, "type")
             .withSubtype(TermResult::class.java, "term")
             .withSubtype(PodcastResult::class.java, "podcast")
+            .withDefaultValue(Unknown)
     }
 }
 

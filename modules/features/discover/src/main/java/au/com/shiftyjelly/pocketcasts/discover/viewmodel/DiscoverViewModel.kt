@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.discover.viewmodel
 
 import android.content.res.Resources
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.view.CategoryAdRow
 import au.com.shiftyjelly.pocketcasts.discover.view.ChangeRegionRow
@@ -19,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverFeedImage
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverFeedTintColors
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverListSummary
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
@@ -42,9 +44,12 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.io.InvalidObjectException
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.rx2.rxMaybe
 import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
@@ -175,6 +180,16 @@ class DiscoverViewModel @Inject constructor(
             }
     }
 
+    /** The row draws from the `lists` entries alone, so no network's own feed is fetched here. */
+    fun loadNetworkList(source: String, authenticated: Boolean?): Flowable<NetworkList> {
+        return rxMaybe { repository.getListFeed(source, authenticated) }
+            .toSingle()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map { NetworkList(listId = it.listId, date = it.date, networks = it.networks) }
+            .toFlowable()
+    }
+
     fun loadCategory(category: DiscoverCategory, resources: Resources) {
         _state.update { it.copy(isLoading = true) }
 
@@ -249,8 +264,7 @@ class DiscoverViewModel @Inject constructor(
     }
 
     private fun addSubscriptionStateToPodcasts(list: PodcastList): Flowable<PodcastList> {
-        return podcastManager.getSubscribedPodcastUuidsRxSingle().toFlowable() // Get the current subscribed list
-            .mergeWith(podcastManager.podcastSubscriptionsRxFlowable()) // Get updated when it changes
+        return podcastManager.podcastSubscriptionsFlow().asFlowable()
             .map { subscribedList ->
                 val updatedPodcasts = list.podcasts.map { podcast ->
                     val isSubscribed = subscribedList.contains(podcast.uuid)
@@ -303,24 +317,18 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun findOrDownloadEpisode(discoverEpisode: DiscoverEpisode, success: (episode: PodcastEpisode) -> Unit) {
-        podcastManager.findOrDownloadPodcastRxSingle(discoverEpisode.podcast_uuid)
-            .flatMapMaybe {
-                @Suppress("DEPRECATION")
-                episodeManager.findByUuidRxMaybe(discoverEpisode.uuid)
+        viewModelScope.launch {
+            val episode = try {
+                podcastManager.findOrDownloadPodcast(discoverEpisode.podcast_uuid)
+                episodeManager.findByUuid(discoverEpisode.uuid)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Timber.e(e)
+                null
             }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { episode ->
-                    if (episode != null) {
-                        success(episode)
-                    }
-                },
-                onError = { throwable ->
-                    Timber.e(throwable)
-                },
-            )
-            .addTo(disposables)
+            episode?.let(success)
+        }
     }
 
     fun playEpisode(episode: PodcastEpisode) {
@@ -406,6 +414,12 @@ data class PodcastList(
     val images: List<DiscoverFeedImage>?,
     val listId: String? = null,
     val date: String? = null,
+)
+
+data class NetworkList(
+    val listId: String?,
+    val date: String?,
+    val networks: List<DiscoverListSummary>,
 )
 
 data class CarouselSponsoredPodcast(

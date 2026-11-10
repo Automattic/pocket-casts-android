@@ -381,4 +381,50 @@ class SwipeRowActionsFactoryTest {
             factory.upNextEpisode(userEpisode),
         )
     }
+
+    @Test
+    fun `up next episode ignores up next swipe setting and queue state`() {
+        val podcastEpisode = PodcastEpisode(uuid = "", publishedDate = Date())
+        val expected = SwipeRowActions(
+            ltr1 = SwipeAction.AddToUpNextTop,
+            ltr2 = SwipeAction.AddToUpNextBottom,
+            rtl1 = SwipeAction.RemoveFromUpNext,
+            rtl2 = SwipeAction.AddToPlaylist,
+        )
+
+        Settings.UpNextAction.entries.forEach { action ->
+            listOf(false, true).forEach { inUpNext ->
+                upNextAction = action
+                isEpisodeInUpNext = inUpNext
+                assertEquals("$action, in queue: $inUpNext", expected, factory.upNextEpisode(podcastEpisode))
+            }
+        }
+    }
+
+    @Test
+    fun `in queue episodes ignore up next swipe setting`() {
+        val episode = PodcastEpisode(uuid = "", publishedDate = Date())
+        val userEpisode = UserEpisode(uuid = "", publishedDate = Date())
+        isEpisodeInUpNext = true
+
+        Settings.UpNextAction.entries.forEach { action ->
+            upNextAction = action
+            assertEquals(SwipeAction.RemoveFromUpNext to null, factory.podcastEpisode(episode).let { it.ltr1 to it.ltr2 })
+            assertEquals(SwipeAction.RemoveFromUpNext to null, factory.userEpisode(userEpisode).let { it.ltr1 to it.ltr2 })
+            Playlist.Type.entries.forEach { type ->
+                assertEquals(SwipeAction.RemoveFromUpNext to null, factory.availablePlaylistEpisode(type, episode).let { it.ltr1 to it.ltr2 })
+            }
+        }
+    }
+
+    @Test
+    fun `unavailable playlist episode ignores up next swipe setting and queue state`() {
+        Settings.UpNextAction.entries.forEach { action ->
+            listOf(false, true).forEach { inUpNext ->
+                upNextAction = action
+                isEpisodeInUpNext = inUpNext
+                assertEquals(SwipeRowActions(rtl1 = SwipeAction.RemoveFromPlaylist), factory.unavailablePlaylistEpisode())
+            }
+        }
+    }
 }

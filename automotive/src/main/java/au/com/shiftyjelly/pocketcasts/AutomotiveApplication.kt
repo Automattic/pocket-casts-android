@@ -94,6 +94,8 @@ class AutomotiveApplication :
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
+            // Since WorkManager 2.10 CoroutineWorkers default to the executor below, where downloads starve them
+            .setWorkerCoroutineContext(Dispatchers.IO)
             .setExecutor(Executors.newFixedThreadPool(3))
             .setJobSchedulerJobIdRange(1000, 20000)
             .build()
@@ -123,6 +125,8 @@ class AutomotiveApplication :
                 moshi = moshi,
             )
         }
+
+        RefreshPodcastsTask.scheduleOrCancel(this, settings)
 
         val playServices = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS
         Log.i(Settings.LOG_TAG_AUTO, "Play services $playServices")

@@ -11,6 +11,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.player.binding.setPlaybackState
 import au.com.shiftyjelly.pocketcasts.player.databinding.FragmentVideoBinding
@@ -26,6 +29,10 @@ import com.airbnb.lottie.LottieAnimationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.time.Duration
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
@@ -107,7 +114,41 @@ class VideoFragment :
             }
         }
 
+        observeVideoSurfaceHandback()
+
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Fires on fullscreen entry and on PiP-expand (a pause→resume with no onStart), covering
+        // wrong-owner residuals the surface-loss observer can't detect.
+        reclaimVideoSurface()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeVideoSurfaceHandback() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                playbackManager.playerFlow
+                    .flatMapLatest { (it as? SimplePlayer)?.hasVideoSurfaceFlow ?: flowOf(false) }
+                    .collect { hasSurface ->
+                        if (!hasSurface) {
+                            reclaimVideoSurface()
+                        }
+                    }
+            }
+        }
+    }
+
+    private fun reclaimVideoSurface() {
+        if (activity?.isFinishing == true) {
+            return
+        }
+        val exoPlayer = (playbackManager.player as? SimplePlayer)?.exoPlayer ?: return
+        val videoView = binding?.videoView ?: return
+        videoView.player = null
+        videoView.player = exoPlayer
     }
 
     override fun onDetach() {

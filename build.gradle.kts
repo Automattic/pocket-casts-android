@@ -13,6 +13,7 @@ import com.google.devtools.ksp.gradle.KspExtension
 import com.google.devtools.ksp.gradle.KspGradleSubplugin
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 import io.sentry.android.gradle.extensions.SentryPluginExtension
+import io.sentry.android.gradle.tasks.SentryCliExecTask
 import java.util.EnumSet
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
@@ -192,16 +193,6 @@ tasks.withType(SpotlessTask::class.java).configureEach {
 
 val javaTarget = JvmTarget.fromTarget(libs.versions.java.get())
 
-allprojects {
-    configurations.configureEach {
-        resolutionStrategy.eachDependency {
-            if (requested.name.startsWith("kotlin-stdlib")) {
-                useVersion(libs.versions.kotlin.asProvider().get())
-            }
-        }
-    }
-}
-
 subprojects {
     apply(plugin = rootProject.libs.plugins.dependency.analysis.get().pluginId)
 
@@ -210,9 +201,6 @@ subprojects {
             compilerOptions {
                 jvmTarget.set(javaTarget)
                 allWarningsAsErrors.set(true)
-                freeCompilerArgs.addAll(
-                    "-Xannotation-default-target=param-property",
-                )
                 optIn.addAll("kotlin.RequiresOptIn")
             }
         }
@@ -456,6 +444,18 @@ subprojects {
             }
         }
 
+        // Without the upload key a release build still succeeds, unsigned, and only fails once something uploads it.
+        tasks.matching { it.name.matches(Regex("package(Release|Prototype)(Bundle)?")) }.configureEach {
+            doFirst {
+                if (!canSignRelease) {
+                    throw GradleException(
+                        "The upload keystore or its credentials are missing, so this release build would not be signed. " +
+                            "Please run `bundle exec fastlane run configure_apply` to apply secrets.",
+                    )
+                }
+            }
+        }
+
         // Set Gradle property 'au.com.shiftyjelly.pocketcasts.leakcanary=true' to enable Leak Canary.
         // You can do this using the gradle.properties file or any other available Gradle mechanism.
         // See: https://docs.gradle.org/current/userguide/build_environment.html#sec:project_properties
@@ -474,9 +474,11 @@ subprojects {
 }
 
 fun Project.applyCommonSentryConfiguration() {
+    val sentryAuthToken = providers.environmentVariable("SENTRY_AUTH_TOKEN").orNull?.trim()?.ifEmpty { null }
+
     extensions.getByType(SentryPluginExtension::class.java).apply {
-        authToken = project.findProperty("sentryAuthToken")?.toString()
-        org = project.findProperty("sentryOrg")?.toString()
+        authToken = sentryAuthToken
+        org = "a8c"
 
         val shouldUploadDebugFiles = System.getenv()["CI"].toBoolean() &&
             !project.properties["skipSentryProguardMappingUpload"]?.toString().toBoolean()
@@ -489,6 +491,17 @@ fun Project.applyCommonSentryConfiguration() {
         autoInstallation.enabled = false
         includeDependenciesReport = false
         ignoredBuildTypes = setOf("debug", "debugProd", "prototype")
+    }
+
+    tasks.withType<SentryCliExecTask>().configureEach {
+        doFirst {
+            if (sentryAuthToken == null) {
+                throw GradleException(
+                    "SENTRY_AUTH_TOKEN is not set (or is blank). Export it to upload debug files to Sentry, " +
+                        "or pass -PskipSentryProguardMappingUpload=true to skip the upload.",
+                )
+            }
+        }
     }
 }
 

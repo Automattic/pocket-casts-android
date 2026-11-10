@@ -8,6 +8,15 @@ import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.FolderShownEvent
+import com.automattic.eventhorizon.PodcastListBadgeType
+import com.automattic.eventhorizon.PodcastListLayoutType
+import com.automattic.eventhorizon.PodcastListSortType
+import com.automattic.eventhorizon.PodcastsListDiscoverButtonTappedEvent
+import com.automattic.eventhorizon.PodcastsListFolderTappedEvent
+import com.automattic.eventhorizon.PodcastsListPodcastTappedEvent
+import com.automattic.eventhorizon.PodcastsListShownEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -28,6 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 class TvYourPodcastsViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val folderManager: FolderManager,
+    private val eventHorizon: EventHorizon,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -60,6 +70,39 @@ class TvYourPodcastsViewModel @Inject constructor(
 
     suspend fun folderPodcasts(folderUuid: String): List<Podcast> {
         return folderManager.findFolderPodcastsSorted(folderUuid)
+    }
+
+    fun trackPodcastsListShown(items: List<FolderItem>) {
+        eventHorizon.track(
+            PodcastsListShownEvent(
+                numberOfPodcasts = items.count { it is FolderItem.Podcast }.toLong(),
+                numberOfFolders = items.count { it is FolderItem.Folder }.toLong(),
+                badgeType = PodcastListBadgeType.Off,
+                layout = PodcastListLayoutType.LargeArtwork,
+                sortOrder = PodcastListSortType.Name,
+            ),
+        )
+    }
+
+    fun trackPodcastTapped() {
+        eventHorizon.track(PodcastsListPodcastTappedEvent)
+    }
+
+    fun trackFolderTapped() {
+        eventHorizon.track(PodcastsListFolderTappedEvent)
+    }
+
+    fun trackDiscoverButtonTapped() {
+        eventHorizon.track(PodcastsListDiscoverButtonTappedEvent)
+    }
+
+    fun trackFolderShown(numberOfPodcasts: Int, sortType: PodcastsSortType) {
+        eventHorizon.track(
+            FolderShownEvent(
+                numberOfPodcasts = numberOfPodcasts.toLong(),
+                sortOrder = sortType.analyticsValue,
+            ),
+        )
     }
 }
 

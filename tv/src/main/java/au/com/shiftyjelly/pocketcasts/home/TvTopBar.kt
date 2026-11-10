@@ -43,13 +43,16 @@ fun TvTopBar(
     onTabSelect: (Int) -> Unit,
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onTabClick: (Int) -> Unit = {},
     autoFocusSelectedTab: Boolean = true,
     onSelectedTabFocus: () -> Unit = {},
+    focusSelectedTab: Boolean = false,
+    onConsumeFocusRequest: () -> Unit = {},
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 32.dp, vertical = 16.dp),
+            .padding(start = 42.dp, end = 42.dp, top = 24.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         TvProfileButton(
@@ -61,14 +64,17 @@ fun TvTopBar(
             tabs = tabs,
             selectedTabIndex = selectedTabIndex,
             onTabSelect = onTabSelect,
+            onTabClick = onTabClick,
             autoFocusSelectedTab = autoFocusSelectedTab,
             onSelectedTabFocus = onSelectedTabFocus,
+            focusSelectedTab = focusSelectedTab,
+            onConsumeFocusRequest = onConsumeFocusRequest,
         )
         Spacer(modifier = Modifier.weight(1f))
         Image(
             painter = painterResource(IR.drawable.ic_pocket_casts_logo),
             contentDescription = stringResource(LR.string.app_name),
-            modifier = Modifier.size(40.dp),
+            modifier = Modifier.size(30.dp),
         )
     }
 }
@@ -86,7 +92,7 @@ private fun TvProfileButton(
         border = IconButtonDefaults.border(
             focusedBorder = Border(BorderStroke(2.dp, Color.White), inset = 2.dp, shape = CircleShape),
         ),
-        modifier = modifier.size(40.dp),
+        modifier = modifier.size(30.dp),
     ) {
         val email = (profile as? TvProfileState.SignedIn)?.email
         if (email != null) {

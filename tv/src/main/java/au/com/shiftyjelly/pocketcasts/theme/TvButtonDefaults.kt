@@ -6,10 +6,14 @@ import androidx.tv.material3.Border
 import androidx.tv.material3.ButtonBorder
 import androidx.tv.material3.ButtonColors
 import androidx.tv.material3.ButtonDefaults
+import androidx.tv.material3.ButtonScale
 import androidx.tv.material3.IconButtonDefaults
 import androidx.tv.material3.MaterialTheme
 
 object TvButtonDefaults {
+
+    /** Keeps a button the same size on focus, so buttons near the safe-area edge don't grow into it. */
+    fun noScale(): ButtonScale = ButtonDefaults.scale(focusedScale = 1f)
 
     @Composable
     fun filledButtonColors(): ButtonColors = ButtonDefaults.colors(
@@ -42,10 +46,18 @@ object TvButtonDefaults {
     )
 
     @Composable
-    fun iconButtonColors(containerColor: Color = MaterialTheme.tvColors.backgroundActive20) = IconButtonDefaults.colors(
+    fun iconButtonColors(
+        containerColor: Color = MaterialTheme.tvColors.backgroundActive20,
+        contentColor: Color = MaterialTheme.tvColors.textPrimary,
+    ) = IconButtonDefaults.colors(
         containerColor = containerColor,
-        contentColor = MaterialTheme.tvColors.textPrimary,
+        contentColor = contentColor,
         focusedContainerColor = MaterialTheme.tvColors.backgroundActive,
         focusedContentColor = MaterialTheme.tvColors.textPrimaryActive,
+    )
+
+    @Composable
+    fun controlBarIconButtonColors() = iconButtonColors(
+        contentColor = MaterialTheme.tvColors.textSecondary,
     )
 }

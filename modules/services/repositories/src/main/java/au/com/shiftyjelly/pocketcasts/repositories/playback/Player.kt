@@ -52,7 +52,6 @@ enum class StreamVideoState {
 }
 
 interface Player {
-    var isPip: Boolean
     val isRemote: Boolean
     val isStreaming: Boolean
     val filePath: String?
@@ -61,6 +60,13 @@ interface Player {
     val name: String
     val isDownloading: Boolean
     val onPlayerEvent: (Player, PlayerEvent) -> Unit
+
+    /**
+     * Smoothed RMS level of the playing audio in the range 0f..1f, updated from the audio
+     * pipeline so it is safe to poll every frame. Players that don't measure audio return 0f,
+     * which the UI treats as "no level available" rather than silence.
+     */
+    val currentAudioLevel: Float get() = 0f
 
     suspend fun load(currentPositionMs: Int)
     suspend fun getCurrentPositionMs(): Int

@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import android.os.SystemClock
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Box
@@ -27,10 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.KeepScreenOnEffect
 import au.com.shiftyjelly.pocketcasts.compose.loading.LoadingView
+import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
@@ -70,7 +73,7 @@ fun TranscriptPage(
     toolbarPadding: PaddingValues = PaddingValues(0.dp),
     transcriptPadding: PaddingValues = PaddingValues(0.dp),
     paywallPadding: PaddingValues = PaddingValues(0.dp),
-    showCloseButton: Boolean = true,
+    isBackHandlerEnabled: Boolean = true,
     toolbarTrailingContent: (@Composable (ToolbarColors) -> Unit)? = null,
     onHighlightText: (() -> Unit)? = null,
 ) {
@@ -105,7 +108,6 @@ fun TranscriptPage(
             Toolbar(
                 searchState = uiState.searchState,
                 hideSearchBar = uiState.isPaywallVisible || !uiState.isTextTranscriptLoaded,
-                showCloseButton = showCloseButton,
                 onClickClose = onClickClose,
                 onUpdateSearchTerm = onUpdateSearchTerm,
                 onClearSearchTerm = onClearSearchTerm,
@@ -172,6 +174,13 @@ fun TranscriptPage(
                         null
                     }
 
+                val onBookmarkText: ((String) -> Unit)? =
+                    if (viewModel != null && uiState.isBookmarkFromSelectionAvailable && FeatureFlag.isEnabled(Feature.SMART_BOOKMARKS)) {
+                        viewModel::createBookmarkFromSelection
+                    } else {
+                        null
+                    }
+
                 TranscriptContent(
                     uiState = uiState,
                     listState = listState,
@@ -180,6 +189,7 @@ fun TranscriptPage(
                     highlightState = highlightState,
                     onEntryClick = tapToSeekHandler,
                     onHighlightText = onHighlightText,
+                    onBookmarkText = onBookmarkText,
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .padding(transcriptPadding),
@@ -211,6 +221,10 @@ fun TranscriptPage(
                     .padding(start = 16.dp, end = 16.dp, bottom = debugBottomPadding),
             )
         }
+    }
+
+    BackHandler(enabled = isSearching && isBackHandlerEnabled) {
+        onHideSearchBar()
     }
 
     ScrollToItemEffect(
@@ -260,11 +274,27 @@ private fun TranscriptMessageEffect(viewModel: TranscriptViewModel?) {
     if (viewModel == null) return
     val context = LocalContext.current
     val tapToSeekUnavailableMessage = stringResource(LR.string.transcript_tap_to_seek_streaming_unavailable)
+    val bookmarkFailedMessage = stringResource(LR.string.bookmark_create_failed)
     LaunchedEffect(viewModel) {
         viewModel.messages.collect { message ->
             when (message) {
                 TranscriptMessage.TapToSeekStreamingUnavailable -> {
                     Toast.makeText(context, tapToSeekUnavailableMessage, Toast.LENGTH_SHORT).show()
+                }
+
+                TranscriptMessage.BookmarkFailed -> {
+                    Toast.makeText(context, bookmarkFailedMessage, Toast.LENGTH_SHORT).show()
+                }
+
+                is TranscriptMessage.OpenBookmarkEditor -> {
+                    context.startActivity(
+                        ChangeBookmarkTitleDeepLink(
+                            message.bookmarkUuid,
+                            isNewBookmark = message.isNewBookmark,
+                            fromEpisode = message.fromEpisode,
+                            sourceView = SourceView.TRANSCRIPT.key,
+                        ).toIntent(context),
+                    )
                 }
             }
         }
@@ -281,6 +311,7 @@ private fun TranscriptContent(
     modifier: Modifier = Modifier,
     highlightState: HighlightState = HighlightState(),
     onEntryClick: ((TranscriptEntry, Int) -> Unit)? = null,
+    onBookmarkText: ((String) -> Unit)? = null,
 ) {
     when (val transcriptState = uiState.transcriptState) {
         is TranscriptState.Loading -> {
@@ -301,6 +332,7 @@ private fun TranscriptContent(
                     state = listState,
                     theme = theme,
                     onHighlightText = onHighlightText,
+                    onBookmarkText = onBookmarkText,
                     modifier = modifier,
                 )
             }
@@ -548,18 +580,6 @@ private fun UserScrollDetectionEffect(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun KeepScreenOnEffect(keepOn: Boolean) {
-    val view = LocalView.current
-    DisposableEffect(keepOn) {
-        val previousKeepScreenOn = view.keepScreenOn
-        view.keepScreenOn = keepOn
-        onDispose {
-            view.keepScreenOn = previousKeepScreenOn
         }
     }
 }

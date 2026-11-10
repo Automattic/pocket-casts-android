@@ -47,6 +47,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import kotlinx.coroutines.delay
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -117,7 +118,7 @@ private fun EmojiButtons(
             modifier = Modifier.weight(1f),
         ) {
             EmojiButton(
-                emojiId = R.raw.app_review_no_animation,
+                emojiId = IR.raw.app_review_no_animation,
                 text = stringResource(LR.string.app_rating_no_label),
                 animationProgress = animationProgress,
                 onClick = onClickNotReally,
@@ -128,7 +129,7 @@ private fun EmojiButtons(
             modifier = Modifier.weight(1f),
         ) {
             EmojiButton(
-                emojiId = R.raw.app_review_yes_animation,
+                emojiId = IR.raw.app_review_yes_animation,
                 text = stringResource(LR.string.app_rating_yes_label),
                 animationProgress = animationProgress,
                 onClick = onClickYes,

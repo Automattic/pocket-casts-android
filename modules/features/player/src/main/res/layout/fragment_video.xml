@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:use_controller="false"
+        app:keep_content_on_player_reset="true"
         app:repeat_toggle_modes="none"/>
 
     <View

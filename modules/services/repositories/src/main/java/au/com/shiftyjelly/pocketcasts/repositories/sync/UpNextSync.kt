@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -34,8 +33,6 @@ import com.pocketcasts.service.api.upNextEpisodeRequest
 import com.pocketcasts.service.api.upNextSyncRequest
 import java.util.Date
 import javax.inject.Inject
-import kotlinx.coroutines.rx2.await
-import kotlinx.coroutines.rx2.awaitSingleOrNull
 import retrofit2.HttpException
 import com.pocketcasts.service.api.UpNextSyncRequest as UpNextProtobufSyncRequest
 
@@ -296,7 +293,7 @@ class UpNextSync @Inject constructor(
         // remove user episodes
         val filteredUuids = podcastUuids.filter { it != Podcast.userPodcast.uuid }
         filteredUuids.forEach { podcastUuid ->
-            podcastManager.findOrDownloadPodcastRxSingle(podcastUuid).await()
+            podcastManager.findOrDownloadPodcast(podcastUuid)
         }
     }
 
@@ -305,12 +302,10 @@ class UpNextSync @Inject constructor(
             return null
         }
         return if (podcastUuid == Podcast.userPodcast.uuid) {
-            userEpisodeManager.downloadMissingUserEpisodeRxMaybe(uuid = episodeUuid, placeholderTitle = title, placeholderPublished = published)
-                .awaitSingleOrNull()
+            userEpisodeManager.downloadMissingUserEpisode(uuid = episodeUuid, placeholderTitle = title, placeholderPublished = published)
         } else {
             val skeletonEpisode = buildSkeletonPodcastEpisode(podcastUuid)
-            episodeManager.downloadMissingEpisodeRxMaybe(episodeUuid = episodeUuid, podcastUuid = podcastUuid, skeletonEpisode = skeletonEpisode, podcastManager = podcastManager, downloadMetaData = false, source = SourceView.UP_NEXT)
-                .awaitSingleOrNull()
+            episodeManager.downloadMissingEpisode(episodeUuid = episodeUuid, podcastUuid = podcastUuid, skeletonEpisode = skeletonEpisode, downloadMetaData = false)
         }
     }
 }

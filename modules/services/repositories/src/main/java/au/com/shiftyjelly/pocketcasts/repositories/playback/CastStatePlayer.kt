@@ -18,8 +18,7 @@ import com.google.common.util.concurrent.ListenableFuture
  * play/pause/buffering state. Metadata is handled separately by
  * [PocketCastsForwardingPlayer.updateMetadata].
  *
- * Transport commands (play, pause, seek, stop) are delegated to [PlaybackManager]
- * via the provided callbacks.
+ * Transport commands (play, pause, seek, stop) are forwarded to the provided callbacks.
  */
 @OptIn(UnstableApi::class)
 internal class CastStatePlayer(

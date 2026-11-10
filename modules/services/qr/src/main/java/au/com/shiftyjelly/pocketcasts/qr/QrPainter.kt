@@ -77,19 +77,6 @@ fun rememberQrPainter(
                 value = QrState.Error
             }
         }
-
-        awaitDispose {
-            val currentState = value
-            if (currentState is QrState.Success) {
-                try {
-                    if (!currentState.bitmap.isRecycled) {
-                        currentState.bitmap.recycle()
-                    }
-                } catch (e: Exception) {
-                    Timber.w(e, "Failed to recycle bitmap")
-                }
-            }
-        }
     }
 
     return remember(qrState) {

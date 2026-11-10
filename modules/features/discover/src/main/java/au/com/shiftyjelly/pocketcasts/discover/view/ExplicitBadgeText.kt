@@ -16,8 +16,6 @@ import androidx.core.graphics.withSave
 import androidx.core.view.doOnLayout
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlin.math.roundToInt
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -29,8 +27,7 @@ internal fun TextView.setPodcastTitleWithExplicitBadge(
     @AttrRes badgeTintAttr: Int = UR.attr.primary_text_02,
 ) {
     val titleText = title?.toString().orEmpty()
-    val showExplicitBadge = explicit == true && FeatureFlag.isEnabled(Feature.EXPLICIT_PODCAST_INDICATOR)
-    if (!showExplicitBadge || titleText.isEmpty()) {
+    if (explicit != true || titleText.isEmpty()) {
         setTag(R.id.explicit_badge_title, null)
         text = title
         contentDescription = null

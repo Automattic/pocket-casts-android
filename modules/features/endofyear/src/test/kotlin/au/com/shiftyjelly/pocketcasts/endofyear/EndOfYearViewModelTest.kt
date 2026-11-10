@@ -666,6 +666,8 @@ class EndOfYearViewModelTest {
 
         override suspend fun isEligibleForEndOfYear(year: Year) = true
 
+        override suspend fun getPlaybackStats(year: Year) = error("Not used")
+
         override suspend fun getPlayedEpisodeCount(year: Year) = -1
     }
 

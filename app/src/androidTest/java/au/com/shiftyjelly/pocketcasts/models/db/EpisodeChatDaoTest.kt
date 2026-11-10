@@ -8,7 +8,9 @@ import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChat
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeChatMessage
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeChatHistoryItem
 import com.squareup.moshi.Moshi
 import java.util.Date
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,7 +18,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,25 +54,24 @@ class EpisodeChatDaoTest {
             createdAt = Date(100),
         )
 
-        episodeChatDao.insertChat(chat)
+        episodeChatDao.insertChatIfAbsent(chat)
 
         assertEquals(chat, episodeChatDao.getChatByEpisode(EPISODE_UUID))
         assertNull(episodeChatDao.getChatByEpisode("missing-episode-uuid"))
     }
 
     @Test
-    fun testReplaceChat() = runTest {
+    fun testInsertChatIfAbsentKeepsExistingChatAndMessages() = runTest {
         insertEpisode()
-        episodeChatDao.insertChat(EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = "old-podcast-uuid", createdAt = Date(100)))
-        val replacement = EpisodeChat(
-            episodeUuid = EPISODE_UUID,
-            podcastUuid = PODCAST_UUID,
-            createdAt = Date(200),
-        )
+        val existing = EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = PODCAST_UUID, createdAt = Date(100))
+        episodeChatDao.insertChatIfAbsent(existing)
+        val message = createMessage(uuid = "message-uuid", text = "Message")
+        episodeChatDao.insertMessage(message)
 
-        episodeChatDao.insertChat(replacement)
+        episodeChatDao.insertChatIfAbsent(EpisodeChat(episodeUuid = EPISODE_UUID, podcastUuid = "other-podcast-uuid", createdAt = Date(200)))
 
-        assertEquals(replacement, episodeChatDao.getChatByEpisode(EPISODE_UUID))
+        assertEquals(existing, episodeChatDao.getChatByEpisode(EPISODE_UUID))
+        assertEquals(listOf(message), episodeChatDao.getMessages(EPISODE_UUID))
     }
 
     @Test
@@ -110,13 +113,95 @@ class EpisodeChatDaoTest {
         assertEquals(listOf(otherMessage), episodeChatDao.getMessages("other-episode-uuid"))
     }
 
+    @Test
+    fun testDeleteAllChatsRemovesChatsAndTheirMessages() = runTest {
+        insertChat(EPISODE_UUID)
+        insertChat("other-episode-uuid")
+        episodeChatDao.insertMessage(createMessage(uuid = "message-uuid", episodeUuid = EPISODE_UUID, text = "Message"))
+        episodeChatDao.insertMessage(createMessage(uuid = "other-message-uuid", episodeUuid = "other-episode-uuid", text = "Other message"))
+
+        episodeChatDao.deleteAllChats()
+
+        assertNull(episodeChatDao.getChatByEpisode(EPISODE_UUID))
+        assertNull(episodeChatDao.getChatByEpisode("other-episode-uuid"))
+        assertEquals(emptyList<EpisodeChatMessage>(), episodeChatDao.getMessages(EPISODE_UUID))
+        assertEquals(emptyList<EpisodeChatMessage>(), episodeChatDao.getMessages("other-episode-uuid"))
+    }
+
+    @Test
+    fun testUpdateRating() = runTest {
+        insertChat()
+        val message = createMessage(uuid = "message-uuid", text = "Answer")
+        episodeChatDao.insertMessage(message)
+
+        episodeChatDao.updateRating("message-uuid", "positive")
+
+        assertEquals(listOf(message.copy(rating = "positive")), episodeChatDao.getMessages(EPISODE_UUID))
+
+        episodeChatDao.updateRating("message-uuid", null)
+
+        assertEquals(listOf(message), episodeChatDao.getMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun testChatHistoryListsChatsWithMessagesNewestFirst() = runTest {
+        testDb.podcastDao().insertSuspend(Podcast(uuid = PODCAST_UUID, title = "Podcast"))
+        insertChat(EPISODE_UUID)
+        insertChat("other-episode-uuid")
+        insertChat("empty-episode-uuid")
+        episodeChatDao.insertMessage(createMessage(uuid = "first-uuid", text = "First", createdAt = Date(100)))
+        episodeChatDao.insertMessage(createMessage(uuid = "latest-uuid", text = "Latest", createdAt = Date(300)))
+        episodeChatDao.insertMessage(
+            createMessage(uuid = "other-uuid", episodeUuid = "other-episode-uuid", text = "Other", createdAt = Date(200)),
+        )
+
+        assertEquals(
+            listOf(
+                EpisodeChatHistoryItem(EPISODE_UUID, "Title $EPISODE_UUID", PODCAST_UUID, "Podcast", 0.0, Date(300)),
+                EpisodeChatHistoryItem("other-episode-uuid", "Title other-episode-uuid", PODCAST_UUID, "Podcast", 0.0, Date(200)),
+            ),
+            episodeChatDao.observeChatHistory().first(),
+        )
+    }
+
+    @Test
+    fun testHasChatWithMessagesWhenTheChatHasMessages() = runTest {
+        insertChat()
+        episodeChatDao.insertMessage(createMessage(uuid = "message-uuid", text = "Message"))
+
+        assertTrue(episodeChatDao.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun testHasNoChatWithMessagesWhenTheChatIsEmpty() = runTest {
+        insertChat()
+
+        assertFalse(episodeChatDao.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun testHasNoChatWithMessagesWithoutAChat() = runTest {
+        insertEpisode()
+
+        assertFalse(episodeChatDao.hasChatWithMessages(EPISODE_UUID))
+    }
+
+    @Test
+    fun testHasNoChatWithMessagesWhenOnlyAnotherEpisodeHasMessages() = runTest {
+        insertChat(EPISODE_UUID)
+        insertChat("other-episode-uuid")
+        episodeChatDao.insertMessage(createMessage(uuid = "other-uuid", episodeUuid = "other-episode-uuid", text = "Other"))
+
+        assertFalse(episodeChatDao.hasChatWithMessages(EPISODE_UUID))
+    }
+
     private suspend fun insertChat(episodeUuid: String = EPISODE_UUID) {
         insertEpisode(episodeUuid)
-        episodeChatDao.insertChat(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = PODCAST_UUID))
+        episodeChatDao.insertChatIfAbsent(EpisodeChat(episodeUuid = episodeUuid, podcastUuid = PODCAST_UUID))
     }
 
     private suspend fun insertEpisode(episodeUuid: String = EPISODE_UUID) {
-        testDb.episodeDao().insert(PodcastEpisode(uuid = episodeUuid, podcastUuid = PODCAST_UUID, publishedDate = Date()))
+        testDb.episodeDao().insert(PodcastEpisode(uuid = episodeUuid, podcastUuid = PODCAST_UUID, title = "Title $episodeUuid", publishedDate = Date()))
     }
 
     private fun createMessage(

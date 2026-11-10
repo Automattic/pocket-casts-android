@@ -1,21 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.helper.search
 
-import com.jakewharton.rxrelay2.BehaviorRelay
-import io.reactivex.Observable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 abstract class SearchHandler<T> {
-    private var searchTerm = ""
-    protected val searchQueryRelay = BehaviorRelay.create<String>()
-        .apply { accept("") }
+    protected val searchQueryFlow = MutableStateFlow("")
 
     protected val noSearchResult = SearchResult("", null)
 
-    abstract fun getSearchResultsObservable(podcastUuid: String): Observable<SearchResult>
+    abstract fun getSearchResultsFlow(podcastUuid: String): Flow<SearchResult>
 
     fun searchQueryUpdated(newValue: String) {
-        val oldValue = searchQueryRelay.value ?: ""
-        searchTerm = newValue
-        searchQueryRelay.accept(newValue)
+        val oldValue = searchQueryFlow.value
+        searchQueryFlow.value = newValue
         trackSearchIfNeeded(oldValue, newValue)
     }
 

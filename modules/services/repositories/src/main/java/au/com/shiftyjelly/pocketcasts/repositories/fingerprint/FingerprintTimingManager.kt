@@ -14,13 +14,18 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.playback.ExoPlayerDataSourceFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.shouldCacheEntireEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintDecodePolicy
+import au.com.shiftyjelly.pocketcasts.utils.fingerprint.FingerprintPolicy
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationCompletedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationFailedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsPreparationStartedEvent
@@ -73,6 +78,8 @@ class FingerprintTimingManager @Inject constructor(
     private val settings: Settings,
     private val dataSourceFactory: Lazy<ExoPlayerDataSourceFactory>,
     private val pcmTap: FingerprintPcmTap,
+    private val decodePolicy: FingerprintDecodePolicy,
+    private val generatedChaptersAvailability: GeneratedChaptersAvailability,
 ) {
 
     /** Who asked for preparation; decides whether streaming over a metered network is acceptable. */
@@ -80,6 +87,16 @@ class FingerprintTimingManager @Inject constructor(
         PLAYBACK,
         TRANSCRIPT_VIEW,
         BOOKMARK,
+        CHAT,
+        ;
+
+        val downloadTrigger: GeneratedChaptersDownloadTriggerType
+            get() = when (this) {
+                PLAYBACK -> GeneratedChaptersDownloadTriggerType.Playback
+                TRANSCRIPT_VIEW -> GeneratedChaptersDownloadTriggerType.TranscriptView
+                BOOKMARK -> GeneratedChaptersDownloadTriggerType.Bookmark
+                CHAT -> GeneratedChaptersDownloadTriggerType.Chat
+            }
     }
 
     sealed interface State {
@@ -161,9 +178,11 @@ class FingerprintTimingManager @Inject constructor(
 
     // Context for current preparation
     private var currentTrigger = PrepareTrigger.PLAYBACK
+    private var retainedTrigger: PrepareTrigger? = null
 
     @Volatile
     private var currentEpisodeUuid: String? = null
+    private var preparingEpisodeUuid: String? = null
     private var currentAudioFilePath: String? = null
     private var currentSharedCacheKey: String? = null
     private var currentDurationSec: Double = 0.0
@@ -180,6 +199,9 @@ class FingerprintTimingManager @Inject constructor(
     @Volatile
     private var currentIsStreaming: Boolean = false
 
+    @Volatile
+    private var playbackHasGeneratedChapters = false
+
     // When true, decode the whole file locally from the start instead of following the PCM tap,
     // so the full reference<->playback map is available for chapter alignment.
     @Volatile
@@ -192,21 +214,60 @@ class FingerprintTimingManager @Inject constructor(
     private fun observePlaybackForProactivePreparation() {
         scope.launch {
             var lastEpisodeUuid: String? = null
+            var lastHasGeneratedChapters = false
             playbackManager.playbackStateFlow.collect { state ->
                 if (!FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS)) return@collect
                 val uuid = state.episodeUuid
+                val hasGeneratedChapters = generatedChaptersAvailability.isAllowed() && state.chapters.hasGeneratedChapters
+                playbackHasGeneratedChapters = state.chapters.hasGeneratedChapters
                 if (state.isPlaying && !uuid.isNullOrEmpty() && uuid != lastEpisodeUuid) {
                     lastEpisodeUuid = uuid
-                    prepareForCurrentEpisode(PrepareTrigger.PLAYBACK)
+                    lastHasGeneratedChapters = hasGeneratedChapters
+                    updatePlaybackPreparation(uuid, hasGeneratedChapters)
                 } else if (lastEpisodeUuid != null && (state.isEmpty || state.isStopped)) {
                     lastEpisodeUuid = null
+                    lastHasGeneratedChapters = false
                     stop()
+                } else if (uuid == lastEpisodeUuid && hasGeneratedChapters != lastHasGeneratedChapters) {
+                    lastHasGeneratedChapters = hasGeneratedChapters
+                    updatePlaybackPreparation(uuid, hasGeneratedChapters)
                 }
             }
         }
     }
 
+    private suspend fun updatePlaybackPreparation(episodeUuid: String, hasGeneratedChapters: Boolean) {
+        if (isPlaybackGateOpen(hasGeneratedChapters)) {
+            prepareCurrentEpisode(PrepareTrigger.PLAYBACK)
+        } else {
+            releasePlaybackPreparation(episodeUuid)
+        }
+    }
+
+    private fun isPlaybackGateOpen(hasGeneratedChapters: Boolean) = shouldPrepareOnPlayback(
+        isGeneratedChaptersAllowed = generatedChaptersAvailability.isAllowed(),
+        hasGeneratedChapters = hasGeneratedChapters,
+        warnOnMeteredNetwork = settings.warnOnMeteredNetwork.value,
+        isUnmetered = { Network.isUnmeteredConnection(context) },
+    )
+
+    private suspend fun releasePlaybackPreparation(episodeUuid: String) {
+        Timber.d("FingerprintTimingManager: skipping playback preparation for $episodeUuid")
+        mutex.withLock {
+            val ownerEpisodeUuid = currentEpisodeUuid ?: preparingEpisodeUuid
+            val isOtherEpisode = ownerEpisodeUuid != null && ownerEpisodeUuid != episodeUuid
+            val isPlaybackOnly = ownerEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.PLAYBACK
+            if (isOtherEpisode || isPlaybackOnly) {
+                resetToIdle()
+            }
+        }
+    }
+
     fun prepareForCurrentEpisode(trigger: PrepareTrigger) {
+        scope.launch { prepareCurrentEpisode(trigger) }
+    }
+
+    private suspend fun prepareCurrentEpisode(trigger: PrepareTrigger, retained: PrepareTrigger? = null) {
         val episode = playbackManager.getCurrentEpisode() ?: run {
             // No episode is currently loaded, so there is no episode UUID to attribute this to.
             markUnavailable(reason = "no_episode", episodeUuid = null)
@@ -219,27 +280,37 @@ class FingerprintTimingManager @Inject constructor(
         val audioSource = episode.downloadedFilePath ?: episode.downloadUrl
         // Reuse the player's on-disk cache (same UUID key) instead of a second download when it applies.
         val sharedCacheKey = episodeUuid.takeIf {
-            !episode.isDownloaded && !episode.isDownloading && !episode.isStreamUrlHls && settings.cacheEntirePlayingEpisode.value
+            shouldCacheEntireEpisode(
+                episode = episode,
+                isHlsStream = episode.isStreamUrlHls,
+                cacheEntirePlayingEpisodeEnabled = settings.cacheEntirePlayingEpisode.value,
+                maxCacheSizeBytes = settings.getExoPlayerCacheEntirePlayingEpisodeSizeInMB() * 1024 * 1024L,
+            )
         }
 
-        scope.launch {
-            val gen: Long
-            mutex.withLock {
-                // Already prepared for this episode — reuse existing state. A failed preparation may
-                // retry when the user opens the transcript, since the failure could be transient.
-                val retryableFailure = trigger == PrepareTrigger.TRANSCRIPT_VIEW && state is State.Failed
-                if (currentEpisodeUuid == episodeUuid && state !is State.Idle && !retryableFailure) {
-                    if (trigger == PrepareTrigger.TRANSCRIPT_VIEW) {
-                        currentTrigger = trigger
-                    }
-                    return@launch
+        val gen: Long
+        mutex.withLock {
+            // Already prepared for this episode — reuse existing state. A failed preparation may
+            // retry when the user opens the transcript or a chat quote, since the failure could be transient.
+            val retryableFailure = canRetryFailedPreparation(trigger) && state is State.Failed
+            if (currentEpisodeUuid == episodeUuid && state !is State.Idle && !retryableFailure) {
+                if (trigger != PrepareTrigger.PLAYBACK) {
+                    currentTrigger = trigger
                 }
-                // The tap builds the map progressively; keep whatever the last episode accumulated.
-                persistMappingCacheIfFull()
-                resetState()
-                generation++
-                gen = generation
+                retainTrigger(trigger)
+                return
             }
+            // The tap builds the map progressively; keep whatever the last episode accumulated.
+            persistMappingCacheIfFull()
+            resetState()
+            generation++
+            gen = generation
+            preparingEpisodeUuid = episodeUuid
+            currentTrigger = trigger
+            retainTrigger(trigger)
+            retained?.let(::retainTrigger)
+        }
+        scope.launch {
             // Abort if a newer stop()/prepare() has started since we acquired the lock.
             if (gen != generation) return@launch
             startDownloadCompletionObserver(episodeUuid)
@@ -264,28 +335,35 @@ class FingerprintTimingManager @Inject constructor(
         val episode = playbackManager.getCurrentEpisode() ?: return
         if (episode.uuid != episodeUuid || !episode.isDownloaded) return
         scope.launch {
-            val trigger = currentTrigger
+            val trigger: PrepareTrigger
+            val retained: PrepareTrigger?
             mutex.withLock {
                 if (currentEpisodeUuid != episodeUuid || !currentIsStreaming) return@launch
+                trigger = currentTrigger
+                retained = retainedTrigger
                 generation++
                 resetState()
                 _stateFlow.value = State.Idle
             }
             Timber.d("FingerprintTimingManager: episode finished downloading — switching to local file")
-            prepareForCurrentEpisode(trigger)
+            prepareCurrentEpisode(trigger, retained)
         }
     }
 
     fun stop() {
         scope.launch {
             mutex.withLock {
-                generation++
-                persistMappingCacheIfFull()
-                resetState()
-                _stateFlow.value = State.Idle
+                resetToIdle()
             }
         }
         Timber.d("FingerprintTimingManager: stopped")
+    }
+
+    private fun resetToIdle() {
+        generation++
+        persistMappingCacheIfFull()
+        resetState()
+        _stateFlow.value = State.Idle
     }
 
     fun onTranscriptShown(episodeUuid: String) {
@@ -293,11 +371,20 @@ class FingerprintTimingManager @Inject constructor(
         prepareForCurrentEpisode(PrepareTrigger.TRANSCRIPT_VIEW)
     }
 
+    fun onChatQuoteShown(episodeUuid: String) {
+        if (playbackManager.getCurrentEpisode()?.uuid != episodeUuid) return
+        prepareForCurrentEpisode(PrepareTrigger.CHAT)
+    }
+
     fun onTranscriptDismissed(episodeUuid: String) {
         scope.launch {
             mutex.withLock {
-                if (currentEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.TRANSCRIPT_VIEW) {
-                    currentTrigger = PrepareTrigger.PLAYBACK
+                val ownerEpisodeUuid = currentEpisodeUuid ?: preparingEpisodeUuid
+                if (ownerEpisodeUuid == episodeUuid && currentTrigger == PrepareTrigger.TRANSCRIPT_VIEW) {
+                    currentTrigger = retainedTrigger ?: PrepareTrigger.PLAYBACK
+                    if (retainedTrigger == null && !isPlaybackGateOpen(playbackHasGeneratedChapters)) {
+                        resetToIdle()
+                    }
                 }
             }
         }
@@ -327,7 +414,16 @@ class FingerprintTimingManager @Inject constructor(
      * Decodes only a small search window around the expected location, matches into a scratch
      * accumulator, and never touches the continuous mapping or the public state.
      */
-    suspend fun resolvePlaybackTime(episode: BaseEpisode, referenceTime: Duration): ChapterSeekResult {
+    suspend fun resolvePlaybackTime(
+        episode: BaseEpisode,
+        referenceTime: Duration,
+        trigger: GeneratedChaptersDownloadTriggerType,
+    ): ChapterSeekResult {
+        if (decodePolicy.current() != FingerprintPolicy.PLATFORM) {
+            return densePlaybackTime(episode.uuid, referenceTime)
+                ?.let { ChapterSeekResult.Resolved(it, usedPrior = true) }
+                ?: ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_UNSUPPORTED_DEVICE)
+        }
         val audioSource = episode.downloadedFilePath
             ?: episode.downloadUrl
             ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_NO_AUDIO_SOURCE)
@@ -339,6 +435,7 @@ class FingerprintTimingManager @Inject constructor(
                 audioSource = audioSource,
                 isDownloaded = episode.isDownloaded,
                 referenceTimeSec = referenceTime.toDouble(DurationUnit.SECONDS),
+                trigger = trigger,
             )
         }
     }
@@ -349,6 +446,7 @@ class FingerprintTimingManager @Inject constructor(
         audioSource: String,
         isDownloaded: Boolean,
         referenceTimeSec: Double,
+        trigger: GeneratedChaptersDownloadTriggerType,
     ): ChapterSeekResult {
         val blocked = shouldBlockOnDemandResolve(
             isDownloaded = isDownloaded,
@@ -380,7 +478,7 @@ class FingerprintTimingManager @Inject constructor(
         // Only a definitive 404 reports the reference as missing; transient fetch failures stay retryable.
         val reference = warmReference ?: run {
             val fetched = withTimeoutOrNull(FingerprintConstants.ON_DEMAND_FETCH_TIMEOUT_MS) {
-                loadOrFetchReferenceData(podcastUuid, episodeUuid, audioSource, isDownloaded)
+                loadOrFetchReferenceData(podcastUuid, episodeUuid, audioSource, isDownloaded, trigger)
             } ?: return ChapterSeekResult.Unresolved(ChapterSeekResult.REASON_TIMEOUT)
             val referenceData = when (fetched) {
                 is FingerprintReferenceRetriever.FetchResult.Success -> fetched.data
@@ -484,6 +582,7 @@ class FingerprintTimingManager @Inject constructor(
         episodeUuid: String,
         audioSource: String,
         isDownloaded: Boolean,
+        trigger: GeneratedChaptersDownloadTriggerType,
     ): FingerprintReferenceRetriever.FetchResult {
         if (isDownloaded) {
             referenceRetriever.loadReferenceData(audioSource)?.let { return FingerprintReferenceRetriever.FetchResult.Success(it) }
@@ -495,7 +594,7 @@ class FingerprintTimingManager @Inject constructor(
             referenceRetriever.loadCachedReference(episodeUuid)?.let { return FingerprintReferenceRetriever.FetchResult.Success(it) }
         }
         val baseUrl = "${BuildConfig.SERVER_SHOW_NOTES_URLS}/generated_transcripts/"
-        val fetched = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid)
+        val fetched = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid, trigger)
         if (fetched is FingerprintReferenceRetriever.FetchResult.Success) {
             if (isDownloaded) {
                 referenceRetriever.saveReferenceData(fetched.data, audioSource)
@@ -692,6 +791,7 @@ class FingerprintTimingManager @Inject constructor(
         catchUpJob?.cancel()
         catchUpJob = null
         currentEpisodeUuid = null
+        preparingEpisodeUuid = null
         currentAudioFilePath = null
         currentSharedCacheKey = null
         currentDurationSec = 0.0
@@ -707,6 +807,13 @@ class FingerprintTimingManager @Inject constructor(
         currentIsStreaming = false
         currentEager = false
         currentTrigger = PrepareTrigger.PLAYBACK
+        retainedTrigger = null
+    }
+
+    private fun retainTrigger(trigger: PrepareTrigger) {
+        if (trigger == PrepareTrigger.CHAT || trigger == PrepareTrigger.BOOKMARK) {
+            retainedTrigger = trigger
+        }
     }
 
     /**
@@ -716,7 +823,9 @@ class FingerprintTimingManager @Inject constructor(
      */
     private suspend fun shouldRunEagerPass(episodeUuid: String, isDownloaded: Boolean): Boolean {
         if (Util.getAppPlatform(context) != AppPlatform.Phone) return false
+        if (decodePolicy.current() != FingerprintPolicy.PLATFORM) return false
         return computeEager(
+            isGeneratedChaptersAllowed = generatedChaptersAvailability.isAllowed(),
             hasGeneratedChapters = chapterManager.get().hasGeneratedChapters(episodeUuid),
             isDownloaded = isDownloaded,
         )
@@ -741,6 +850,12 @@ class FingerprintTimingManager @Inject constructor(
         if (Util.getAppPlatform(context) != AppPlatform.Phone) {
             markUnavailable(reason = "unsupported_platform", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
             Timber.d("FingerprintTimingManager: unsupported platform")
+            return
+        }
+
+        if (decodePolicy.current() == FingerprintPolicy.DISABLED) {
+            markUnavailable(reason = "unsupported_device", isStreaming = !isDownloaded, episodeUuid = episodeUuid)
+            Timber.d("FingerprintTimingManager: unsupported device")
             return
         }
 
@@ -806,7 +921,7 @@ class FingerprintTimingManager @Inject constructor(
         Timber.d("FingerprintTimingManager: fetching reference from server for $episodeUuid")
 
         val baseUrl = "${BuildConfig.SERVER_SHOW_NOTES_URLS}/generated_transcripts/"
-        val fetchResult = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid)
+        val fetchResult = referenceRetriever.fetchReferenceData(baseUrl, podcastUuid, episodeUuid, trigger.downloadTrigger)
         if (gen != generation) return
 
         val referenceData = when (fetchResult) {
@@ -982,6 +1097,7 @@ class FingerprintTimingManager @Inject constructor(
      */
     private fun maybeStartCatchUpResolve(gen: Long, startSec: Double) {
         if (currentEager) return
+        if (decodePolicy.current() != FingerprintPolicy.PLATFORM) return
         if (isWithinMatchedContent(startSec, snapshotPlaybackToReference)) return
         catchUpJob?.cancel()
         catchUpJob = scope.launch(Dispatchers.IO) {
@@ -1545,9 +1661,10 @@ class FingerprintTimingManager @Inject constructor(
     companion object {
         /** Core eager-pass gate (assumes the platform check already passed). */
         internal fun computeEager(
+            isGeneratedChaptersAllowed: Boolean,
             hasGeneratedChapters: Boolean,
             isDownloaded: Boolean,
-        ): Boolean = hasGeneratedChapters && isDownloaded
+        ): Boolean = isGeneratedChaptersAllowed && hasGeneratedChapters && isDownloaded
 
         /** A chapter tap is user-initiated, so metered data is allowed unless the user asked to be warned. */
         internal fun shouldBlockOnDemandResolve(
@@ -1555,6 +1672,17 @@ class FingerprintTimingManager @Inject constructor(
             warnOnMeteredNetwork: Boolean,
             isUnmetered: () -> Boolean,
         ): Boolean = !isDownloaded && warnOnMeteredNetwork && !isUnmetered()
+
+        internal fun shouldPrepareOnPlayback(
+            isGeneratedChaptersAllowed: Boolean,
+            hasGeneratedChapters: Boolean,
+            warnOnMeteredNetwork: Boolean,
+            isUnmetered: () -> Boolean,
+        ): Boolean = isGeneratedChaptersAllowed &&
+            hasGeneratedChapters &&
+            !shouldBlockOnDemandResolve(isDownloaded = false, warnOnMeteredNetwork = warnOnMeteredNetwork, isUnmetered = isUnmetered)
+
+        internal fun canRetryFailedPreparation(trigger: PrepareTrigger): Boolean = trigger == PrepareTrigger.TRANSCRIPT_VIEW || trigger == PrepareTrigger.CHAT
 
         fun interpolate(
             time: Double,

@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.transcripts
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -11,17 +13,24 @@ import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatManager
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.BookmarkTranscript
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import au.com.shiftyjelly.pocketcasts.utils.search.kmpSearch
+import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
 import com.automattic.eventhorizon.SyncedTranscriptsAutoScrollResumedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekFailedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekUsedEvent
@@ -37,7 +46,9 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -46,21 +57,27 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel(assistedFactory = TranscriptViewModel.Factory::class)
 class TranscriptViewModel @AssistedInject constructor(
     @Assisted private val source: Source,
+    @ApplicationContext private val context: Context,
     private val transcriptManager: TranscriptManager,
     private val episodeManager: EpisodeManager,
     private val userManager: UserManager,
     private val paymentClient: PaymentClient,
     private val eventHorizon: EventHorizon,
     private val sharingClient: TranscriptSharingClient,
+    private val bookmarkManager: BookmarkManager,
+    private val chatManager: ChatManager,
     val fingerprintTimingManager: FingerprintTimingManager,
     val playbackManager: PlaybackManager,
 ) : ViewModel() {
@@ -101,6 +118,7 @@ class TranscriptViewModel @AssistedInject constructor(
     fun loadTranscript(episodeUuid: String) {
         loadTranscriptJob?.cancel()
         syncedStateJob?.cancel()
+        syncedPlaybackJob?.cancel()
         loadTranscriptJob = viewModelScope.launch {
             searchJob?.cancelAndJoin()
 
@@ -144,22 +162,20 @@ class TranscriptViewModel @AssistedInject constructor(
             }
             _uiState.update { state -> state.copy(transcriptState = transcriptState) }
 
-            if (transcriptState is TranscriptState.Loaded) {
-                trackTranscriptShown(transcriptState.transcript)
+            if (transcriptState is TranscriptState.Loaded && transcriptState.transcript is Transcript.Text) {
+                observeSyncedState()
+                // Playback can start after the transcript is shown, for example from the episode details toolbar.
+                observePlaybackForSyncing(episodeUuid)
             }
 
-            if (transcriptState is TranscriptState.Loaded && transcriptState.transcript is Transcript.Text) {
-                val currentPlayingUuid = playbackManager.getCurrentEpisode()?.uuid
-                if (currentPlayingUuid == episodeUuid) {
-                    fingerprintTimingManager.prepareForCurrentEpisode(FingerprintTimingManager.PrepareTrigger.TRANSCRIPT_VIEW)
-                    _uiState.update { state -> state.copy(syncedState = fingerprintTimingManager.state) }
-                    observeSyncedState()
-                }
+            if (transcriptState is TranscriptState.Loaded) {
+                trackTranscriptShown(transcriptState.transcript, episodeUuid)
             }
         }
     }
 
     private var syncedStateJob: Job? = null
+    private var syncedPlaybackJob: Job? = null
 
     private fun observeSyncedState() {
         syncedStateJob?.cancel()
@@ -167,6 +183,20 @@ class TranscriptViewModel @AssistedInject constructor(
             fingerprintTimingManager.stateFlow.collect { syncedState ->
                 _uiState.update { state -> state.copy(syncedState = syncedState) }
             }
+        }
+    }
+
+    private fun observePlaybackForSyncing(episodeUuid: String) {
+        syncedPlaybackJob?.cancel()
+        syncedPlaybackJob = viewModelScope.launch {
+            playbackManager.playbackStateFlow
+                .map { it.episodeUuid }
+                .distinctUntilChanged()
+                .collect { playingEpisodeUuid ->
+                    if (playingEpisodeUuid == episodeUuid) {
+                        fingerprintTimingManager.onTranscriptShown(episodeUuid)
+                    }
+                }
         }
     }
 
@@ -235,7 +265,7 @@ class TranscriptViewModel @AssistedInject constructor(
                 trackSeekFailed("episode_not_found", currentState.syncedState)
                 return null
             }
-            val result = fingerprintTimingManager.resolvePlaybackTime(episode, textEntry.startTimeMs.milliseconds)
+            val result = fingerprintTimingManager.resolvePlaybackTime(episode, textEntry.startTimeMs.milliseconds, GeneratedChaptersDownloadTriggerType.TranscriptView)
             return when (result) {
                 is ChapterSeekResult.Resolved -> {
                     // Resolving can take seconds; drop the seek if the episode changed meanwhile.
@@ -297,6 +327,7 @@ class TranscriptViewModel @AssistedInject constructor(
         super.onCleared()
         loadTranscriptJob?.cancel()
         syncedStateJob?.cancel()
+        syncedPlaybackJob?.cancel()
     }
 
     fun reloadTranscript() {
@@ -436,7 +467,46 @@ class TranscriptViewModel @AssistedInject constructor(
         }
     }
 
-    private fun trackTranscriptShown(transcript: Transcript) {
+    fun createBookmarkFromSelection(selectedText: String) {
+        val transcript = (uiState.value.transcriptState as? TranscriptState.Loaded)?.transcript as? Transcript.Text ?: return
+        viewModelScope.launch {
+            val result = buildBookmarkFromSelection(transcript, selectedText)
+            if (result == null) {
+                _messages.send(TranscriptMessage.BookmarkFailed)
+            } else {
+                val (bookmark, isNew) = result
+                _messages.send(TranscriptMessage.OpenBookmarkEditor(bookmark.uuid, isNewBookmark = isNew, fromEpisode = source == Source.Episode))
+            }
+        }
+    }
+
+    private suspend fun buildBookmarkFromSelection(transcript: Transcript.Text, selectedText: String): Pair<Bookmark, Boolean>? {
+        if (!transcript.isGenerated) return null
+        val model = BookmarkTranscript.from(transcript)
+        val span = model.selectionDisplaySpan(selectedText) ?: return null
+        val passage = model.passage(span)
+        if (passage.text.isEmpty()) return null
+        val referenceTimeMs = model.referenceTimeMsAt(span.start) ?: return null
+        val episode = episodeManager.findByUuid(transcript.episodeUuid) ?: return null
+
+        val playbackMs = fingerprintTimingManager.playbackTimeMs(forReferenceTime = referenceTimeMs / 1000.0) ?: return null
+        val timeSecs = playbackMs / 1000
+        val referenceTimeSecs = (referenceTimeMs / 1000).toInt()
+
+        val isNew = bookmarkManager.findByEpisodeTime(episode, timeSecs) == null
+        val bookmark = bookmarkManager.add(
+            episode = episode,
+            timeSecs = timeSecs,
+            title = context.getString(LR.string.bookmark),
+            creationSource = BookmarkSourceType.Transcript,
+            passage = passage.text,
+            passageLocation = passage.location,
+            referenceTime = referenceTimeSecs,
+        )
+        return bookmark to isNew
+    }
+
+    private suspend fun trackTranscriptShown(transcript: Transcript, episodeUuid: String) {
         val isPaywallVisible = !_uiState.value.isPlusUser && transcript.isGenerated
         if (isPaywallVisible) {
             track { source, podcastUuid, episodeUuid ->
@@ -447,6 +517,17 @@ class TranscriptViewModel @AssistedInject constructor(
                 )
             }
         } else {
+            val hasEpisodeChat = if (FeatureFlag.isEnabled(Feature.EPISODE_CHAT)) {
+                try {
+                    chatManager.hasChatWithMessages(episodeUuid)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    null
+                }
+            } else {
+                null
+            }
             track { source, podcastUuid, episodeUuid ->
                 TranscriptShownEvent(
                     type = transcript.type.analyticsValue,
@@ -454,6 +535,7 @@ class TranscriptViewModel @AssistedInject constructor(
                     podcastUuid = podcastUuid,
                     episodeUuid = episodeUuid,
                     source = source,
+                    hasEpisodeChat = hasEpisodeChat,
                 )
             }
         }
@@ -511,6 +593,8 @@ class TranscriptViewModel @AssistedInject constructor(
 
 sealed interface TranscriptMessage {
     data object TapToSeekStreamingUnavailable : TranscriptMessage
+    data object BookmarkFailed : TranscriptMessage
+    data class OpenBookmarkEditor(val bookmarkUuid: String, val isNewBookmark: Boolean, val fromEpisode: Boolean) : TranscriptMessage
 }
 
 data class UiState(
@@ -537,6 +621,12 @@ data class UiState(
         !isPaywallVisible &&
         transcriptEpisodeUuid != null &&
         transcriptEpisodeUuid == playingEpisodeUuid
+
+    // Passages only exist against the generated transcript, which needs the fingerprint mapping
+    // (playing + synced) to place the bookmark on the audio.
+    val isBookmarkFromSelectionAvailable get() = isPlusUser &&
+        isGeneratedTextTranscript &&
+        isSyncedActive
 
     companion object {
         val Empty = UiState(

@@ -74,6 +74,10 @@ enum class EpisodeViewSource(
         key = "now_playing",
         analyticsValue = EpisodeViewSourceType.NowPlaying,
     ),
+    BOOKMARKS(
+        key = "bookmarks",
+        analyticsValue = EpisodeViewSourceType.Bookmarks,
+    ),
     UNKNOWN(
         key = "unknown",
         analyticsValue = EpisodeViewSourceType.Unknown,

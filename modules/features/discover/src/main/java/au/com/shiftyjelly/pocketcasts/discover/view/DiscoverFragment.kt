@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentDiscoverBinding
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.DiscoverViewModel
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
+import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
@@ -25,9 +26,10 @@ import au.com.shiftyjelly.pocketcasts.search.SearchFragment
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverListSummary
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
-import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyle
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
@@ -116,7 +118,7 @@ class DiscoverFragment :
             trackCategoryShownImpression(contentList)
         }
 
-        if (contentList.expandedStyle is ExpandedStyle.GridList) {
+        if (contentList.expandedStyle.usePodcastGrid) {
             val fragment = PodcastGridFragment.newInstance(transformedList)
             (activity as FragmentHostListener).addFragment(fragment)
         } else {
@@ -134,10 +136,43 @@ class DiscoverFragment :
                 ),
             )
         }
-        if (list.expandedStyle is ExpandedStyle.GridList) {
+        if (list.expandedStyle.usePodcastGrid) {
             val fragment = PodcastGridFragment.newInstance(transformedList)
             (activity as FragmentHostListener).addFragment(fragment)
         }
+    }
+
+    override fun onNetworkClicked(network: DiscoverListSummary) {
+        eventHorizon.track(
+            DiscoverListShowAllTappedEvent(
+                listId = network.uuid,
+                // No date passed as it's not available until the list is loaded
+                listDatetime = "",
+            ),
+        )
+        (activity as FragmentHostListener).openNetworkPage(
+            listId = network.uuid,
+            title = network.title,
+            sourceView = SourceView.DISCOVER,
+        )
+    }
+
+    override fun onNetworksShowAllClicked(row: DiscoverRow, listDate: String?) {
+        // the Networks row always carries a uuid, so the inferred-id fallback that onPodcastListClicked needs does not apply
+        row.listUuid?.let { listId ->
+            eventHorizon.track(
+                DiscoverListShowAllTappedEvent(
+                    listId = listId,
+                    listDatetime = listDate.orEmpty(),
+                ),
+            )
+        }
+        val transformedList = viewModel.transformNetworkLoadableList(row, resources)
+        val fragment = NetworksGridFragment.newInstance(
+            sourceUrl = transformedList.source,
+            title = transformedList.title.tryToLocalise(resources),
+        )
+        (activity as FragmentHostListener).addFragment(fragment)
     }
 
     override fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?) {
@@ -226,6 +261,7 @@ class DiscoverFragment :
                 listener = this,
                 theme = theme,
                 loadPodcastList = { source, authenticated -> viewModel.loadPodcastList(source, authenticated) },
+                loadNetworkList = { source, authenticated -> viewModel.loadNetworkList(source, authenticated) },
                 loadCarouselSponsoredPodcastList = viewModel::loadCarouselSponsoredPodcasts,
                 categoriesState = { (url, popularIds, sponsoredIds) ->
                     categoriesManager.setRowInfo(popularCategoryIds = popularIds, sponsoredCategoryIds = sponsoredIds)

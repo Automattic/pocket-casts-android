@@ -20,6 +20,7 @@ class SyncSettingsTaskTest {
     private val lastSyncTime: Instant = Instant.EPOCH
 
     private val showGeneratedChapters = mock<UserSetting<Boolean>>()
+    private val showWhatsNewDot = mock<UserSetting<Boolean>>()
     private val settings = mock<Settings>()
 
     private class FakeNamedSettingsCaller(
@@ -46,26 +47,27 @@ class SyncSettingsTaskTest {
         whenever(settings.collectListeningStats).thenReturn(unsyncedSetting())
         whenever(settings.audioOnly).thenReturn(unsyncedSetting())
         whenever(settings.showGeneratedChapters).thenReturn(showGeneratedChapters)
+        whenever(settings.showWhatsNewDot).thenReturn(showWhatsNewDot)
     }
 
     @Test
-    fun `opting out of generated chapters pushes disableAiChapters true`() = runTest {
-        whenever(showGeneratedChapters.getSyncValue(lastSyncTime)).thenReturn(false)
-        val caller = FakeNamedSettingsCaller()
-
-        SyncSettingsTask.run(settings, lastSyncTime, caller)
-
-        assertEquals(true, caller.request?.settings?.disableAiChapters)
-    }
-
-    @Test
-    fun `showing generated chapters pushes disableAiChapters false`() = runTest {
+    fun `turning generated chapters on pushes showGeneratedChapters true`() = runTest {
         whenever(showGeneratedChapters.getSyncValue(lastSyncTime)).thenReturn(true)
         val caller = FakeNamedSettingsCaller()
 
         SyncSettingsTask.run(settings, lastSyncTime, caller)
 
-        assertEquals(false, caller.request?.settings?.disableAiChapters)
+        assertEquals(true, caller.request?.settings?.showGeneratedChapters)
+    }
+
+    @Test
+    fun `turning generated chapters off pushes showGeneratedChapters false`() = runTest {
+        whenever(showGeneratedChapters.getSyncValue(lastSyncTime)).thenReturn(false)
+        val caller = FakeNamedSettingsCaller()
+
+        SyncSettingsTask.run(settings, lastSyncTime, caller)
+
+        assertEquals(false, caller.request?.settings?.showGeneratedChapters)
     }
 
     @Test
@@ -76,24 +78,13 @@ class SyncSettingsTaskTest {
         SyncSettingsTask.run(settings, lastSyncTime, caller)
 
         assertNotNull(caller.request)
-        assertNull(caller.request?.settings?.disableAiChapters)
+        assertNull(caller.request?.settings?.showGeneratedChapters)
     }
 
     @Test
-    fun `a disableAiChapters response of true hides generated chapters`() = runTest {
+    fun `a showGeneratedChapters response of true turns generated chapters on`() = runTest {
         val caller = FakeNamedSettingsCaller(
-            mapOf("disableAiChapters" to SettingResponse(value = true, changed = true)),
-        )
-
-        SyncSettingsTask.run(settings, lastSyncTime, caller)
-
-        verify(showGeneratedChapters).set(eq(false), eq(false), any(), any())
-    }
-
-    @Test
-    fun `a disableAiChapters response of false shows generated chapters`() = runTest {
-        val caller = FakeNamedSettingsCaller(
-            mapOf("disableAiChapters" to SettingResponse(value = false, changed = true)),
+            mapOf("showGeneratedChapters" to SettingResponse(value = true, changed = true)),
         )
 
         SyncSettingsTask.run(settings, lastSyncTime, caller)
@@ -102,13 +93,56 @@ class SyncSettingsTaskTest {
     }
 
     @Test
-    fun `an unchanged disableAiChapters response is not applied`() = runTest {
+    fun `a showGeneratedChapters response of false turns generated chapters off`() = runTest {
         val caller = FakeNamedSettingsCaller(
-            mapOf("disableAiChapters" to SettingResponse(value = true, changed = false)),
+            mapOf("showGeneratedChapters" to SettingResponse(value = false, changed = true)),
+        )
+
+        SyncSettingsTask.run(settings, lastSyncTime, caller)
+
+        verify(showGeneratedChapters).set(eq(false), eq(false), any(), any())
+    }
+
+    @Test
+    fun `an unchanged showGeneratedChapters response is not applied`() = runTest {
+        val caller = FakeNamedSettingsCaller(
+            mapOf("showGeneratedChapters" to SettingResponse(value = true, changed = false)),
         )
 
         SyncSettingsTask.run(settings, lastSyncTime, caller)
 
         verify(showGeneratedChapters, never()).set(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `a legacy disableAiChapters response is ignored`() = runTest {
+        val caller = FakeNamedSettingsCaller(
+            mapOf("disableAiChapters" to SettingResponse(value = false, changed = true)),
+        )
+
+        SyncSettingsTask.run(settings, lastSyncTime, caller)
+
+        verify(showGeneratedChapters, never()).set(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `turning the what's new dot off pushes showWhatsNewDot false`() = runTest {
+        whenever(showWhatsNewDot.getSyncValue(lastSyncTime)).thenReturn(false)
+        val caller = FakeNamedSettingsCaller()
+
+        SyncSettingsTask.run(settings, lastSyncTime, caller)
+
+        assertEquals(false, caller.request?.settings?.showWhatsNewDot)
+    }
+
+    @Test
+    fun `a showWhatsNewDot response is applied without being pushed back`() = runTest {
+        val caller = FakeNamedSettingsCaller(
+            mapOf("showWhatsNewDot" to SettingResponse(value = false, changed = true)),
+        )
+
+        SyncSettingsTask.run(settings, lastSyncTime, caller)
+
+        verify(showWhatsNewDot).set(eq(false), eq(false), any(), any())
     }
 }

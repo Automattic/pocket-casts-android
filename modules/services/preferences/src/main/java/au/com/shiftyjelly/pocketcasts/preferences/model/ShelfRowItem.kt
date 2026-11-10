@@ -46,6 +46,13 @@ enum class ShelfItem(
         showIf = { it is PodcastEpisode },
         analyticsValue = ShelfActionType.ShareEpisode,
     ),
+    EpisodeChat(
+        id = "episode_chat",
+        titleId = { LR.string.episode_chat_shelf_title },
+        iconId = { IR.drawable.ic_episode_chat },
+        showIf = { it is PodcastEpisode },
+        analyticsValue = ShelfActionType.EpisodeChat,
+    ),
     AddToPlaylist(
         id = "add_to_playlist",
         titleId = { LR.string.add_to_playlist_description },

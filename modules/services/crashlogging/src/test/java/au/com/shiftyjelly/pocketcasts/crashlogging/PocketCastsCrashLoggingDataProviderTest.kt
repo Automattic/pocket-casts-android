@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.crashlogging
 
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.crashlogging.PocketCastsCrashLoggingDataProvider.Companion.GLOBAL_TAG_APP_PLATFORM
+import au.com.shiftyjelly.pocketcasts.crashlogging.PocketCastsCrashLoggingDataProvider.Companion.GLOBAL_TAG_INSTALL_SOURCE
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeBuildDataProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeCrashReportPermissionCheck
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeEncryptedLogging
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Test
 
@@ -24,16 +26,18 @@ class PocketCastsCrashLoggingDataProviderTest {
 
     @Before
     fun setUp() {
-        sut = PocketCastsCrashLoggingDataProvider(
-            fakeObserveUser,
-            FakeCrashReportPermissionCheck(),
-            fakeBuildDataProvider,
-            FakeEncryptedLogging(),
-            File.createTempFile("test", "test"),
-            localeProvider = { null },
-            connectionStatusProvider = { true },
-        )
+        sut = createSut()
     }
+
+    private fun createSut() = PocketCastsCrashLoggingDataProvider(
+        fakeObserveUser,
+        FakeCrashReportPermissionCheck(),
+        fakeBuildDataProvider,
+        FakeEncryptedLogging(),
+        File.createTempFile("test", "test"),
+        localeProvider = { null },
+        connectionStatusProvider = { true },
+    )
 
     @Test
     fun `should provide specific error sampling for mobile platform`() {
@@ -66,6 +70,23 @@ class PocketCastsCrashLoggingDataProviderTest {
                 "mobile",
             )
         }
+    }
+
+    @Test
+    fun `should attach install source tag when available`() = runTest {
+        fakeBuildDataProvider.installSource = "amazon_appstore"
+
+        assertEquals(
+            "amazon_appstore",
+            createSut().applicationContextProvider.last()[GLOBAL_TAG_INSTALL_SOURCE],
+        )
+    }
+
+    @Test
+    fun `should not attach install source tag when unavailable`() = runTest {
+        fakeBuildDataProvider.installSource = null
+
+        assertFalse(createSut().applicationContextProvider.last().containsKey(GLOBAL_TAG_INSTALL_SOURCE))
     }
 
     @Test

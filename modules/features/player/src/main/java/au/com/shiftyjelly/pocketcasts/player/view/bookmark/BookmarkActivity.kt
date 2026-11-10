@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat
 import androidx.fragment.app.commitNow
@@ -26,8 +27,7 @@ class BookmarkActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(VR.layout.activity_blank_fragment)
+        setContentView(FrameLayout(this).apply { id = VR.id.container })
 
         if (savedInstanceState == null) {
             supportFragmentManager.commitNow {

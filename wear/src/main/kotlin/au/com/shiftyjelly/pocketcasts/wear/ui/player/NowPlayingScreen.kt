@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -36,8 +35,9 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.MarqueeTextMediaDisplay
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.horologist.PodcastControlButtonsStyled
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.horologist.SetVolumeButtonStyled
+import com.google.android.horologist.audio.ui.VolumePositionIndicator
 import com.google.android.horologist.audio.ui.VolumeUiState
-import com.google.android.horologist.compose.rotaryinput.accumulatedBehavior
+import com.google.android.horologist.audio.ui.volumeRotaryBehavior
 import com.google.android.horologist.media.ui.components.background.ColorBackground
 import com.google.android.horologist.media.ui.components.display.MessageMediaDisplay
 import com.google.android.horologist.media.ui.screens.player.PlayerScreen
@@ -82,8 +82,15 @@ fun NowPlayingScreen(
     val volumeUiState by volumeViewModel.volumeUiState.collectAsStateWithLifecycle()
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        positionIndicator = {
+            VolumePositionIndicator(
+                volumeUiState = { volumeUiState },
+                displayIndicatorEvents = volumeViewModel.displayIndicatorEvents,
+            )
+        },
     ) {
         val state = playerViewModel.state.collectAsState().value
+        val focusRequester = remember { FocusRequester() }
 
         PlayerScreen(
             mediaDisplay = {
@@ -190,11 +197,14 @@ fun NowPlayingScreen(
                 }
             },
             modifier = Modifier
-                .onVolumeChangeByScroll(
-                    focusRequester = remember { FocusRequester() },
-                    onVolumeChangeByScroll = volumeViewModel::onVolumeChangeByScroll,
-                )
-                .requestFocusOnHierarchyActive(),
+                .requestFocusOnHierarchyActive()
+                .rotaryScrollable(
+                    behavior = volumeRotaryBehavior(
+                        volumeUiStateProvider = { volumeViewModel.volumeUiState.value },
+                        onRotaryVolumeInput = { newVolume -> volumeViewModel.setVolume(newVolume) },
+                    ),
+                    focusRequester = focusRequester,
+                ),
         )
     }
 }
@@ -241,13 +251,3 @@ fun NowPlayingSettingsButtons(
         )
     }
 }
-
-@Composable
-private fun Modifier.onVolumeChangeByScroll(
-    focusRequester: FocusRequester,
-    onVolumeChangeByScroll: (scrollPixels: Float) -> Unit,
-) = focusRequester(focusRequester)
-    .rotaryScrollable(
-        behavior = accumulatedBehavior(onValueChange = onVolumeChangeByScroll),
-        focusRequester = focusRequester,
-    )

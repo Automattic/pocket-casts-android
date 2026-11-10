@@ -67,7 +67,7 @@ class UpdateEpisodeDetailsTask @AssistedInject constructor(
         }
     }
 
-    private val episodeUuids: List<String>? = inputData.getStringArray(INPUT_EPISODE_UUIDS)?.toList()
+    private val episodeUuids: List<String>? = inputData.getNullableStringArray(INPUT_EPISODE_UUIDS)?.filterNotNull()
 
     override suspend fun doWork(): Result {
         if (episodeUuids == null) {

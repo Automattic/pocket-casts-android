@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,6 +28,8 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.discover.R
+import au.com.shiftyjelly.pocketcasts.discover.compose.NetworksRow
+import au.com.shiftyjelly.pocketcasts.discover.compose.NetworksRowPlaceholder
 import au.com.shiftyjelly.pocketcasts.discover.compose.SmallListRow
 import au.com.shiftyjelly.pocketcasts.discover.compose.SmallListRowPlaceholder
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCarouselListBinding
@@ -37,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowChangeRegionBindin
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowCollectionListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowErrorBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowMostPopularPodcastsBinding
+import au.com.shiftyjelly.pocketcasts.discover.databinding.RowNetworksBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastLargeListBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastLargeListWithPodcastBinding
 import au.com.shiftyjelly.pocketcasts.discover.databinding.RowPodcastSmallListBinding
@@ -51,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.Col
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.Companion.HEADER_OFFSET
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.PodcastsViewHolder.Companion.NUMBER_OF_ROWS_PER_PAGE
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.CarouselSponsoredPodcast
+import au.com.shiftyjelly.pocketcasts.discover.viewmodel.NetworkList
 import au.com.shiftyjelly.pocketcasts.discover.viewmodel.PodcastList
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
@@ -58,10 +63,10 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
-import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverEpisode
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverListSummary
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
@@ -73,9 +78,10 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeDrawable
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatPattern
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.hideRow
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
@@ -95,22 +101,22 @@ import com.automattic.eventhorizon.DiscoverListPodcastSubscribedEvent
 import com.automattic.eventhorizon.DiscoverListPodcastTappedEvent
 import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Flowable
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
-import io.reactivex.schedulers.Schedulers
 import kotlin.math.ceil
 import kotlin.math.min
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.rxSingle
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val MAX_ROWS_SMALL_LIST = 20
+private const val MAX_NETWORKS_ROW = 10
 private const val INITIAL_PREFETCH_COUNT = 1
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
@@ -129,6 +135,7 @@ internal class DiscoverAdapter(
     val listener: Listener,
     val theme: Theme,
     loadPodcastList: (String, Boolean?) -> Flowable<PodcastList>,
+    private val loadNetworkList: (String, Boolean?) -> Flowable<NetworkList>,
     val loadCarouselSponsoredPodcastList: (List<SponsoredPodcast>) -> Flowable<List<CarouselSponsoredPodcast>>,
     private val categoriesState: (CategoriesStateInput) -> Flowable<CategoriesManager.State>,
     private val eventHorizon: EventHorizon,
@@ -138,6 +145,8 @@ internal class DiscoverAdapter(
         fun onPodcastSubscribe(podcast: DiscoverPodcast, listUuid: String?, listDate: String? = null)
         fun onPodcastListClicked(contentList: NetworkLoadableList, podcastList: PodcastList? = null)
         fun onCollectionHeaderClicked(list: NetworkLoadableList)
+        fun onNetworkClicked(network: DiscoverListSummary)
+        fun onNetworksShowAllClicked(row: DiscoverRow, listDate: String?)
         fun onEpisodeClicked(episode: DiscoverEpisode, listUuid: String?)
         fun onEpisodePlayClicked(episode: DiscoverEpisode)
         fun onEpisodeStopClicked()
@@ -407,6 +416,55 @@ internal class DiscoverAdapter(
                     ),
                 )
                 listIdImpressionTracked.add(listId)
+            }
+        }
+    }
+
+    inner class NetworksViewHolder(val binding: RowNetworksBinding) : NetworkLoadableViewHolder(binding.root) {
+        private var networks by mutableStateOf(emptyList<DiscoverListSummary>())
+        private var isLoading by mutableStateOf(true)
+        private var boundSource: String? = null
+
+        private var scrollState by mutableStateOf(LazyListState())
+
+        init {
+            binding.networksRow.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
+            binding.networksRow.setContent {
+                AppTheme(theme.activeTheme) {
+                    if (isLoading) {
+                        NetworksRowPlaceholder()
+                    } else {
+                        NetworksRow(
+                            networks = networks,
+                            scrollState = scrollState,
+                            onClickNetwork = listener::onNetworkClicked,
+                        )
+                    }
+                }
+            }
+        }
+
+        fun loading(row: DiscoverRow) {
+            binding.lblTitle.text = row.title.tryToLocalise(context.resources)
+            binding.btnShowAll.setOnClickListener(null)
+            if (row.source != boundSource) {
+                boundSource = row.source
+                networks = emptyList()
+                scrollState = LazyListState()
+            }
+            isLoading = networks.isEmpty()
+        }
+
+        fun bind(list: NetworkList, row: DiscoverRow) {
+            networks = list.networks
+            isLoading = false
+            binding.btnShowAll.setOnClickListener {
+                listener.onNetworksShowAllClicked(row, list.date)
+            }
+            if (list.networks.isEmpty()) {
+                hideRow()
+            } else {
+                showRow()
             }
         }
     }
@@ -688,6 +746,8 @@ internal class DiscoverAdapter(
 
             R.layout.row_podcast_small_list -> SmallListViewHolder(RowPodcastSmallListBinding.inflate(inflater, parent, false))
 
+            R.layout.row_networks -> NetworksViewHolder(RowNetworksBinding.inflate(inflater, parent, false))
+
             R.layout.row_carousel_list -> CarouselListViewHolder(RowCarouselListBinding.inflate(inflater, parent, false))
 
             R.layout.row_error -> ErrorViewHolder(RowErrorBinding.inflate(inflater, parent, false))
@@ -767,6 +827,11 @@ internal class DiscoverAdapter(
                         is DisplayStyle.SingleEpisode -> R.layout.row_single_episode
                         is DisplayStyle.CollectionList -> R.layout.row_collection_list
                         else -> R.layout.row_error
+                    }
+                } else if (row.type is ListType.ListsList && row.displayStyle is DisplayStyle.LargeList) {
+                    // with the flag off this falls through to row_error, a zero-height view, so the row takes no space
+                    if (FeatureFlag.isEnabled(Feature.NETWORK_DISCOVERY)) {
+                        return R.layout.row_networks
                     }
                 } else if (row.type is ListType.Categories && row.displayStyle is DisplayStyle.Pills) {
                     return R.layout.row_category_pills
@@ -851,12 +916,10 @@ internal class DiscoverAdapter(
                             Flowable.fromIterable(mutableList.toList())
                                 .concatMap { discoverPodcast ->
                                     // For each podcast, we need to load its background color.
-                                    val zipper: BiFunction<DiscoverPodcast, Optional<ArtworkColors>, DiscoverPodcast> = BiFunction { podcast: DiscoverPodcast, colors: Optional<ArtworkColors> ->
-                                        val backgroundColor = colors.get()?.tintForDarkBg ?: 0
-                                        podcast.color = backgroundColor
-                                        podcast
-                                    }
-                                    Single.zip(Single.just(discoverPodcast), staticServiceManager.getColorsSingle(discoverPodcast.uuid).subscribeOn(Schedulers.io()), zipper).toFlowable()
+                                    rxSingle(Dispatchers.IO) {
+                                        discoverPodcast.color = staticServiceManager.getColors(discoverPodcast.uuid)?.tintForDarkBg ?: 0
+                                        discoverPodcast
+                                    }.toFlowable()
                                 }
                                 .toList().toFlowable()
                         }
@@ -878,6 +941,22 @@ internal class DiscoverAdapter(
                         onNext = { list ->
                             val truncatedList = list.copy(podcasts = list.podcasts.take(MAX_ROWS_SMALL_LIST))
                             holder.bind(truncatedList, smallListCurrentPage.remove(holder.itemId))
+                        },
+                    )
+                    row.listUuid?.let { trackListImpression(it) }
+                }
+
+                is NetworksViewHolder -> {
+                    holder.loading(row)
+                    holder.loadFlowable(
+                        loadNetworkList(row.source, row.authenticated),
+                        onNext = { list ->
+                            val truncatedList = list.copy(networks = list.networks.take(MAX_NETWORKS_ROW))
+                            holder.bind(truncatedList, row)
+                        },
+                        onError = { error ->
+                            Timber.e(error, "Could not load feed ${row.source}")
+                            holder.hideRow()
                         },
                     )
                     row.listUuid?.let { trackListImpression(it) }

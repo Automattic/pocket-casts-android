@@ -45,7 +45,6 @@ import java.util.UUID
 import javax.net.ssl.SSLException
 import kotlin.time.measureTimedValue
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.rx2.await
 import okhttp3.Call
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.repositories.download.EpisodeDownloader.Result as DownloadResult
@@ -103,6 +102,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
     private val downloader = EpisodeDownloader(
         httpClient = httpClient,
         progressCache = progressCache,
+        waitForWifi = args.waitForWifi,
         onCall = { call ->
             downloadCall = call
         },
@@ -207,8 +207,7 @@ class DownloadEpisodeWorker @AssistedInject constructor(
             }
 
             is UserEpisode -> {
-                val freshDownloadUrl = userEpisodeManager.getPlaybackUrlRxSingle(episode).await()
-                episode.copy(downloadUrl = freshDownloadUrl)
+                episode.copy(downloadUrl = userEpisodeManager.getPlaybackUrl(episode))
             }
         }
     }

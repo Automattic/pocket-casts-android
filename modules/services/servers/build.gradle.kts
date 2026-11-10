@@ -31,7 +31,6 @@ dependencies {
 
     implementation(libs.automattic.crashlogging)
     implementation(libs.coroutines.core)
-    implementation(libs.coroutines.rx2)
     implementation(libs.moshi.adapters)
     implementation(libs.okHttp.logging)
     implementation(libs.retrofit.moshi)
@@ -52,5 +51,6 @@ dependencies {
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.okHttp.mockwebserver)
+    testImplementation(libs.robolectric)
     testImplementation(projects.modules.services.sharedtest)
 }
