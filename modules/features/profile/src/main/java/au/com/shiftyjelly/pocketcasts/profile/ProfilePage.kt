@@ -131,6 +131,7 @@ internal fun ProfilePage(
                             imageId = R.drawable.playback_2026_banner,
                             title = stringResource(LR.string.playback_2026_banner_title),
                             summary = stringResource(LR.string.playback_2026_banner_description),
+                            summaryMaxWidth = 197.dp,
                             modifier = Modifier.padding(horizontal = horizontalPadding),
                         )
                     }
