@@ -13,6 +13,7 @@ object Playback2026 {
     enum class Source(val analyticsValue: EndOfYearStoryOpenSourceType) {
         Modal(EndOfYearStoryOpenSourceType.Modal),
         Profile(EndOfYearStoryOpenSourceType.Profile),
+        UserLogin(EndOfYearStoryOpenSourceType.UserLogin),
     }
 
     fun start(context: Context, source: Source) {

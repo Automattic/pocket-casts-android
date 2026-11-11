@@ -189,6 +189,9 @@ class AutomotiveSettingsActivity :
     override fun showStoriesOrAccount(source: String) {
     }
 
+    override fun showPlayback2026OrAccount(source: String) {
+    }
+
     override fun whatsNewDismissed(fromConfirmAction: Boolean) {
     }
 

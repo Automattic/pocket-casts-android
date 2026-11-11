@@ -51,6 +51,7 @@ interface FragmentHostListener {
     fun overrideNextRefreshTimer()
     fun isUpNextShowing(): Boolean
     fun showStoriesOrAccount(source: String)
+    fun showPlayback2026OrAccount(source: String)
     fun whatsNewDismissed(fromConfirmAction: Boolean = false)
     fun onPlayerBackstackChanged()
 }
