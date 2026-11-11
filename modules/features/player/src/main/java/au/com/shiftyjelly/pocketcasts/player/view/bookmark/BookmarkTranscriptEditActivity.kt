@@ -31,7 +31,6 @@ class BookmarkTranscriptEditActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val args = IntentCompat.getParcelableExtra(intent, NEW_INSTANCE_KEY, BookmarkTranscriptEditArguments::class.java)
-        // Launched without arguments (seen from automated test devices), nothing to edit
         if (args == null) {
             finish()
             return
