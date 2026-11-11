@@ -2,7 +2,8 @@
 
 # Usage: should-skip-job.sh --job-type <job>
 # Returns 0 to skip, 1 to run, 15 for invalid arguments.
-# Only webhook PR builds skip jobs. POCKET_CASTS_CI_FULL_BUILD=1 forces a full run.
+# Webhook PR and main builds can skip jobs. POCKET_CASTS_CI_FULL_BUILD=1 forces a full run.
+# main compares HEAD to its first parent; CI_CHANGED_FILES_BASE supplies a wider range.
 
 [[ $# -eq 2 && "$1" == --job-type ]] || exit 15
 job="$2"
@@ -11,7 +12,18 @@ case "$job" in
   *) echo "Unknown job type: $job" >&2; exit 15 ;;
 esac
 if [[ "${POCKET_CASTS_CI_FULL_BUILD:-}" == 1 || "${BUILDKITE_SOURCE:-}" != webhook ||
-      ! "${BUILDKITE_PULL_REQUEST:-}" =~ ^[0-9]+$ ]]; then
+      -n "${BUILDKITE_TAG:-}" ]]; then
+  exit 1
+fi
+
+if [[ "${BUILDKITE_PULL_REQUEST-false}" =~ ^[0-9]+$ ]]; then
+  changed_files=(pr_changed_files)
+elif [[ "${BUILDKITE_PULL_REQUEST-false}" == false && "${BUILDKITE_BRANCH:-}" == main ]]; then
+  changed_files=(commit_changed_files)
+  if [[ -n "${CI_CHANGED_FILES_BASE:-}" ]]; then
+    changed_files+=(--base "$CI_CHANGED_FILES_BASE")
+  fi
+else
   exit 1
 fi
 
@@ -55,13 +67,8 @@ case "$job" in
   lint) ;;
 esac
 
-# Include both sides of renames without changing the checkout's Git config.
-config_index=${GIT_CONFIG_COUNT:-0}
-export GIT_CONFIG_COUNT=$((config_index + 1))
-export "GIT_CONFIG_KEY_${config_index}=diff.renames" "GIT_CONFIG_VALUE_${config_index}=false"
-
 # Empty diffs, errors and unknown paths run the job: skipping requires success.
-if pr_changed_files --all-match "${SKIP_PATTERNS[@]}"; then
+if "${changed_files[@]}" --all-match "${SKIP_PATTERNS[@]}"; then
   message="Skipping ${BUILDKITE_LABEL:-$job} - no relevant files changed"
   echo "$message"
   if [[ "${BUILDKITE:-}" == true ]]; then
