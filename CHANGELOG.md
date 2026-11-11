@@ -1,5 +1,8 @@
 8.26
 -----
+*   New Features
+    *   Add Set Sleep Timer and Cancel Sleep Timer commands to the Tasker Control Playback action
+        ([#6400](https://github.com/Automattic/pocket-casts-android/pull/6400))
 
 
 8.25
