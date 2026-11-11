@@ -19,10 +19,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EventHorizon
 import io.reactivex.Flowable
 import java.time.Instant
@@ -47,9 +44,6 @@ import org.mockito.kotlin.whenever
 class PodcastsViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
-
-    @get:Rule
-    val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val folder = Folder(
         uuid = "folder",
@@ -92,17 +86,6 @@ class PodcastsViewModelTest {
         val viewModel = createViewModel(hidePlayedPodcasts = true, subscription = null)
 
         assertEquals(listOf(unplayedPodcast.uuid), viewModel.loadedItems().map(FolderItem::uuid))
-    }
-
-    @Test
-    fun `shows played podcasts when the feature flag is off`() = runTest {
-        FeatureFlag.setEnabled(Feature.HIDE_PLAYED_PODCASTS, false)
-        val viewModel = createViewModel(hidePlayedPodcasts = true, subscription = null)
-
-        assertEquals(
-            listOf(unplayedPodcast.uuid, playedPodcast.uuid, playedPodcastInFolder.uuid),
-            viewModel.loadedItems().map(FolderItem::uuid),
-        )
     }
 
     @Test

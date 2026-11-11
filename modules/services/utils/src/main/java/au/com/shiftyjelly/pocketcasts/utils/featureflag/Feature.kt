@@ -405,15 +405,6 @@ enum class Feature(
         hasDevToggle = true,
         addedOn = LocalDate.parse("2026-10-21"),
     ),
-    HIDE_PLAYED_PODCASTS(
-        key = "hide_played_podcasts",
-        title = "Played Podcasts option to hide podcasts with nothing left to listen to",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-        addedOn = LocalDate.parse("2026-11-11"),
-    ),
 
     // Playback 2026, the yearly listening recap. Also the remote kill switch: turning it off hides every entry point.
     PLAYBACK_2026(

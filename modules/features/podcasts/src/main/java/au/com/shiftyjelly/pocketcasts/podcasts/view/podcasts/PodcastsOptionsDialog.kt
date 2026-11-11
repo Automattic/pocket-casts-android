@@ -10,8 +10,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListCreateActivit
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastListModalOptionType
@@ -88,16 +86,12 @@ class PodcastsOptionsDialog(
                     trackTapOnModalOption(ModalOption.BADGE)
                 },
             )
-            .apply {
-                if (FeatureFlag.isEnabled(Feature.HIDE_PLAYED_PODCASTS)) {
-                    addTextOption(
-                        titleId = LR.string.podcasts_menu_played_podcasts,
-                        imageId = R.drawable.ic_eyeball,
-                        valueId = playedPodcastsLabelId(settings.hidePlayedPodcasts.value),
-                        click = { openPlayedPodcastsOptions() },
-                    )
-                }
-            }
+            .addTextOption(
+                titleId = LR.string.podcasts_menu_played_podcasts,
+                imageId = R.drawable.ic_eyeball,
+                valueId = playedPodcastsLabelId(settings.hidePlayedPodcasts.value),
+                click = { openPlayedPodcastsOptions() },
+            )
             .addTextOption(
                 titleId = LR.string.podcasts_menu_share_podcasts,
                 imageId = R.drawable.ic_share_option,
