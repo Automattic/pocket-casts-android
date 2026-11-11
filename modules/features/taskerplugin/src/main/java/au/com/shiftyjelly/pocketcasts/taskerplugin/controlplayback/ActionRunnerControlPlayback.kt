@@ -3,12 +3,16 @@ package au.com.shiftyjelly.pocketcasts.taskerplugin.controlplayback
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
+import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.episodeManager
+import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.eventHorizon
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.playbackManager
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.podcastManager
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.settings
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.nullIfEmpty
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
+import com.automattic.eventhorizon.EpisodeArchivedEvent
 import com.joaomgcd.taskerpluginlibrary.action.TaskerPluginRunnerActionNoOutput
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResult
@@ -23,6 +27,7 @@ private const val ERROR_INVALID_TIME_TO_SKIP_PROVIDED = 5
 private const val ERROR_INVALID_PLAYBACK_SPEED_PROVIDED = 6
 private const val ERROR_INVALID_TRIM_SILENCE_MODE_PROVIDED = 7
 private const val ERROR_INVALID_VOLUME_BOOST_VALUE_PROVIDED = 8
+private const val ERROR_NO_PODCAST_EPISODE_TO_ARCHIVE = 9
 
 class ActionRunnerControlPlayback : TaskerPluginRunnerActionNoOutput<InputControlPlayback>() {
 
@@ -75,6 +80,18 @@ class ActionRunnerControlPlayback : TaskerPluginRunnerActionNoOutput<InputContro
                 val volumeBoostEnabled = input.regular.volumeBoostEnabled?.toBooleanStrictOrNull() ?: return TaskerPluginResultError(ERROR_INVALID_VOLUME_BOOST_VALUE_PROVIDED, context.getString(R.string.volume_boost_enabled_not_valid, input.regular.volumeBoostEnabled))
 
                 context.updateEffects { isVolumeBoosted = volumeBoostEnabled }
+            }
+
+            InputControlPlayback.PlaybackCommand.ArchiveCurrentEpisode -> {
+                val episode = playbackManager.getCurrentEpisode() as? PodcastEpisode ?: return TaskerPluginResultError(ERROR_NO_PODCAST_EPISODE_TO_ARCHIVE, context.getString(R.string.no_podcast_episode_to_archive))
+
+                context.episodeManager.archiveBlocking(episode, playbackManager, sync = true, shouldShuffleUpNext = context.settings.upNextShuffle.value)
+                context.eventHorizon.track(
+                    EpisodeArchivedEvent(
+                        episodeUuid = episode.uuid,
+                        source = SourceView.TASKER.analyticsValue,
+                    ),
+                )
             }
         }
 
