@@ -17,6 +17,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeRecentlyPlayedSortOptionTooltipDismissedEvent
 import com.automattic.eventhorizon.EpisodeRecentlyPlayedSortOptionTooltipShownEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -38,6 +40,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -121,7 +124,11 @@ class PodcastsViewModel @AssistedInject constructor(
                 }
             }
 
-        val hiddenPodcastUuidsFlow = settings.hidePlayedPodcasts.flow
+        val hiddenPodcastUuidsFlow = combine(
+            settings.hidePlayedPodcasts.flow,
+            FeatureFlag.isEnabledFlow(Feature.HIDE_PLAYED_PODCASTS),
+        ) { hidePlayed, isFeatureEnabled -> hidePlayed && isFeatureEnabled }
+            .distinctUntilChanged()
             .flatMapLatest { hidePlayed ->
                 if (hidePlayed) podcastManager.observePlayedPodcastUuids() else flowOf(emptySet())
             }
