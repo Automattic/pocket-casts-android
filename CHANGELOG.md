@@ -1,5 +1,8 @@
 8.26
 -----
+*   New Features
+    *   Add an Archive Current Episode command to the Tasker Control Playback action
+        ([#6401](https://github.com/Automattic/pocket-casts-android/pull/6401))
 
 
 8.25
