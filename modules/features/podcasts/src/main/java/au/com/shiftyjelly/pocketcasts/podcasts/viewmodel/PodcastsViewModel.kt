@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -123,9 +124,13 @@ class PodcastsViewModel @AssistedInject constructor(
                 }
             }
 
-        val hiddenPodcastUuidsFlow = settings.hidePlayedPodcasts.flow
+        val hiddenPodcastUuidsFlow = combine(
+            settings.hidePlayedPodcasts.flow,
+            FeatureFlag.isEnabledFlow(Feature.HIDE_PLAYED_PODCASTS),
+        ) { hidePlayed, isFeatureEnabled -> hidePlayed && isFeatureEnabled }
+            .distinctUntilChanged()
             .flatMapLatest { hidePlayed ->
-                if (hidePlayed && FeatureFlag.isEnabled(Feature.HIDE_PLAYED_PODCASTS)) podcastManager.observePlayedPodcastUuids() else flowOf(emptySet())
+                if (hidePlayed) podcastManager.observePlayedPodcastUuids() else flowOf(emptySet())
             }
 
         return combine(

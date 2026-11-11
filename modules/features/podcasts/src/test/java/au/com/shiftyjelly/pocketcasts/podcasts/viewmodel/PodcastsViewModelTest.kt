@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
+import androidx.lifecycle.ViewModelStore
 import au.com.shiftyjelly.pocketcasts.analytics.testing.TestEventSink
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -67,6 +69,12 @@ class PodcastsViewModelTest {
 
     private val podcastsFlow = MutableStateFlow(listOf(unplayedPodcast, playedPodcast, playedPodcastInFolder))
     private val folderManager = mock<FolderManager>()
+    private val viewModelStore = ViewModelStore()
+
+    @After
+    fun tearDown() {
+        viewModelStore.clear()
+    }
 
     private val plusSubscription = Subscription(
         tier = SubscriptionTier.Plus,
@@ -103,6 +111,16 @@ class PodcastsViewModelTest {
             listOf(unplayedPodcast.uuid, playedPodcast.uuid, playedPodcastInFolder.uuid),
             viewModel.loadedItems().map(FolderItem::uuid),
         )
+    }
+
+    @Test
+    fun `shows played podcasts when the feature flag is turned off while observing`() = runTest {
+        val viewModel = createViewModel(hidePlayedPodcasts = true, subscription = null)
+        assertEquals(listOf(unplayedPodcast.uuid), viewModel.loadedItems().map(FolderItem::uuid))
+
+        FeatureFlag.setEnabled(Feature.HIDE_PLAYED_PODCASTS, false)
+
+        viewModel.uiState.first { state -> state.items.size == 3 }
     }
 
     @Test
@@ -184,7 +202,7 @@ class PodcastsViewModelTest {
         val suggestedFoldersManager = mock<SuggestedFoldersManager> {
             on { observeSuggestedFolders() } doReturn flowOf(emptyList())
         }
-        return PodcastsViewModel(
+        val viewModel = PodcastsViewModel(
             podcastManager = podcastManager,
             episodeManager = mock(),
             folderManager = folderManager,
@@ -197,5 +215,7 @@ class PodcastsViewModelTest {
             blazeAdsManager = mock { on { findPodcastListAd() } doReturn flowOf(null) },
             folderUuid = folderUuid,
         )
+        viewModelStore.put(viewModelStore.keys().size.toString(), viewModel)
+        return viewModel
     }
 }
