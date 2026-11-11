@@ -21,26 +21,38 @@ SKIP_PATTERNS=(
   'config/*' 'fastlane/*' 'Gemfile' 'Gemfile.lock' 'version.properties'
   'docs/*' 'metadata/*'
 )
+LOCALIZATION_PATTERNS=('*/src/main/res/values*/strings.xml')
+TEST_PATTERNS=('*/src/test/*' '*/src/androidTest/*')
+
+# Each job lists all its exclusions here. App source trees are independent;
+# shared modules and module build files can still affect more than one app.
 case "$job" in
-  validation|unit-tests|instrumented-tests) SKIP_PATTERNS+=('*/src/main/res/values*/strings.xml') ;;
-esac
-case "$job" in
-  unit-tests) SKIP_PATTERNS+=('*/src/androidTest/*') ;;
-  *-build|instrumented-tests)
-    SKIP_PATTERNS+=('*/src/test/*')
-    if [[ "$job" == instrumented-tests ]]; then
-      # Firebase builds and tests only the phone app. Shared test helpers still matter.
-      target=app
-    else
-      target="${job%-build}"
-      SKIP_PATTERNS+=('*/src/androidTest/*')
-    fi
-    # App source trees are independent; shared modules and module build files
-    # still matter, since they can affect more than one app.
-    for app in app automotive wear tv; do
-      [[ "$app" == "$target" ]] || SKIP_PATTERNS+=("$app/src/*")
-    done
+  validation)
+    SKIP_PATTERNS+=("${LOCALIZATION_PATTERNS[@]}")
     ;;
+  unit-tests)
+    SKIP_PATTERNS+=("${LOCALIZATION_PATTERNS[@]}" '*/src/androidTest/*')
+    ;;
+  instrumented-tests)
+    # Firebase builds and tests only the phone app. Shared test helpers still matter.
+    SKIP_PATTERNS+=(
+      "${LOCALIZATION_PATTERNS[@]}" '*/src/test/*'
+      'automotive/src/*' 'wear/src/*' 'tv/src/*'
+    )
+    ;;
+  app-build)
+    SKIP_PATTERNS+=("${TEST_PATTERNS[@]}" 'automotive/src/*' 'wear/src/*' 'tv/src/*')
+    ;;
+  automotive-build)
+    SKIP_PATTERNS+=("${TEST_PATTERNS[@]}" 'app/src/*' 'wear/src/*' 'tv/src/*')
+    ;;
+  wear-build)
+    SKIP_PATTERNS+=("${TEST_PATTERNS[@]}" 'app/src/*' 'automotive/src/*' 'tv/src/*')
+    ;;
+  tv-build)
+    SKIP_PATTERNS+=("${TEST_PATTERNS[@]}" 'app/src/*' 'automotive/src/*' 'wear/src/*')
+    ;;
+  lint) ;;
 esac
 
 # Include both sides of renames without changing the checkout's Git config.
