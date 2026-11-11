@@ -17,6 +17,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.EpisodeRecentlyPlayedSortOptionTooltipDismissedEvent
 import com.automattic.eventhorizon.EpisodeRecentlyPlayedSortOptionTooltipShownEvent
 import com.automattic.eventhorizon.EventHorizon
@@ -123,7 +125,7 @@ class PodcastsViewModel @AssistedInject constructor(
 
         val hiddenPodcastUuidsFlow = settings.hidePlayedPodcasts.flow
             .flatMapLatest { hidePlayed ->
-                if (hidePlayed) podcastManager.observePlayedPodcastUuids() else flowOf(emptySet())
+                if (hidePlayed && FeatureFlag.isEnabled(Feature.HIDE_PLAYED_PODCASTS)) podcastManager.observePlayedPodcastUuids() else flowOf(emptySet())
             }
 
         return combine(
