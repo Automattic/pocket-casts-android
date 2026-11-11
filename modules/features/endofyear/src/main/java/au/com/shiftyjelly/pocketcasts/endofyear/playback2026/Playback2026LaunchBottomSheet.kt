@@ -13,6 +13,7 @@ fun Playback2026LaunchBottomSheet(
     parent: ViewGroup,
     onClick: () -> Unit,
     onExpand: () -> Unit,
+    onCollapse: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     EndOfYearLaunchBottomSheet(
@@ -22,7 +23,7 @@ fun Playback2026LaunchBottomSheet(
         buttonLabel = stringResource(LR.string.playback_2026_sheet_button),
         onClick = onClick,
         onExpand = onExpand,
-        onCollapse = {},
+        onCollapse = onCollapse,
         modifier = modifier,
     )
 }
