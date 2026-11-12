@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import com.pocketcasts.service.api.BookmarkRequest
 import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.EpisodesResponse
+import com.pocketcasts.service.api.Playback2026ArchetypeResponse
 import com.pocketcasts.service.api.PodcastRatingAddRequest
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingShowRequest
@@ -200,6 +201,10 @@ interface SyncService {
     @Headers("Content-Type: application/octet-stream")
     @PUT("/user/whats_new/unread")
     suspend fun markWhatsNewAsUnread(@Header("Authorization") authorization: String, @Body request: UuidsRequest): Response<Void>
+
+    @Headers("Content-Type: application/octet-stream")
+    @GET("/user/playback-2026/archetype")
+    suspend fun getPlayback2026Archetype(@Header("Authorization") authorization: String): Playback2026ArchetypeResponse
 
     @Headers("Content-Type: application/octet-stream")
     @POST("/user/bookmark/list")

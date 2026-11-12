@@ -16,12 +16,12 @@ class Playback2026PayloadTest {
     fun `map podcasts to payload podcasts`() {
         val stats = stats(
             podcasts = listOf(
-                podcastStats(uuid = "uuid-1", categories = "Comedy\nSociety & Culture", playedSeconds = 3600.0, episodeCount = 4),
-                podcastStats(uuid = "uuid-2", categories = "", playedSeconds = 60.0, episodeCount = 1),
+                podcastStats(uuid = "uuid-1", playedSeconds = 3600.0, episodeCount = 4),
+                podcastStats(uuid = "uuid-2", playedSeconds = 60.0, episodeCount = 1),
             ),
         )
 
-        val payload = stats.toPlaybackPayload(year)
+        val payload = stats.toPlaybackPayload(year, archetype = null)
 
         assertEquals(2026, payload.year)
         assertEquals(
@@ -30,7 +30,6 @@ class Playback2026PayloadTest {
                     uuid = "uuid-1",
                     title = "Title uuid-1",
                     author = "Author uuid-1",
-                    genre = "Comedy",
                     artworkUrl = PodcastImage.getMediumArtworkUrl("uuid-1"),
                     playedSeconds = 3600.0,
                     episodesPlayed = 4,
@@ -39,7 +38,6 @@ class Playback2026PayloadTest {
                     uuid = "uuid-2",
                     title = "Title uuid-2",
                     author = "Author uuid-2",
-                    genre = "Other",
                     artworkUrl = PodcastImage.getMediumArtworkUrl("uuid-2"),
                     playedSeconds = 60.0,
                     episodesPlayed = 1,
@@ -59,7 +57,7 @@ class Playback2026PayloadTest {
             completedEpisodeCount = 7,
         )
 
-        val payload = stats.toPlaybackPayload(year)
+        val payload = stats.toPlaybackPayload(year, archetype = null)
 
         assertEquals(monthlySeconds, payload.monthlySeconds)
         assertEquals(500.0, payload.previousYearSeconds)
@@ -68,7 +66,7 @@ class Playback2026PayloadTest {
 
     @Test
     fun `leave out previous year and completion without listening`() {
-        val payload = stats(lastYearSeconds = 0.0, startedEpisodeCount = 0, completedEpisodeCount = 0).toPlaybackPayload(year)
+        val payload = stats(lastYearSeconds = 0.0, startedEpisodeCount = 0, completedEpisodeCount = 0).toPlaybackPayload(year, archetype = null)
 
         assertNull(payload.previousYearSeconds)
         assertNull(payload.completion)
@@ -90,14 +88,12 @@ class Playback2026PayloadTest {
 
     private fun podcastStats(
         uuid: String,
-        categories: String,
         playedSeconds: Double,
         episodeCount: Int,
     ) = PlaybackPodcastStats(
         uuid = uuid,
         title = "Title $uuid",
         author = "Author $uuid",
-        categories = categories,
         playedSeconds = playedSeconds,
         playedEpisodeCount = episodeCount,
     )
