@@ -9,14 +9,9 @@ data class PlaybackPodcastStats(
     @ColumnInfo(name = "uuid") val uuid: String,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "author") val author: String,
-    @ColumnInfo(name = "category") private val categories: String,
     @ColumnInfo(name = "played_seconds") val playedSeconds: Double,
     @ColumnInfo(name = "played_episode_count") val playedEpisodeCount: Int,
-) {
-    /** The podcast's first category, unlocalised, or null if it has none. */
-    val firstCategory: String?
-        get() = categories.split("\n").first().trim().takeIf { it.isNotEmpty() }
-}
+)
 
 /**
  * When an episode was last played and how far in, for grouping listening time by month.

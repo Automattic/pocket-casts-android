@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.endofyear.playback2026
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.PlaybackStats
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import java.time.Year
 import kotlinx.coroutines.CompletableDeferred
@@ -29,15 +30,16 @@ class Playback2026ViewModelTest {
 
     private val endOfYearSync = mock<EndOfYearSync>()
     private val endOfYearManager = mock<EndOfYearManager>()
+    private val syncManager = mock<SyncManager>()
 
     @Test
     fun `sync history before reading stats`() = runTest {
         whenever(endOfYearSync.sync(Year.of(2026))).thenReturn(true)
         whenever(endOfYearManager.getPlaybackStats(Year.of(2026))).thenReturn(stats)
 
-        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager)
+        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager, syncManager)
 
-        assertEquals(stats.toPlaybackPayload(Year.of(2026)), viewModel.payload.value)
+        assertEquals(stats.toPlaybackPayload(Year.of(2026), archetype = null), viewModel.payload.value)
         inOrder(endOfYearSync, endOfYearManager) {
             verify(endOfYearSync).sync(Year.of(2026))
             verify(endOfYearManager).getPlaybackStats(Year.of(2026))
@@ -49,9 +51,9 @@ class Playback2026ViewModelTest {
         whenever(endOfYearSync.sync(Year.of(2026))).thenReturn(false)
         whenever(endOfYearManager.getPlaybackStats(Year.of(2026))).thenReturn(stats)
 
-        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager)
+        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager, syncManager)
 
-        assertEquals(stats.toPlaybackPayload(Year.of(2026)), viewModel.payload.value)
+        assertEquals(stats.toPlaybackPayload(Year.of(2026), archetype = null), viewModel.payload.value)
     }
 
     @Test
@@ -63,10 +65,10 @@ class Playback2026ViewModelTest {
         }
         whenever(endOfYearManager.getPlaybackStats(Year.of(2026))).thenReturn(stats)
 
-        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager)
+        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager, syncManager)
         assertNull(viewModel.payload.value)
 
         sync.complete(true)
-        assertEquals(stats.toPlaybackPayload(Year.of(2026)), viewModel.payload.value)
+        assertEquals(stats.toPlaybackPayload(Year.of(2026), archetype = null), viewModel.payload.value)
     }
 }

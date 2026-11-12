@@ -30,6 +30,7 @@ import com.automattic.eventhorizon.OnboardingFlowType
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.EpisodesResponse
+import com.pocketcasts.service.api.Playback2026Archetype
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingsResponse
 import com.pocketcasts.service.api.PodcastsEpisodesRequest
@@ -135,6 +136,9 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun getWhatsNewReadMessageIds(messageIds: Collection<String>): Set<String>
     suspend fun markWhatsNewAsRead(messageIds: Collection<String>)
     suspend fun markWhatsNewAsUnread(messageIds: Collection<String>)
+
+    // Playback
+    suspend fun getPlayback2026Archetype(): Playback2026Archetype
 
     // Rating
     suspend fun addPodcastRating(podcastUuid: String, rate: Int): PodcastRatingResponse
