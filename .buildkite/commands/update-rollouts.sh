@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-REQUIRED_ENV_VARS=(TRACK ROLLOUT_PERCENT RELEASE_VERSION)
+REQUIRED_ENV_VARS=(TRACK ROLLOUT_PERCENT)
 
 missing=()
 for var in "${REQUIRED_ENV_VARS[@]}"; do
@@ -27,5 +27,5 @@ echo '--- 🚀 Update Rollouts'
 bundle exec fastlane update_rollouts \
   track:"$TRACK" \
   percent:"$ROLLOUT_PERCENT" \
-  version:"$RELEASE_VERSION" \
+  version:"${RELEASE_VERSION:-}" \
   milestone:"${MILESTONE:-}"
