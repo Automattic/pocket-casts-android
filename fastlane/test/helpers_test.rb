@@ -74,6 +74,25 @@ class FastlaneHelpersTest < Minitest::Test
                  rollout_announcement(track: 'production', percent: 0.01, version: '7.94', skipped_apps: ['wear'])
   end
 
+  def test_rollout_announcement_flags_a_missing_version_for_investigation
+    ['', "  \n", nil].each do |version|
+      assert_equal <<~MESSAGE.chomp,
+        :announcement: An unknown version has started rolling out to 50% of users.
+        :warning: Version unavailable. This is unexpected, please investigate.
+      MESSAGE
+                   rollout_announcement(track: 'production', percent: 0.5, version: version)
+    end
+  end
+
+  def test_rollout_announcement_flags_a_missing_version_on_the_submission_message_too
+    assert_equal <<~MESSAGE.chomp,
+      :announcement: An unknown version has been submitted to the Production track for Google to review.
+      :warning: Version unavailable. This is unexpected, please investigate.
+      :warning: Not rolled out to wear — Google Play had no matching release.
+    MESSAGE
+                 rollout_announcement(track: 'production', percent: 0.01, version: nil, skipped_apps: ['wear'])
+  end
+
   def test_rollout_announcement_keeps_the_original_wording_when_every_variant_rolled_out
     assert_equal ':announcement: `7.94` has started rolling out to 20% of users.',
                  rollout_announcement(track: 'beta', percent: 0.2, version: '7.94', skipped_apps: [])
