@@ -10,22 +10,7 @@
     },
     {
       "file": "android/pocket-casts/google-services.json",
-      "destination": "app/google-services.json",
-      "encrypt": true
-    },
-    {
-      "file": "android/pocket-casts/google-services.json",
-      "destination": "automotive/google-services.json",
-      "encrypt": true
-    },
-    {
-      "file": "android/pocket-casts/google-services.json",
-      "destination": "wear/google-services.json",
-      "encrypt": true
-    },
-    {
-      "file": "android/pocket-casts/google-services.json",
-      "destination": "tv/google-services.json",
+      "destination": "~/.configure/pocket-casts-android/secrets/google-services.json",
       "encrypt": true
     },
     {
