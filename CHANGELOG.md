@@ -2,6 +2,7 @@
 -----
 *   Bug Fixes
     *   Fix Auto Restart Sleep Timer not restarting the timer when playback resumes within 5 minutes, including after adding time
+        ([#6406](https://github.com/Automattic/pocket-casts-android/pull/6406))
 
 
 8.25
