@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts
 import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.repositories.playback.AutomotiveStartupSync
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,9 +17,13 @@ class AutoPlaybackService : PlaybackService() {
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
+    @Inject
+    lateinit var automotiveStartupSync: AutomotiveStartupSync
+
     override fun onCreate() {
         super.onCreate()
         settings.setAutomotiveConnectedToMediaSession(false)
+        automotiveStartupSync.reset()
 
         RefreshPodcastsTask.runNow(this, applicationScope)
 
