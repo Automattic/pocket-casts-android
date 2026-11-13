@@ -70,8 +70,10 @@ open class BaseDialogFragment : BottomSheetDialogFragment() {
 
         view.isClickable = true
 
-        dialog?.window?.let { window ->
+        activity?.window?.let { window ->
             theme.updateWindowStatusBarIcons(window = window, statusBarIconColor = statusBarIconColor)
+        }
+        dialog?.window?.let { window ->
             theme.updateWindowNavigationBarColor(window = window, navigationBarColor = navigationBarColor)
         }
 
