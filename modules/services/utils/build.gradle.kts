@@ -19,7 +19,6 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     api(libs.androidx.appcompat)
-    api(libs.coil)
     api(libs.dagger.hilt.android)
     api(libs.material)
     api(libs.okhttp)

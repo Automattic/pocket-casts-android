@@ -23,7 +23,6 @@ dependencies {
 
     api(libs.billing.ktx)
     api(libs.eventhorizon)
-    api(libs.media3.extractor)
     api(libs.moshi)
     api(libs.okhttp)
     api(libs.room)
@@ -36,7 +35,6 @@ dependencies {
     implementation(libs.dagger.hilt.core)
     implementation(libs.play.auth)
     implementation(libs.play.cast)
-    implementation(libs.room.ktx)
     implementation(libs.room.rx2)
     implementation(libs.timber)
 
@@ -46,8 +44,7 @@ dependencies {
 
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
-    testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.media3.common)
     testImplementation(projects.modules.services.sharedtest)
 
     androidTestImplementation(libs.androidx.annotation)

@@ -19,8 +19,9 @@ android {
 }
 
 dependencies {
-
-    api(libs.compose.material3.adaptive)
+    api(libs.navigation.common)
+    api(libs.navigation.runtime)
+    api(libs.window.core)
 
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)
@@ -29,7 +30,6 @@ dependencies {
 
     implementation(platform(libs.compose.bom))
 
-    implementation(libs.androidx.webkit)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.compose.activity)
@@ -41,12 +41,10 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     debugImplementation(libs.compose.ui.tooling)
     debugProdImplementation(libs.compose.ui.tooling)
-    implementation(libs.compose.ui.util)
     debugImplementation(libs.compose.ui.test.manifest)
     implementation(libs.fragment.compose)
     implementation(libs.lottie)
     implementation(libs.lottie.compose)
-    implementation(libs.navigation.compose)
     implementation(libs.reorderable)
 
     implementation(projects.modules.services.images)

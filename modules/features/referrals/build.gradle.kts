@@ -25,12 +25,12 @@ dependencies {
     implementation(platform(libs.compose.bom))
 
     implementation(libs.compose.material)
+    implementation(libs.compose.material3.adaptive)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.reactive)
     implementation(libs.dagger.hilt.android)
-    implementation(libs.fragment.compose)
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.runtime.compose)
 
     implementation(projects.modules.features.account)
