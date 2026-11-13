@@ -43,7 +43,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
-import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.asAlbumArtContentUri
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -76,9 +75,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
@@ -708,6 +709,9 @@ class MediaSessionManager(
         } ?: ForegroundStart.Unconfirmed
     }
 
+    /**
+     * Runs once per process. Subscribe with [disposables] or [applicationScope], not [scope], which [release] cancels.
+     */
     @OptIn(UnstableApi::class)
     private fun observeForMedia3Updates() {
         if (isAutomotive) {
@@ -797,7 +801,15 @@ class MediaSessionManager(
                 } else {
                     null
                 }
-                Optional.of(MediaUpdateData(episode, podcast, state, showArtwork, useEpisodeArtwork, artworkData))
+                // Resolved off the main thread, because the car's artwork lookup checks for files on disk.
+                val artworkUri = if (showArtwork) {
+                    resolveAndWrapArtworkUri(episode, podcast, useEpisodeArtwork)
+                } else {
+                    null
+                }
+                Optional.of(
+                    MediaUpdateData(episode, podcast, state, showArtwork, useEpisodeArtwork, artworkData, artworkUri),
+                )
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -813,12 +825,15 @@ class MediaSessionManager(
                         }
                         return@subscribeBy
                     }
-                    val wrappedUri = if (data.showArtwork) {
-                        resolveAndWrapArtworkUri(data.episode, data.podcast, data.useEpisodeArtwork)
-                    } else {
-                        null
-                    }
-                    player.updateMetadata(data.episode, data.podcast, data.showArtwork, data.useEpisodeArtwork, data.artworkData, artworkUri = wrappedUri, showRating = !isAutomotive)
+                    player.updateMetadata(
+                        data.episode,
+                        data.podcast,
+                        data.showArtwork,
+                        data.useEpisodeArtwork,
+                        data.artworkData,
+                        artworkUri = data.artworkUri,
+                        showRating = !isAutomotive,
+                    )
                     player.isTransientLoss = data.state.transientLoss
                     updateMedia3CustomLayout()
                 },
@@ -842,7 +857,7 @@ class MediaSessionManager(
         ) { visibility, items -> visibility to items }
             .onEach { withContext(Dispatchers.Main) { updateMedia3CustomLayout() } }
             .catch { Timber.e(it) }
-            .launchIn(scope)
+            .launchIn(applicationScope)
 
         playbackManager.upNextQueue.changesObservable
             .observeOn(Schedulers.io())
@@ -853,6 +868,20 @@ class MediaSessionManager(
                 onError = { Timber.e(it, "Error observing Up Next changes") },
             )
             .addTo(disposables)
+
+        // Browse lists bake the artwork URI into each item, so reload whatever a car is showing when the choice changes.
+        settings.artworkConfiguration.flow
+            .map { it.useEpisodeArtwork }
+            .distinctUntilChanged()
+            .drop(1)
+            .onEach {
+                withContext(Dispatchers.Main) {
+                    val session = media3Session ?: return@withContext
+                    media3LibraryCallback?.notifySubscribedChildrenChanged(session)
+                }
+            }
+            .catch { Timber.e(it, "Failed to refresh browse lists after artwork setting change") }
+            .launchIn(applicationScope)
     }
 
     @OptIn(UnstableApi::class)
@@ -1000,15 +1029,19 @@ class MediaSessionManager(
     }
 
     /**
-     * Resolves an artwork URI for the given episode, wrapping it through
+     * Resolves an artwork URI for the given episode. On automotive the URI goes through
      * [AlbumArtContentProvider][au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtContentProvider]
-     * on automotive so that AAOS can load it via a content:// scheme.
+     * so that AAOS can load it via a content:// scheme, matching the artwork shown in the browse lists
+     * (including embedded file artwork and the podcast artwork fallback).
      */
     private fun resolveAndWrapArtworkUri(
         episode: BaseEpisode,
         podcast: Podcast?,
         useEpisodeArtwork: Boolean = true,
     ): android.net.Uri? {
+        if (isAutomotive) {
+            return AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork)
+        }
         val url = when (episode) {
             is PodcastEpisode -> {
                 if (useEpisodeArtwork) {
@@ -1023,12 +1056,15 @@ class MediaSessionManager(
                 episode.artworkUrl?.takeIf { it.isNotBlank() }
             }
         } ?: return null
-        val uri = url.toUri()
-        return if (isAutomotive) uri.asAlbumArtContentUri(context) else uri
+        return url.toUri()
     }
 
     fun release() {
-        disposables.clear()
+        // The Media3 observers start once per process and skip updates while there is no session,
+        // so keep them subscribed for the session a restarted service creates.
+        if (!needsMedia3Session) {
+            disposables.clear()
+        }
         scope.cancel()
         if (needsMedia3Session) {
             lastCustomLayout = emptyList()
@@ -1699,13 +1735,14 @@ private data class MediaUpdateData(
     val showArtwork: Boolean,
     val useEpisodeArtwork: Boolean,
     val artworkData: ByteArray?,
+    val artworkUri: android.net.Uri?,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is MediaUpdateData) return false
         return episode == other.episode && podcast == other.podcast && state == other.state &&
             showArtwork == other.showArtwork && useEpisodeArtwork == other.useEpisodeArtwork &&
-            artworkData.contentEquals(other.artworkData)
+            artworkData.contentEquals(other.artworkData) && artworkUri == other.artworkUri
     }
 
     override fun hashCode(): Int {
@@ -1715,6 +1752,7 @@ private data class MediaUpdateData(
         result = 31 * result + showArtwork.hashCode()
         result = 31 * result + useEpisodeArtwork.hashCode()
         result = 31 * result + (artworkData?.contentHashCode() ?: 0)
+        result = 31 * result + (artworkUri?.hashCode() ?: 0)
         return result
     }
 }

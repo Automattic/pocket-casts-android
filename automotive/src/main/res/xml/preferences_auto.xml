@@ -7,6 +7,13 @@
             android:title="@string/settings_auto_play"
             android:summary="@string/settings_auto_play_summary" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_title_appearance">
+        <SwitchPreference
+            android:key="episodeArtwork"
+            android:persistent="false"
+            android:title="@string/settings_use_episode_artwork"
+            android:summary="@string/settings_use_episode_artwork_details" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_title_playback">
         <SwitchPreference
             android:key="autoSubscribeToPlayed"

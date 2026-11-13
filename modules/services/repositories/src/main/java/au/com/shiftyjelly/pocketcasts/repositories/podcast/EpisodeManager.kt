@@ -62,7 +62,11 @@ interface EpisodeManager {
     fun updatePlayedUpToBlocking(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean)
     fun updateDurationBlocking(episode: BaseEpisode?, durationInSecs: Double, syncChanges: Boolean)
     fun updatePlayingStatusBlocking(episode: BaseEpisode?, status: EpisodePlayingStatus)
-    suspend fun updateImageUrls(updates: List<ImageUrlUpdate>)
+
+    /**
+     * Stores the given episode image URLs, returning true when any episode's image URL changed.
+     */
+    suspend fun updateImageUrls(updates: List<ImageUrlUpdate>): Boolean
     suspend fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeDownloadStatus)
     suspend fun disableAutoDownload(episode: BaseEpisode) = disableAutoDownload(setOf(episode))
     suspend fun disableAutoDownload(episodes: Collection<BaseEpisode>)

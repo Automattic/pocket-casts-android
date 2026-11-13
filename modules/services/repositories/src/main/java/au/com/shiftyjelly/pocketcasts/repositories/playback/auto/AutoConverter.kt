@@ -147,30 +147,42 @@ object AutoConverter {
             .build()
     }
 
+    /**
+     * Returns a content uri for the artwork to show for [episode], or for [podcast] when there is no episode.
+     * When episode artwork is chosen, the uri carries a fallback so the provider can serve the podcast's
+     * artwork instead if the episode image fails to load.
+     */
     fun getPodcastArtworkUri(podcast: Podcast?, episode: BaseEpisode?, context: Context, useEpisodeArtwork: Boolean): Uri? {
-        val artworkUri = when (episode) {
-            is PodcastEpisode -> if (useEpisodeArtwork) {
-                episode.imageUrl ?: EpisodeFileMetadata.artworkCacheFile(context, episode.uuid).takeIf(File::exists)?.path ?: podcast?.getArtworkUrl(480)
-            } else {
-                podcast?.getArtworkUrl(480)
+        val podcastArtworkUrl = podcast?.getArtworkUrl(480)?.takeIf(String::isNotBlank)
+
+        val (artworkUrl, fallbackUrl) = when (episode) {
+            is PodcastEpisode -> {
+                val episodeArtworkUrl = if (useEpisodeArtwork) {
+                    episode.imageUrl?.takeIf(String::isNotBlank) ?: embeddedArtworkPath(episode, context)
+                } else {
+                    null
+                }
+                if (episodeArtworkUrl != null) episodeArtworkUrl to podcastArtworkUrl else podcastArtworkUrl to null
             }
 
-            is UserEpisode -> if (useEpisodeArtwork) {
-                EpisodeFileMetadata.artworkCacheFile(context, episode.uuid).takeIf(File::exists)?.path ?: episode.artworkUrl
-            } else {
-                episode.artworkUrl
+            is UserEpisode -> {
+                val fileArtworkUrl = episode.artworkUrl?.takeIf(String::isNotBlank)
+                val embeddedArtworkPath = if (useEpisodeArtwork) embeddedArtworkPath(episode, context) else null
+                if (embeddedArtworkPath != null) embeddedArtworkPath to fileArtworkUrl else fileArtworkUrl to null
             }
 
-            null -> {
-                podcast?.getArtworkUrl(480)
-            }
-        }?.toUri()
+            null -> podcastArtworkUrl to null
+        }
 
-        if (artworkUri == null) {
+        if (artworkUrl == null) {
             return null
         }
 
-        return getArtworkUriForContentProvider(artworkUri, context)
+        return artworkUrl.toUri().asAlbumArtContentUri(context, fallback = fallbackUrl?.toUri())
+    }
+
+    private fun embeddedArtworkPath(episode: BaseEpisode, context: Context): String? {
+        return EpisodeFileMetadata.artworkCacheFile(context, episode.uuid).takeIf(File::exists)?.path
     }
 
     fun getPodcastArtworkBitmap(episode: BaseEpisode, context: Context, useEpisodeArtwork: Boolean): Bitmap? {

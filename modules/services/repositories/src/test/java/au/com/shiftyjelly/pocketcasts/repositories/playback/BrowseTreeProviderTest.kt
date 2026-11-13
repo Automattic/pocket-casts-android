@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import java.util.Date
 import java.util.UUID
@@ -24,11 +25,17 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
@@ -45,6 +52,7 @@ class BrowseTreeProviderTest {
     private lateinit var upNextQueue: UpNextQueue
     private lateinit var settings: Settings
     private lateinit var serviceManager: ServiceManager
+    private lateinit var showNotesManager: ShowNotesManager
     private lateinit var provider: BrowseTreeProvider
 
     @Before
@@ -57,6 +65,7 @@ class BrowseTreeProviderTest {
         upNextQueue = mock()
         settings = mock()
         serviceManager = mock()
+        showNotesManager = mock()
         provider = BrowseTreeProvider(
             podcastManager = podcastManager,
             episodeManager = episodeManager,
@@ -67,6 +76,7 @@ class BrowseTreeProviderTest {
             settings = settings,
             serviceManager = serviceManager,
             listRepository = mock(),
+            showNotesManager = showNotesManager,
         )
     }
 
@@ -320,15 +330,74 @@ class BrowseTreeProviderTest {
         assertEquals(AutoMediaId(latestEpisode.uuid, podcastTwo.uuid).toMediaId(), mediaItems[4].mediaId)
     }
 
+    // --- fetchEpisodeArtwork ---
+
+    @Test
+    fun `fetchEpisodeArtwork does nothing when episode artwork is off`() = runTest {
+        val podcast = Podcast(uuid = UUID.randomUUID().toString())
+        whenever(podcastManager.findPodcastByUuid(podcast.uuid)).thenReturn(podcast)
+        mockArtworkConfiguration(useEpisodeArtwork = false)
+
+        assertFalse(provider.fetchEpisodeArtwork(podcast.uuid))
+        verify(showNotesManager, never()).updateEpisodeImageUrls(any())
+    }
+
+    @Test
+    fun `fetchEpisodeArtwork ignores lists that are not podcasts`() = runTest {
+        mockArtworkConfiguration(useEpisodeArtwork = true)
+
+        assertFalse(provider.fetchEpisodeArtwork("playlist-uuid"))
+        assertFalse(provider.fetchEpisodeArtwork(MEDIA_ID_ROOT))
+        verify(podcastManager, never()).findPodcastByUuid(MEDIA_ID_ROOT)
+        verify(showNotesManager, never()).updateEpisodeImageUrls(any())
+    }
+
+    @Test
+    fun `fetchEpisodeArtwork fetches image URLs once and reports the change`() = runTest {
+        val podcast = Podcast(uuid = UUID.randomUUID().toString())
+        whenever(podcastManager.findPodcastByUuid(podcast.uuid)).thenReturn(podcast)
+        whenever(showNotesManager.updateEpisodeImageUrls(podcast.uuid)).thenReturn(true)
+        mockArtworkConfiguration(useEpisodeArtwork = true)
+
+        assertTrue(provider.fetchEpisodeArtwork(podcast.uuid))
+        assertFalse(provider.fetchEpisodeArtwork(podcast.uuid))
+        verify(showNotesManager, times(1)).updateEpisodeImageUrls(podcast.uuid)
+    }
+
+    @Test
+    fun `fetchEpisodeArtwork reports no change when no image URL changed`() = runTest {
+        val podcast = Podcast(uuid = UUID.randomUUID().toString())
+        whenever(podcastManager.findPodcastByUuid(podcast.uuid)).thenReturn(podcast)
+        whenever(showNotesManager.updateEpisodeImageUrls(podcast.uuid)).thenReturn(false)
+        mockArtworkConfiguration(useEpisodeArtwork = true)
+
+        assertFalse(provider.fetchEpisodeArtwork(podcast.uuid))
+        verify(showNotesManager).updateEpisodeImageUrls(podcast.uuid)
+    }
+
+    @Test
+    fun `fetchEpisodeArtwork tries again after a failed fetch`() = runTest {
+        val podcast = Podcast(uuid = UUID.randomUUID().toString())
+        whenever(podcastManager.findPodcastByUuid(podcast.uuid)).thenReturn(podcast)
+        whenever(showNotesManager.updateEpisodeImageUrls(podcast.uuid))
+            .thenThrow(RuntimeException("offline"))
+            .thenReturn(true)
+        mockArtworkConfiguration(useEpisodeArtwork = true)
+
+        assertFalse(provider.fetchEpisodeArtwork(podcast.uuid))
+        assertTrue(provider.fetchEpisodeArtwork(podcast.uuid))
+        verify(showNotesManager, times(2)).updateEpisodeImageUrls(podcast.uuid)
+    }
+
     private fun mockAutoShowPlayed(value: Boolean) {
         val mockAutoShowPlayed = mock<au.com.shiftyjelly.pocketcasts.preferences.UserSetting<Boolean>>()
         whenever(mockAutoShowPlayed.value).thenReturn(value)
         whenever(settings.autoShowPlayed).thenReturn(mockAutoShowPlayed)
     }
 
-    private fun mockArtworkConfiguration() {
+    private fun mockArtworkConfiguration(useEpisodeArtwork: Boolean = false) {
         val mockArtworkConfig = mock<au.com.shiftyjelly.pocketcasts.preferences.UserSetting<ArtworkConfiguration>>()
-        whenever(mockArtworkConfig.value).thenReturn(ArtworkConfiguration(useEpisodeArtwork = false))
+        whenever(mockArtworkConfig.value).thenReturn(ArtworkConfiguration(useEpisodeArtwork = useEpisodeArtwork))
         whenever(settings.artworkConfiguration).thenReturn(mockArtworkConfig)
     }
 }

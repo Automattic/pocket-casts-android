@@ -31,11 +31,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
@@ -67,7 +69,41 @@ class BrowseTreeProvider @Inject constructor(
     private val settings: Settings,
     private val serviceManager: ServiceManager,
     private val listRepository: ListRepository,
+    private val showNotesManager: ShowNotesManager,
 ) {
+    private val podcastsWithFetchedEpisodeArtwork: MutableSet<String> = ConcurrentHashMap.newKeySet()
+
+    /**
+     * Episode image URLs only arrive with a podcast's show notes, which are normally fetched when an episode
+     * plays. Fetches them the first time a podcast's episode list is opened, so the list can show episode
+     * artwork before anything has been played.
+     *
+     * @return true when an episode's image URL changed and the list should be reloaded.
+     */
+    suspend fun fetchEpisodeArtwork(parentId: String): Boolean {
+        // Built-in lists and folders use "__NAME__" ids, so only plain ids can be podcasts.
+        val isBuiltInList = parentId.startsWith("__")
+        if (isBuiltInList || !settings.artworkConfiguration.value.useEpisodeArtwork) {
+            return false
+        }
+        if (parentId in podcastsWithFetchedEpisodeArtwork) {
+            return false
+        }
+        val podcast = podcastManager.findPodcastByUuid(parentId) ?: return false
+        if (!podcastsWithFetchedEpisodeArtwork.add(podcast.uuid)) {
+            return false
+        }
+        return try {
+            showNotesManager.updateEpisodeImageUrls(podcast.uuid)
+        } catch (e: CancellationException) {
+            podcastsWithFetchedEpisodeArtwork.remove(podcast.uuid)
+            throw e
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to fetch episode artwork for podcast ${podcast.uuid}")
+            podcastsWithFetchedEpisodeArtwork.remove(podcast.uuid)
+            false
+        }
+    }
 
     fun getRootId(isRecent: Boolean, isSuggested: Boolean, hasCurrentEpisode: Boolean, isAutomotive: Boolean): String? {
         return when {

@@ -281,19 +281,18 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateImageUrls(updates: List<ImageUrlUpdate>) {
-        appDatabase.withTransaction {
-            updates.forEach { updateImageUrl(it.episodeUuid, it.imageUrl) }
+    override suspend fun updateImageUrls(updates: List<ImageUrlUpdate>): Boolean {
+        return appDatabase.withTransaction {
+            updates.map { updateImageUrl(it.episodeUuid, it.imageUrl) }.any { changed -> changed }
         }
     }
 
-    private suspend fun updateImageUrl(episodeUuid: String, imageUrl: String) {
-        findByUuid(episodeUuid)?.let { episode ->
-            if (episode.imageUrl != imageUrl) {
-                episode.imageUrl = imageUrl
-                updateBlocking(episode)
-            }
-        }
+    private suspend fun updateImageUrl(episodeUuid: String, imageUrl: String): Boolean {
+        val episode = findByUuid(episodeUuid) ?: return false
+        if (episode.imageUrl == imageUrl) return false
+        episode.imageUrl = imageUrl
+        updateBlocking(episode)
+        return true
     }
 
     override suspend fun updateEpisodeStatus(episode: BaseEpisode?, status: EpisodeDownloadStatus) {

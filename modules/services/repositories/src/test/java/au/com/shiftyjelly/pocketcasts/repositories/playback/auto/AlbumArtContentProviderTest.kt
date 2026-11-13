@@ -3,8 +3,12 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback.auto
 import android.content.Context
 import android.os.ParcelFileDescriptor
 import androidx.core.net.toUri
+import coil3.request.CachePolicy
+import coil3.size.Size
 import java.io.File
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -63,6 +67,68 @@ class AlbumArtContentProviderTest {
         val uri = traversalPath.toUri().asAlbumArtContentUri(context)
 
         assertNull(provider.openFile(uri, "r"))
+    }
+
+    @Test
+    fun `serves the fallback when the artwork is missing`() {
+        val missing = File(context.cacheDir, "missing-episode-artwork.jpg")
+        val fallbackBytes = byteArrayOf(7, 7, 7)
+        val fallback = File(context.cacheDir, "podcast-artwork.jpg").apply { writeBytes(fallbackBytes) }
+        val uri = missing.absolutePath.toUri().asAlbumArtContentUri(context, fallback = fallback.absolutePath.toUri())
+
+        val descriptor = provider.openFile(uri, "r")
+
+        assertNotNull(descriptor)
+        descriptor?.use {
+            ParcelFileDescriptor.AutoCloseInputStream(it).use { input ->
+                assertArrayEquals(fallbackBytes, input.readBytes())
+            }
+        }
+    }
+
+    @Test
+    fun `prefers the artwork over the fallback when both exist`() {
+        val artworkBytes = byteArrayOf(1)
+        val artwork = File(context.cacheDir, "episode-artwork.jpg").apply { writeBytes(artworkBytes) }
+        val fallback = File(context.cacheDir, "podcast-artwork.jpg").apply { writeBytes(byteArrayOf(2)) }
+        val uri = artwork.absolutePath.toUri().asAlbumArtContentUri(context, fallback = fallback.absolutePath.toUri())
+
+        val descriptor = provider.openFile(uri, "r")
+
+        assertNotNull(descriptor)
+        descriptor?.use {
+            ParcelFileDescriptor.AutoCloseInputStream(it).use { input ->
+                assertArrayEquals(artworkBytes, input.readBytes())
+            }
+        }
+    }
+
+    @Test
+    fun `refuses a fallback outside the app's private storage`() {
+        val missing = File(context.cacheDir, "missing-episode-artwork.jpg")
+        val secret = File(context.filesDir.parentFile, "secret.txt").apply { writeBytes(byteArrayOf(0)) }
+        val uri = missing.absolutePath.toUri().asAlbumArtContentUri(context, fallback = secret.absolutePath.toUri())
+
+        assertNull(provider.openFile(uri, "r"))
+    }
+
+    @Test
+    fun `leaves out a fallback that matches the artwork`() {
+        val artwork = File(context.cacheDir, "artwork.jpg").absolutePath.toUri()
+
+        val uri = artwork.asAlbumArtContentUri(context, fallback = artwork)
+
+        assertNull(uri.getQueryParameter(ALBUM_ART_FALLBACK_PARAM))
+    }
+
+    @Test
+    fun `downloads artwork without a full size decode or memory cache entry`() {
+        val request = AlbumArtContentProvider.artworkFileRequest(context, "https://example.com/episode.jpg")
+
+        val size = runBlocking { request.sizeResolver.size() }
+        val decodeSize = AlbumArtContentProvider.ARTWORK_DECODE_SIZE_PX
+        assertEquals(Size(decodeSize, decodeSize), size)
+        assertEquals(CachePolicy.DISABLED, request.memoryCachePolicy)
     }
 
     @Test
