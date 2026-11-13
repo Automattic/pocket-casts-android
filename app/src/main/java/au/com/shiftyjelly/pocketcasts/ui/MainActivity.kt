@@ -1151,7 +1151,7 @@ class MainActivity :
                                 parent = viewGroup,
                                 onClick = {
                                     eventHorizon.track(EndOfYearModalTappedEvent(currentYear = Playback2026.YEAR.value.toLong()))
-                                    Playback2026.start(this@MainActivity, Playback2026.Source.Modal)
+                                    showPlayback2026OrAccount(Playback2026.Source.Modal.name)
                                 },
                                 onExpand = {
                                     eventHorizon.track(EndOfYearModalShownEvent(currentYear = Playback2026.YEAR.value.toLong()))
@@ -1180,6 +1180,15 @@ class MainActivity :
             showStories(StoriesSource.fromString(source))
         } else {
             viewModel.waitingForSignInToShowStories = true
+            openOnboardingFlow(OnboardingFlow.LoggedOut)
+        }
+    }
+
+    override fun showPlayback2026OrAccount(source: String) {
+        if (viewModel.isSignedIn) {
+            Playback2026.start(this, Playback2026.Source.valueOf(source))
+        } else {
+            viewModel.waitingForSignInToShowPlayback2026 = true
             openOnboardingFlow(OnboardingFlow.LoggedOut)
         }
     }
@@ -1274,6 +1283,9 @@ class MainActivity :
                 if (viewModel.waitingForSignInToShowStories) {
                     showStories(StoriesSource.USER_LOGIN)
                     viewModel.waitingForSignInToShowStories = false
+                } else if (viewModel.waitingForSignInToShowPlayback2026) {
+                    Playback2026.start(this@MainActivity, Playback2026.Source.UserLogin)
+                    viewModel.waitingForSignInToShowPlayback2026 = false
                 } else if (settings.getEndOfYearShowModal()) {
                     if (isWhatsNewShowing()) return@observe
                     showEndOfYearModal()

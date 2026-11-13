@@ -133,7 +133,7 @@ class ProfileFragment :
             },
             onPlayback2026Click = {
                 profileViewModel.onPlayback2026BannerClick()
-                Playback2026.start(requireActivity(), Playback2026.Source.Profile)
+                (activity as? FragmentHostListener)?.showPlayback2026OrAccount(Playback2026.Source.Profile.name)
             },
             onClaimReferralsClick = {
                 fragmentHostListener.showBottomSheet(ReferralsGuestPassFragment.newInstance(ReferralsPageType.Claim))

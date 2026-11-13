@@ -80,6 +80,7 @@ class MainActivityViewModel
         .stateIn(viewModelScope, started = SharingStarted.WhileSubscribed(5_000), initialValue = null)
     val shouldShowStoriesModal = MutableStateFlow(false)
     var waitingForSignInToShowStories = false
+    var waitingForSignInToShowPlayback2026 = false
 
     init {
         viewModelScope.launch {
