@@ -51,7 +51,7 @@ constructor(
                 if (watchSyncAuthData == null) {
                     LogBuffer.i(TAG, "Removing auth token from Wear: Phone not logged in to Pocket Casts")
                 } else {
-                    LogBuffer.i(TAG, "Sending auth token to Wear Data Layer (identity: ${watchSyncAuthData.loginIdentity})")
+                    LogBuffer.i(TAG, "Sending auth token to Wear Data Layer (identity: ${watchSyncAuthData.loginIdentity.key})")
                 }
 
                 tokenBundleRepository.update(watchSyncAuthData)
@@ -81,7 +81,7 @@ constructor(
             return
         }
         try {
-            LogBuffer.i(TAG, "Received WatchSyncAuthData change from phone (identity: ${data.loginIdentity})")
+            LogBuffer.i(TAG, "Received WatchSyncAuthData change from phone (identity: ${data.loginIdentity.key})")
 
             if (!syncManager.isLoggedIn()) {
                 LogBuffer.i(TAG, "Not logged in - attempting login with token")
@@ -90,7 +90,10 @@ constructor(
                     loginIdentity = data.loginIdentity,
                     signInSource = SignInSource.WatchPhoneSync,
                 )
-                LogBuffer.i(TAG, "Login result: ${result::class.simpleName}")
+                when (result) {
+                    is LoginResult.Success -> LogBuffer.i(TAG, "Login from phone succeeded")
+                    is LoginResult.Failed -> LogBuffer.e(TAG, "Login from phone failed: ${result.message} (id: ${result.messageId})")
+                }
                 onResult(result)
             } else {
                 LogBuffer.i(TAG, "Already logged in, skipping login")
