@@ -439,3 +439,16 @@ message UuidsRequest {
 message UuidListResponse {
   repeated string uuids = 1;
 }
+
+message Playback2026ArchetypeResponse {
+  Playback2026Archetype archetype = 1;
+}
+
+enum Playback2026Archetype {
+  PLAYBACK_2026_ARCHETYPE_UNSPECIFIED = 0;
+  FLANEUR = 1;
+  AVANT_GARDIST = 2;
+  COLLECTOR = 3;
+  AFICIONADO = 4;
+  ANTHOLOGIST = 5;
+}

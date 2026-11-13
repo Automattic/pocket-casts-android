@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.google.protobuf.StringValue
 import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.EpisodesResponse
+import com.pocketcasts.service.api.Playback2026Archetype
 import com.pocketcasts.service.api.PodcastRatingAddRequest
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingShowRequest
@@ -218,6 +219,10 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun markWhatsNewAsUnread(messageIds: Collection<String>, token: AccessToken) {
         service.markWhatsNewAsUnread(addBearer(token), uuidsRequest(messageIds)).throwUnlessSuccessful()
+    }
+
+    suspend fun getPlayback2026Archetype(token: AccessToken): Playback2026Archetype {
+        return service.getPlayback2026Archetype(addBearer(token)).archetype
     }
 
     private fun uuidsRequest(messageIds: Collection<String>) = UuidsRequest.newBuilder().addAllUuids(messageIds).build()
