@@ -30,16 +30,13 @@ dependencies {
 
     implementation(platform(libs.compose.bom))
 
-    implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.mediarouter)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.coil)
     implementation(libs.coil.network.okhttp)
-    implementation(libs.compose.activity)
     implementation(libs.coroutines.core)
     implementation(libs.material.dialogs)
     implementation(libs.material.progressbar)
-    implementation(libs.media3.cast)
     implementation(libs.timber)
 
     implementation(projects.modules.services.images)
