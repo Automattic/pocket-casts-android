@@ -113,7 +113,14 @@ internal class Media3SessionCallback(
             .add(SessionCommand(SessionCommand.COMMAND_CODE_SESSION_SET_RATING))
             .build()
 
-        return MediaSession.ConnectionResult.accept(sessionCommands, TRANSPORT_PLAYER_COMMANDS)
+        val playerCommands = if (isAutomotive) {
+            TRANSPORT_PLAYER_COMMANDS
+        } else {
+            TRANSPORT_PLAYER_COMMANDS.buildUpon()
+                .addAll(Player.COMMAND_GET_TIMELINE, Player.COMMAND_SEEK_TO_MEDIA_ITEM)
+                .build()
+        }
+        return MediaSession.ConnectionResult.accept(sessionCommands, playerCommands)
     }
 
     override fun onCustomCommand(
