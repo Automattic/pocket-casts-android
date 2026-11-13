@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlayerSleepTimerRestartedEvent
 import com.automattic.eventhorizon.SleepTimerRestartSourceType
+import java.time.Clock
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration
@@ -20,9 +21,11 @@ import kotlinx.coroutines.flow.update
 class SleepTimer @Inject constructor(
     private val settings: Settings,
     private val eventHorizon: EventHorizon,
+    private val clock: Clock,
 ) {
     companion object {
-        private val MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES = 1.minutes
+        // Must match the window promised by settings_sleep_timer_auto_restart_summary, which iOS also uses
+        private val MIN_TIME_TO_RESTART_SLEEP_TIMER_IN_MINUTES = 5.minutes
         const val TAG: String = "SleepTimer"
     }
 
@@ -62,7 +65,7 @@ class SleepTimer @Inject constructor(
 
         sleepTimerHistory = SleepTimerHistory.AfterTime(
             lastSleepAfterTime = duration,
-            lastFinishedTime = System.currentTimeMillis().milliseconds + duration,
+            lastFinishedTime = clock.millis().milliseconds + duration,
         )
     }
 
@@ -78,6 +81,15 @@ class SleepTimer @Inject constructor(
         }
 
         LogBuffer.i(TAG, "Added extra time: $newTimeLeft")
+    }
+
+    /**
+     * Called when a "sleep in x minutes" countdown runs out. The auto restart window is measured from this moment,
+     * because the end time worked out in [sleepAfter] goes stale once extra time is added.
+     */
+    fun recordSleepAfterTimeFinished() {
+        val history = sleepTimerHistory as? SleepTimerHistory.AfterTime ?: return
+        sleepTimerHistory = history.copy(lastFinishedTime = clock.millis().milliseconds)
     }
 
     /*
@@ -100,7 +112,7 @@ class SleepTimer @Inject constructor(
         if (!settings.autoSleepTimerRestart.value || sleepTimerHistory is SleepTimerHistory.None) return
         val lastTimeHasFinished = sleepTimerHistory.lastFinishedTime ?: return
 
-        val diffTime = System.currentTimeMillis().milliseconds - lastTimeHasFinished
+        val diffTime = clock.millis().milliseconds - lastTimeHasFinished
 
         when (val history = sleepTimerHistory) {
             is SleepTimerHistory.AfterChapter -> {
@@ -221,13 +233,13 @@ class SleepTimer @Inject constructor(
         LogBuffer.i(TAG, "Episode $uuid was marked as end of episode")
         sleepTimerHistory = SleepTimerHistory.AfterEpisode(
             lastEpisodeUuidAutomaticEnded = uuid,
-            lastFinishedTime = System.currentTimeMillis().milliseconds,
+            lastFinishedTime = clock.millis().milliseconds,
         )
     }
 
     private fun setEndOfChapter() {
         LogBuffer.i(TAG, "End of chapter was reached")
-        val time = System.currentTimeMillis().milliseconds
+        val time = clock.millis().milliseconds
         sleepTimerHistory = SleepTimerHistory.AfterChapter(
             lastSleepAfterEndOfChapterTime = time,
             lastFinishedTime = time,
