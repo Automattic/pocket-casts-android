@@ -1,5 +1,7 @@
 8.26
 -----
+*   Bug Fixes
+    *   Fix Auto Restart Sleep Timer not restarting the timer when playback resumes within 5 minutes, including after adding time
 
 
 8.25
