@@ -445,11 +445,18 @@ subprojects {
         }
 
         // Without the upload key a release build still succeeds, unsigned, and only fails once something uploads it.
+        val sentryDsn = project.property("pocketcastsSentryDsn").toString()
         tasks.matching { it.name.matches(Regex("package(Release|Prototype)(Bundle)?")) }.configureEach {
             doFirst {
                 if (!canSignRelease) {
                     throw GradleException(
                         "The upload keystore or its credentials are missing, so this release build would not be signed. " +
+                            "Please run `bundle exec fastlane run configure_apply` to apply secrets.",
+                    )
+                }
+                if (sentryDsn.isBlank()) {
+                    throw GradleException(
+                        "The Sentry DSN is missing, so this release build would not report crashes. " +
                             "Please run `bundle exec fastlane run configure_apply` to apply secrets.",
                     )
                 }
