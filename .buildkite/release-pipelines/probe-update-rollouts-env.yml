@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+---
+
+# Validation only, for #5831: triggered like update-rollouts.yml, with build-level env and no `$VAR` in the command.
+
+steps:
+  - label: ":mag: Probe update-rollouts env at job runtime"
+    command: .buildkite/commands/probe-update-rollouts-env.sh
+    plugins: [$CI_TOOLKIT]
+    agents:
+      queue: "mac-metal"
