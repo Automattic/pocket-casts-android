@@ -11,7 +11,11 @@ class BaseEpisodeMediaSessionEqualTest {
 
     @Test
     fun `same podcast episode is equal`() {
-        val episode = PodcastEpisode(uuid = "episode", publishedDate = publishedDate, imageUrl = "https://example.com/a.jpg")
+        val episode = PodcastEpisode(
+            uuid = "episode",
+            publishedDate = publishedDate,
+            imageUrl = "https://example.com/a.jpg",
+        )
 
         assertTrue(BaseEpisode.isMediaSessionEqual(episode, episode.copy()))
     }
@@ -36,5 +40,14 @@ class BaseEpisodeMediaSessionEqualTest {
         val episode = PodcastEpisode(uuid = "episode", publishedDate = publishedDate)
 
         assertFalse(BaseEpisode.isMediaSessionEqual(episode, episode.copy(uuid = "other")))
+    }
+
+    @Test
+    fun `missing episodes are not equal`() {
+        val episode = PodcastEpisode(uuid = "episode", publishedDate = publishedDate)
+
+        assertFalse(BaseEpisode.isMediaSessionEqual(episode, null))
+        assertFalse(BaseEpisode.isMediaSessionEqual(null, episode))
+        assertFalse(BaseEpisode.isMediaSessionEqual(null, null))
     }
 }

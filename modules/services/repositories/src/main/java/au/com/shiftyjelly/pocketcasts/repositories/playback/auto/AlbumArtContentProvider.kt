@@ -24,6 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.plus
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.HttpUrl
@@ -38,7 +39,10 @@ class AlbumArtContentProvider : ContentProvider() {
         // The provider serves the cached file, not the bitmap, so a thumbnail decode is enough to finish the request.
         internal const val ARTWORK_DECODE_SIZE_PX = 64
 
-        // With podcast artwork to fall back on, don't hold the car's binder thread for a slow episode artwork host.
+        // Each lookup holds one of the car's binder threads, so stop waiting for a slow image host after this long.
+        internal val ARTWORK_TIMEOUT = 10.seconds
+
+        // With podcast artwork to fall back on, give up on a slow episode image sooner.
         internal val ARTWORK_WITH_FALLBACK_TIMEOUT = 5.seconds
 
         fun getAuthority(context: Context): String = String.format(AUTHORITY, context.packageName)
@@ -48,6 +52,47 @@ class AlbumArtContentProvider : ContentProvider() {
             .size(ARTWORK_DECODE_SIZE_PX)
             .memoryCachePolicy(CachePolicy.DISABLED)
             .build()
+
+        /**
+         * Finds the file for [artwork], or for [fallback] when the artwork is missing, fails to load or misses
+         * its time limit. [findFile] is given the time limit for each lookup.
+         */
+        internal fun findArtworkOrFallback(
+            artwork: String?,
+            fallback: String?,
+            findFile: (urlOrPath: String, timeout: Duration) -> File?,
+        ): File? {
+            val artworkTimeout = if (fallback.isNullOrBlank()) ARTWORK_TIMEOUT else ARTWORK_WITH_FALLBACK_TIMEOUT
+            return findFileOrNull(artwork, artworkTimeout, findFile)
+                ?: findFileOrNull(fallback, ARTWORK_TIMEOUT, findFile)
+        }
+
+        private fun findFileOrNull(
+            urlOrPath: String?,
+            timeout: Duration,
+            findFile: (urlOrPath: String, timeout: Duration) -> File?,
+        ): File? {
+            if (urlOrPath.isNullOrBlank()) return null
+            // Caught for each lookup, so a failed artwork lookup still leaves the fallback to try.
+            return runCatching { findFile(urlOrPath, timeout) }
+                .onFailure { exception ->
+                    LogBuffer.e("AlbumArtProvider", exception, "Failed to find artwork for $urlOrPath")
+                }
+                .getOrNull()
+        }
+
+        /**
+         * Runs [load] in [scope] and waits up to [timeout] for its result, returning null when it misses the limit.
+         * The load isn't cancelled then, so a slow download still reaches the disk cache for the car's next request.
+         */
+        internal suspend fun <T : Any> awaitWithTimeout(
+            scope: CoroutineScope,
+            timeout: Duration,
+            load: suspend () -> T,
+        ): T? {
+            val result = scope.async { load() }
+            return withTimeoutOrNull(timeout) { result.await() }
+        }
     }
 
     override fun onCreate() = true
@@ -58,10 +103,11 @@ class AlbumArtContentProvider : ContentProvider() {
 
             val applicationContext = context?.applicationContext ?: return@runCatching null
 
-            val fallback = uri.getQueryParameter(ALBUM_ART_FALLBACK_PARAM)
-            val artworkTimeout = if (fallback.isNullOrBlank()) null else ARTWORK_WITH_FALLBACK_TIMEOUT
-            val artworkFile = findArtworkFile(uri.lastPathSegment, applicationContext, artworkTimeout)
-                ?: findArtworkFile(fallback, applicationContext, timeout = null)
+            val artworkFile = findArtworkOrFallback(
+                artwork = uri.lastPathSegment,
+                fallback = uri.getQueryParameter(ALBUM_ART_FALLBACK_PARAM),
+                findFile = { urlOrPath, timeout -> findArtworkFile(urlOrPath, applicationContext, timeout) },
+            )
 
             artworkFile?.let { ParcelFileDescriptor.open(it, ParcelFileDescriptor.MODE_READ_ONLY) }
         }
@@ -78,8 +124,7 @@ class AlbumArtContentProvider : ContentProvider() {
         return EntryPointAccessors.fromApplication(context, AlbumArtEntryPoint::class.java)
     }
 
-    private fun findArtworkFile(urlOrPath: String?, context: Context, timeout: Duration?): File? {
-        if (urlOrPath.isNullOrBlank()) return null
+    private fun findArtworkFile(urlOrPath: String, context: Context, timeout: Duration): File? {
         val imageUrl = urlOrPath.toHttpUrlOrNull()
         return if (imageUrl != null) {
             getEntryPoint(context)
@@ -114,17 +159,11 @@ class AlbumArtContentProvider : ContentProvider() {
         return path == canonicalDir || path.startsWith(canonicalDir + File.separator)
     }
 
-    private fun AlbumArtEntryPoint.getArtworkFile(url: HttpUrl, context: Context, timeout: Duration?): File? {
+    private fun AlbumArtEntryPoint.getArtworkFile(url: HttpUrl, context: Context, timeout: Duration): File? {
         val imageLoader = imageLoader()
         val request = artworkFileRequest(context, url.toString())
         val result = runBlocking {
-            if (timeout == null) {
-                imageLoader.execute(request)
-            } else {
-                // Download outside this call, so an image that misses the timeout still reaches the disk cache.
-                val download = applicationScope().async(Dispatchers.IO) { imageLoader.execute(request) }
-                withTimeoutOrNull(timeout) { download.await() }
-            }
+            awaitWithTimeout(applicationScope() + Dispatchers.IO, timeout) { imageLoader.execute(request) }
         }
         return when (result) {
             null -> {

@@ -283,7 +283,8 @@ class EpisodeManagerImpl @Inject constructor(
 
     override suspend fun updateImageUrls(updates: List<ImageUrlUpdate>): Boolean {
         return appDatabase.withTransaction {
-            updates.map { updateImageUrl(it.episodeUuid, it.imageUrl) }.any { changed -> changed }
+            // Counting updates every episode, where any() would stop at the first change.
+            updates.count { update -> updateImageUrl(update.episodeUuid, update.imageUrl) } > 0
         }
     }
 

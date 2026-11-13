@@ -167,8 +167,8 @@ object AutoConverter {
 
             is UserEpisode -> {
                 val fileArtworkUrl = episode.artworkUrl?.takeIf(String::isNotBlank)
-                val embeddedArtworkPath = if (useEpisodeArtwork) embeddedArtworkPath(episode, context) else null
-                if (embeddedArtworkPath != null) embeddedArtworkPath to fileArtworkUrl else fileArtworkUrl to null
+                val episodeArtworkPath = if (useEpisodeArtwork) embeddedArtworkPath(episode, context) else null
+                if (episodeArtworkPath != null) episodeArtworkPath to fileArtworkUrl else fileArtworkUrl to null
             }
 
             null -> podcastArtworkUrl to null

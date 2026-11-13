@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import java.util.Date
 import java.util.UUID
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -384,6 +385,28 @@ class BrowseTreeProviderTest {
         whenever(podcastManager.findPodcastByUuid(podcast.uuid)).thenReturn(podcast)
         whenever(showNotesManager.updateEpisodeImageUrls(podcast.uuid))
             .thenThrow(RuntimeException("offline"))
+            .thenReturn(true)
+        mockArtworkConfiguration(useEpisodeArtwork = true)
+
+        assertFalse(provider.fetchEpisodeArtwork(podcast.uuid))
+        clock += EPISODE_ARTWORK_RETRY_INTERVAL - 1.seconds
+        assertFalse(provider.fetchEpisodeArtwork(podcast.uuid))
+        verify(showNotesManager, times(1)).updateEpisodeImageUrls(podcast.uuid)
+
+        clock += 1.seconds
+        assertTrue(provider.fetchEpisodeArtwork(podcast.uuid))
+        verify(showNotesManager, times(2)).updateEpisodeImageUrls(podcast.uuid)
+    }
+
+    @Test
+    fun `fetchEpisodeArtwork counts the retry interval from when a slow fetch fails`() = runTest {
+        val podcast = Podcast(uuid = UUID.randomUUID().toString())
+        whenever(podcastManager.findPodcastByUuid(podcast.uuid)).thenReturn(podcast)
+        whenever(showNotesManager.updateEpisodeImageUrls(podcast.uuid))
+            .thenAnswer {
+                clock += 1.minutes
+                throw RuntimeException("timed out")
+            }
             .thenReturn(true)
         mockArtworkConfiguration(useEpisodeArtwork = true)
 

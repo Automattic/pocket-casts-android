@@ -62,6 +62,7 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -170,6 +171,7 @@ class MediaSessionManager(
     }
 
     val disposables = CompositeDisposable()
+    private val isObservingMedia3 = AtomicBoolean(false)
     private val source = SourceView.MEDIA_BUTTON_BROADCAST_ACTION
 
     @Volatile
@@ -710,10 +712,15 @@ class MediaSessionManager(
     }
 
     /**
-     * Runs once per process. Subscribe with [disposables] or [applicationScope], not [scope], which [release] cancels.
+     * Subscribes once per process, and later calls do nothing. Subscribe with [disposables] or [applicationScope],
+     * not [scope], which [release] cancels.
      */
     @OptIn(UnstableApi::class)
     private fun observeForMedia3Updates() {
+        // release() keeps these observers, so subscribing again would deliver every update twice.
+        if (!isObservingMedia3.compareAndSet(false, true)) {
+            return
+        }
         if (isAutomotive) {
             playbackManager.playbackStateRelay
                 .map { it.isError }
@@ -869,7 +876,7 @@ class MediaSessionManager(
             )
             .addTo(disposables)
 
-        // Browse lists bake the artwork URI into each item, so reload whatever a car is showing when the choice changes.
+        // Browse lists bake the artwork URI into each item, so reload what a car is showing when the choice changes.
         settings.artworkConfiguration.flow
             .map { it.useEpisodeArtwork }
             .distinctUntilChanged()

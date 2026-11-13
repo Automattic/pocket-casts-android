@@ -56,6 +56,18 @@ class MediaSessionManagerReleaseTest {
         assertEquals(observerCount, manager.disposables.size())
     }
 
+    @Test
+    fun `observing again doesn't add a second set of Media3 observers`() {
+        FeatureFlag.setEnabled(Feature.MEDIA3_SESSION, true)
+        val manager = createManager()
+        manager.startObserving()
+        val observerCount = manager.disposables.size()
+
+        manager.startObserving()
+
+        assertEquals(observerCount, manager.disposables.size())
+    }
+
     private fun createManager(): MediaSessionManager {
         val upNextQueue = mock<UpNextQueue> {
             on { changesObservable } doReturn Observable.never()

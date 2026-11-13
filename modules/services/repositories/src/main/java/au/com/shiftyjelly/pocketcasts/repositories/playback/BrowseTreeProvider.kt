@@ -80,6 +80,7 @@ class BrowseTreeProvider @Inject constructor(
     private val clock: Clock,
 ) {
     // Podcast uuid to the earliest time, in epoch millis, that its episode artwork can be fetched again.
+    // It only holds the podcasts opened in the car since the app started, so it isn't pruned.
     private val nextEpisodeArtworkFetch = ConcurrentHashMap<String, Long>()
 
     /**
@@ -97,6 +98,7 @@ class BrowseTreeProvider @Inject constructor(
             return false
         }
         val now = clock.millis()
+        // A podcast's list id is its uuid, so a recently fetched podcast is skipped before the database lookup.
         if (!isEpisodeArtworkFetchDue(parentId, now)) {
             return false
         }
@@ -111,7 +113,9 @@ class BrowseTreeProvider @Inject constructor(
             throw e
         } catch (e: Exception) {
             Timber.e(e, "Failed to fetch episode artwork for podcast ${podcast.uuid}")
-            nextEpisodeArtworkFetch[podcast.uuid] = now + EPISODE_ARTWORK_RETRY_INTERVAL.inWholeMilliseconds
+            // Counted from the failure, so a fetch that took a while to fail still waits the full interval.
+            val retryAt = clock.millis() + EPISODE_ARTWORK_RETRY_INTERVAL.inWholeMilliseconds
+            nextEpisodeArtworkFetch[podcast.uuid] = retryAt
             false
         }
     }

@@ -31,9 +31,16 @@ class AutoConverterArtworkTest {
         EpisodeFileMetadata.artworkCacheFile(context, "file-uuid").delete()
     }
 
+    private fun podcastEpisode(imageUrl: String? = null) = PodcastEpisode(
+        uuid = "episode-uuid",
+        podcastUuid = podcast.uuid,
+        publishedDate = Date(),
+        imageUrl = imageUrl,
+    )
+
     @Test
     fun `uses episode artwork with the podcast artwork as fallback`() {
-        val episode = PodcastEpisode(uuid = "episode-uuid", podcastUuid = podcast.uuid, publishedDate = Date(), imageUrl = episodeImageUrl)
+        val episode = podcastEpisode(imageUrl = episodeImageUrl)
 
         val uri = AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork = true)!!
 
@@ -43,7 +50,7 @@ class AutoConverterArtworkTest {
 
     @Test
     fun `uses podcast artwork without fallback when episode artwork is off`() {
-        val episode = PodcastEpisode(uuid = "episode-uuid", podcastUuid = podcast.uuid, publishedDate = Date(), imageUrl = episodeImageUrl)
+        val episode = podcastEpisode(imageUrl = episodeImageUrl)
 
         val uri = AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork = false)!!
 
@@ -53,7 +60,7 @@ class AutoConverterArtworkTest {
 
     @Test
     fun `uses podcast artwork when the episode has no artwork`() {
-        val episode = PodcastEpisode(uuid = "episode-uuid", podcastUuid = podcast.uuid, publishedDate = Date(), imageUrl = " ")
+        val episode = podcastEpisode(imageUrl = " ")
 
         val uri = AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork = true)!!
 
@@ -63,8 +70,9 @@ class AutoConverterArtworkTest {
 
     @Test
     fun `uses embedded file artwork when the episode has no image URL`() {
-        val embedded = EpisodeFileMetadata.artworkCacheFile(context, "episode-uuid").apply { writeBytes(byteArrayOf(1)) }
-        val episode = PodcastEpisode(uuid = "episode-uuid", podcastUuid = podcast.uuid, publishedDate = Date())
+        val embedded = EpisodeFileMetadata.artworkCacheFile(context, "episode-uuid")
+            .apply { writeBytes(byteArrayOf(1)) }
+        val episode = podcastEpisode()
 
         val uri = AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork = true)!!
 

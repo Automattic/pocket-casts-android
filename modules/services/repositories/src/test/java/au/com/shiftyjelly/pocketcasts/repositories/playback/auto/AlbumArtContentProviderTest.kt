@@ -6,11 +6,21 @@ import androidx.core.net.toUri
 import coil3.request.CachePolicy
 import coil3.size.Size
 import java.io.File
+import java.io.IOException
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.currentTime
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -18,6 +28,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @Config(manifest = Config.NONE)
 @RunWith(RobolectricTestRunner::class)
 class AlbumArtContentProviderTest {
@@ -129,6 +140,87 @@ class AlbumArtContentProviderTest {
         val decodeSize = AlbumArtContentProvider.ARTWORK_DECODE_SIZE_PX
         assertEquals(Size(decodeSize, decodeSize), size)
         assertEquals(CachePolicy.DISABLED, request.memoryCachePolicy)
+    }
+
+    @Test
+    fun `gives up on the artwork sooner when there is a fallback`() {
+        val lookups = mutableListOf<Pair<String, Duration>>()
+        val fallbackFile = File(context.cacheDir, "podcast-artwork.jpg")
+
+        val file = AlbumArtContentProvider.findArtworkOrFallback(
+            artwork = "episode-artwork",
+            fallback = "podcast-artwork",
+            findFile = { urlOrPath, timeout ->
+                lookups += urlOrPath to timeout
+                fallbackFile.takeIf { urlOrPath == "podcast-artwork" }
+            },
+        )
+
+        assertEquals(fallbackFile, file)
+        val expectedLookups = listOf(
+            "episode-artwork" to AlbumArtContentProvider.ARTWORK_WITH_FALLBACK_TIMEOUT,
+            "podcast-artwork" to AlbumArtContentProvider.ARTWORK_TIMEOUT,
+        )
+        assertEquals(expectedLookups, lookups)
+    }
+
+    @Test
+    fun `gives artwork without a fallback the full time limit`() {
+        val lookups = mutableListOf<Pair<String, Duration>>()
+
+        AlbumArtContentProvider.findArtworkOrFallback(
+            artwork = "podcast-artwork",
+            fallback = null,
+            findFile = { urlOrPath, timeout ->
+                lookups += urlOrPath to timeout
+                null
+            },
+        )
+
+        assertEquals(listOf("podcast-artwork" to AlbumArtContentProvider.ARTWORK_TIMEOUT), lookups)
+    }
+
+    @Test
+    fun `tries the fallback when the artwork lookup throws`() {
+        val fallbackFile = File(context.cacheDir, "podcast-artwork.jpg")
+
+        val file = AlbumArtContentProvider.findArtworkOrFallback(
+            artwork = "episode-artwork",
+            fallback = "podcast-artwork",
+            findFile = { urlOrPath, _ ->
+                if (urlOrPath == "episode-artwork") throw IOException("Disk cache unavailable")
+                fallbackFile
+            },
+        )
+
+        assertEquals(fallbackFile, file)
+    }
+
+    @Test
+    fun `returns artwork that loads within the time limit`() = runTest {
+        val artwork = AlbumArtContentProvider.awaitWithTimeout(backgroundScope, timeout = 5.seconds) {
+            delay(4.seconds)
+            "artwork"
+        }
+
+        assertEquals("artwork", artwork)
+    }
+
+    @Test
+    fun `stops waiting at the time limit but keeps loading the artwork`() = runTest {
+        var loaded = false
+
+        val artwork = AlbumArtContentProvider.awaitWithTimeout(backgroundScope, timeout = 5.seconds) {
+            delay(6.seconds)
+            loaded = true
+            "artwork"
+        }
+
+        assertNull(artwork)
+        assertEquals(5.seconds.inWholeMilliseconds, currentTime)
+        assertFalse(loaded)
+        advanceTimeBy(2.seconds)
+        assertTrue(loaded)
     }
 
     @Test
