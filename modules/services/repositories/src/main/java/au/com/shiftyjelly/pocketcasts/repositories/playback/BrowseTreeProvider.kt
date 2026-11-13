@@ -37,10 +37,13 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import java.time.Clock
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.flow.first
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -50,6 +53,10 @@ private const val DOWNLOADS_ROOT = "__DOWNLOADS__"
 private const val FILES_ROOT = "__FILES__"
 private const val EPISODE_LIMIT = 100
 private const val NUM_SUGGESTED_ITEMS = 8
+
+// Refetching picks up artwork for episodes that arrived since the last fetch.
+internal val EPISODE_ARTWORK_REFETCH_INTERVAL = 1.hours
+internal val EPISODE_ARTWORK_RETRY_INTERVAL = 5.minutes
 
 internal const val FILTERS_ROOT = "__FILTERS__"
 internal const val DISCOVER_ROOT = "__DISCOVER__"
@@ -70,13 +77,16 @@ class BrowseTreeProvider @Inject constructor(
     private val serviceManager: ServiceManager,
     private val listRepository: ListRepository,
     private val showNotesManager: ShowNotesManager,
+    private val clock: Clock,
 ) {
-    private val podcastsWithFetchedEpisodeArtwork: MutableSet<String> = ConcurrentHashMap.newKeySet()
+    // Podcast uuid to the earliest time, in epoch millis, that its episode artwork can be fetched again.
+    private val nextEpisodeArtworkFetch = ConcurrentHashMap<String, Long>()
 
     /**
      * Episode image URLs only arrive with a podcast's show notes, which are normally fetched when an episode
-     * plays. Fetches them the first time a podcast's episode list is opened, so the list can show episode
-     * artwork before anything has been played.
+     * plays. Fetches them when a podcast's episode list is opened, so the list can show episode artwork before
+     * anything has been played. A podcast is fetched again after [EPISODE_ARTWORK_REFETCH_INTERVAL], or after
+     * [EPISODE_ARTWORK_RETRY_INTERVAL] when the fetch failed.
      *
      * @return true when an episode's image URL changed and the list should be reloaded.
      */
@@ -86,23 +96,45 @@ class BrowseTreeProvider @Inject constructor(
         if (isBuiltInList || !settings.artworkConfiguration.value.useEpisodeArtwork) {
             return false
         }
-        if (parentId in podcastsWithFetchedEpisodeArtwork) {
+        val now = clock.millis()
+        if (!isEpisodeArtworkFetchDue(parentId, now)) {
             return false
         }
         val podcast = podcastManager.findPodcastByUuid(parentId) ?: return false
-        if (!podcastsWithFetchedEpisodeArtwork.add(podcast.uuid)) {
+        if (!reserveEpisodeArtworkFetch(podcast.uuid, now)) {
             return false
         }
         return try {
             showNotesManager.updateEpisodeImageUrls(podcast.uuid)
         } catch (e: CancellationException) {
-            podcastsWithFetchedEpisodeArtwork.remove(podcast.uuid)
+            nextEpisodeArtworkFetch.remove(podcast.uuid)
             throw e
         } catch (e: Exception) {
             Timber.e(e, "Failed to fetch episode artwork for podcast ${podcast.uuid}")
-            podcastsWithFetchedEpisodeArtwork.remove(podcast.uuid)
+            nextEpisodeArtworkFetch[podcast.uuid] = now + EPISODE_ARTWORK_RETRY_INTERVAL.inWholeMilliseconds
             false
         }
+    }
+
+    private fun isEpisodeArtworkFetchDue(podcastUuid: String, now: Long): Boolean {
+        val nextFetch = nextEpisodeArtworkFetch[podcastUuid] ?: return true
+        return now >= nextFetch
+    }
+
+    /**
+     * Claims the next fetch for a podcast, so lists loading at the same time don't fetch it twice.
+     */
+    private fun reserveEpisodeArtworkFetch(podcastUuid: String, now: Long): Boolean {
+        var reserved = false
+        nextEpisodeArtworkFetch.compute(podcastUuid) { _, nextFetch ->
+            if (nextFetch == null || now >= nextFetch) {
+                reserved = true
+                now + EPISODE_ARTWORK_REFETCH_INTERVAL.inWholeMilliseconds
+            } else {
+                nextFetch
+            }
+        }
+        return reserved
     }
 
     fun getRootId(isRecent: Boolean, isSuggested: Boolean, hasCurrentEpisode: Boolean, isAutomotive: Boolean): String? {

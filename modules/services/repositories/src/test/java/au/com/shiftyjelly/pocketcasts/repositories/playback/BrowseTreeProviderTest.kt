@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
+import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import java.util.Date
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
@@ -54,6 +55,7 @@ class BrowseTreeProviderTest {
     private lateinit var serviceManager: ServiceManager
     private lateinit var showNotesManager: ShowNotesManager
     private lateinit var provider: BrowseTreeProvider
+    private val clock = MutableClock()
 
     @Before
     fun setUp() {
@@ -77,6 +79,7 @@ class BrowseTreeProviderTest {
             serviceManager = serviceManager,
             listRepository = mock(),
             showNotesManager = showNotesManager,
+            clock = clock,
         )
     }
 
@@ -385,6 +388,28 @@ class BrowseTreeProviderTest {
         mockArtworkConfiguration(useEpisodeArtwork = true)
 
         assertFalse(provider.fetchEpisodeArtwork(podcast.uuid))
+        clock += EPISODE_ARTWORK_RETRY_INTERVAL - 1.seconds
+        assertFalse(provider.fetchEpisodeArtwork(podcast.uuid))
+        verify(showNotesManager, times(1)).updateEpisodeImageUrls(podcast.uuid)
+
+        clock += 1.seconds
+        assertTrue(provider.fetchEpisodeArtwork(podcast.uuid))
+        verify(showNotesManager, times(2)).updateEpisodeImageUrls(podcast.uuid)
+    }
+
+    @Test
+    fun `fetchEpisodeArtwork fetches again after the refetch interval`() = runTest {
+        val podcast = Podcast(uuid = UUID.randomUUID().toString())
+        whenever(podcastManager.findPodcastByUuid(podcast.uuid)).thenReturn(podcast)
+        whenever(showNotesManager.updateEpisodeImageUrls(podcast.uuid)).thenReturn(false, true)
+        mockArtworkConfiguration(useEpisodeArtwork = true)
+
+        assertFalse(provider.fetchEpisodeArtwork(podcast.uuid))
+        clock += EPISODE_ARTWORK_REFETCH_INTERVAL - 1.seconds
+        assertFalse(provider.fetchEpisodeArtwork(podcast.uuid))
+        verify(showNotesManager, times(1)).updateEpisodeImageUrls(podcast.uuid)
+
+        clock += 1.seconds
         assertTrue(provider.fetchEpisodeArtwork(podcast.uuid))
         verify(showNotesManager, times(2)).updateEpisodeImageUrls(podcast.uuid)
     }
