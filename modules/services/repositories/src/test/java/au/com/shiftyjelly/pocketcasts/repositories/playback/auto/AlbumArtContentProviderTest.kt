@@ -17,10 +17,8 @@ import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -198,29 +196,40 @@ class AlbumArtContentProviderTest {
 
     @Test
     fun `returns artwork that loads within the time limit`() = runTest {
-        val artwork = AlbumArtContentProvider.awaitWithTimeout(backgroundScope, timeout = 5.seconds) {
+        val lateArtwork = mutableListOf<String>()
+
+        val artwork = AlbumArtContentProvider.awaitWithTimeout(
+            scope = backgroundScope,
+            timeout = 5.seconds,
+            onLateResult = { lateArtwork += it },
+        ) {
             delay(4.seconds)
             "artwork"
         }
+        advanceTimeBy(10.seconds)
 
         assertEquals("artwork", artwork)
+        assertEquals(emptyList<String>(), lateArtwork)
     }
 
     @Test
-    fun `stops waiting at the time limit but keeps loading the artwork`() = runTest {
-        var loaded = false
+    fun `stops waiting at the time limit and passes the artwork on when it arrives`() = runTest {
+        val lateArtwork = mutableListOf<String>()
 
-        val artwork = AlbumArtContentProvider.awaitWithTimeout(backgroundScope, timeout = 5.seconds) {
+        val artwork = AlbumArtContentProvider.awaitWithTimeout(
+            scope = backgroundScope,
+            timeout = 5.seconds,
+            onLateResult = { lateArtwork += it },
+        ) {
             delay(6.seconds)
-            loaded = true
             "artwork"
         }
 
         assertNull(artwork)
         assertEquals(5.seconds.inWholeMilliseconds, currentTime)
-        assertFalse(loaded)
+        assertEquals(emptyList<String>(), lateArtwork)
         advanceTimeBy(2.seconds)
-        assertTrue(loaded)
+        assertEquals(listOf("artwork"), lateArtwork)
     }
 
     @Test

@@ -24,6 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
@@ -49,6 +50,8 @@ class AlbumArtContentProvider : ContentProvider() {
 
         internal fun artworkFileRequest(context: Context, url: String): ImageRequest = ImageRequest.Builder(context)
             .data(url)
+            // Keyed by the URL alone, so AlbumArtCache can tell whether an image is downloaded before the car asks.
+            .diskCacheKey(url)
             .size(ARTWORK_DECODE_SIZE_PX)
             .memoryCachePolicy(CachePolicy.DISABLED)
             .build()
@@ -83,15 +86,21 @@ class AlbumArtContentProvider : ContentProvider() {
 
         /**
          * Runs [load] in [scope] and waits up to [timeout] for its result, returning null when it misses the limit.
-         * The load isn't cancelled then, so a slow download still reaches the disk cache for the car's next request.
+         * The load isn't cancelled then, so a slow download still reaches the disk cache, and its result is passed
+         * to [onLateResult] when it arrives.
          */
         internal suspend fun <T : Any> awaitWithTimeout(
             scope: CoroutineScope,
             timeout: Duration,
+            onLateResult: (T) -> Unit = {},
             load: suspend () -> T,
         ): T? {
             val result = scope.async { load() }
-            return withTimeoutOrNull(timeout) { result.await() }
+            val onTimeResult = withTimeoutOrNull(timeout) { result.await() }
+            if (onTimeResult == null) {
+                scope.launch { runCatching { result.await() }.onSuccess(onLateResult) }
+            }
+            return onTimeResult
         }
     }
 
@@ -163,7 +172,13 @@ class AlbumArtContentProvider : ContentProvider() {
         val imageLoader = imageLoader()
         val request = artworkFileRequest(context, url.toString())
         val result = runBlocking {
-            awaitWithTimeout(applicationScope() + Dispatchers.IO, timeout) { imageLoader.execute(request) }
+            awaitWithTimeout(
+                scope = applicationScope() + Dispatchers.IO,
+                timeout = timeout,
+                // The car got other artwork, or none, for this link, so tell it to reload now that the image is here.
+                onLateResult = { lateResult -> if (lateResult is SuccessResult) albumArtCache().onLateDownload() },
+                load = { imageLoader.execute(request) },
+            )
         }
         return when (result) {
             null -> {
@@ -210,6 +225,8 @@ class AlbumArtContentProvider : ContentProvider() {
     @InstallIn(SingletonComponent::class)
     interface AlbumArtEntryPoint {
         fun imageLoader(): ImageLoader
+
+        fun albumArtCache(): AlbumArtCache
 
         @ApplicationScope
         fun applicationScope(): CoroutineScope

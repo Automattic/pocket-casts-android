@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.ALBUM_ART_PENDING_PARAM
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtCache
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
@@ -55,6 +57,7 @@ class BrowseTreeProviderTest {
     private lateinit var settings: Settings
     private lateinit var serviceManager: ServiceManager
     private lateinit var showNotesManager: ShowNotesManager
+    private lateinit var albumArtCache: AlbumArtCache
     private lateinit var provider: BrowseTreeProvider
     private val clock = MutableClock()
 
@@ -69,6 +72,7 @@ class BrowseTreeProviderTest {
         settings = mock()
         serviceManager = mock()
         showNotesManager = mock()
+        albumArtCache = mock()
         provider = BrowseTreeProvider(
             podcastManager = podcastManager,
             episodeManager = episodeManager,
@@ -81,6 +85,7 @@ class BrowseTreeProviderTest {
             listRepository = mock(),
             showNotesManager = showNotesManager,
             clock = clock,
+            albumArtCache = albumArtCache,
         )
     }
 
@@ -183,6 +188,31 @@ class BrowseTreeProviderTest {
             AutoMediaId(currentEpisode.uuid, podcastOne.uuid).toMediaId(),
             result[0].mediaId,
         )
+    }
+
+    @Test
+    fun `episode artwork links stay pending until the image is downloaded`() = runTest {
+        val context = RuntimeEnvironment.getApplication()
+        val podcast = Podcast(uuid = UUID.randomUUID().toString())
+        val imageUrl = "https://example.com/episode.jpg"
+        val episode = PodcastEpisode(
+            uuid = UUID.randomUUID().toString(),
+            podcastUuid = podcast.uuid,
+            publishedDate = Date(),
+            imageUrl = imageUrl,
+        )
+        whenever(upNextQueue.currentEpisode).thenReturn(episode)
+        whenever(podcastManager.findPodcastByUuid(podcast.uuid)).thenReturn(podcast)
+        mockArtworkConfiguration(useEpisodeArtwork = true)
+
+        whenever(albumArtCache.isDownloaded(imageUrl)).thenReturn(false)
+        val pendingUri = provider.loadRecentChildren(context).single().mediaMetadata.artworkUri
+        whenever(albumArtCache.isDownloaded(imageUrl)).thenReturn(true)
+        val downloadedUri = provider.loadRecentChildren(context).single().mediaMetadata.artworkUri
+
+        assertEquals("true", pendingUri?.getQueryParameter(ALBUM_ART_PENDING_PARAM))
+        assertNull(downloadedUri?.getQueryParameter(ALBUM_ART_PENDING_PARAM))
+        assertEquals(imageUrl, downloadedUri?.lastPathSegment)
     }
 
     @Test

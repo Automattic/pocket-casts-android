@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback.auto
 
 import android.content.Context
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -38,11 +39,18 @@ class AutoConverterArtworkTest {
         imageUrl = imageUrl,
     )
 
+    private fun artworkUri(
+        podcast: Podcast?,
+        episode: BaseEpisode?,
+        useEpisodeArtwork: Boolean = true,
+        isArtworkDownloaded: (url: String) -> Boolean = { true },
+    ) = AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork, isArtworkDownloaded)!!
+
     @Test
     fun `uses episode artwork with the podcast artwork as fallback`() {
         val episode = podcastEpisode(imageUrl = episodeImageUrl)
 
-        val uri = AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork = true)!!
+        val uri = artworkUri(podcast, episode, useEpisodeArtwork = true)
 
         assertEquals(episodeImageUrl, uri.lastPathSegment)
         assertEquals(podcastArtworkUrl, uri.getQueryParameter(ALBUM_ART_FALLBACK_PARAM))
@@ -52,7 +60,7 @@ class AutoConverterArtworkTest {
     fun `uses podcast artwork without fallback when episode artwork is off`() {
         val episode = podcastEpisode(imageUrl = episodeImageUrl)
 
-        val uri = AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork = false)!!
+        val uri = artworkUri(podcast, episode, useEpisodeArtwork = false)
 
         assertEquals(podcastArtworkUrl, uri.lastPathSegment)
         assertNull(uri.getQueryParameter(ALBUM_ART_FALLBACK_PARAM))
@@ -62,7 +70,7 @@ class AutoConverterArtworkTest {
     fun `uses podcast artwork when the episode has no artwork`() {
         val episode = podcastEpisode(imageUrl = " ")
 
-        val uri = AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork = true)!!
+        val uri = artworkUri(podcast, episode, useEpisodeArtwork = true)
 
         assertEquals(podcastArtworkUrl, uri.lastPathSegment)
         assertNull(uri.getQueryParameter(ALBUM_ART_FALLBACK_PARAM))
@@ -74,7 +82,7 @@ class AutoConverterArtworkTest {
             .apply { writeBytes(byteArrayOf(1)) }
         val episode = podcastEpisode()
 
-        val uri = AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork = true)!!
+        val uri = artworkUri(podcast, episode, useEpisodeArtwork = true)
 
         assertEquals(embedded.path, uri.lastPathSegment)
         assertEquals(podcastArtworkUrl, uri.getQueryParameter(ALBUM_ART_FALLBACK_PARAM))
@@ -86,7 +94,7 @@ class AutoConverterArtworkTest {
         val fileArtworkUrl = "https://example.com/file.jpg"
         val episode = UserEpisode(uuid = "file-uuid", publishedDate = Date(), artworkUrl = fileArtworkUrl)
 
-        val uri = AutoConverter.getPodcastArtworkUri(null, episode, context, useEpisodeArtwork = true)!!
+        val uri = artworkUri(podcast = null, episode = episode)
 
         assertEquals(embedded.path, uri.lastPathSegment)
         assertEquals(fileArtworkUrl, uri.getQueryParameter(ALBUM_ART_FALLBACK_PARAM))
@@ -94,9 +102,51 @@ class AutoConverterArtworkTest {
 
     @Test
     fun `uses podcast artwork without fallback when there is no episode`() {
-        val uri = AutoConverter.getPodcastArtworkUri(podcast, null, context, useEpisodeArtwork = true)!!
+        val uri = artworkUri(podcast, episode = null)
 
         assertEquals(podcastArtworkUrl, uri.lastPathSegment)
         assertNull(uri.getQueryParameter(ALBUM_ART_FALLBACK_PARAM))
+    }
+
+    @Test
+    fun `marks episode artwork as pending until its image is downloaded`() {
+        val episode = podcastEpisode(imageUrl = episodeImageUrl)
+        val checkedUrls = mutableListOf<String>()
+
+        val pendingUri = artworkUri(
+            podcast,
+            episode,
+            isArtworkDownloaded = { url ->
+                checkedUrls += url
+                false
+            },
+        )
+        val downloadedUri = artworkUri(podcast, episode, isArtworkDownloaded = { true })
+
+        assertEquals(listOf(episodeImageUrl), checkedUrls)
+        assertEquals(episodeImageUrl, pendingUri.lastPathSegment)
+        assertEquals("true", pendingUri.getQueryParameter(ALBUM_ART_PENDING_PARAM))
+        assertEquals(episodeImageUrl, downloadedUri.lastPathSegment)
+        assertNull(downloadedUri.getQueryParameter(ALBUM_ART_PENDING_PARAM))
+    }
+
+    @Test
+    fun `doesn't mark episode artwork without a fallback as pending`() {
+        val episode = podcastEpisode(imageUrl = episodeImageUrl)
+
+        val uri = artworkUri(podcast = null, episode = episode, isArtworkDownloaded = { false })
+
+        assertNull(uri.getQueryParameter(ALBUM_ART_FALLBACK_PARAM))
+        assertNull(uri.getQueryParameter(ALBUM_ART_PENDING_PARAM))
+    }
+
+    @Test
+    fun `doesn't mark embedded file artwork as pending`() {
+        EpisodeFileMetadata.artworkCacheFile(context, "episode-uuid").writeBytes(byteArrayOf(1))
+
+        val uri = artworkUri(podcast, podcastEpisode(), isArtworkDownloaded = { false })
+
+        assertEquals(podcastArtworkUrl, uri.getQueryParameter(ALBUM_ART_FALLBACK_PARAM))
+        assertNull(uri.getQueryParameter(ALBUM_ART_PENDING_PARAM))
     }
 }

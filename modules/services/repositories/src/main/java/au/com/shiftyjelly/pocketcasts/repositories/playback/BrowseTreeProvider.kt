@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtCache
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.convertFolderToMediaItem
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.convertPodcastToMediaItem
@@ -78,6 +79,7 @@ class BrowseTreeProvider @Inject constructor(
     private val listRepository: ListRepository,
     private val showNotesManager: ShowNotesManager,
     private val clock: Clock,
+    private val albumArtCache: AlbumArtCache,
 ) {
     // Podcast uuid to the earliest time, in epoch millis, that its episode artwork can be fetched again.
     // It only holds the podcasts opened in the car since the app started, so it isn't pruned.
@@ -379,6 +381,7 @@ class BrowseTreeProvider @Inject constructor(
                                 parentPodcast,
                                 sourceId = sourceId,
                                 useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                                isArtworkDownloaded = albumArtCache::isDownloaded,
                             ),
                         )
                     }
@@ -410,6 +413,7 @@ class BrowseTreeProvider @Inject constructor(
                             podcast,
                             groupTrailers = !podcast.isSubscribed,
                             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                            isArtworkDownloaded = albumArtCache::isDownloaded,
                         ),
                     )
                 }
@@ -429,6 +433,7 @@ class BrowseTreeProvider @Inject constructor(
                 it,
                 Podcast.userPodcast,
                 useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                isArtworkDownloaded = albumArtCache::isDownloaded,
             )
         }
     }
@@ -442,6 +447,7 @@ class BrowseTreeProvider @Inject constructor(
                     episode = episode,
                     parentPodcast = podcast,
                     useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                    isArtworkDownloaded = albumArtCache::isDownloaded,
                 )
             }
         }
@@ -457,6 +463,7 @@ class BrowseTreeProvider @Inject constructor(
                     episode = episode,
                     parentPodcast = podcast,
                     useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                    isArtworkDownloaded = albumArtCache::isDownloaded,
                 )
             }
         }
@@ -647,6 +654,7 @@ class BrowseTreeProvider @Inject constructor(
                     episode = episode,
                     parentPodcast = podcast,
                     useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                    isArtworkDownloaded = albumArtCache::isDownloaded,
                 )
             }
         }

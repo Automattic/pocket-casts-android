@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtCache
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -146,6 +147,7 @@ class MediaSessionManagerCallbackTest {
         errorReporter = mock<PlaybackServiceErrorReporter>(),
         bookmarkManager = mock<BookmarkManager>(),
         browseTreeProvider = mock<BrowseTreeProvider>(),
+        albumArtCache = AlbumArtCache(mock()),
         applicationScope = scope,
     )
 

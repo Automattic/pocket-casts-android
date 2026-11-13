@@ -41,6 +41,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getArtworkUrl
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtCache
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
@@ -55,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PlaybackServiceType
+import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -109,6 +111,7 @@ class MediaSessionManager(
     val errorReporter: PlaybackServiceErrorReporter,
     val bookmarkManager: BookmarkManager,
     val browseTreeProvider: BrowseTreeProvider,
+    private val albumArtCache: AlbumArtCache,
     private val applicationScope: CoroutineScope,
 ) {
     companion object {
@@ -172,6 +175,10 @@ class MediaSessionManager(
 
     val disposables = CompositeDisposable()
     private val isObservingMedia3 = AtomicBoolean(false)
+
+    // Recomputes the now playing artwork link once a late image is downloaded, as the link changes then.
+    private val lateArtworkRefreshes = BehaviorRelay.createDefault(Unit)
+
     private val source = SourceView.MEDIA_BUTTON_BROADCAST_ACTION
 
     @Volatile
@@ -774,7 +781,12 @@ class MediaSessionManager(
         val artworkConfig = settings.artworkConfiguration.flow.asObservable()
         val showArtworkOnLockScreen = settings.showArtworkOnLockScreen.flow.asObservable()
 
-        Observables.combineLatest(episodeAndState, artworkConfig, showArtworkOnLockScreen) { episodeState, config, showArtwork ->
+        Observables.combineLatest(
+            episodeAndState,
+            artworkConfig,
+            showArtworkOnLockScreen,
+            lateArtworkRefreshes,
+        ) { episodeState, config, showArtwork, _ ->
             Triple(episodeState, config.useEpisodeArtwork, showArtwork)
         }
             .observeOn(Schedulers.io())
@@ -888,6 +900,22 @@ class MediaSessionManager(
                 }
             }
             .catch { Timber.e(it, "Failed to refresh browse lists after artwork setting change") }
+            .launchIn(applicationScope)
+
+        // An episode's artwork link changes once its image is downloaded. When an image arrives after the car stopped
+        // waiting for it, reload what the car shows, so it loads the image from the new link.
+        albumArtCache.lateDownloads
+            .onEach {
+                withContext(Dispatchers.Main) {
+                    val session = media3Session ?: return@withContext
+                    media3LibraryCallback?.notifySubscribedChildrenChanged(session)
+                }
+                // Only the car's now playing artwork uses these links.
+                if (isAutomotive) {
+                    lateArtworkRefreshes.accept(Unit)
+                }
+            }
+            .catch { Timber.e(it, "Failed to refresh car artwork after a late download") }
             .launchIn(applicationScope)
     }
 
@@ -1047,7 +1075,13 @@ class MediaSessionManager(
         useEpisodeArtwork: Boolean = true,
     ): android.net.Uri? {
         if (isAutomotive) {
-            return AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork)
+            return AutoConverter.getPodcastArtworkUri(
+                podcast,
+                episode,
+                context,
+                useEpisodeArtwork,
+                albumArtCache::isDownloaded,
+            )
         }
         val url = when (episode) {
             is PodcastEpisode -> {
@@ -1237,7 +1271,13 @@ class MediaSessionManager(
                     val podcastUuid = if (episode is PodcastEpisode) episode.podcastUuid else null
                     val podcast = podcastUuid?.let { podcastManager.findPodcastByUuidBlocking(it) }
                     val podcastTitle = episode.displaySubtitle(podcast)
-                    val localUri = AutoConverter.getPodcastArtworkUri(podcast, episode, context, settings.artworkConfiguration.value.useEpisodeArtwork)
+                    val localUri = AutoConverter.getPodcastArtworkUri(
+                        podcast,
+                        episode,
+                        context,
+                        settings.artworkConfiguration.value.useEpisodeArtwork,
+                        albumArtCache::isDownloaded,
+                    )
                     val description = MediaDescriptionCompat.Builder()
                         .setDescription(episode.episodeDescription)
                         .setTitle(episode.title)
@@ -1335,7 +1375,13 @@ class MediaSessionManager(
         Timber.i("MediaSession metadata. Episode: ${episode.uuid} ${episode.title} Duration: ${episode.durationMs.toLong()}")
 
         if (settings.showArtworkOnLockScreen.value) {
-            val bitmapUri = AutoConverter.getPodcastArtworkUri(podcast, episode, context, useEpisodeArtwork)?.toString()
+            val bitmapUri = AutoConverter.getPodcastArtworkUri(
+                podcast,
+                episode,
+                context,
+                useEpisodeArtwork,
+                albumArtCache::isDownloaded,
+            )?.toString()
             nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, bitmapUri)
             if (Util.isAutomotive(context)) nowPlayingBuilder = nowPlayingBuilder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, bitmapUri)
 
