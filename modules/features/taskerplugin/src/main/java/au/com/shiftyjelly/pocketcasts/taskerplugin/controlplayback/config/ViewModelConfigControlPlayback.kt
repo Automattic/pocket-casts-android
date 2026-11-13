@@ -65,6 +65,7 @@ class ViewModelConfigControlPlayback @Inject constructor(
         object : InputField<Boolean>(LR.string.set_volume_boost, IR.drawable.filter_volume, InputControlPlayback.PlaybackCommand.SetVolumeBoost, { volumeBoostEnabled }, { volumeBoostEnabled = it }) {
             override fun getPossibleValues() = MutableStateFlow(listOf(true, false))
         },
+        InputField(LR.string.sleep_timer_minutes, IR.drawable.filter_time, InputControlPlayback.PlaybackCommand.SetSleepTimer, { sleepTimerMinutes }, { sleepTimerMinutes = it }),
     )
 
     fun setCommand(value: String?) {

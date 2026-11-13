@@ -2667,6 +2667,10 @@
     <string name="set_volume_boost">Set Volume Boost</string>
     <string name="volume_boost_enabled">Volume Boost Enabled</string>
     <string name="volume_boost_enabled_not_valid">Volume Boost Enabled value must be \'true\' or \'false\', was  %1$s</string>
+    <string name="set_sleep_timer">Set Sleep Timer</string>
+    <string name="cancel_sleep_timer">Cancel Sleep Timer</string>
+    <string name="sleep_timer_minutes">Sleep Timer (Minutes)</string>
+    <string name="sleep_timer_minutes_not_valid">Sleep timer minutes %1$s not valid</string>
     <string name="podcast_id">Podcast ID</string>
     <string name="podcast_id_description">An unique ID that represents the podcast. Can be used on the \'Query Podcast Episodes\' action.</string>
     <string name="podcast_title">Podcast Title</string>

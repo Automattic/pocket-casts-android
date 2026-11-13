@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -21,6 +22,7 @@ interface TaskerEntryPoint {
     fun getPodcastManager(): PodcastManager
     fun getEpisodeManager(): EpisodeManager
     fun getPlaylistManager(): PlaylistManager
+    fun getSleepTimer(): SleepTimer
 }
 
 val Context.appTheme get() = EntryPointAccessors.fromApplication(applicationContext, TaskerEntryPoint::class.java).getTheme()
@@ -29,3 +31,4 @@ val Context.playlistManager get() = EntryPointAccessors.fromApplication(applicat
 val Context.episodeManager get() = EntryPointAccessors.fromApplication(applicationContext, TaskerEntryPoint::class.java).getEpisodeManager()
 val Context.podcastManager get() = EntryPointAccessors.fromApplication(applicationContext, TaskerEntryPoint::class.java).getPodcastManager()
 val Context.settings get() = EntryPointAccessors.fromApplication(applicationContext, TaskerEntryPoint::class.java).getSettings()
+val Context.sleepTimer get() = EntryPointAccessors.fromApplication(applicationContext, TaskerEntryPoint::class.java).getSleepTimer()
