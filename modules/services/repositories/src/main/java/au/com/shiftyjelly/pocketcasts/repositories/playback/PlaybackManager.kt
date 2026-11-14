@@ -55,6 +55,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpen
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_DUCK
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_NORMAL
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtCache
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.AlternateEnclosureManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
@@ -177,6 +178,7 @@ open class PlaybackManager @Inject constructor(
     private val notificationManager: NotificationManager,
     private val autoPlaySelector: AutoPlaySelector,
     private val browseTreeProvider: BrowseTreeProvider,
+    private val albumArtCache: AlbumArtCache,
     private val alternateEnclosureManager: AlternateEnclosureManager,
     private val generatedChapterSeeker: Lazy<GeneratedChapterSeeker>,
     private val playbackServiceErrorReporter: PlaybackServiceErrorReporter,
@@ -272,6 +274,7 @@ open class PlaybackManager @Inject constructor(
         errorReporter = playbackServiceErrorReporter,
         bookmarkManager = bookmarkManager,
         browseTreeProvider = browseTreeProvider,
+        albumArtCache = albumArtCache,
         applicationScope = applicationScope,
     )
 

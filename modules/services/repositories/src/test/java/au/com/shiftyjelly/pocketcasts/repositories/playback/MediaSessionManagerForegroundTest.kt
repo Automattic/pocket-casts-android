@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.os.Build
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtCache
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -64,6 +65,7 @@ class MediaSessionManagerForegroundTest {
             errorReporter = mock<PlaybackServiceErrorReporter>(),
             bookmarkManager = mock<BookmarkManager>(),
             browseTreeProvider = mock(),
+            albumArtCache = AlbumArtCache(mock(), CoroutineScope(testDispatcher)),
             applicationScope = CoroutineScope(testDispatcher),
         )
     }

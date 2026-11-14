@@ -39,7 +39,13 @@ sealed interface BaseEpisode {
                 t2 != null &&
                 t1.uuid == t2.uuid &&
                 (
-                    (t1 is PodcastEpisode && t2 is PodcastEpisode && t1.isStarred == t2.isStarred) ||
+                    (
+                        t1 is PodcastEpisode &&
+                            t2 is PodcastEpisode &&
+                            t1.isStarred == t2.isStarred &&
+                            // The episode image URL usually arrives with the show notes after playback starts.
+                            t1.imageUrl == t2.imageUrl
+                        ) ||
                         (t1 is UserEpisode && t2 is UserEpisode && t1.tintColorIndex == t2.tintColorIndex)
                     )
         }

@@ -38,6 +38,7 @@ import coil3.executeBlocking
 import coil3.imageLoader
 import coil3.toBitmap
 import java.io.File
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -67,8 +68,16 @@ object AutoConverter {
     private const val STATUS_DOWNLOADED = 2L
     private const val STATUS_NOT_DOWNLOADED = 0L
 
-    fun convertEpisodeToMediaItem(context: Context, episode: BaseEpisode, parentPodcast: Podcast, useEpisodeArtwork: Boolean, groupTrailers: Boolean = false, sourceId: String = parentPodcast.uuid): MediaItem {
-        val localUri = getPodcastArtworkUri(parentPodcast, episode, context, useEpisodeArtwork)
+    fun convertEpisodeToMediaItem(
+        context: Context,
+        episode: BaseEpisode,
+        parentPodcast: Podcast,
+        useEpisodeArtwork: Boolean,
+        isArtworkDownloaded: (url: String) -> Boolean,
+        groupTrailers: Boolean = false,
+        sourceId: String = parentPodcast.uuid,
+    ): MediaItem {
+        val localUri = getPodcastArtworkUri(parentPodcast, episode, context, useEpisodeArtwork, isArtworkDownloaded)
 
         val extras = extrasForEpisode(episode)
         if (groupTrailers) {
@@ -95,7 +104,14 @@ object AutoConverter {
 
     fun convertPodcastToMediaItem(podcast: Podcast, context: Context, useEpisodeArtwork: Boolean): MediaItem? {
         return try {
-            val localUri = getPodcastArtworkUri(podcast = podcast, episode = null, context = context, useEpisodeArtwork = useEpisodeArtwork)
+            val localUri = getPodcastArtworkUri(
+                podcast = podcast,
+                episode = null,
+                context = context,
+                useEpisodeArtwork = useEpisodeArtwork,
+                // Without an episode the link is to the podcast's own artwork, which is never marked as pending.
+                isArtworkDownloaded = { true },
+            )
 
             val metadata = MediaMetadata.Builder()
                 .setTitle(podcast.title)
@@ -147,30 +163,50 @@ object AutoConverter {
             .build()
     }
 
-    fun getPodcastArtworkUri(podcast: Podcast?, episode: BaseEpisode?, context: Context, useEpisodeArtwork: Boolean): Uri? {
-        val artworkUri = when (episode) {
-            is PodcastEpisode -> if (useEpisodeArtwork) {
-                episode.imageUrl ?: EpisodeFileMetadata.artworkCacheFile(context, episode.uuid).takeIf(File::exists)?.path ?: podcast?.getArtworkUrl(480)
-            } else {
-                podcast?.getArtworkUrl(480)
+    /**
+     * Returns a content uri for the artwork to show for [episode], or for [podcast] when there is no episode.
+     * When episode artwork is chosen, the uri carries a fallback so the provider can serve the podcast's
+     * artwork instead if the episode image fails to load. Until [isArtworkDownloaded] reports the episode image
+     * as downloaded, the uri is also marked as pending, so it changes once the image is downloaded.
+     */
+    fun getPodcastArtworkUri(
+        podcast: Podcast?,
+        episode: BaseEpisode?,
+        context: Context,
+        useEpisodeArtwork: Boolean,
+        isArtworkDownloaded: (url: String) -> Boolean,
+    ): Uri? {
+        val podcastArtworkUrl = podcast?.getArtworkUrl(480)?.takeIf(String::isNotBlank)
+
+        val (artworkUrl, fallbackUrl) = when (episode) {
+            is PodcastEpisode -> {
+                val episodeArtworkUrl = if (useEpisodeArtwork) {
+                    episode.imageUrl?.takeIf(String::isNotBlank) ?: embeddedArtworkPath(episode, context)
+                } else {
+                    null
+                }
+                if (episodeArtworkUrl != null) episodeArtworkUrl to podcastArtworkUrl else podcastArtworkUrl to null
             }
 
-            is UserEpisode -> if (useEpisodeArtwork) {
-                EpisodeFileMetadata.artworkCacheFile(context, episode.uuid).takeIf(File::exists)?.path ?: episode.artworkUrl
-            } else {
-                episode.artworkUrl
+            is UserEpisode -> {
+                val fileArtworkUrl = episode.artworkUrl?.takeIf(String::isNotBlank)
+                val episodeArtworkPath = if (useEpisodeArtwork) embeddedArtworkPath(episode, context) else null
+                if (episodeArtworkPath != null) episodeArtworkPath to fileArtworkUrl else fileArtworkUrl to null
             }
 
-            null -> {
-                podcast?.getArtworkUrl(480)
-            }
-        }?.toUri()
+            null -> podcastArtworkUrl to null
+        }
 
-        if (artworkUri == null) {
+        if (artworkUrl == null) {
             return null
         }
 
-        return getArtworkUriForContentProvider(artworkUri, context)
+        val isPending = fallbackUrl != null && artworkUrl.toHttpUrlOrNull() != null && !isArtworkDownloaded(artworkUrl)
+        return artworkUrl.toUri().asAlbumArtContentUri(context, fallback = fallbackUrl?.toUri(), isPending = isPending)
+    }
+
+    private fun embeddedArtworkPath(episode: BaseEpisode, context: Context): String? {
+        return EpisodeFileMetadata.artworkCacheFile(context, episode.uuid).takeIf(File::exists)?.path
     }
 
     fun getPodcastArtworkBitmap(episode: BaseEpisode, context: Context, useEpisodeArtwork: Boolean): Bitmap? {

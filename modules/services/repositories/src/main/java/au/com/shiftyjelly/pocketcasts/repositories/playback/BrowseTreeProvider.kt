@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtCache
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.convertFolderToMediaItem
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.convertPodcastToMediaItem
@@ -31,14 +32,19 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import java.time.Clock
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.flow.first
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -48,6 +54,10 @@ private const val DOWNLOADS_ROOT = "__DOWNLOADS__"
 private const val FILES_ROOT = "__FILES__"
 private const val EPISODE_LIMIT = 100
 private const val NUM_SUGGESTED_ITEMS = 8
+
+// Refetching picks up artwork for episodes that arrived since the last fetch.
+internal val EPISODE_ARTWORK_REFETCH_INTERVAL = 1.hours
+internal val EPISODE_ARTWORK_RETRY_INTERVAL = 5.minutes
 
 internal const val FILTERS_ROOT = "__FILTERS__"
 internal const val DISCOVER_ROOT = "__DISCOVER__"
@@ -67,7 +77,71 @@ class BrowseTreeProvider @Inject constructor(
     private val settings: Settings,
     private val serviceManager: ServiceManager,
     private val listRepository: ListRepository,
+    private val showNotesManager: ShowNotesManager,
+    private val clock: Clock,
+    private val albumArtCache: AlbumArtCache,
 ) {
+    // Podcast uuid to the earliest time, in epoch millis, that its episode artwork can be fetched again.
+    // It only holds the podcasts opened in the car since the app started, so it isn't pruned.
+    private val nextEpisodeArtworkFetch = ConcurrentHashMap<String, Long>()
+
+    /**
+     * Episode image URLs only arrive with a podcast's show notes, which are normally fetched when an episode
+     * plays. Fetches them when a podcast's episode list is opened, so the list can show episode artwork before
+     * anything has been played. A podcast is fetched again after [EPISODE_ARTWORK_REFETCH_INTERVAL], or after
+     * [EPISODE_ARTWORK_RETRY_INTERVAL] when the fetch failed.
+     *
+     * @return true when an episode's image URL changed and the list should be reloaded.
+     */
+    suspend fun fetchEpisodeArtwork(parentId: String): Boolean {
+        // Built-in lists and folders use "__NAME__" ids, so only plain ids can be podcasts.
+        val isBuiltInList = parentId.startsWith("__")
+        if (isBuiltInList || !settings.artworkConfiguration.value.useEpisodeArtwork) {
+            return false
+        }
+        val now = clock.millis()
+        // A podcast's list id is its uuid, so a recently fetched podcast is skipped before the database lookup.
+        if (!isEpisodeArtworkFetchDue(parentId, now)) {
+            return false
+        }
+        val podcast = podcastManager.findPodcastByUuid(parentId) ?: return false
+        if (!reserveEpisodeArtworkFetch(podcast.uuid, now)) {
+            return false
+        }
+        return try {
+            showNotesManager.updateEpisodeImageUrls(podcast.uuid)
+        } catch (e: CancellationException) {
+            nextEpisodeArtworkFetch.remove(podcast.uuid)
+            throw e
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to fetch episode artwork for podcast ${podcast.uuid}")
+            // Counted from the failure, so a fetch that took a while to fail still waits the full interval.
+            val retryAt = clock.millis() + EPISODE_ARTWORK_RETRY_INTERVAL.inWholeMilliseconds
+            nextEpisodeArtworkFetch[podcast.uuid] = retryAt
+            false
+        }
+    }
+
+    private fun isEpisodeArtworkFetchDue(podcastUuid: String, now: Long): Boolean {
+        val nextFetch = nextEpisodeArtworkFetch[podcastUuid] ?: return true
+        return now >= nextFetch
+    }
+
+    /**
+     * Claims the next fetch for a podcast, so lists loading at the same time don't fetch it twice.
+     */
+    private fun reserveEpisodeArtworkFetch(podcastUuid: String, now: Long): Boolean {
+        var reserved = false
+        nextEpisodeArtworkFetch.compute(podcastUuid) { _, nextFetch ->
+            if (nextFetch == null || now >= nextFetch) {
+                reserved = true
+                now + EPISODE_ARTWORK_REFETCH_INTERVAL.inWholeMilliseconds
+            } else {
+                nextFetch
+            }
+        }
+        return reserved
+    }
 
     fun getRootId(isRecent: Boolean, isSuggested: Boolean, hasCurrentEpisode: Boolean, isAutomotive: Boolean): String? {
         return when {
@@ -307,6 +381,7 @@ class BrowseTreeProvider @Inject constructor(
                                 parentPodcast,
                                 sourceId = sourceId,
                                 useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                                isArtworkDownloaded = albumArtCache::isDownloaded,
                             ),
                         )
                     }
@@ -338,6 +413,7 @@ class BrowseTreeProvider @Inject constructor(
                             podcast,
                             groupTrailers = !podcast.isSubscribed,
                             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                            isArtworkDownloaded = albumArtCache::isDownloaded,
                         ),
                     )
                 }
@@ -357,6 +433,7 @@ class BrowseTreeProvider @Inject constructor(
                 it,
                 Podcast.userPodcast,
                 useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                isArtworkDownloaded = albumArtCache::isDownloaded,
             )
         }
     }
@@ -370,6 +447,7 @@ class BrowseTreeProvider @Inject constructor(
                     episode = episode,
                     parentPodcast = podcast,
                     useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                    isArtworkDownloaded = albumArtCache::isDownloaded,
                 )
             }
         }
@@ -385,6 +463,7 @@ class BrowseTreeProvider @Inject constructor(
                     episode = episode,
                     parentPodcast = podcast,
                     useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                    isArtworkDownloaded = albumArtCache::isDownloaded,
                 )
             }
         }
@@ -575,6 +654,7 @@ class BrowseTreeProvider @Inject constructor(
                     episode = episode,
                     parentPodcast = podcast,
                     useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork,
+                    isArtworkDownloaded = albumArtCache::isDownloaded,
                 )
             }
         }

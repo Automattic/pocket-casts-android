@@ -4,6 +4,7 @@ import androidx.media3.session.MediaLibraryService
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AlbumArtCache
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
@@ -71,6 +72,7 @@ class MediaSessionManagerPlaylistsChangedTest {
         errorReporter = mock<PlaybackServiceErrorReporter>(),
         bookmarkManager = mock<BookmarkManager>(),
         browseTreeProvider = mock<BrowseTreeProvider>(),
+        albumArtCache = AlbumArtCache(mock(), this),
         applicationScope = this,
     )
 }
