@@ -230,10 +230,10 @@ internal class Media3LibrarySessionCallback(
             } catch (e: Exception) {
                 Timber.e(e, "Failed to load children for: $parentId")
                 future.set(LibraryResult.ofError(SessionError.ERROR_UNKNOWN))
+                return@launch
             }
-        }
-        if (Util.isAutomotive(contextProvider())) {
-            scope.launch {
+            // Fetched once the list has loaded, because loading the list is what saves a podcast opened from search.
+            if (Util.isAutomotive(contextProvider())) {
                 try {
                     if (browseTreeProvider.fetchEpisodeArtwork(parentId)) {
                         session.notifyChildrenChanged(parentId, Int.MAX_VALUE, null)

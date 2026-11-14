@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import com.google.common.collect.ImmutableList
 import java.util.Date
 import java.util.concurrent.ExecutionException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -35,6 +36,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -476,6 +478,36 @@ class Media3LibrarySessionCallbackTest {
         automotiveCallback.onGetChildren(mockSession, mockController, "podcast-uuid", 0, Int.MAX_VALUE, null).get()
 
         verify(mockSession, never()).notifyChildrenChanged(any<String>(), any(), anyOrNull())
+    }
+
+    @Test
+    fun `onGetChildren on automotive fetches episode artwork once the list has loaded`() = runTest {
+        val automotiveCallback = createAutomotiveCallback()
+        val loadedItems = CompletableDeferred<List<MediaItem>>()
+        whenever(browseTreeProvider.loadChildren(eq("podcast-uuid"), any())).doSuspendableAnswer { loadedItems.await() }
+        whenever(browseTreeProvider.fetchEpisodeArtwork("podcast-uuid")).thenReturn(false)
+
+        val result = automotiveCallback
+            .onGetChildren(mockSession, mockController, "podcast-uuid", 0, Int.MAX_VALUE, null)
+        verify(browseTreeProvider, never()).fetchEpisodeArtwork(any())
+
+        loadedItems.complete(emptyList())
+        result.get()
+        verify(browseTreeProvider).fetchEpisodeArtwork("podcast-uuid")
+    }
+
+    @Test
+    fun `onGetChildren on automotive skips the artwork fetch when the list fails to load`() = runTest {
+        val automotiveCallback = createAutomotiveCallback()
+        whenever(browseTreeProvider.loadChildren(eq("podcast-uuid"), any()))
+            .thenThrow(IllegalStateException("Database closed"))
+
+        val result = automotiveCallback
+            .onGetChildren(mockSession, mockController, "podcast-uuid", 0, Int.MAX_VALUE, null)
+            .get()
+
+        assertEquals(SessionError.ERROR_UNKNOWN, result.resultCode)
+        verify(browseTreeProvider, never()).fetchEpisodeArtwork(any())
     }
 
     @Test
