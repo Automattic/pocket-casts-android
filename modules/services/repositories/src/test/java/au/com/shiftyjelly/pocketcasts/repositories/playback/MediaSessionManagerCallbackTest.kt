@@ -147,7 +147,7 @@ class MediaSessionManagerCallbackTest {
         errorReporter = mock<PlaybackServiceErrorReporter>(),
         bookmarkManager = mock<BookmarkManager>(),
         browseTreeProvider = mock<BrowseTreeProvider>(),
-        albumArtCache = AlbumArtCache(mock()),
+        albumArtCache = AlbumArtCache(mock(), scope),
         applicationScope = scope,
     )
 

@@ -58,26 +58,30 @@ class AlbumArtContentProvider : ContentProvider() {
 
         /**
          * Finds the file for [artwork], or for [fallback] when the artwork is missing, fails to load or misses
-         * its time limit. [findFile] is given the time limit for each lookup.
+         * its time limit. [findFile] is given the time limit for each lookup, and whether to download the image
+         * again later if it fails. Only an [isPending] artwork is retried: the car keeps the fallback it gets
+         * for a pending link until the link changes, and the link only changes once the image is downloaded.
          */
         internal fun findArtworkOrFallback(
             artwork: String?,
             fallback: String?,
-            findFile: (urlOrPath: String, timeout: Duration) -> File?,
+            isPending: Boolean,
+            findFile: (urlOrPath: String, timeout: Duration, retryOnFailure: Boolean) -> File?,
         ): File? {
             val artworkTimeout = if (fallback.isNullOrBlank()) ARTWORK_TIMEOUT else ARTWORK_WITH_FALLBACK_TIMEOUT
-            return findFileOrNull(artwork, artworkTimeout, findFile)
-                ?: findFileOrNull(fallback, ARTWORK_TIMEOUT, findFile)
+            return findFileOrNull(artwork, artworkTimeout, retryOnFailure = isPending, findFile)
+                ?: findFileOrNull(fallback, ARTWORK_TIMEOUT, retryOnFailure = false, findFile)
         }
 
         private fun findFileOrNull(
             urlOrPath: String?,
             timeout: Duration,
-            findFile: (urlOrPath: String, timeout: Duration) -> File?,
+            retryOnFailure: Boolean,
+            findFile: (urlOrPath: String, timeout: Duration, retryOnFailure: Boolean) -> File?,
         ): File? {
             if (urlOrPath.isNullOrBlank()) return null
             // Caught for each lookup, so a failed artwork lookup still leaves the fallback to try.
-            return runCatching { findFile(urlOrPath, timeout) }
+            return runCatching { findFile(urlOrPath, timeout, retryOnFailure) }
                 .onFailure { exception ->
                     LogBuffer.e("AlbumArtProvider", exception, "Failed to find artwork for $urlOrPath")
                 }
@@ -115,7 +119,10 @@ class AlbumArtContentProvider : ContentProvider() {
             val artworkFile = findArtworkOrFallback(
                 artwork = uri.lastPathSegment,
                 fallback = uri.getQueryParameter(ALBUM_ART_FALLBACK_PARAM),
-                findFile = { urlOrPath, timeout -> findArtworkFile(urlOrPath, applicationContext, timeout) },
+                isPending = uri.getBooleanQueryParameter(ALBUM_ART_PENDING_PARAM, false),
+                findFile = { urlOrPath, timeout, retryOnFailure ->
+                    findArtworkFile(urlOrPath, applicationContext, timeout, retryOnFailure)
+                },
             )
 
             artworkFile?.let { ParcelFileDescriptor.open(it, ParcelFileDescriptor.MODE_READ_ONLY) }
@@ -133,11 +140,16 @@ class AlbumArtContentProvider : ContentProvider() {
         return EntryPointAccessors.fromApplication(context, AlbumArtEntryPoint::class.java)
     }
 
-    private fun findArtworkFile(urlOrPath: String, context: Context, timeout: Duration): File? {
+    private fun findArtworkFile(
+        urlOrPath: String,
+        context: Context,
+        timeout: Duration,
+        retryOnFailure: Boolean,
+    ): File? {
         val imageUrl = urlOrPath.toHttpUrlOrNull()
         return if (imageUrl != null) {
             getEntryPoint(context)
-                .getArtworkFile(imageUrl, context, timeout)
+                .getArtworkFile(imageUrl, context, timeout, retryOnFailure)
                 ?.takeIf(File::exists)
         } else {
             // The provider is exported, so only serve local files from our own private storage
@@ -168,15 +180,28 @@ class AlbumArtContentProvider : ContentProvider() {
         return path == canonicalDir || path.startsWith(canonicalDir + File.separator)
     }
 
-    private fun AlbumArtEntryPoint.getArtworkFile(url: HttpUrl, context: Context, timeout: Duration): File? {
+    private fun AlbumArtEntryPoint.getArtworkFile(
+        url: HttpUrl,
+        context: Context,
+        timeout: Duration,
+        retryOnFailure: Boolean,
+    ): File? {
         val imageLoader = imageLoader()
+        val albumArtCache = albumArtCache()
         val request = artworkFileRequest(context, url.toString())
+        val onFailure = { failure: ErrorResult -> if (retryOnFailure) albumArtCache.retryFailedDownload(failure) }
         val result = runBlocking {
             awaitWithTimeout(
                 scope = applicationScope() + Dispatchers.IO,
                 timeout = timeout,
-                // The car got other artwork, or none, for this link, so tell it to reload now that the image is here.
-                onLateResult = { lateResult -> if (lateResult is SuccessResult) albumArtCache().onLateDownload() },
+                onLateResult = { lateResult ->
+                    when (lateResult) {
+                        // The car got other artwork, or none, for this link, so have it reload now the image is here.
+                        is SuccessResult -> albumArtCache.onLateDownload()
+
+                        is ErrorResult -> onFailure(lateResult)
+                    }
+                },
                 load = { imageLoader.execute(request) },
             )
         }
@@ -190,6 +215,7 @@ class AlbumArtContentProvider : ContentProvider() {
 
             is ErrorResult -> {
                 LogBuffer.e(LogBuffer.TAG_INVALID_STATE, result.throwable, "Failed to load artwork for url: $url")
+                onFailure(result)
                 null
             }
         }

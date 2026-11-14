@@ -142,40 +142,64 @@ class AlbumArtContentProviderTest {
 
     @Test
     fun `gives up on the artwork sooner when there is a fallback`() {
-        val lookups = mutableListOf<Pair<String, Duration>>()
+        val lookups = mutableListOf<Lookup>()
         val fallbackFile = File(context.cacheDir, "podcast-artwork.jpg")
 
         val file = AlbumArtContentProvider.findArtworkOrFallback(
             artwork = "episode-artwork",
             fallback = "podcast-artwork",
-            findFile = { urlOrPath, timeout ->
-                lookups += urlOrPath to timeout
+            isPending = false,
+            findFile = { urlOrPath, timeout, retryOnFailure ->
+                lookups += Lookup(urlOrPath, timeout, retryOnFailure)
                 fallbackFile.takeIf { urlOrPath == "podcast-artwork" }
             },
         )
 
         assertEquals(fallbackFile, file)
         val expectedLookups = listOf(
-            "episode-artwork" to AlbumArtContentProvider.ARTWORK_WITH_FALLBACK_TIMEOUT,
-            "podcast-artwork" to AlbumArtContentProvider.ARTWORK_TIMEOUT,
+            Lookup("episode-artwork", AlbumArtContentProvider.ARTWORK_WITH_FALLBACK_TIMEOUT, retryOnFailure = false),
+            Lookup("podcast-artwork", AlbumArtContentProvider.ARTWORK_TIMEOUT, retryOnFailure = false),
+        )
+        assertEquals(expectedLookups, lookups)
+    }
+
+    @Test
+    fun `retries a pending artwork that fails but not its fallback`() {
+        val lookups = mutableListOf<Lookup>()
+
+        AlbumArtContentProvider.findArtworkOrFallback(
+            artwork = "episode-artwork",
+            fallback = "podcast-artwork",
+            isPending = true,
+            findFile = { urlOrPath, timeout, retryOnFailure ->
+                lookups += Lookup(urlOrPath, timeout, retryOnFailure)
+                null
+            },
+        )
+
+        val expectedLookups = listOf(
+            Lookup("episode-artwork", AlbumArtContentProvider.ARTWORK_WITH_FALLBACK_TIMEOUT, retryOnFailure = true),
+            Lookup("podcast-artwork", AlbumArtContentProvider.ARTWORK_TIMEOUT, retryOnFailure = false),
         )
         assertEquals(expectedLookups, lookups)
     }
 
     @Test
     fun `gives artwork without a fallback the full time limit`() {
-        val lookups = mutableListOf<Pair<String, Duration>>()
+        val lookups = mutableListOf<Lookup>()
 
         AlbumArtContentProvider.findArtworkOrFallback(
             artwork = "podcast-artwork",
             fallback = null,
-            findFile = { urlOrPath, timeout ->
-                lookups += urlOrPath to timeout
+            isPending = false,
+            findFile = { urlOrPath, timeout, retryOnFailure ->
+                lookups += Lookup(urlOrPath, timeout, retryOnFailure)
                 null
             },
         )
 
-        assertEquals(listOf("podcast-artwork" to AlbumArtContentProvider.ARTWORK_TIMEOUT), lookups)
+        val expectedLookup = Lookup("podcast-artwork", AlbumArtContentProvider.ARTWORK_TIMEOUT, retryOnFailure = false)
+        assertEquals(listOf(expectedLookup), lookups)
     }
 
     @Test
@@ -185,7 +209,8 @@ class AlbumArtContentProviderTest {
         val file = AlbumArtContentProvider.findArtworkOrFallback(
             artwork = "episode-artwork",
             fallback = "podcast-artwork",
-            findFile = { urlOrPath, _ ->
+            isPending = true,
+            findFile = { urlOrPath, _, _ ->
                 if (urlOrPath == "episode-artwork") throw IOException("Disk cache unavailable")
                 fallbackFile
             },
@@ -239,4 +264,6 @@ class AlbumArtContentProviderTest {
 
         assertNull(provider.openFile(uri, "r"))
     }
+
+    private data class Lookup(val urlOrPath: String, val timeout: Duration, val retryOnFailure: Boolean)
 }

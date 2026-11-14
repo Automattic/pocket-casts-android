@@ -65,7 +65,7 @@ class MediaSessionManagerForegroundTest {
             errorReporter = mock<PlaybackServiceErrorReporter>(),
             bookmarkManager = mock<BookmarkManager>(),
             browseTreeProvider = mock(),
-            albumArtCache = AlbumArtCache(mock()),
+            albumArtCache = AlbumArtCache(mock(), CoroutineScope(testDispatcher)),
             applicationScope = CoroutineScope(testDispatcher),
         )
     }

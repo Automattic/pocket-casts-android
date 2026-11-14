@@ -1,15 +1,24 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playback.auto
 
+import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import coil3.ImageLoader
 import coil3.annotation.ExperimentalCoilApi
+import coil3.request.ErrorResult
+import coil3.request.SuccessResult
+import java.io.IOException
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.launch
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 /**
@@ -20,11 +29,14 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 @Singleton
 class AlbumArtCache @Inject constructor(
     private val imageLoader: ImageLoader,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
     private val lateDownloadEvents = MutableSharedFlow<Unit>(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
+
+    private val retryingUrls: MutableSet<String> = ConcurrentHashMap.newKeySet()
 
     /**
      * Emits after images finish downloading once the provider stopped waiting for them, so the car can reload
@@ -49,7 +61,40 @@ class AlbumArtCache @Inject constructor(
         lateDownloadEvents.tryEmit(Unit)
     }
 
+    /**
+     * Downloads the image again after [failure], so a pending link can still change to it once a weak connection
+     * recovers. Tries after each of [DOWNLOAD_RETRY_DELAYS] and stops at the first success. Only network errors
+     * are retried, since an image the host refused, or one that can't be decoded, would fail again.
+     */
+    internal fun retryFailedDownload(failure: ErrorResult) {
+        val request = failure.request
+        val url = request.data.toString()
+        if (!failure.isNetworkError() || !retryingUrls.add(url)) {
+            return
+        }
+        applicationScope.launch {
+            try {
+                for (retryDelay in DOWNLOAD_RETRY_DELAYS) {
+                    delay(retryDelay)
+                    when (val result = imageLoader.execute(request)) {
+                        is SuccessResult -> {
+                            onLateDownload()
+                            break
+                        }
+
+                        is ErrorResult -> if (!result.isNetworkError()) break
+                    }
+                }
+            } finally {
+                retryingUrls.remove(url)
+            }
+        }
+    }
+
+    private fun ErrorResult.isNetworkError() = throwable is IOException
+
     internal companion object {
         val LATE_DOWNLOAD_GROUPING = 1.seconds
+        val DOWNLOAD_RETRY_DELAYS = listOf(30.seconds, 2.minutes)
     }
 }

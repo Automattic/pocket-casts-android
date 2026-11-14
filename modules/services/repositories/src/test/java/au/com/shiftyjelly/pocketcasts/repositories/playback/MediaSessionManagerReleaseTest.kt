@@ -95,7 +95,7 @@ class MediaSessionManagerReleaseTest {
             errorReporter = mock<PlaybackServiceErrorReporter>(),
             bookmarkManager = mock<BookmarkManager>(),
             browseTreeProvider = mock<BrowseTreeProvider>(),
-            albumArtCache = AlbumArtCache(mock()),
+            albumArtCache = AlbumArtCache(mock(), applicationScope),
             applicationScope = applicationScope,
         )
     }
