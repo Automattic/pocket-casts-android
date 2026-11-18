@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-04 11:58:23+0000
+Translation-Revision-Date: 2026-11-10 09:55:29+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="chat_jumping_to_time">Zu %1$s springen …</string>
+    <string name="chat_jumped_to_time">Zu %1$s gesprungen …</string>
+    <string name="playback_2026_sheet_button">Meine Wiedergabeliste 2026 anzeigen</string>
+    <string name="playback_2026_sheet_description">Was du dir angehört hast. Deine Lieblingspodcasts. Und was dich als Hörer auszeichnet. Dein Jahresrückblick bei Pocket Casts ist da.</string>
+    <string name="playback_2026_banner_description">Entdecke deine Hörstatistiken, welche Art von Hörer du bist und vieles mehr.</string>
+    <string name="playback_2026_banner_title">Deine Wiedergabeliste 2026 ist da!</string>
+    <string name="chapters_generated_none_message">Wir konnten hierfür keine Kapitel generieren.</string>
+    <string name="chapters_generated_none_title">Keine Kapitel für diese Folge</string>
+    <string name="chapters_generated_generating_note">Dies kann bei längeren Folgen eine Minute dauern. Kapitel werden im Player angezeigt, wenn sie fertig sind.</string>
+    <string name="chapters_generated_generating">Kapitel werden generiert …</string>
+    <string name="chapters_generated_ai_note">Kapitel werden mithilfe von KI generiert und sind möglicherweise nicht ganz korrekt.</string>
+    <string name="chapters_generated_generate">Kapitel generieren</string>
+    <string name="chapters_generated_none_yet_message">Generiere Kapitel und springe direkt zum gewünschten Teil.</string>
+    <string name="chapters_generated_none_yet_title">Noch keine Kapitel</string>
+    <string name="chat_playback_position">Wiedergabeposition</string>
     <string name="settings_generated_chapters_summary">Wenn eine Folge keine eigenen Kapitel hat, werden diese von Pocket Casts automatisch für dich generiert.</string>
     <string name="podcasts_played_podcasts_show">Anzeigen</string>
     <string name="podcasts_played_podcasts_hide">Ausblenden</string>

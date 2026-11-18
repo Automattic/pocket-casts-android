@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-05 09:56:00+0000
+Translation-Revision-Date: 2026-11-10 09:58:11+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="chat_jumping_to_time">正在跳至 %1$s …</string>
+    <string name="chat_jumped_to_time">已跳至 %1$s</string>
+    <string name="playback_2026_sheet_button">檢視我的 2026 年度播放回顧</string>
+    <string name="playback_2026_sheet_description">你收聽的內容， 你喜愛的 Podcast， 還有你獨特的聆聽品味。 你的 Pocket Casts 年度回顧出爐了。</string>
+    <string name="playback_2026_banner_description">探索你的收聽統計資料、收聽類型等。</string>
+    <string name="playback_2026_banner_title">2026 年度播放回顧出爐了！</string>
+    <string name="chapters_generated_none_message">無法產生本集章節。</string>
+    <string name="chapters_generated_none_title">本集沒有章節</string>
+    <string name="chapters_generated_generating_note">較長的單集可能需稍等片刻。 章節準備就緒時，會顯示在播放器上。</string>
+    <string name="chapters_generated_generating">正在產生章節…</string>
+    <string name="chapters_generated_ai_note">章節是使用 AI 產生，可能不完全正確。</string>
+    <string name="chapters_generated_generate">產生章節</string>
+    <string name="chapters_generated_none_yet_message">產生章節並直接跳到所需部分。</string>
+    <string name="chapters_generated_none_yet_title">尚無章節</string>
+    <string name="chat_playback_position">播放位置</string>
     <string name="settings_generated_chapters_summary">若單集未提供章節資訊，Pocket Casts 會自動產生。</string>
     <string name="podcasts_played_podcasts_show">顯示</string>
     <string name="podcasts_played_podcasts_hide">隱藏</string>

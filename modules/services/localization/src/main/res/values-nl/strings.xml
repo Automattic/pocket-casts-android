@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-05 09:57:57+0000
+Translation-Revision-Date: 2026-11-10 14:54:39+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="chat_jumping_to_time">Springen naar %1$s…</string>
+    <string name="chat_jumped_to_time">Gesprongen naar %1$s</string>
+    <string name="playback_2026_sheet_button">Mijn Playback 2026 bekijken</string>
+    <string name="playback_2026_sheet_description">Waar je naar geluisterd hebt. Je favoriete podcasts. En wat jou als luisteraar onderscheidt. Je jaar in Pocket Casts staat klaar.</string>
+    <string name="playback_2026_banner_description">Ontdek je luisterstatistieken, welk soort luisteraar je bent en meer.</string>
+    <string name="playback_2026_banner_title">Playback 2026 is beschikbaar!</string>
+    <string name="chapters_generated_none_message">We konden geen hoofdstukken genereren voor deze.</string>
+    <string name="chapters_generated_none_title">Geen hoofdstukken voor deze aflevering</string>
+    <string name="chapters_generated_generating_note">Dit kan even duren voor langere afleveringen. Hoofdstukken verschijnen in de afspeelomgeving zodra ze klaar zijn.</string>
+    <string name="chapters_generated_generating">Hoofdstukken worden gegenereerd …</string>
+    <string name="chapters_generated_ai_note">Hoofdstukken worden gegenereerd met behulp van AI en zijn mogelijk niet helemaal nauwkeurig.</string>
+    <string name="chapters_generated_generate">Hoofdstukken genereren</string>
+    <string name="chapters_generated_none_yet_message">Genereer hoofdstukken en spring direct naar het deel dat je wilt.</string>
+    <string name="chapters_generated_none_yet_title">Nog geen hoofdstukken</string>
+    <string name="chat_playback_position">Afspeelpositie</string>
     <string name="settings_generated_chapters_summary">Wanneer een aflevering geen eigen hoofdstukken heeft, worden deze automatisch door Pocket Casts voor je gegenereerd.</string>
     <string name="podcasts_played_podcasts_hide">Verbergen</string>
     <string name="podcasts_played_podcasts_description">Verbergt podcasts waar je volledig naar hebt geluisterd. Ze verschijnen opnieuw wanneer een nieuwe aflevering arriveert.</string>
