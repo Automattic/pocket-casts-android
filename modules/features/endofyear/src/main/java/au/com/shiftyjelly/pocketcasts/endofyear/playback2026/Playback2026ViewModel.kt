@@ -8,12 +8,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import com.automattic.pocketcasts.playback.PlaybackPayload
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
 @HiltViewModel
@@ -39,18 +41,30 @@ class Playback2026ViewModel @Inject constructor(
         }
     }
 
-    /** The listener archetype the server works out, or null when it can't be reached: the stories show their default. */
+    /**
+     * The listener archetype the server works out, or null when it can't be reached in [ARCHETYPE_TIMEOUT]:
+     * the stories show their default.
+     */
     private suspend fun fetchArchetype(): PlaybackPayload.Archetype? {
         if (!syncManager.isLoggedIn()) return null
         val archetype = try {
-            syncManager.getPlayback2026Archetype()
+            withTimeoutOrNull(ARCHETYPE_TIMEOUT) { syncManager.getPlayback2026Archetype() }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             Timber.i(e, "Playback 2026: couldn't get the archetype, the stories show their default")
             return null
         }
+        if (archetype == null) {
+            Timber.i("Playback 2026: the archetype took longer than $ARCHETYPE_TIMEOUT, the stories show their default")
+            return null
+        }
         Timber.i("Playback 2026: archetype $archetype")
         return archetype.toPlaybackArchetype()
+    }
+
+    internal companion object {
+        /** How long Playback waits for the archetype before it opens with the default. */
+        val ARCHETYPE_TIMEOUT = 20.seconds
     }
 }
