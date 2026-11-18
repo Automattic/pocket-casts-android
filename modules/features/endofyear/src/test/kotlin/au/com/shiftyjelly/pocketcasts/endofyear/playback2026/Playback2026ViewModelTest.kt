@@ -3,14 +3,22 @@ package au.com.shiftyjelly.pocketcasts.endofyear.playback2026
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.PlaybackStats
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import com.automattic.pocketcasts.playback.PlaybackPayload
+import com.pocketcasts.service.api.Playback2026Archetype
 import java.time.Year
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -29,15 +37,16 @@ class Playback2026ViewModelTest {
 
     private val endOfYearSync = mock<EndOfYearSync>()
     private val endOfYearManager = mock<EndOfYearManager>()
+    private val syncManager = mock<SyncManager>()
 
     @Test
     fun `sync history before reading stats`() = runTest {
         whenever(endOfYearSync.sync(Year.of(2026))).thenReturn(true)
         whenever(endOfYearManager.getPlaybackStats(Year.of(2026))).thenReturn(stats)
 
-        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager)
+        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager, syncManager)
 
-        assertEquals(stats.toPlaybackPayload(Year.of(2026)), viewModel.payload.value)
+        assertEquals(stats.toPlaybackPayload(Year.of(2026), archetype = null), viewModel.payload.value)
         inOrder(endOfYearSync, endOfYearManager) {
             verify(endOfYearSync).sync(Year.of(2026))
             verify(endOfYearManager).getPlaybackStats(Year.of(2026))
@@ -49,9 +58,9 @@ class Playback2026ViewModelTest {
         whenever(endOfYearSync.sync(Year.of(2026))).thenReturn(false)
         whenever(endOfYearManager.getPlaybackStats(Year.of(2026))).thenReturn(stats)
 
-        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager)
+        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager, syncManager)
 
-        assertEquals(stats.toPlaybackPayload(Year.of(2026)), viewModel.payload.value)
+        assertEquals(stats.toPlaybackPayload(Year.of(2026), archetype = null), viewModel.payload.value)
     }
 
     @Test
@@ -63,10 +72,42 @@ class Playback2026ViewModelTest {
         }
         whenever(endOfYearManager.getPlaybackStats(Year.of(2026))).thenReturn(stats)
 
-        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager)
+        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager, syncManager)
         assertNull(viewModel.payload.value)
 
         sync.complete(true)
-        assertEquals(stats.toPlaybackPayload(Year.of(2026)), viewModel.payload.value)
+        assertEquals(stats.toPlaybackPayload(Year.of(2026), archetype = null), viewModel.payload.value)
+    }
+
+    @Test
+    fun `use the archetype from the server`() = runTest {
+        whenever(endOfYearSync.sync(Year.of(2026))).thenReturn(true)
+        whenever(endOfYearManager.getPlaybackStats(Year.of(2026))).thenReturn(stats)
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever(syncManager.getPlayback2026Archetype()).thenReturn(Playback2026Archetype.FLANEUR)
+
+        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager, syncManager)
+
+        assertEquals(
+            stats.toPlaybackPayload(Year.of(2026), archetype = PlaybackPayload.Archetype.Flaneur),
+            viewModel.payload.value,
+        )
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `use the default archetype when the server takes too long`() = runTest {
+        whenever(endOfYearSync.sync(Year.of(2026))).thenReturn(true)
+        whenever(endOfYearManager.getPlaybackStats(Year.of(2026))).thenReturn(stats)
+        whenever(syncManager.isLoggedIn()).thenReturn(true)
+        whenever(syncManager.getPlayback2026Archetype()).doSuspendableAnswer { awaitCancellation() }
+
+        val viewModel = Playback2026ViewModel(endOfYearSync, endOfYearManager, syncManager)
+
+        advanceTimeBy(Playback2026ViewModel.ARCHETYPE_TIMEOUT - 1.milliseconds)
+        assertNull(viewModel.payload.value)
+
+        advanceTimeBy(2.milliseconds)
+        assertEquals(stats.toPlaybackPayload(Year.of(2026), archetype = null), viewModel.payload.value)
     }
 }

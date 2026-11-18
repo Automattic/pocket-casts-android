@@ -115,7 +115,6 @@ abstract class EndOfYearDao {
           podcast.uuid AS uuid,
           podcast.title AS title,
           podcast.author AS author,
-          podcast.podcast_category AS category,
           SUM(episode.played_up_to) AS played_seconds,
           COUNT(episode.uuid) AS played_episode_count
         FROM podcast_episodes AS episode
