@@ -128,8 +128,12 @@ class ProfileFragment :
                 profileViewModel.onPlaybackClick()
                 (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.key)
             },
+            onPlayback2026Show = {
+                profileViewModel.onPlayback2026BannerShown()
+            },
             onPlayback2026Click = {
-                Playback2026.start(requireActivity())
+                profileViewModel.onPlayback2026BannerClick()
+                (activity as? FragmentHostListener)?.showPlayback2026OrAccount(Playback2026.Source.Profile.name)
             },
             onClaimReferralsClick = {
                 fragmentHostListener.showBottomSheet(ReferralsGuestPassFragment.newInstance(ReferralsPageType.Claim))

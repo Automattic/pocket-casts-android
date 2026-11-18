@@ -18,7 +18,7 @@
 [versions]
 # ignore AboutLibraries versions such as -b02 and stick to the stable versions
 aboutlibraries = "15.3.0"
-android-gradle-plugin = "9.5.0"
+android-gradle-plugin = "9.5.1"
 billing = "9.1.0"
 coil = "3.6.3"
 compose = "2026.08.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
@@ -34,7 +34,7 @@ horologist = "0.8.4-alpha"
 java = "17"
 kotlin = "2.4.21"
 kotlin-coroutines = "1.11.0"
-ksp = "2.3.13"
+ksp = "2.3.12"
 ktlint = "1.8.0"
 ktlint-compose-rules = "0.6.8"
 lifecycle = "2.11.0"
@@ -47,11 +47,11 @@ moshi = "1.15.2"
 navigation = "2.10.2"
 okhttp = "5.5.1"
 protobuf = "4.36.2"
-protobuf-plugin = "0.10.0"
+protobuf-plugin = "0.10.1"
 retrofit = "3.0.0"
 room = "2.8.5"
 security-lint = "1.0.4"
-sentry-plugin = "6.25.0"
+sentry-plugin = "6.26.0"
 tasker-plugin = "0.4.10"
 test = "1.7.0"
 tv-material = "1.1.0"
@@ -59,6 +59,7 @@ espresso = "3.7.0"
 tracks = "6.0.9"
 wear-compose = "1.6.2"
 webkit = "1.18.0"
+window = "1.5.0"
 wordpress-lint = "2.2.0"
 work = "2.12.0"
 credentials = "1.6.0"
@@ -78,6 +79,7 @@ billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = 
 # Coil
 
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
+coil-core = { module = "io.coil-kt.coil3:coil-core", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 
@@ -117,6 +119,7 @@ dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref =
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 dagger-hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt" }
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-compiler" }
+hilt-lifecycle-viewmodel-compose = "androidx.hilt:hilt-lifecycle-viewmodel-compose:1.4.0"
 hilt-navigation-compose = "androidx.hilt:hilt-navigation-compose:1.4.0"
 hilt-work = "androidx.hilt:hilt-work:1.4.0"
 
@@ -193,6 +196,7 @@ moshi-adapters = { module = "com.squareup.moshi:moshi-adapters", version.ref = "
 moshi-kotlin-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshi" }
 
 # Navigation
+navigation-common = { module = "androidx.navigation:navigation-common", version.ref = "navigation" }
 navigation-runtime = { module = "androidx.navigation:navigation-runtime", version.ref = "navigation" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
@@ -263,6 +267,9 @@ wear-compose-navigation = { module = "androidx.wear.compose:compose-navigation",
 # Webkit
 androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "webkit" }
 
+# Window
+window-core = { module = "androidx.window:window-core", version.ref = "window" }
+
 # Work Manager
 work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 work-test = { module = "androidx.work:work-testing", version.ref = "work" }
@@ -285,7 +292,7 @@ androidx-palette = "androidx.palette:palette:1.1.0"
 androidx-preference-ktx = "androidx.preference:preference-ktx:1.2.1"
 androidx-recyclerview = "androidx.recyclerview:recyclerview:1.4.0"
 androidx-swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0"
-androidx-uiautomator = "androidx.test.uiautomator:uiautomator:2.4.0"
+androidx-uiautomator = "androidx.test.uiautomator:uiautomator:2.4.1"
 androidx-viewpager = "androidx.viewpager2:viewpager2:1.1.0"
 capturable = "dev.shreyaspatil:capturable:3.0.1"
 compose-webview = "io.github.kevinnzou:compose-webview:0.33.6"
@@ -295,7 +302,7 @@ encryptedlogging = "com.automattic:encryptedlogging:1.1.2"
 eventhorizon = "com.automattic:eventhorizon:pocket-casts-2026-11-04_14-08-53"
 engage = "com.google.android.engage:engage-core:1.6.0"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
-guava = "com.google.guava:guava:33.7.2-android" # Required to fix conflict between versions in exoplayer and workmanager
+guava = "com.google.guava:guava:33.8.0-android" # Required to fix conflict between versions in exoplayer and workmanager
 jsonassert = "org.skyscreamer:jsonassert:1.5.3"
 junit = "junit:junit:4.13.2"
 leakcanary = "com.squareup.leakcanary:leakcanary-android:2.14"
@@ -306,7 +313,7 @@ play-auth = "com.google.android.gms:play-services-auth:21.6.0"
 play-cast = "com.google.android.gms:play-services-cast-framework:23.0.0"
 play-review = "com.google.android.play:review-ktx:2.0.2"
 play-wearable = "com.google.android.gms:play-services-wearable:20.0.1"
-pocketcasts-playback = "com.automattic.pocketcasts:playback:0.2.0"
+pocketcasts-playback = "com.automattic.pocketcasts:playback:0.3.0"
 reorderable = "sh.calvin.reorderable:reorderable:3.1.0"
 robolectric = "org.robolectric:robolectric:4.17"
 timber = "com.jakewharton.timber:timber:5.0.1"
@@ -329,5 +336,5 @@ measure-builds = { id = "com.automattic.android.measure-builds", version.ref = "
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 room = { id = "androidx.room", version.ref = "room" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
-spotless = "com.diffplug.spotless:8.10.4"
+spotless = "com.diffplug.spotless:8.11.0"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

@@ -197,6 +197,14 @@ class ProfileViewModel @Inject constructor(
         )
     }
 
+    internal fun onPlayback2026BannerShown() {
+        eventHorizon.track(EndOfYearProfileCardShownEvent(currentYear = Playback2026.YEAR.value.toLong()))
+    }
+
+    internal fun onPlayback2026BannerClick() {
+        eventHorizon.track(EndOfYearProfileCardTappedEvent(currentYear = Playback2026.YEAR.value.toLong()))
+    }
+
     internal fun onPlaybackClick() {
         eventHorizon.track(
             EndOfYearProfileCardTappedEvent(

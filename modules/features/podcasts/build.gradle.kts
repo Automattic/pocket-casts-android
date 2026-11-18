@@ -65,7 +65,7 @@ dependencies {
     implementation(libs.coroutines.rx2)
     implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)

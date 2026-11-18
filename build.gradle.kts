@@ -76,6 +76,21 @@ dependencyAnalysis {
                 // Mockito Android is incorrectly reported
                 // We need it to run instrumentation tests that mock Android classes
                 exclude("org.mockito:mockito-android")
+                // Multiplatform artifact that the plugin only sees as its Android variant
+                exclude("sh.calvin.reorderable:reorderable")
+            }
+        }
+
+        // The Hilt Gradle plugin fails the build without hilt-android, even when no code uses it directly
+        listOf(
+            ":modules:services:coroutines",
+            ":modules:services:media-noop",
+            ":modules:services:payment",
+        ).forEach { path ->
+            project(path) {
+                onUnusedDependencies {
+                    exclude("com.google.dagger:hilt-android")
+                }
             }
         }
 
