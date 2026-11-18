@@ -1,0 +1,16 @@
+name: 🤖 Auto-merge Dependabot Updates
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  dependabot-auto-merge:
+    # Trial pinned to Automattic/dangermattic#135 — move to a release tag once it ships.
+    uses: Automattic/dangermattic/.github/workflows/reusable-dependabot-auto-merge.yml@8829e151552c08eae20dff3b6163499b63b0fb44
+    with:
+      merge-method: squash
