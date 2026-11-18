@@ -37,6 +37,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -643,6 +644,106 @@ class Media3SessionCallbackTest {
     }
 
     @Test
+    fun `repeated KEYCODE_MEDIA_FAST_FORWARD is consumed without skipping again`() = runTest {
+        mockSkipSettings()
+
+        val initialHandled = sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_FAST_FORWARD)
+        val repeatHandled = sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_FAST_FORWARD, repeatCount = 1)
+        testScope.advanceUntilIdle()
+
+        assertTrue(initialHandled)
+        assertTrue(repeatHandled)
+        verify(playbackManager, times(1)).skipForwardSuspend(
+            sourceView = any(),
+            jumpAmountSeconds = eq(30),
+        )
+    }
+
+    @Test
+    fun `repeated KEYCODE_MEDIA_REWIND is consumed without skipping again`() = runTest {
+        mockSkipSettings()
+
+        val initialHandled = sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_REWIND)
+        val repeatHandled = sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_REWIND, repeatCount = 1)
+        testScope.advanceUntilIdle()
+
+        assertTrue(initialHandled)
+        assertTrue(repeatHandled)
+        verify(playbackManager, times(1)).skipBackwardSuspend(
+            sourceView = any(),
+            jumpAmountSeconds = eq(10),
+        )
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_NEXT on Automotive skips without headphone action or playback resume`() = runTest {
+        mockSkipSettings()
+        callback = createCallback(isAutomotive = true)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_NEXT)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).skipForwardSuspend(
+            sourceView = eq(SourceView.AUTOMOTIVE),
+            jumpAmountSeconds = eq(30),
+        )
+        verify(settings, never()).headphoneControlsNextAction
+        verify(bookmarkHelper, never()).handleAddBookmarkAction(any(), any())
+        verify(playbackManager, never()).isPlaying()
+        verify(playbackManager, never()).playQueueSuspend(
+            sourceView = any(),
+            showedStreamWarning = any(),
+        )
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PREVIOUS on Automotive skips backward without headphone action`() = runTest {
+        mockSkipSettings()
+        callback = createCallback(isAutomotive = true)
+
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).skipBackwardSuspend(
+            sourceView = eq(SourceView.AUTOMOTIVE),
+            jumpAmountSeconds = eq(10),
+        )
+        verify(settings, never()).headphoneControlsPreviousAction
+        verify(playbackManager, never()).isPlaying()
+        verify(playbackManager, never()).playQueueSuspend(
+            sourceView = any(),
+            showedStreamWarning = any(),
+        )
+    }
+
+    @Test
+    fun `held KEYCODE_MEDIA_NEXT on Automotive skips once`() = runTest {
+        mockSkipSettings()
+        callback = createCallback(isAutomotive = true)
+
+        val initialHandled = sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_NEXT)
+        val repeatHandled = sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_NEXT, repeatCount = 1)
+        testScope.advanceUntilIdle()
+
+        assertTrue(initialHandled)
+        assertTrue(repeatHandled)
+        verify(playbackManager, times(1)).skipForwardSuspend(
+            sourceView = any(),
+            jumpAmountSeconds = eq(30),
+        )
+    }
+
+    @Test
+    fun `onConnect on Automotive exposes seek to next and previous`() {
+        val playerCommands = createCallback(isAutomotive = true)
+            .onConnect(mockSession, mockController)
+            .availablePlayerCommands
+
+        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
+    }
+
+    @Test
     fun `KEYCODE_MEDIA_PAUSE from Android Auto reports Android Auto source`() = runTest {
         whenever(mockController.packageName).thenReturn(ANDROID_AUTO_PACKAGE_NAME)
 
@@ -781,12 +882,12 @@ class Media3SessionCallbackTest {
         isAutomotive = isAutomotive,
     )
 
-    private fun sendMediaButtonEvent(keyCode: Int) {
-        val keyEvent = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
+    private fun sendMediaButtonEvent(keyCode: Int, repeatCount: Int = 0): Boolean {
+        val keyEvent = KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, keyCode, repeatCount)
         val intent = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
             putExtra(Intent.EXTRA_KEY_EVENT, keyEvent)
         }
-        callback.onMediaButtonEvent(mockSession, mockController, intent)
+        return callback.onMediaButtonEvent(mockSession, mockController, intent)
     }
 
     private fun mockHeadphoneNextAction(action: HeadphoneAction) {

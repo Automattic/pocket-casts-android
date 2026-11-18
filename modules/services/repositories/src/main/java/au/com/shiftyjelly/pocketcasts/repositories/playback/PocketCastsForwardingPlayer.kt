@@ -164,7 +164,17 @@ class PocketCastsForwardingPlayer(
     override fun getMediaMetadata(): MediaMetadata = currentMediaItem.mediaMetadata
 
     override fun isCommandAvailable(command: Int): Boolean {
-        return if (isEmptyState) availableCommands.contains(command) else super.isCommandAvailable(command)
+        return when {
+            isEmptyState -> availableCommands.contains(command)
+
+            // The wrapped player only holds the current episode, so it reports "seek to next" as
+            // unavailable. Media3 then routes a controller's skipToNext() to "seek to next media
+            // item", which is not granted, and drops it. Answer for the directional commands
+            // here so they reach seekToNext() / seekToPrevious().
+            isAutomotive && (command == Player.COMMAND_SEEK_TO_NEXT || command == Player.COMMAND_SEEK_TO_PREVIOUS) -> true
+
+            else -> super.isCommandAvailable(command)
+        }
     }
 
     override fun getAvailableCommands(): Player.Commands {
@@ -177,16 +187,7 @@ class PocketCastsForwardingPlayer(
                 )
                 .build()
         }
-        return Player.Commands.Builder()
-            .addAll(
-                Player.COMMAND_PLAY_PAUSE,
-                Player.COMMAND_SET_MEDIA_ITEM,
-                Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
-                Player.COMMAND_STOP,
-                Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
-                Player.COMMAND_GET_METADATA,
-            )
-            .build()
+        return transportPlayerCommands(isAutomotive)
     }
 
     override fun seekTo(positionMs: Long) {
