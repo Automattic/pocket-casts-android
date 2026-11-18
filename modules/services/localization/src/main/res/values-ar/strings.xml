@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-04 09:57:47+0000
+Translation-Revision-Date: 2026-11-10 19:58:47+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="chat_jumping_to_time">جارٍ الانتقال إلى ⁦%1$s⁩…</string>
+    <string name="chat_jumped_to_time">انتقل إلى ⁦%1$s⁩</string>
+    <string name="playback_2026_sheet_button">عرض التشغيل الخاص بي في 2026</string>
+    <string name="playback_2026_sheet_description">ما استمعت إليه. حلقات البث الصوتي الذي أحببتها. وما يميزك كمستمع. ملخص عامك في Pocket Casts أصبح جاهزًا.</string>
+    <string name="playback_2026_banner_description">اكتشف إحصاءات الاستماع الخاصة بك، وتعرّف على نمطك كمستمع، والمزيد.</string>
+    <string name="playback_2026_banner_title">ملخص التشغيل لعام 2026 أصبح هنا!</string>
+    <string name="chapters_generated_none_message">لم نتمكن من إنشاء فصول لهذا الفصل.</string>
+    <string name="chapters_generated_none_title">لا توجد فصول لهذه الحلقة</string>
+    <string name="chapters_generated_generating_note">قد يستغرق ذلك دقيقة للحصول على حلقات أطول. ستظهر الفصول على المشغل عندما تصبح جاهزة.</string>
+    <string name="chapters_generated_generating">جارٍ إنشاء الفصول…</string>
+    <string name="chapters_generated_ai_note">يتم إنشاء الفصول باستخدام الذكاء الاصطناعي، وقد لا تكون دقيقة تمامًا.</string>
+    <string name="chapters_generated_generate">إنشاء فصول</string>
+    <string name="chapters_generated_none_yet_message">أنشئ فصول وتخطي مباشرة إلى الجزء الذي تريده.</string>
+    <string name="chapters_generated_none_yet_title">لا توجد فصول حتى الآن</string>
+    <string name="chat_playback_position">موضع التشغيل</string>
     <string name="settings_generated_chapters_summary">عندما لا تحتوي الحلقة على فصول خاصة بها، سيقوم تطبيق Pocket Casts بإنشائها تلقائيًا من أجلك.</string>
     <string name="podcasts_played_podcasts_show">عرض</string>
     <string name="podcasts_played_podcasts_hide">إخفاء</string>

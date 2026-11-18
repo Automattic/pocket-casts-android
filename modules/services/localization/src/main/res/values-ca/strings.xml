@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-30 21:50:26+0000
+Translation-Revision-Date: 2026-11-12 21:49:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="chat_jumping_to_time">S\'està saltant a %1$s…</string>
+    <string name="chat_jumped_to_time">S\'ha saltat a %1$s</string>
+    <string name="playback_2026_sheet_description">El que has escoltat. Els pòdcasts que t\'han encantat. I el que et fa diferent com a oient. Ja és aquí el teu any a Pocket Casts.</string>
+    <string name="playback_2026_banner_description">Descobreix les teves estadístiques d\'escolta, quin tipus d\'oient ets i més coses.</string>
+    <string name="playback_2026_sheet_button">Mostra el meu Playback 2026</string>
+    <string name="playback_2026_banner_title">Ja és aquí el Playback 2026!</string>
+    <string name="chapters_generated_none_message">No s\'han pogut generar capítols per a aquest episodi.</string>
+    <string name="chapters_generated_none_title">No hi ha capítols per a aquest episodi</string>
+    <string name="chapters_generated_generating_note">Pot trigar una estona en els episodis més llargs. Els capítols es mostraran al reproductor quan estiguin a punt.</string>
+    <string name="chapters_generated_generating">S\'estan generant els capítols…</string>
+    <string name="chapters_generated_ai_note">Els capítols es generen amb IA i poden no ser del tot precisos.</string>
+    <string name="chapters_generated_generate">Genera capítols</string>
+    <string name="chapters_generated_none_yet_message">Genera capítols i salta directament a la part que vulguis.</string>
+    <string name="chapters_generated_none_yet_title">Encara no hi ha capítols</string>
+    <string name="chat_playback_position">Posició de reproducció</string>
+    <string name="settings_generated_chapters_summary">Quan un episodi no tingui capítols propis, Pocket Casts els generarà automàticament.</string>
+    <string name="podcasts_played_podcasts_hide">Amaga</string>
+    <string name="podcasts_played_podcasts_show">Mostra</string>
+    <string name="podcasts_played_podcasts_description">Amaga els pòdcasts que ja has escoltat del tot. Tornen a aparèixer quan arriba un episodi nou.</string>
+    <string name="podcasts_menu_played_podcasts">Pòdcasts escoltats</string>
+    <string name="chapters_generated_upsell_button">Obtén els capítols generats</string>
+    <string name="chapters_generated_upsell_message">Amb Pocket Casts Plus, oblida\'t d\'anar movent-te per la barra de reproducció. Salta directament a la part que t\'interessa.</string>
+    <string name="chapters_generated_upsell_title">Capítols generats automàticament</string>
     <string name="chapters_generated_turn_on">Activa</string>
     <string name="chapters_generated_off_message">Torna\'ls a activar per anar directament a la part que t\'interessa.</string>
     <string name="chapters_generated_off_title">Els capítols generats estan desactivats</string>
@@ -226,6 +249,7 @@ Language: ca
     <string name="settings_audio_only_summary">Si s\'activa, els episodis amb vídeo es reproduiran només en àudio i s\'estalviaran dades.</string>
     <string name="settings_audio_only">Només àudio</string>
     <string name="profile_try_duration_for_free">Prova %1$s gratis</string>
+    <string name="settings_generated_chapters">Genera capítols automàticament</string>
     <string name="profile_stats_listening_activity_info_summary">Una estimació de quan has estat escoltant, basada en el teu historial de reproducció. Si acabes un episodi al llarg de diversos dies, es mostra l\'últim dia.</string>
     <string name="profile_stats_listening_activity_info_title">Activitat d\'escolta</string>
     <string name="profile_stats_listening_activity_info_help">Informació</string>

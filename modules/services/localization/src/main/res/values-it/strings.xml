@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-04 14:55:45+0000
+Translation-Revision-Date: 2026-11-10 11:55:28+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="chat_jumping_to_time">Salto a %1$s…</string>
+    <string name="chat_jumped_to_time">Saltato a %1$s</string>
+    <string name="playback_2026_sheet_button">Visualizza Le mie riproduzioni 2026</string>
+    <string name="playback_2026_sheet_description">Cosa hai ascoltato. I podcast che hai amato. E cosa ti contraddistingue come ascoltatore. Il tuo anno su Pocket Casts è qui.</string>
+    <string name="playback_2026_banner_description">Scopri le tue statistiche di ascolto, il tuo profilo di ascolto e molto altro.</string>
+    <string name="playback_2026_banner_title">Riproduzioni 2026 è qui!</string>
+    <string name="chapters_generated_none_message">Impossibile generare i capitoli per questo.</string>
+    <string name="chapters_generated_none_title">Nessun capitolo per questo episodio</string>
+    <string name="chapters_generated_generating_note">Per gli episodi più lunghi potrebbe volerci qualche minuto. I capitoli appariranno sul lettore una volta pronti.</string>
+    <string name="chapters_generated_generating">Generazione dei capitoli…</string>
+    <string name="chapters_generated_ai_note">I capitoli vengono generati tramite l\'IA e potrebbero non essere perfettamente precisi.</string>
+    <string name="chapters_generated_generate">Genera capitoli</string>
+    <string name="chapters_generated_none_yet_message">Genera capitoli e passa direttamente alla parte che desideri.</string>
+    <string name="chapters_generated_none_yet_title">Ancora nessun capitolo</string>
+    <string name="chat_playback_position">Posizione di riproduzione</string>
     <string name="settings_generated_chapters_summary">Quando un episodio non ha capitoli propri, Pocket Casts li genererà automaticamente per te.</string>
     <string name="podcasts_played_podcasts_show">Mostra</string>
     <string name="podcasts_played_podcasts_hide">Nascondi</string>
