@@ -2,7 +2,7 @@
 -----
 *   Bug Fixes
     *   Fix other apps on the phone restarting every hour, which could make the phone slow and show "App isn't responding" dialogs
-        ([#TBD](https://github.com/Automattic/pocket-casts-android/pull/TBD))
+        ([#6425](https://github.com/Automattic/pocket-casts-android/pull/6425))
 
 8.25
 -----
