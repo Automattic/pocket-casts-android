@@ -1,5 +1,8 @@
 8.26
 -----
+*   Updates
+    *   Update the Ask about this episode tooltip copy
+        ([#6426](https://github.com/Automattic/pocket-casts-android/pull/6426))
 
 
 8.25
