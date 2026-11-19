@@ -16,7 +16,10 @@ import com.automattic.eventhorizon.EventHorizon
 import dagger.Lazy
 import java.io.File
 import java.net.HttpURLConnection
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 import kotlinx.coroutines.runBlocking
 import okhttp3.Cache
 import okhttp3.Dispatcher
@@ -31,8 +34,14 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import retrofit2.create
@@ -46,6 +55,8 @@ class PocketCastsAccountAuthenticatorTest {
     private lateinit var context: Context
     private lateinit var mockWebServer: MockWebServer
     private lateinit var account: Account
+    private lateinit var accountManager: AccountManager
+    private val cachedAccessToken = AtomicReference<String?>(null)
     private lateinit var authenticator: PocketCastsAccountAuthenticator
 
     @Before
@@ -66,10 +77,17 @@ class PocketCastsAccountAuthenticatorTest {
         val okhttpCache = Cache(File(context.cacheDir.absolutePath, "HttpCache"), (10 * 1024 * 1024).toLong())
 
         account = Account("support@pocketcasts.com", AccountConstants.ACCOUNT_TYPE)
-        val accountManager = mock<AccountManager> {
+        accountManager = mock<AccountManager> {
             on { getAccountsByType(AccountConstants.ACCOUNT_TYPE) } doReturn arrayOf(account)
+            // An account signed in before the refresh token moved to user data
             on { getPassword(account) } doReturn "refresh_token"
             on { getUserData(account, AccountConstants.SIGN_IN_TYPE_KEY) } doReturn AccountConstants.SignInType.Tokens.value
+            // Behave like the platform auth token cache so a refreshed token is visible to the next caller
+            on { peekAuthToken(account, AccountConstants.TOKEN_TYPE) } doAnswer { cachedAccessToken.get() }
+            on { setAuthToken(eq(account), eq(AccountConstants.TOKEN_TYPE), anyOrNull()) } doAnswer {
+                cachedAccessToken.set(it.arguments[2] as String?)
+                Unit
+            }
         }
         val tokenErrorNotification = mock<TokenErrorNotification>()
         val syncAccountManager = SyncAccountManagerImpl(tokenErrorNotification, accountManager)
@@ -136,6 +154,58 @@ class PocketCastsAccountAuthenticatorTest {
             """{"grant_type":"refresh_token","refresh_token":"refresh_token"}""",
             request?.body?.readUtf8(),
         )
+
+        // the refreshed token goes to user data, because setPassword broadcasts LOGIN_ACCOUNTS_CHANGED to every app
+        verify(accountManager).setUserData(account, AccountConstants.REFRESH_TOKEN_KEY, "refresh token")
+        verify(accountManager, never()).setPassword(any(), anyOrNull())
+    }
+
+    /**
+     * Concurrent callers without a cached access token should share a single refresh.
+     */
+    @Test
+    fun getAuthTokenConcurrentCallersRefreshOnce() {
+        repeat(2) {
+            mockWebServer.enqueue(
+                MockResponse()
+                    .setResponseCode(HttpURLConnection.HTTP_OK)
+                    .setBodyDelay(500, TimeUnit.MILLISECONDS)
+                    .setBody(
+                        """
+                        {
+                            "email": "support@pocketcasts.com",
+                            "uuid": "79424ba0-f09b-013b-249c-566ad7a4dc9d",
+                            "isNew": false,
+                            "accessToken": "new access token $it",
+                            "tokenType": "Bearer",
+                            "expiresIn": 1800,
+                            "refreshToken": "refresh token $it"
+                        }
+                        """.trimIndent(),
+                    ),
+            )
+        }
+
+        val callers = 4
+        val start = CountDownLatch(1)
+        val executor = Executors.newFixedThreadPool(callers)
+        try {
+            val results = (1..callers).map {
+                executor.submit<String?> {
+                    start.await()
+                    authenticator.getAuthToken(null, account, null, null).getString(AccountManager.KEY_AUTHTOKEN)
+                }
+            }
+            start.countDown()
+            val tokens = results.map { it.get(10, TimeUnit.SECONDS) }
+
+            assertEquals(List(callers) { "new access token 0" }, tokens)
+            assertEquals(1, mockWebServer.requestCount)
+            verify(accountManager).setUserData(account, AccountConstants.REFRESH_TOKEN_KEY, "refresh token 0")
+            verify(accountManager, never()).setPassword(any(), anyOrNull())
+        } finally {
+            executor.shutdownNow()
+        }
     }
 
     /**
