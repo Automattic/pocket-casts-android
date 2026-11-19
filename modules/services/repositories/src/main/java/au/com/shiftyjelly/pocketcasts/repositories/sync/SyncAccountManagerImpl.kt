@@ -134,15 +134,17 @@ open class SyncAccountManagerImpl @Inject constructor(
                 AccountConstants.SignInType.Tokens.value,
             )
             putString(AccountConstants.LOGIN_IDENTITY, loginIdentity.key)
+            putString(AccountConstants.REFRESH_TOKEN_KEY, refreshToken.value)
         }
+        // Adding the account broadcasts LOGIN_ACCOUNTS_CHANGED once anyway, so the password is still set here
+        // to keep the account usable by older app versions after a downgrade. It is never rewritten afterwards.
         val accountAdded = accountManager.addAccountExplicitly(account, refreshToken.value, userData)
         accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, accessToken.value)
 
-        // When the account was already added, set the sign in type to Tokens because the account
-        // does not seem to get updated with this from the userData in the addAccountExplicitly call
+        // When the account was already added, addAccountExplicitly ignores the userData, so set it here
         if (!accountAdded) {
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Account already added, setting sign in type to Tokens")
-            accountManager.setUserData(account, AccountConstants.SIGN_IN_TYPE_KEY, AccountConstants.SignInType.Tokens.value)
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Account already added, updating the sign in type and refresh token")
+            setRefreshToken(refreshToken)
         }
     }
 
@@ -152,10 +154,21 @@ open class SyncAccountManagerImpl @Inject constructor(
         }
     }
 
+    /**
+     * Don't use AccountManager.setPassword here. It runs on every access token refresh, and each call deletes the
+     * account's auth tokens and broadcasts LOGIN_ACCOUNTS_CHANGED, which cold starts every app on the device that
+     * listens for it. setUserData doesn't broadcast.
+     */
     override fun setRefreshToken(refreshToken: RefreshToken) {
         val account = getAccount() ?: return
-        accountManager.setPassword(account, refreshToken.value)
-        accountManager.setUserData(account, AccountConstants.SIGN_IN_TYPE_KEY, AccountConstants.SignInType.Tokens.value)
+        setUserDataIfChanged(account, AccountConstants.REFRESH_TOKEN_KEY, refreshToken.value)
+        setUserDataIfChanged(account, AccountConstants.SIGN_IN_TYPE_KEY, AccountConstants.SignInType.Tokens.value)
+    }
+
+    private fun setUserDataIfChanged(account: Account, key: String, value: String) {
+        if (accountManager.getUserData(account, key) != value) {
+            accountManager.setUserData(account, key, value)
+        }
     }
 
     override fun setAccessToken(accessToken: AccessToken) {
@@ -163,13 +176,21 @@ open class SyncAccountManagerImpl @Inject constructor(
         accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, accessToken.value)
     }
 
-    override fun getRefreshToken(account: Account?): RefreshToken? = (account ?: getAccount())?.let {
-        val refreshToken = accountManager.getPassword(it)
-        if (refreshToken != null && refreshToken.isNotEmpty()) {
-            RefreshToken(refreshToken)
-        } else {
-            null
+    override fun getRefreshToken(account: Account?): RefreshToken? {
+        val currentAccount = account ?: getAccount() ?: return null
+        val refreshToken = accountManager.getUserData(currentAccount, AccountConstants.REFRESH_TOKEN_KEY)
+        if (!refreshToken.isNullOrEmpty()) {
+            return RefreshToken(refreshToken)
         }
+        // Accounts signed in before the refresh token moved to user data only have it as the password, so copy it across once.
+        // The legacy password is left in place because clearing it would broadcast LOGIN_ACCOUNTS_CHANGED.
+        val legacyRefreshToken = accountManager.getPassword(currentAccount)
+        if (legacyRefreshToken.isNullOrEmpty()) {
+            return null
+        }
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Migrating the refresh token from the account password to user data")
+        accountManager.setUserData(currentAccount, AccountConstants.REFRESH_TOKEN_KEY, legacyRefreshToken)
+        return RefreshToken(legacyRefreshToken)
     }
 
     override fun setEmail(email: String) {

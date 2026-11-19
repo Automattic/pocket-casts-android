@@ -88,6 +88,8 @@ import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.rx2.rxSingle
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
@@ -158,8 +160,14 @@ class SyncManagerImpl @Inject constructor(
 
     override fun emailFlow() = syncAccountManager.emailFlow().distinctUntilChanged()
 
+    // AccountManager runs the authenticator once per getAuthToken caller, so concurrent callers
+    // would each refresh the token. Let one refresh and hand its token to the rest.
+    private val accessTokenRefreshLock = Mutex()
+
     override suspend fun getAccessToken(account: Account): AccessToken = syncAccountManager.peekAccessToken(account)
-        ?: fetchAccessToken(account)
+        ?: accessTokenRefreshLock.withLock {
+            syncAccountManager.peekAccessToken(account) ?: fetchAccessToken(account)
+        }
 
     override fun getRefreshToken(): RefreshToken? = syncAccountManager.getRefreshToken()
 
