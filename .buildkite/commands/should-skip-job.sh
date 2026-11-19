@@ -27,6 +27,11 @@ elif [[ "${BUILDKITE_PULL_REQUEST-false}" == false && "${BUILDKITE_BRANCH:-}" ==
   changed_files=(commit_changed_files)
   if [[ -n "${CI_CHANGED_FILES_BASE:-}" ]]; then
     changed_files+=(--base "$CI_CHANGED_FILES_BASE")
+  else
+    # The first parent covers a whole PR for a squash merge ("… (#123)") or a merge commit. A direct push can bring
+    # earlier commits that this build doesn't see, so it runs every job.
+    squash_subject='\(#[0-9]+\)$'
+    [[ "$(git rev-list --parents -n 1 HEAD | wc -w)" -gt 2 || "$(git log -1 --format=%s HEAD)" =~ $squash_subject ]] || run_job
   fi
 else
   run_job
