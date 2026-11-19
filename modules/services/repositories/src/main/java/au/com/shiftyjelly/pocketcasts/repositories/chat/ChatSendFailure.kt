@@ -16,4 +16,5 @@ enum class ChatSendFailure(val value: String) {
 internal data class UserMessageMetadata(
     val failure: String? = null,
     val inputType: String? = null,
+    val isStopped: Boolean? = null,
 )

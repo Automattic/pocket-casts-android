@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import au.com.shiftyjelly.pocketcasts.utils.search.kmpSearch
 import com.automattic.eventhorizon.BookmarkSourceType
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
 import com.automattic.eventhorizon.SyncedTranscriptsAutoScrollResumedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekFailedEvent
 import com.automattic.eventhorizon.SyncedTranscriptsSeekUsedEvent
@@ -264,7 +265,7 @@ class TranscriptViewModel @AssistedInject constructor(
                 trackSeekFailed("episode_not_found", currentState.syncedState)
                 return null
             }
-            val result = fingerprintTimingManager.resolvePlaybackTime(episode, textEntry.startTimeMs.milliseconds)
+            val result = fingerprintTimingManager.resolvePlaybackTime(episode, textEntry.startTimeMs.milliseconds, GeneratedChaptersDownloadTriggerType.TranscriptView)
             return when (result) {
                 is ChapterSeekResult.Resolved -> {
                     // Resolving can take seconds; drop the seek if the episode changed meanwhile.

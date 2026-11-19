@@ -1,13 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.share
 
 import android.os.Bundle
+import android.widget.FrameLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
 class ShareListCreateActivity : AppCompatActivity() {
@@ -20,12 +21,11 @@ class ShareListCreateActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
         enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
-
-        setContentView(R.layout.activity_blank_fragment)
+        setContentView(FrameLayout(this).apply { id = VR.id.container })
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, ShareListCreateFragment())
+                .replace(VR.id.container, ShareListCreateFragment())
                 .commitNow()
         }
     }

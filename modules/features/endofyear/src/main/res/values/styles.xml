@@ -5,4 +5,9 @@
         <item name="android:windowBackground">#80000000</item>
         <item name="android:windowNoTitle">true</item>
     </style>
+
+    <!-- The Playback design's ground, so nothing flashes white before the story's first frame. -->
+    <style name="Theme.Playback2026" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#2D0004</item>
+    </style>
 </resources>

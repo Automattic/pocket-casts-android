@@ -9,8 +9,12 @@ android {
     namespace = "au.com.shiftyjelly.pocketcasts.search"
     buildFeatures {
         buildConfig = true
-        viewBinding = true
         compose = true
+    }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
     }
 }
 
@@ -31,15 +35,12 @@ dependencies {
 
     implementation(platform(libs.compose.bom))
 
-    implementation(libs.androidx.core.ktx)
     implementation(libs.compose.material)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.reactive)
-    implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
-    implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.rx2.android)
     implementation(libs.rx2.java)
@@ -49,15 +50,19 @@ dependencies {
     implementation(libs.timber)
 
     implementation(projects.modules.services.compose)
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.lifecycle.viewmodel.compose)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
 
+    debugImplementation(libs.compose.ui.test.manifest)
+
+    testImplementation(libs.compose.ui.test.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.robolectric)
 
     testImplementation(projects.modules.services.sharedtest)
     testImplementation(projects.modules.services.analytics.testing)

@@ -1,16 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -52,6 +49,7 @@ internal fun ChatHeader(
     onClickClose: () -> Unit,
     onClickMore: () -> Unit,
     onClickPlayPause: () -> Unit,
+    onSeek: (positionMs: Int) -> Unit,
     theme: ChatTheme,
     modifier: Modifier = Modifier,
 ) {
@@ -84,7 +82,7 @@ internal fun ChatHeader(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 4.dp, top = 12.dp, bottom = 12.dp),
+                .padding(start = 16.dp, end = 4.dp, top = 12.dp),
         ) {
             if (userEpisode != null) {
                 EpisodeImage(
@@ -137,19 +135,11 @@ internal fun ChatHeader(
                 )
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(2.dp)
-                .background(theme.progressTrack),
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(playback.progress)
-                    .height(2.dp)
-                    .background(theme.progress, CircleShape),
-            )
-        }
+        ChatProgressBar(
+            playback = playback,
+            onSeek = onSeek,
+            theme = theme,
+        )
     }
 }
 
@@ -166,10 +156,11 @@ private fun ChatHeaderPreview(
                 podcastUuid = "preview-podcast-uuid",
                 podcastTitle = "Smart Money",
                 userEpisode = null,
-                playback = ChatPlayback(isPlaying = true, positionMs = 30, durationMs = 100),
+                playback = ChatPlayback(isPlaying = true, positionMs = 30, durationMs = 100, isSeekable = true),
                 onClickClose = {},
                 onClickMore = {},
                 onClickPlayPause = {},
+                onSeek = {},
                 theme = theme,
                 modifier = Modifier.background(theme.background),
             )

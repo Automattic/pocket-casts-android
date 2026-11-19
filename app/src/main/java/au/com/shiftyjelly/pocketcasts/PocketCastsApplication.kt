@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.crashlogging.InitializeRemoteLogging
 import au.com.shiftyjelly.pocketcasts.discover.worker.CuratedPodcastsSyncWorker
+import au.com.shiftyjelly.pocketcasts.endofyear.playback2026.Playback2026
 import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeDownloadStatus
@@ -20,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewExceptionH
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ProcessLifecycle
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadStatusObserver
+import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
@@ -359,7 +361,8 @@ class PocketCastsApplication :
         keepPlayerWidgetsUpdated()
 
         if (FeatureFlag.isEnabled(Feature.SYNC_EOY_DATA_ON_STARTUP)) {
-            applicationScope.launch { endOfYearSync.sync() }
+            val year = if (FeatureFlag.isEnabled(Feature.PLAYBACK_2026)) Playback2026.YEAR else EndOfYearManager.YEAR_TO_SYNC
+            applicationScope.launch { endOfYearSync.sync(year) }
         }
 
         PlaybackStatsSyncWorker.scheduleOneTimeWork(this)

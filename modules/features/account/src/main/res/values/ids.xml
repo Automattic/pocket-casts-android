@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="toolbarLayout" type="id" />
+    <item name="toolbar" type="id" />
+    <item name="nav_host_fragment" type="id" />
+    <item name="btnClose" type="id" />
+    <item name="imgLogo" type="id" />
+</resources>

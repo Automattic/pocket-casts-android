@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.ChapterSeekResult
 import au.com.shiftyjelly.pocketcasts.repositories.fingerprint.FingerprintTimingManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.automattic.eventhorizon.GeneratedChaptersDownloadTriggerType
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -20,7 +21,7 @@ class BookmarkPlaybackTimeResolver @Inject constructor(
         if (referenceTimeSecs == null || !FeatureFlag.isEnabled(Feature.SYNCED_TRANSCRIPTS)) {
             return fallbackMs
         }
-        return when (val result = fingerprintTimingManager.resolvePlaybackTime(episode, referenceTimeSecs.seconds)) {
+        return when (val result = fingerprintTimingManager.resolvePlaybackTime(episode, referenceTimeSecs.seconds, GeneratedChaptersDownloadTriggerType.Bookmark)) {
             is ChapterSeekResult.Resolved -> result.playbackTime.inWholeMilliseconds.toInt()
             is ChapterSeekResult.Unresolved -> fallbackMs
         }

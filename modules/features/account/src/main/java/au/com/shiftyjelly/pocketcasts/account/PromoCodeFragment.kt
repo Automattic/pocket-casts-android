@@ -6,12 +6,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import au.com.shiftyjelly.pocketcasts.account.databinding.FragmentPromocodeBinding
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,7 +33,9 @@ class PromoCodeFragment : BaseFragment() {
     private val promoCode: String
         get() = arguments?.getString(ARG_PROMO_CODE)!!
 
-    private var binding: FragmentPromocodeBinding? = null
+    private var form by mutableStateOf<PromoCodePageState?>(null)
+    private var onDoneClick: () -> Unit = {}
+    private var onCreateClick: () -> Unit = {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,30 +43,36 @@ class PromoCodeFragment : BaseFragment() {
         viewModel.setup(promoCode, requireContext())
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentPromocodeBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
+        AppTheme(theme.activeTheme) {
+            PromoCodePage(
+                state = form ?: initialState(),
+                onCloseClick = { activity?.finish() },
+                onDoneClick = { onDoneClick() },
+                onCreateClick = { onCreateClick() },
+                onSignInClick = {
+                    findNavController().navigate(R.id.action_promoCodeFragment_to_signInFragment)
+                    showLoading()
+                },
+            )
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        form = initialState()
         viewModel.state.observe(
             viewLifecycleOwner,
             Observer {
-                val binding = binding ?: return@Observer
+                val form = form ?: return@Observer
                 when (it) {
                     is PromoCodeViewModel.ViewState.Loading -> {
                         showLoading()
                     }
 
                     is PromoCodeViewModel.ViewState.Success -> {
-                        binding.loadedGroup.isVisible = false
+                        this.form = form.copy(isLoaded = false)
                         // We need to set this to true here so we know not to show the gift dialog.
                         // There is no way to know what type of gift the upgrade came via the API
                         settings.freeGiftAcknowledged.set(true, updateModifiedAt = true)
@@ -74,70 +84,60 @@ class PromoCodeFragment : BaseFragment() {
                     }
 
                     is PromoCodeViewModel.ViewState.NotSignedIn -> {
-                        binding.progress.isVisible = false
-                        binding.loadedGroup.isVisible = true
-                        binding.btnSignIn.isVisible = true
-                        binding.btnDone.setText(LR.string.profile_promo_create_account)
-                        binding.btnCreateOnError.isVisible = false
-
-                        binding.lblTitle.setText(LR.string.profile_promo_sign_in_or_create)
-                        binding.lblDetail.setText(LR.string.profile_promo_sign_in_or_create_summary)
-                        binding.imgDone.setup(ContextCompat.getDrawable(binding.imgDone.context, R.drawable.ic_plus_account))
-
-                        binding.btnSignIn.setOnClickListener {
-                            findNavController().navigate(R.id.action_promoCodeFragment_to_signInFragment)
-                            showLoading()
-                        }
-                        binding.btnDone.setOnClickListener {
+                        this.form = form.copy(
+                            isProgressVisible = false,
+                            isLoaded = true,
+                            isSignInVisible = true,
+                            doneText = getString(LR.string.profile_promo_create_account),
+                            createText = null,
+                            title = getString(LR.string.profile_promo_sign_in_or_create),
+                            detail = getString(LR.string.profile_promo_sign_in_or_create_summary),
+                            imageRes = R.drawable.ic_plus_account,
+                            overlayRes = null,
+                        )
+                        onDoneClick = {
                             findNavController().navigate(R.id.action_promoCodeFragment_to_createEmailFragment)
                             showLoading()
                         }
                     }
 
                     is PromoCodeViewModel.ViewState.Failed -> {
-                        binding.progress.isVisible = false
-                        binding.loadedGroup.isVisible = true
-                        binding.btnSignIn.isVisible = false
-                        binding.btnCreateOnError.isVisible = it.shouldShowSignup
-
-                        binding.lblTitle.text = it.title
-                        binding.lblDetail.text = it.errorMessage
-                        val imgDone = binding.imgDone
-                        val overlay = if (it.errorOverlayRes != null) ContextCompat.getDrawable(imgDone.context, it.errorOverlayRes) else null
-                        imgDone.setup(ContextCompat.getDrawable(imgDone.context, it.errorImageRes), overlay = overlay)
-
-                        binding.btnDone.setText(LR.string.done)
-                        binding.btnDone.setOnClickListener { activity?.finish() }
-
-                        binding.btnCreateOnError.setText(if (it.isSignedIn) LR.string.profile_promo_sign_up_for_plus else LR.string.profile_promo_create_pocket_casts_account)
-                        binding.btnCreateOnError.setOnClickListener { _ ->
-                            if (it.isSignedIn) {
-                                activity?.finish()
-                                val intent = AccountActivity.newUpgradeInstance(view.context)
-                                view.context.startActivity(intent)
-                            } else {
-                                activity?.finish()
-                                val intent = AccountActivity.newAutoSelectPlusInstance(view.context)
-                                view.context.startActivity(intent)
-                            }
+                        this.form = form.copy(
+                            isProgressVisible = false,
+                            isLoaded = true,
+                            isSignInVisible = false,
+                            createText = if (it.shouldShowSignup) getString(if (it.isSignedIn) LR.string.profile_promo_sign_up_for_plus else LR.string.profile_promo_create_pocket_casts_account) else null,
+                            title = it.title,
+                            detail = it.errorMessage,
+                            imageRes = it.errorImageRes,
+                            overlayRes = it.errorOverlayRes,
+                            doneText = getString(LR.string.done),
+                        )
+                        onDoneClick = { activity?.finish() }
+                        onCreateClick = {
+                            activity?.finish()
+                            val intent = if (it.isSignedIn) AccountActivity.newUpgradeInstance(view.context) else AccountActivity.newAutoSelectPlusInstance(view.context)
+                            view.context.startActivity(intent)
                         }
                     }
                 }
             },
         )
-
-        binding?.btnClose?.setOnClickListener { activity?.finish() }
     }
 
     private fun showLoading() {
-        val binding = binding ?: return
-
-        binding.progress.isVisible = true
-        binding.btnSignIn.isVisible = false
-        binding.loadedGroup.isVisible = false
-        binding.btnCreateOnError.isVisible = false
-
-        binding.lblTitle.text = null
-        binding.lblDetail.text = null
+        form = form?.copy(isProgressVisible = true, isSignInVisible = false, isLoaded = false, createText = null, title = "", detail = "")
     }
+
+    private fun initialState() = PromoCodePageState(
+        isProgressVisible = true,
+        isLoaded = true,
+        imageRes = R.drawable.ic_create_new_account,
+        overlayRes = null,
+        title = "",
+        detail = "",
+        doneText = getString(LR.string.done),
+        createText = null,
+        isSignInVisible = false,
+    )
 }

@@ -25,19 +25,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.InlineTextContent
-import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -55,10 +50,10 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.ParagraphStyle
-import androidx.compose.ui.text.Placeholder
-import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -80,9 +75,9 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
+import au.com.shiftyjelly.pocketcasts.repositories.chat.findChatTimestamps
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlin.math.ceil
-import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -92,6 +87,9 @@ internal fun AiMessageBubble(
     theme: ChatTheme,
     modifier: Modifier = Modifier,
     revealProgress: (() -> Float)? = null,
+    episodeDurationMs: Int = 0,
+    loadingTimestampMs: Int? = null,
+    onClickTimestamp: (startMs: Int) -> Unit = {},
 ) {
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
@@ -99,9 +97,20 @@ internal fun AiMessageBubble(
         with(density) { textMeasurer.measure(BULLET_PREFIX, AiMessageTextStyle).size.width.toSp() }
     }
     val styledText = remember(text, bulletIndent) { text.withHangingBullets(bulletIndent) }
+    val currentOnClickTimestamp by rememberUpdatedState(onClickTimestamp)
+    val isRevealed = revealProgress == null
+    val linkedText = remember(styledText, theme.timestamp, isRevealed, episodeDurationMs, loadingTimestampMs) {
+        styledText.withTimestampLinks(
+            linkColor = theme.timestamp,
+            isEnabled = isRevealed,
+            episodeDurationMs = episodeDurationMs,
+            loadingStartMs = loadingTimestampMs,
+            onClick = { startMs -> currentOnClickTimestamp(startMs) },
+        )
+    }
     val wipe = remember { TextWipe() }
     Text(
-        text = styledText,
+        text = linkedText,
         color = theme.aiBubbleText,
         style = AiMessageTextStyle,
         onTextLayout = wipe::onTextLayout,
@@ -121,6 +130,49 @@ private fun Modifier.revealedBy(
     val timeline = remember(text) { TextRevealTimeline(text) }
     return textWipe(wipe) { timeline.revealedLength(revealProgress()) }
 }
+
+private fun AnnotatedString.withTimestampLinks(
+    linkColor: Color,
+    isEnabled: Boolean,
+    episodeDurationMs: Int,
+    loadingStartMs: Int?,
+    onClick: (startMs: Int) -> Unit,
+): AnnotatedString {
+    val timestamps = findChatTimestamps(text).filter { episodeDurationMs <= 0 || it.startMs < episodeDurationMs }
+    if (timestamps.isEmpty()) return this
+    val source = this
+    return buildAnnotatedString {
+        append(source)
+        timestamps.forEach { timestamp ->
+            val style = if (timestamp.startMs == loadingStartMs) jumpingTimestampStyle(linkColor) else SpanStyle(color = linkColor)
+            val start = timestamp.range.first
+            val end = timestamp.range.last + 1
+            if (isEnabled) {
+                addLink(
+                    LinkAnnotation.Clickable(
+                        tag = TIMESTAMP_LINK_TAG,
+                        styles = TextLinkStyles(style = style, pressedStyle = jumpingTimestampStyle(linkColor)),
+                        linkInteractionListener = { onClick(timestamp.startMs) },
+                    ),
+                    start,
+                    end,
+                )
+            } else {
+                addStyle(style, start, end)
+            }
+        }
+    }
+}
+
+private const val TIMESTAMP_LINK_TAG = "timestamp"
+
+private fun jumpingTimestampStyle(color: Color) = SpanStyle(
+    color = color.copy(alpha = JUMPING_TIMESTAMP_ALPHA),
+    background = color.copy(alpha = JUMPING_TIMESTAMP_BACKGROUND_ALPHA),
+)
+
+private const val JUMPING_TIMESTAMP_ALPHA = 0.6f
+private const val JUMPING_TIMESTAMP_BACKGROUND_ALPHA = 0.16f
 
 internal fun String.withHangingBullets(indent: TextUnit): AnnotatedString {
     val lines = lines()
@@ -152,20 +204,9 @@ internal fun AiQuoteBubble(
     revealProgress: (() -> Float)? = null,
     onClickPlay: () -> Unit = {},
 ) {
-    val timestampColor = if (isPlayable) theme.quoteTimestamp else theme.secondaryText
-    val quoteColor = if (isLoading) theme.aiBubbleText.copy(alpha = LOADING_QUOTE_ALPHA) else theme.aiBubbleText
-    val text = remember(quote, timestampLabel, timestampColor, quoteColor, isLoading) {
-        quoteText(quote, timestampLabel, quoteColor, timestampColor, isLoading)
-    }
-    val spinnerSize = with(LocalDensity.current) { QuoteSpinnerSize.toSp() }
-    val inlineContent = remember(timestampColor, spinnerSize) {
-        mapOf(
-            QUOTE_SPINNER_ID to InlineTextContent(
-                placeholder = Placeholder(width = spinnerSize, height = spinnerSize, placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter),
-            ) {
-                QuoteLoadingSpinner(color = timestampColor)
-            },
-        )
+    val timestampColor = if (isPlayable) theme.timestamp else theme.secondaryText
+    val text = remember(quote, timestampLabel, theme.aiBubbleText, timestampColor, isLoading) {
+        quoteText(quote, timestampLabel, theme.aiBubbleText, timestampColor, isLoading)
     }
     val wipe = remember { TextWipe() }
     val revealTicks = remember(text) { TextRevealTimeline(text).ticks }
@@ -173,44 +214,34 @@ internal fun AiQuoteBubble(
         derivedStateOf { revealProgress == null || revealProgress() >= revealTicks }
     }
     val loadingDescription = stringResource(LR.string.chat_quote_finding_moment)
-    Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Text(
-            text = text,
-            inlineContent = inlineContent,
-            onTextLayout = wipe::onTextLayout,
-            color = theme.aiBubbleText,
-            fontSize = 15.sp,
-            lineHeight = 20.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(
-                    if (isPlayable && isRevealed) {
-                        Modifier.clickable(
-                            onClickLabel = stringResource(LR.string.chat_play_quote),
-                            role = Role.Button,
-                            onClick = onClickPlay,
-                        )
-                    } else {
-                        Modifier
-                    },
-                )
-                .revealedBy(wipe, text, revealProgress)
-                .then(
-                    if (isLoading) {
-                        Modifier.semantics { stateDescription = loadingDescription }
-                    } else {
-                        Modifier
-                    },
-                ),
-        )
-        QuoteFindingMoment(
-            isLoading = isLoading,
-            theme = theme,
-        )
-    }
+    Text(
+        text = text,
+        onTextLayout = wipe::onTextLayout,
+        color = theme.aiBubbleText,
+        fontSize = 15.sp,
+        lineHeight = 20.sp,
+        modifier = modifier
+            .fillMaxWidth()
+            .then(
+                if (isPlayable && isRevealed) {
+                    Modifier.clickable(
+                        onClickLabel = stringResource(LR.string.chat_play_quote),
+                        role = Role.Button,
+                        onClick = onClickPlay,
+                    )
+                } else {
+                    Modifier
+                },
+            )
+            .revealedBy(wipe, text, revealProgress)
+            .then(
+                if (isLoading) {
+                    Modifier.semantics { stateDescription = loadingDescription }
+                } else {
+                    Modifier
+                },
+            ),
+    )
 }
 
 internal fun quoteTimestampText(timestampLabel: String) = if (timestampLabel.isEmpty()) "" else "($timestampLabel)"
@@ -227,67 +258,11 @@ internal fun quoteText(
     }
     if (timestampLabel.isNotEmpty()) {
         append(" ")
-        withStyle(SpanStyle(color = timestampColor)) {
+        withStyle(if (isLoading) jumpingTimestampStyle(timestampColor) else SpanStyle(color = timestampColor)) {
             append(quoteTimestampText(timestampLabel))
         }
     }
-    if (isLoading) {
-        append(" ")
-        appendInlineContent(QUOTE_SPINNER_ID, alternateText = " ")
-    }
 }
-
-@Composable
-private fun QuoteLoadingSpinner(
-    color: Color,
-    modifier: Modifier = Modifier,
-) {
-    if (rememberIsReduceMotionEnabled()) {
-        CircularProgressIndicator(
-            progress = REDUCED_MOTION_SPINNER_PROGRESS,
-            color = color,
-            strokeWidth = 1.5.dp,
-            modifier = modifier.size(QuoteSpinnerSize),
-        )
-    } else {
-        CircularProgressIndicator(
-            color = color,
-            strokeWidth = 1.5.dp,
-            modifier = modifier.size(QuoteSpinnerSize),
-        )
-    }
-}
-
-@Composable
-private fun QuoteFindingMoment(
-    isLoading: Boolean,
-    theme: ChatTheme,
-    modifier: Modifier = Modifier,
-) {
-    var isVisible by remember { mutableStateOf(false) }
-    LaunchedEffect(isLoading) {
-        isVisible = false
-        if (isLoading) {
-            delay(FINDING_MOMENT_DELAY_MS)
-            isVisible = true
-        }
-    }
-    if (isLoading && isVisible) {
-        Text(
-            text = stringResource(LR.string.chat_quote_finding_moment),
-            color = theme.inputHint,
-            fontSize = 12.sp,
-            lineHeight = 16.sp,
-            modifier = modifier.clearAndSetSemantics {},
-        )
-    }
-}
-
-private const val QUOTE_SPINNER_ID = "quoteSpinner"
-private val QuoteSpinnerSize = 12.dp
-private const val LOADING_QUOTE_ALPHA = 0.6f
-private const val REDUCED_MOTION_SPINNER_PROGRESS = 0.75f
-private const val FINDING_MOMENT_DELAY_MS = 1_000L
 
 @Composable
 internal fun UserMessageBubble(
@@ -300,6 +275,7 @@ internal fun UserMessageBubble(
     chipMorph: () -> Float = { 0f },
 ) {
     val isChipWidth by remember(chipMorph) { derivedStateOf { chipMorph() >= CHIP_WIDTH_MORPH_POINT } }
+    val widestLine = remember { WidestLine() }
     Column(
         horizontalAlignment = Alignment.End,
         modifier = modifier.fillMaxWidth(),
@@ -323,11 +299,13 @@ internal fun UserMessageBubble(
                 color = theme.userBubbleText,
                 fontSize = 15.sp,
                 lineHeight = 20.sp,
+                onTextLayout = widestLine::onTextLayout,
                 modifier = Modifier
-                    .widthIn(max = if (isChipWidth) Dp.Unspecified else UserBubbleMaxWidth)
+                    .then(if (isChipWidth) Modifier.chipMaxWidth() else Modifier.widthIn(max = UserBubbleMaxWidth))
                     .drawBehind { drawUserBubble(chipMorph(), theme) }
                     .padding(horizontal = 16.dp)
-                    .verticalPadding { lerp(10.dp, 12.dp, chipMorph()) },
+                    .verticalPadding { lerp(10.dp, 12.dp, chipMorph()) }
+                    .hugWidestLine(widestLine),
             )
             if (isNotSent) {
                 ChatNotSentLabel(theme = theme)
@@ -446,7 +424,6 @@ private fun chipMorphShape(chipMorph: Float) = RoundedCornerShape(
     bottomStart = lerp(16.dp, ChipCornerRadius, chipMorph),
 )
 
-private val ChipCornerRadius = 22.dp
 private val ChipBorderWidth = 1.dp
 private val UserBubbleMaxWidth = 250.dp
 private const val CHIP_WIDTH_MORPH_POINT = 0.5f

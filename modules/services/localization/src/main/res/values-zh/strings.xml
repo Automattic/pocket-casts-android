@@ -1,11 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-20 11:57:30+0000
+Translation-Revision-Date: 2026-11-10 09:56:34+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="chat_jumping_to_time">正在跳转至 %1$s…</string>
+    <string name="chat_jumped_to_time">已跳转至 %1$s</string>
+    <string name="playback_2026_sheet_button">查看我的 2026 年播放记录</string>
+    <string name="playback_2026_sheet_description">您收听过的内容。 您喜爱的播客。 以及您作为听众的与众不同之处。 您的 Pocket Casts 年度回顾已上线。</string>
+    <string name="playback_2026_banner_description">欢迎查看您的收听统计数据、了解您所属的听众类型，并探索更多内容。</string>
+    <string name="playback_2026_banner_title">2026 年播放记录现已上线！</string>
+    <string name="chapters_generated_none_message">我们无法为此剧集生成章节。</string>
+    <string name="chapters_generated_none_title">此剧集无章节</string>
+    <string name="chapters_generated_generating_note">对于较长的剧集，这可能需要一分钟的时间。 章节准备就绪后将显示在播放器上。</string>
+    <string name="chapters_generated_generating">正在生成章节…</string>
+    <string name="chapters_generated_ai_note">章节使用 AI 生成，可能不完全准确。</string>
+    <string name="chapters_generated_generate">生成章节</string>
+    <string name="chapters_generated_none_yet_message">生成章节，并直接跳转至您感兴趣的部分。</string>
+    <string name="chapters_generated_none_yet_title">尚无章节</string>
+    <string name="chat_playback_position">播放位置</string>
+    <string name="settings_generated_chapters_summary">如果某剧集本身没有章节，Pocket Casts 会自动为您生成章节。</string>
+    <string name="podcasts_played_podcasts_show">显示</string>
+    <string name="podcasts_played_podcasts_hide">隐藏</string>
+    <string name="podcasts_played_podcasts_description">隐藏您已完整收听的播客。 每当有新剧集上线时，它们就会重新出现。</string>
+    <string name="podcasts_menu_played_podcasts">已播放的播客</string>
+    <string name="chapters_generated_upsell_button">获取生成的章节</string>
+    <string name="chapters_generated_upsell_message">有了 Pocket Casts Plus，就再也不用手动拖动进度条了。 直接跳转至您想要收听的部分。</string>
+    <string name="chapters_generated_upsell_title">章节已自动生成</string>
+    <string name="chapters_generated_turn_on">打开</string>
+    <string name="chapters_generated_off_message">重新打开它们，即可直接跳转到您想要查看的部分。</string>
+    <string name="chapters_generated_off_title">生成的章节已关闭</string>
+    <string name="chapters_generated_undo">撤销</string>
+    <string name="chapters_generated_turned_off">已关闭生成的章节</string>
+    <string name="chapters_generated_turn_off">关闭生成的章节</string>
+    <string name="chat_loading_still_working">继续处理中…</string>
+    <string name="chat_loading_writing_answer">正在撰写您的答案</string>
+    <string name="chat_loading_finding_moments">正在寻找精彩片段</string>
+    <string name="chat_loading_reading_transcript">正在阅读文字转录稿</string>
+    <string name="automotive_nothing_playing_title">选择一个剧集进行播放</string>
+    <string name="chat_quote_finding_moment">正在寻找对应时刻…</string>
+    <string name="chat_quote_play_failed">无法播放该剧集的这一段</string>
+    <string name="chat_history_empty_body">询问关于剧集的问题，您的聊天记录将显示在此处。</string>
+    <string name="chat_history_empty_title">尚无聊天记录</string>
     <string name="chat_about_episode">聊聊 %1$s</string>
     <string name="chat_now_playing_episode">正在播放 %1$s</string>
     <string name="chat_undo">撤销</string>
@@ -18,8 +56,6 @@ Language: zh_CN
     <string name="chat_answering">正在回答</string>
     <string name="chat_error_server_on_our_end">我们这边出了点问题。</string>
     <string name="chat_not_sent_tap_to_retry">未发送。 轻点以重试。</string>
-    <string name="chat_feedback_send_failed">无法发送您的反馈。 检查您的连接。</string>
-    <string name="chat_feedback_sending">正在发送反馈</string>
     <string name="chat_feedback_what_went_wrong">出现的问题</string>
     <string name="chat_beta_sheet_sign_in">登录以尝试</string>
     <string name="episode_chat_needs_transcript_message">“关于此剧集的提问”功能需要文字转录稿。 此剧集没有文字转录稿。</string>
@@ -213,8 +249,7 @@ Language: zh_CN
     <string name="settings_audio_only_summary">如果此选项开启，带有视频的剧集将仅以音频形式播放，从而节省数据流量。</string>
     <string name="settings_audio_only">仅限音频</string>
     <string name="profile_try_duration_for_free">免费试用 %1$s</string>
-    <string name="settings_generated_chapters_summary">如有自动生成的章节，则显示。</string>
-    <string name="settings_generated_chapters">生成的章节</string>
+    <string name="settings_generated_chapters">自动生成章节</string>
     <string name="profile_stats_listening_activity_info_summary">根据您的播放历史记录估算您收听的时间。 如果您分几天听完一集，则它会显示在最后一天。</string>
     <string name="profile_stats_listening_activity_info_title">收听活动</string>
     <string name="profile_stats_listening_activity_info_help">信息</string>
@@ -256,7 +291,6 @@ Language: zh_CN
     <string name="blogs_found_headline">大声朗读您的博客</string>
     <string name="blogs_found_followed_badge">已关注播客</string>
     <string name="blogs_found_feed_detected">已找到源</string>
-    <string name="chapters_generated_disclaimer">这些章节为自动生成，可能不完全准确。</string>
     <string name="chat_play_quote">播放引用</string>
     <string name="chat_clear">清除聊天记录</string>
     <string name="chat_send">发送</string>
@@ -2474,6 +2508,12 @@ Language: zh_CN
     </plurals>
     <plurals name="chapter">
         <item quantity="other">章节</item>
+    </plurals>
+    <plurals name="chapters_generated_count">
+        <item quantity="other">%d 个生成的章节</item>
+    </plurals>
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="other">%1$d 个生成的章节 • %2$d 个已隐藏</item>
     </plurals>
     <plurals name="day">
         <item quantity="other">天</item>

@@ -13,6 +13,11 @@ android {
         viewBinding = true
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -51,13 +56,14 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
-    implementation(libs.androidx.webkit)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.compose.activity)
     implementation(libs.compose.animation)
     implementation(libs.compose.livedata)
     implementation(libs.compose.material)
     implementation(libs.compose.material.icons.core)
+    implementation(libs.compose.material3.adaptive)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.webview)
@@ -65,13 +71,10 @@ dependencies {
     implementation(libs.coroutines.rx2)
     implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
-    implementation(libs.hilt.navigation.compose)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.lifecycle.runtime.compose)
-    implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.lottie.compose)
     implementation(libs.media3.exoplayer)
-    implementation(libs.media3.extractor)
     implementation(libs.play.cast)
     implementation(libs.reorderable)
     implementation(libs.rx2.android)
@@ -84,11 +87,15 @@ dependencies {
     implementation(projects.modules.features.reimagine)
     implementation(projects.modules.services.images)
 
+    debugImplementation(libs.compose.ui.test.manifest)
+
     testImplementation(libs.androidx.arch.core)
+    testImplementation(libs.compose.ui.test.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.robolectric)
     testImplementation(libs.turbine)
 
     testImplementation(projects.modules.services.sharedtest)

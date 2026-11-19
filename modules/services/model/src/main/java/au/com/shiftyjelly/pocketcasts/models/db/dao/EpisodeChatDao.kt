@@ -44,6 +44,15 @@ abstract class EpisodeChatDao {
     abstract suspend fun deleteMessagesByEpisode(episodeUuid: String)
 
     @Transaction
+    open suspend fun insertMessageIfNewest(message: EpisodeChatMessage): Boolean {
+        val messages = getMessages(message.episodeUuid)
+        val stored = messages.firstOrNull { it.uuid == message.uuid }
+        if (stored != null && messages.last().uuid != message.uuid) return false
+        insertMessage(message.copy(createdAt = stored?.createdAt ?: message.createdAt))
+        return true
+    }
+
+    @Transaction
     open suspend fun takeMessages(episodeUuid: String): List<EpisodeChatMessage> {
         val messages = getMessages(episodeUuid)
         deleteMessagesByEpisode(episodeUuid)

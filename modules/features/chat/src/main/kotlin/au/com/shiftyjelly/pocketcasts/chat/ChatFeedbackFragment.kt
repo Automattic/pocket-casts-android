@@ -53,13 +53,14 @@ class ChatFeedbackFragment : BaseDialogFragment() {
             podcastColors: PodcastColors,
             trigger: Trigger,
             messageIndex: Long?,
+            answerUuid: String?,
         ) {
             if (fragmentManager.isStateSaved || fragmentManager.findFragmentByTag(TAG) != null) return
             ChatFeedbackFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(
                         ARGS_KEY,
-                        Args(episodeUuid, podcastUuid, sourceView, podcastColors, trigger, messageIndex),
+                        Args(episodeUuid, podcastUuid, sourceView, podcastColors, trigger, messageIndex, answerUuid),
                     )
                 }
             }.show(fragmentManager, TAG)
@@ -83,6 +84,7 @@ class ChatFeedbackFragment : BaseDialogFragment() {
             sourceView = args.sourceView,
             trigger = args.trigger.analyticsValue,
             messageIndex = args.messageIndex,
+            answerUuid = args.answerUuid,
         )
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -97,9 +99,6 @@ class ChatFeedbackFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        LaunchedEffect(uiState.isSubmitting) {
-            isCancelable = !uiState.isSubmitting
-        }
 
         AppTheme(theme.activeTheme) {
             CompositionLocalProvider(LocalPodcastColors provides args.podcastColors) {
@@ -113,8 +112,6 @@ class ChatFeedbackFragment : BaseDialogFragment() {
                     details = uiState.details,
                     showDetails = uiState.showDetails,
                     canSubmit = uiState.canSubmit,
-                    isSubmitting = uiState.isSubmitting,
-                    hasSubmitError = uiState.hasSubmitError,
                     onSelectReason = viewModel::onReasonSelected,
                     onDetailsChange = viewModel::onDetailsChange,
                     onSubmit = viewModel::submit,
@@ -155,5 +152,6 @@ class ChatFeedbackFragment : BaseDialogFragment() {
         val podcastColors: PodcastColors,
         val trigger: Trigger,
         val messageIndex: Long?,
+        val answerUuid: String?,
     ) : Parcelable
 }

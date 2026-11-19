@@ -36,7 +36,6 @@ dependencies {
     implementation(libs.retrofit.moshi)
     implementation(libs.retrofit.protobuf) { exclude(group = "com.google.protobuf", module = "protobuf-java") }
     implementation(libs.retrofit.rx2)
-    implementation(libs.rx2.android)
     implementation(libs.timber)
 
     implementation(projects.modules.services.localization)

@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,6 +41,24 @@ private object NotesCardTheme {
 internal fun TrialFinishedNotesCard(
     modifier: Modifier = Modifier,
 ) {
+    NotesCard(modifier = modifier) {
+        TrialFinishedNotesItem.entries.forEach { item ->
+            NotesCardRow(text = stringResource(item.text)) {
+                GradientIcon(
+                    painter = painterResource(item.icon),
+                    gradientBrush = Brush.plusGradientBrush,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun NotesCard(
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Card(
         shape = DefaultCardShape,
         elevation = 8.dp,
@@ -48,18 +67,18 @@ internal fun TrialFinishedNotesCard(
             .fillMaxWidth()
             .border(width = 2.dp, color = NotesCardTheme.borderColor, shape = DefaultCardShape),
     ) {
-        Column(modifier = Modifier.padding(bottom = 20.dp)) {
-            TrialFinishedNotesItem.entries.forEach {
-                NotesItemRow(item = it)
-            }
-        }
+        Column(
+            modifier = Modifier.padding(bottom = 20.dp),
+            content = content,
+        )
     }
 }
 
 @Composable
-private fun NotesItemRow(
-    item: TrialFinishedNotesItem,
+internal fun NotesCardRow(
+    text: String,
     modifier: Modifier = Modifier,
+    icon: @Composable () -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
@@ -67,16 +86,12 @@ private fun NotesItemRow(
             .fillMaxWidth()
             .padding(top = 20.dp, start = 32.dp, end = 16.dp),
     ) {
-        GradientIcon(
-            painter = painterResource(item.icon),
-            gradientBrush = Brush.plusGradientBrush,
-            modifier = Modifier.size(24.dp),
-        )
+        icon()
 
         Spacer(Modifier.width(16.dp))
 
         TextH50(
-            text = stringResource(item.text),
+            text = text,
             color = MaterialTheme.theme.colors.primaryText02,
             fontWeight = FontWeight.W400,
         )

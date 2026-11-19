@@ -40,6 +40,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnLayout
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
@@ -125,6 +126,8 @@ import au.com.shiftyjelly.pocketcasts.discover.view.PodcastGridListFragment
 import au.com.shiftyjelly.pocketcasts.discover.view.PodcastListFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
+import au.com.shiftyjelly.pocketcasts.endofyear.playback2026.Playback2026
+import au.com.shiftyjelly.pocketcasts.endofyear.playback2026.Playback2026LaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -591,6 +594,10 @@ class MainActivity :
                     }
                 }
             }
+        }
+
+        if (savedInstanceState == null) {
+            showPlayback2026SheetIfNeeded()
         }
 
         lifecycleScope.launch {
@@ -1128,6 +1135,39 @@ class MainActivity :
         )
     }
 
+    private fun showPlayback2026SheetIfNeeded() {
+        // Onboarding, What's New and the End of Year prompt go first. The sheet waits for them,
+        // or for the next launch after onboarding.
+        if (launchedInitialOnboarding || settings.playback2026SheetShown.value) return
+        lifecycleScope.launch {
+            if (!viewModel.shouldShowPlayback2026Sheet()) return@launch
+            val viewGroup = binding.modalBottomSheet
+            if (viewModel.state.value.shouldShowWhatsNew || viewGroup.isNotEmpty()) return@launch
+            viewGroup.addView(
+                ComposeView(viewGroup.context).apply {
+                    setContent {
+                        AppTheme(theme.activeTheme) {
+                            Playback2026LaunchBottomSheet(
+                                parent = viewGroup,
+                                onClick = {
+                                    eventHorizon.track(EndOfYearModalTappedEvent(currentYear = Playback2026.YEAR.value.toLong()))
+                                    showPlayback2026OrAccount(Playback2026.Source.Modal.name)
+                                },
+                                onExpand = {
+                                    eventHorizon.track(EndOfYearModalShownEvent(currentYear = Playback2026.YEAR.value.toLong()))
+                                    settings.playback2026SheetShown.set(true, updateModifiedAt = false)
+                                },
+                                onCollapse = {
+                                    eventHorizon.track(EndOfYearModalDismissedEvent(currentYear = Playback2026.YEAR.value.toLong()))
+                                },
+                            )
+                        }
+                    }
+                },
+            )
+        }
+    }
+
     private fun showEndOfYearModal() {
         viewModel.updateStoriesModalShowState(true)
         launch(Dispatchers.Main) {
@@ -1140,6 +1180,15 @@ class MainActivity :
             showStories(StoriesSource.fromString(source))
         } else {
             viewModel.waitingForSignInToShowStories = true
+            openOnboardingFlow(OnboardingFlow.LoggedOut)
+        }
+    }
+
+    override fun showPlayback2026OrAccount(source: String) {
+        if (viewModel.isSignedIn) {
+            Playback2026.start(this, Playback2026.Source.valueOf(source))
+        } else {
+            viewModel.waitingForSignInToShowPlayback2026 = true
             openOnboardingFlow(OnboardingFlow.LoggedOut)
         }
     }
@@ -1234,6 +1283,9 @@ class MainActivity :
                 if (viewModel.waitingForSignInToShowStories) {
                     showStories(StoriesSource.USER_LOGIN)
                     viewModel.waitingForSignInToShowStories = false
+                } else if (viewModel.waitingForSignInToShowPlayback2026) {
+                    Playback2026.start(this@MainActivity, Playback2026.Source.UserLogin)
+                    viewModel.waitingForSignInToShowPlayback2026 = false
                 } else if (settings.getEndOfYearShowModal()) {
                     if (isWhatsNewShowing()) return@observe
                     showEndOfYearModal()
@@ -1355,6 +1407,7 @@ class MainActivity :
     override fun whatsNewDismissed(fromConfirmAction: Boolean) {
         if (fromConfirmAction) return
         if (settings.getEndOfYearShowModal()) showEndOfYearModal()
+        showPlayback2026SheetIfNeeded()
     }
 
     override fun getPlayerBottomSheetState(): Int {

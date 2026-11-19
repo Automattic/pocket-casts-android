@@ -1,18 +1,27 @@
 package au.com.shiftyjelly.pocketcasts.chat.ui
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarData
+import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.Surface
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -44,6 +53,10 @@ private fun ChatSnackbar(
     data: SnackbarData,
     theme: ChatTheme,
 ) {
+    if (data.isProgress) {
+        ChatProgressSnackbar(message = data.message, theme = theme)
+        return
+    }
     Snackbar(
         backgroundColor = Color.White,
         contentColor = theme.onWhiteText,
@@ -62,17 +75,77 @@ private fun ChatSnackbar(
             }
         },
         elevation = 0.dp,
-        modifier = if (data.actionLabel != null) Modifier.heightIn(min = 56.dp) else Modifier,
+        modifier = if (data.actionLabel != null) Modifier.heightIn(min = ToastMinHeight) else Modifier,
     ) {
-        Text(
-            text = data.message,
-            fontSize = 13.sp,
-            lineHeight = 18.sp,
-            letterSpacing = 0.sp,
-            fontWeight = FontWeight.SemiBold,
+        ToastText(text = data.message)
+    }
+}
+
+@Composable
+private fun ChatProgressSnackbar(
+    message: String,
+    theme: ChatTheme,
+) {
+    Surface(
+        shape = MaterialTheme.shapes.small,
+        color = Color.White,
+        contentColor = theme.onWhiteText,
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = ToastMinHeight)
+                .padding(horizontal = 16.dp),
+        ) {
+            ToastSpinner(color = theme.toastAction)
+            ToastText(text = message)
+        }
+    }
+}
+
+@Composable
+private fun ToastText(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        fontSize = 13.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.sp,
+        fontWeight = FontWeight.SemiBold,
+        modifier = modifier,
+    )
+}
+
+private val ToastMinHeight = 56.dp
+
+private val SnackbarData.isProgress get() = actionLabel == null && duration == SnackbarDuration.Indefinite
+
+@Composable
+private fun ToastSpinner(
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    if (rememberIsReduceMotionEnabled()) {
+        CircularProgressIndicator(
+            progress = REDUCED_MOTION_SPINNER_PROGRESS,
+            color = color,
+            strokeWidth = 2.dp,
+            modifier = modifier.size(16.dp),
+        )
+    } else {
+        CircularProgressIndicator(
+            color = color,
+            strokeWidth = 2.dp,
+            modifier = modifier.size(16.dp),
         )
     }
 }
+
+private const val REDUCED_MOTION_SPINNER_PROGRESS = 0.75f
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

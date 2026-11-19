@@ -6,10 +6,10 @@ gem 'danger-dangermattic', '~> 1.4'
 gem 'fastlane', '~> 2.241'
 gem 'fastlane-plugin-firebase_app_distribution', '~> 1.0'
 
-gem 'fastlane-plugin-wpmreleasetoolkit', '~> 15.1'
+gem 'fastlane-plugin-wpmreleasetoolkit', '~> 15.3'
 # These lines are kept to help with testing Release Toolkit changes
 # gem 'fastlane-plugin-wpmreleasetoolkit', path: '../../release-toolkit'
 # gem 'fastlane-plugin-wpmreleasetoolkit', git: 'https://github.com/wordpress-mobile/release-toolkit', branch: ''
 
 # Used in scripts/themes/
-gem 'google-apis-sheets_v4', '~> 0.49'
+gem 'google-apis-sheets_v4', '~> 0.51'

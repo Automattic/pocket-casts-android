@@ -5,13 +5,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.discover.R
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
+import androidx.compose.runtime.remember
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
-import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.automattic.eventhorizon.DiscoverCategoriesPickerClosedEvent
 import com.automattic.eventhorizon.DiscoverCategoriesPickerPickEvent
@@ -29,31 +35,23 @@ class CategoriesBottomSheet : BaseDialogFragment() {
 
     private val region get() = requireArguments().getString(REGION_KEY, "")
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        return inflater.inflate(R.layout.fragment_categories_bottom_sheet, container, false)
+    override val includeNavigationBarPadding = false
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
+        AppTheme(theme.activeTheme) {
+            CategoriesBottomSheetPage(
+                categories = remember {
+                    categoriesManager.state.value
+                        .allCategories
+                        .sortedBy { it.name.tryToLocalise(resources) }
+                },
+                contentPadding = WindowInsets.systemBars.union(WindowInsets.displayCutout).only(WindowInsetsSides.Bottom).asPaddingValues(),
+                onCategoryClick = ::onCategoryClick,
+            )
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val recyclerView = view.findViewById<RecyclerView>(R.id.categoriesRecyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(view.context)
-
-        val adapter = CategoriesBottomSheetAdapter { category ->
-            trackCategorySelected(category)
-            categoriesManager.selectCategory(category.id)
-            dismiss()
-        }
-        recyclerView.adapter = adapter
-        recyclerView.setSystemWindowInsetToPadding(bottom = true)
-
-        val sortedCategories = categoriesManager.state.value
-            .allCategories
-            .sortedBy { it.name.tryToLocalise(resources) }
-        adapter.submitList(sortedCategories)
-
         val behavior = BottomSheetBehavior.from(view.parent as View)
         val windowHeight = resources.displayMetrics.heightPixels
         val halfHeight = windowHeight / 2
@@ -62,6 +60,12 @@ class CategoriesBottomSheet : BaseDialogFragment() {
 
         categoriesManager.setAllCategoriesShown(true)
         trackShown()
+    }
+
+    private fun onCategoryClick(category: DiscoverCategory) {
+        trackCategorySelected(category)
+        categoriesManager.selectCategory(category.id)
+        dismiss()
     }
 
     override fun onDismiss(dialog: DialogInterface) {

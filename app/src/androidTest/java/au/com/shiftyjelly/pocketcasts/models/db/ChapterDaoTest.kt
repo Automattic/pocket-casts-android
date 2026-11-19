@@ -318,6 +318,66 @@ class ChapterDaoTest {
     }
 
     @Test
+    fun doNotReplaceShowNotesChaptersWithGeneratedChapters() = runBlocking {
+        val showNotesChapters = chapters(count = 3, origin = ChapterOrigin.ShowNotes, titleSuffix = "0")
+        chapterDao.replaceAllChapters("episode-id", showNotesChapters)
+
+        val generatedChapters = chapters(count = 6, origin = ChapterOrigin.Generated, titleSuffix = "1")
+        chapterDao.replaceAllChapters("episode-id", generatedChapters)
+
+        val result = chapterDao.findAll()
+        assertEquals(showNotesChapters, result)
+    }
+
+    @Test
+    fun doNotReplacePodcastIndexChaptersWithGeneratedChapters() = runBlocking {
+        val podcastIndexChapters = chapters(count = 3, origin = ChapterOrigin.PodcastIndex, titleSuffix = "0")
+        chapterDao.replaceAllChapters("episode-id", podcastIndexChapters)
+
+        val generatedChapters = chapters(count = 6, origin = ChapterOrigin.Generated, titleSuffix = "1")
+        chapterDao.replaceAllChapters("episode-id", generatedChapters)
+
+        val result = chapterDao.findAll()
+        assertEquals(podcastIndexChapters, result)
+    }
+
+    @Test
+    fun replaceGeneratedChaptersWithGeneratedChapters() = runBlocking {
+        val generatedChapters1 = chapters(count = 6, origin = ChapterOrigin.Generated, titleSuffix = "0")
+        chapterDao.replaceAllChapters("episode-id", generatedChapters1)
+
+        val generatedChapters2 = chapters(count = 3, origin = ChapterOrigin.Generated, titleSuffix = "1")
+        chapterDao.replaceAllChapters("episode-id", generatedChapters2)
+
+        val result = chapterDao.findAll()
+        assertEquals(generatedChapters2, result)
+    }
+
+    @Test
+    fun replaceGeneratedChaptersWithShowNotesChapters() = runBlocking {
+        val generatedChapters = chapters(count = 6, origin = ChapterOrigin.Generated, titleSuffix = "0")
+        chapterDao.replaceAllChapters("episode-id", generatedChapters)
+
+        val showNotesChapters = chapters(count = 3, origin = ChapterOrigin.ShowNotes, titleSuffix = "1")
+        chapterDao.replaceAllChapters("episode-id", showNotesChapters)
+
+        val result = chapterDao.findAll()
+        assertEquals(showNotesChapters, result)
+    }
+
+    @Test
+    fun replaceGeneratedChaptersWithEmbeddedChapters() = runBlocking {
+        val generatedChapters = chapters(count = 6, origin = ChapterOrigin.Generated, titleSuffix = "0")
+        chapterDao.replaceAllChapters("episode-id", generatedChapters)
+
+        val embeddedChapters = chapters(count = 3, origin = ChapterOrigin.NativeMedia, titleSuffix = "1")
+        chapterDao.replaceAllChapters("episode-id", embeddedChapters)
+
+        val result = chapterDao.findAll()
+        assertEquals(embeddedChapters, result)
+    }
+
+    @Test
     fun observeChaptersForEpisodeInAscendingOrder() = runBlocking {
         val id1 = "episode-id-1"
         val id2 = "episode-id-2"
@@ -351,5 +411,15 @@ class ChapterDaoTest {
             chapterDao.replaceAllChapters(id1, chaptersEpisode1 + chapterEpisode1)
             assertEquals(listOf(chapterEpisode1) + chaptersEpisode1, awaitItem())
         }
+    }
+
+    private fun chapters(count: Int, origin: ChapterOrigin, titleSuffix: String) = List(count) { index ->
+        Chapter(
+            index = index,
+            title = "$index-$titleSuffix",
+            episodeUuid = "episode-id",
+            startTimeMs = 0L + index,
+            origin = origin,
+        )
     }
 }

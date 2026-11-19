@@ -189,6 +189,7 @@ val forcedPurchaseSources = listOf(
     OnboardingUpgradeSource.BLOGS,
     OnboardingUpgradeSource.BOOKMARKS,
     OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
+    OnboardingUpgradeSource.GENERATED_CHAPTERS,
     OnboardingUpgradeSource.GENERATED_TRANSCRIPTS,
     OnboardingUpgradeSource.SKIP_CHAPTERS,
     OnboardingUpgradeSource.SUGGESTED_FOLDERS,

@@ -1,11 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-21 09:56:17+0000
+Translation-Revision-Date: 2026-11-10 14:54:39+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="chat_jumping_to_time">Springen naar %1$s…</string>
+    <string name="chat_jumped_to_time">Gesprongen naar %1$s</string>
+    <string name="playback_2026_sheet_button">Mijn Playback 2026 bekijken</string>
+    <string name="playback_2026_sheet_description">Waar je naar geluisterd hebt. Je favoriete podcasts. En wat jou als luisteraar onderscheidt. Je jaar in Pocket Casts staat klaar.</string>
+    <string name="playback_2026_banner_description">Ontdek je luisterstatistieken, welk soort luisteraar je bent en meer.</string>
+    <string name="playback_2026_banner_title">Playback 2026 is beschikbaar!</string>
+    <string name="chapters_generated_none_message">We konden geen hoofdstukken genereren voor deze.</string>
+    <string name="chapters_generated_none_title">Geen hoofdstukken voor deze aflevering</string>
+    <string name="chapters_generated_generating_note">Dit kan even duren voor langere afleveringen. Hoofdstukken verschijnen in de afspeelomgeving zodra ze klaar zijn.</string>
+    <string name="chapters_generated_generating">Hoofdstukken worden gegenereerd …</string>
+    <string name="chapters_generated_ai_note">Hoofdstukken worden gegenereerd met behulp van AI en zijn mogelijk niet helemaal nauwkeurig.</string>
+    <string name="chapters_generated_generate">Hoofdstukken genereren</string>
+    <string name="chapters_generated_none_yet_message">Genereer hoofdstukken en spring direct naar het deel dat je wilt.</string>
+    <string name="chapters_generated_none_yet_title">Nog geen hoofdstukken</string>
+    <string name="chat_playback_position">Afspeelpositie</string>
+    <string name="settings_generated_chapters_summary">Wanneer een aflevering geen eigen hoofdstukken heeft, worden deze automatisch door Pocket Casts voor je gegenereerd.</string>
+    <string name="podcasts_played_podcasts_hide">Verbergen</string>
+    <string name="podcasts_played_podcasts_description">Verbergt podcasts waar je volledig naar hebt geluisterd. Ze verschijnen opnieuw wanneer een nieuwe aflevering arriveert.</string>
+    <string name="chapters_generated_upsell_title">Hoofdstukken automatisch gegenereerd</string>
+    <string name="podcasts_played_podcasts_show">Tonen</string>
+    <string name="podcasts_menu_played_podcasts">Afgespeelde podcasts</string>
+    <string name="chapters_generated_upsell_button">Gegenereerde hoofdstukken downloaden</string>
+    <string name="chapters_generated_upsell_message">Met Pocket Casts Plus hoef je niet meer te zoeken. Ga direct naar het onderdeel waarvoor je bent gekomen.</string>
+    <string name="chapters_generated_turn_on">Inschakelen</string>
+    <string name="chapters_generated_off_message">Zet ze weer aan om direct naar het deel te springen waarvoor je bent gekomen.</string>
+    <string name="chapters_generated_off_title">Gegenereerde hoofdstukken staan uit</string>
+    <string name="chapters_generated_undo">Ongedaan maken</string>
+    <string name="chapters_generated_turned_off">Gegenereerde hoofdstukken uitgeschakeld</string>
+    <string name="chapters_generated_turn_off">Gegenereerde hoofdstukken uitschakelen</string>
+    <string name="chat_loading_still_working">We zijn er mee bezig…</string>
+    <string name="chat_loading_writing_answer">Je antwoord aan het schrijven</string>
+    <string name="chat_loading_finding_moments">De juiste momenten vinden</string>
+    <string name="chat_loading_reading_transcript">De transcriptie lezen</string>
+    <string name="automotive_nothing_playing_title">Kies een aflevering om af te spelen</string>
+    <string name="chat_quote_finding_moment">Het moment vinden…</string>
+    <string name="chat_quote_play_failed">Kan dit deel van de aflevering niet afspelen</string>
+    <string name="chat_history_empty_body">Vraag naar een aflevering en je chat wordt hier weergegeven.</string>
+    <string name="chat_history_empty_title">Nog geen chats</string>
     <string name="chat_about_episode">Chat over %1$s</string>
     <string name="chat_undo">Ongedaan maken</string>
     <string name="chat_history_older">Ouder</string>
@@ -15,12 +53,10 @@ Language: nl
     <string name="chat_history_previous_7_days">Afgelopen 7 dagen</string>
     <string name="chat_history">Chatgeschiedenis</string>
     <string name="chat_offline_note">Je bent offline. Maak verbinding om een vraag te stellen.</string>
-    <string name="chat_feedback_send_failed">Je feedback kon niet verzonden worden. Controleer de verbinding</string>
     <string name="chat_answering">Beantwoorden</string>
     <string name="chat_error_server_on_our_end">Er is iets fout gegaan aan onze kant.</string>
     <string name="chat_not_sent_tap_to_retry">Niet verzonden. Tik om het opnieuw te proberen.</string>
     <string name="chat_beta_sheet_sign_in">Log in om het te proberen</string>
-    <string name="chat_feedback_sending">Feedback wordt verstuurd</string>
     <string name="chat_feedback_what_went_wrong">Wat is er misgegaan</string>
     <string name="episode_chat_needs_transcript_message">Vraag over deze aflevering die een transcriptie nodig heeft. Deze aflevering heeft geen transcript.</string>
     <string name="onboarding_episode_chat_answer">Deze aflevering gaat over AI, gezondheid en productiviteit.</string>
@@ -213,8 +249,7 @@ Language: nl
     <string name="settings_audio_only_summary">Indien ingeschakeld, worden afleveringen met video alleen als audio afgespeeld, waardoor gegevens worden opgeslagen.</string>
     <string name="settings_audio_only">Alleen audio</string>
     <string name="profile_try_duration_for_free">Probeer %1$s gratis</string>
-    <string name="settings_generated_chapters_summary">Automatisch gegenereerde hoofdstukken weergeven indien beschikbaar.</string>
-    <string name="settings_generated_chapters">Gegenereerde hoofdstukken</string>
+    <string name="settings_generated_chapters">Hoofdstukken automatisch genereren</string>
     <string name="profile_stats_listening_activity_info_summary">Een schatting van wanneer je hebt geluisterd, op basis van je afspeelgeschiedenis. Als je een aflevering over een paar dagen luistert, wordt deze op de laatste dag weergegeven.</string>
     <string name="profile_stats_listening_activity_info_title">Luisteractiviteit</string>
     <string name="profile_stats_listening_activity_info_help">Informatie</string>
@@ -256,7 +291,6 @@ Language: nl
     <string name="blogs_found_headline">Je blog hardop lezen</string>
     <string name="blogs_found_followed_badge">PODCAST GEVOLGD</string>
     <string name="blogs_found_feed_detected">Feed gevonden</string>
-    <string name="chapters_generated_disclaimer">Deze hoofdstukken worden automatisch gegenereerd en zijn mogelijk niet perfect nauwkeurig.</string>
     <string name="chat_play_quote">Citaat afspelen</string>
     <string name="chat_clear">Chat wissen</string>
     <string name="chat_send">Verzenden</string>
@@ -2476,6 +2510,14 @@ Language: nl
     <plurals name="chapter">
         <item quantity="one">hoofdstuk</item>
         <item quantity="other">hoofdstukken</item>
+    </plurals>
+    <plurals name="chapters_generated_count">
+        <item quantity="one">%d Gegenereerd hoofdstuk</item>
+        <item quantity="other">%d Gegenereerde hoofdstukken</item>
+    </plurals>
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="one">%1$d Gegenereerd hoofdstuk • %2$d verborgen</item>
+        <item quantity="other">%1$d Gegenereerde hoofdstukken • %2$d verborgen</item>
     </plurals>
     <plurals name="day">
         <item quantity="one">dag</item>

@@ -34,7 +34,6 @@ dependencies {
     implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
     implementation(libs.lottie.compose)
-    implementation(libs.timber)
 
     implementation(projects.modules.services.images)
 }
