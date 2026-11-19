@@ -1,7 +1,7 @@
 8.26
 -----
 *   Bug Fixes
-    *   Fix other apps on the phone restarting every hour, which could make the phone slow and show "App isn't responding" dialogs
+    *   Stop Pocket Casts from waking other apps on the phone every hour, which could slow down phones that are low on memory
         ([#6425](https://github.com/Automattic/pocket-casts-android/pull/6425))
 
 8.25
