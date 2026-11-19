@@ -54,6 +54,7 @@ check_values() {
 }
 read_vars
 check_values
+selected_expected=("${expected[@]}")
 export PROBE_SKIP=${!variables[0]} PROBE_SCENARIO=$scenario
 export CI_CHANGED_FILES_BASE=$base
 read_vars
@@ -74,6 +75,16 @@ export CI_CHANGED_FILES_BASE=missing-ci-probe-base
 read_vars
 check_values
 export CI_CHANGED_FILES_BASE=HEAD
+read_vars
+check_values
+unset CI_CHANGED_FILES_BASE
+
+# A direct push without a PR-merge subject runs fully unless an explicit base is supplied.
+git commit --amend -qm 'Fixture direct push'
+read_vars
+check_values
+export CI_CHANGED_FILES_BASE=$base
+expected=("${selected_expected[@]}")
 read_vars
 check_values
 unset CI_CHANGED_FILES_BASE
