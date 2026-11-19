@@ -1,11 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-21 09:58:42+0000
+Translation-Revision-Date: 2026-11-10 14:58:59+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="chat_jumping_to_time">Saltando a las %1$s…</string>
+    <string name="chat_jumped_to_time">Ha saltado a las %1$s</string>
+    <string name="playback_2026_sheet_button">Ver mi reproducción de 2026</string>
+    <string name="playback_2026_sheet_description">Lo que has escuchado. Los pódcasts que te han encantado. Y lo que te distingue como oyente. Tu año en Pocket Casts ya está aquí.</string>
+    <string name="playback_2026_banner_description">Descubre tus estadísticas de escucha, qué tipo de oyente eres y mucho más.</string>
+    <string name="playback_2026_banner_title">¡Playback ya está aquí!</string>
+    <string name="chapters_generated_none_message">No hemos podido generar capítulos para este episodio.</string>
+    <string name="chapters_generated_none_title">No hay capítulos para este episodio</string>
+    <string name="chapters_generated_generating_note">Esto puede tardar un minuto en los episodios más largos. Los capítulos aparecerán en el reproductor cuando estén listos.</string>
+    <string name="chapters_generated_generating">Generando capítulos…</string>
+    <string name="chapters_generated_ai_note">Los capítulos se generan mediante IA y es posible que no sean del todo precisos.</string>
+    <string name="chapters_generated_generate">Generar capítulos</string>
+    <string name="chapters_generated_none_yet_message">Genera capítulos y ve directamente a la parte que quieras.</string>
+    <string name="chapters_generated_none_yet_title">Aún no hay capítulos</string>
+    <string name="chat_playback_position">Posición de reproducción</string>
+    <string name="settings_generated_chapters_summary">Cuando un episodio no tiene capítulos propios, Pocket Casts los generará automáticamente por ti.</string>
+    <string name="podcasts_played_podcasts_show">Mostrar</string>
+    <string name="podcasts_played_podcasts_hide">Ocultar</string>
+    <string name="chapters_generated_upsell_button">Obtener capítulos generados</string>
+    <string name="podcasts_played_podcasts_description">Oculta los pódcasts que has escuchado por completo. Volverán a aparecer cuando haya un episodio nuevo.</string>
+    <string name="podcasts_menu_played_podcasts">Pódcasts reproducidos</string>
+    <string name="chapters_generated_upsell_message">Con Pocket Casts Plus, olvídate de avanzar manualmente por el audio. Ve directamente a la parte que te interesa.</string>
+    <string name="chapters_generated_upsell_title">Capítulos generados automáticamente</string>
+    <string name="chapters_generated_turn_on">Activar</string>
+    <string name="chapters_generated_off_message">Vuelve a activarlos para ir directamente a la parte que te interesa.</string>
+    <string name="chapters_generated_off_title">Los capítulos generados están desactivados</string>
+    <string name="chapters_generated_undo">Deshacer</string>
+    <string name="chapters_generated_turned_off">Se han desactivado los capítulos generados</string>
+    <string name="chapters_generated_turn_off">Desactivar los capítulos generados</string>
+    <string name="chat_loading_still_working">Aún estamos trabajando en ello…</string>
+    <string name="chat_loading_writing_answer">Redactando tu respuesta</string>
+    <string name="chat_loading_finding_moments">Buscando los momentos adecuados</string>
+    <string name="chat_loading_reading_transcript">Leyendo la transcripción</string>
+    <string name="automotive_nothing_playing_title">Elige un episodio para reproducirlo</string>
+    <string name="chat_quote_finding_moment">Encontrando el momento…</string>
+    <string name="chat_quote_play_failed">No se ha podido reproducir esta parte del episodio</string>
+    <string name="chat_history_empty_body">Pregunta por un episodio y tu chat aparecerá aquí.</string>
+    <string name="chat_history_empty_title">Aún no hay chats</string>
     <string name="chat_about_episode">Chatear sobre %1$s</string>
     <string name="chat_undo">Deshacer</string>
     <string name="chat_history_previous_7_days">Anteriores 7 días</string>
@@ -18,8 +56,6 @@ Language: es
     <string name="chat_answering">Respondiendo</string>
     <string name="chat_error_server_on_our_end">Se ha producido un error por nuestra parte.</string>
     <string name="chat_not_sent_tap_to_retry">No se ha enviado. Toca para intentarlo de nuevo.</string>
-    <string name="chat_feedback_send_failed">No hemos podido enviar tus comentarios. Comprueba tu conexión.</string>
-    <string name="chat_feedback_sending">Enviando comentarios</string>
     <string name="chat_feedback_what_went_wrong">Qué ha salido mal</string>
     <string name="chat_beta_sheet_sign_in">Accede para probarlo</string>
     <string name="episode_chat_needs_transcript_message">La función Preguntar sobre este episodio requiere una transcripción. Este episodio no tiene.</string>
@@ -213,8 +249,7 @@ Language: es
     <string name="settings_audio_only_summary">Si está activado, los episodios con vídeo se reproducirán como solo audio y se guardarán los datos.</string>
     <string name="settings_audio_only">Solo audio</string>
     <string name="profile_try_duration_for_free">Prueba %1$s gratis</string>
-    <string name="settings_generated_chapters_summary">Muestra los capítulos generados automáticamente cuando estén disponibles.</string>
-    <string name="settings_generated_chapters">Capítulos generados</string>
+    <string name="settings_generated_chapters">Generar capítulos automáticamente</string>
     <string name="profile_stats_listening_activity_info_summary">Una estimación de cuándo has estado escuchando, basada en tu historial de reproducción. Si terminas un episodio a lo largo de varios días, se mostrará el último día.</string>
     <string name="profile_stats_listening_activity_info_title">Actividad de escucha</string>
     <string name="profile_stats_listening_activity_info_help">Información</string>
@@ -256,7 +291,6 @@ Language: es
     <string name="blogs_found_headline">Leyendo tu blog en voz alta</string>
     <string name="blogs_found_followed_badge">PÓDCAST SEGUIDO</string>
     <string name="blogs_found_feed_detected">Feed encontrado</string>
-    <string name="chapters_generated_disclaimer">Estos capítulos se generan automáticamente y puede que no sean del todo precisos.</string>
     <string name="chat_play_quote">Reproducir cita</string>
     <string name="chat_clear">Borrar chat</string>
     <string name="chat_send">Enviar</string>
@@ -2477,6 +2511,14 @@ Language: es
     <plurals name="chapter">
         <item quantity="one">capítulo</item>
         <item quantity="other">capítulos</item>
+    </plurals>
+    <plurals name="chapters_generated_count">
+        <item quantity="one">%d capítulo generado</item>
+        <item quantity="other">%d capítulos generados</item>
+    </plurals>
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="one">%1$d capítulo generado • %2$d ocultos</item>
+        <item quantity="other">%1$d capítulos generados • %2$d ocultos</item>
     </plurals>
     <plurals name="day">
         <item quantity="one">día</item>

@@ -16,7 +16,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.GeneratedChaptersAvailability
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.GeneratedChaptersResult
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.eventhorizon.ChapterLinkClickedEvent
 import com.automattic.eventhorizon.ChaptersShownEvent
 import com.automattic.eventhorizon.ChaptersShownSource
@@ -25,14 +29,18 @@ import com.automattic.eventhorizon.DeselectChaptersChapterSelectedEvent
 import com.automattic.eventhorizon.DeselectChaptersToggledOffEvent
 import com.automattic.eventhorizon.DeselectChaptersToggledOnEvent
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.GeneratedChaptersPromptShownEvent
+import com.automattic.eventhorizon.GeneratedChaptersPromptType
+import com.automattic.eventhorizon.GeneratedChaptersToggleSourceType
 import com.automattic.eventhorizon.PlayerChapterSelectedEvent
+import com.automattic.eventhorizon.SettingsGeneralGeneratedChaptersToggledEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,6 +60,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 @HiltViewModel(assistedFactory = ChaptersViewModel.Factory::class)
 class ChaptersViewModel @AssistedInject constructor(
@@ -63,23 +72,53 @@ class ChaptersViewModel @AssistedInject constructor(
     private val eventHorizon: EventHorizon,
     private val generatedChapterSeeker: GeneratedChapterSeeker,
     private val transcriptManager: TranscriptManager,
+    private val generatedChaptersAvailability: GeneratedChaptersAvailability,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val isTogglingChapters = MutableStateFlow(false)
 
+    private val generatedChaptersLoad = MutableStateFlow<GeneratedChaptersLoad?>(null)
+
     init {
         viewModelScope.launch(ioDispatcher) {
-            mode.episodeIdFlow()
-                .filter { it.isNotEmpty() }
-                .collectLatest { episodeId ->
-                    var retryDelay = 5.seconds
-                    while (!transcriptManager.loadGeneratedChapters(episodeId) && retryDelay <= 2.minutes) {
-                        delay(retryDelay)
-                        retryDelay *= 2
-                    }
-                }
+            combine(
+                mode.hasGeneratedTranscriptFlow(),
+                generatedChaptersAvailability.isAllowedFlow,
+            ) { (episodeId, hasGeneratedTranscript), isEnabled ->
+                GeneratedChaptersLoad(episodeId, isEnabled, hasGeneratedTranscript)
+            }.collectLatest(::loadGeneratedChapters)
         }
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun Mode.hasGeneratedTranscriptFlow() = episodeIdFlow()
+        .filter { it.isNotEmpty() }
+        .flatMapLatest { episodeId ->
+            episodeManager.findEpisodeByUuidFlow(episodeId)
+                .map { episode -> episodeId to ((episode as? PodcastEpisode)?.hasGeneratedTranscript == true) }
+                .distinctUntilChanged()
+        }
+
+    private suspend fun loadGeneratedChapters(load: GeneratedChaptersLoad) {
+        generatedChaptersLoad.value = load
+        if (!load.isEnabled) return
+        var result = transcriptManager.loadGeneratedChapters(load.episodeId)
+        for ((retry, retryDelay) in RETRY_DELAYS.withIndex()) {
+            if (result != GeneratedChaptersResult.Failed) break
+            if (retry == QUIET_RETRIES_START) {
+                generatedChaptersLoad.value = load.copy(isFinished = true)
+            }
+            delay(retryDelay)
+            result = transcriptManager.loadGeneratedChapters(load.episodeId)
+        }
+        if (result != GeneratedChaptersResult.Loaded || !awaitSavedChapters(load.episodeId)) {
+            generatedChaptersLoad.value = load.copy(isFinished = true)
+        }
+    }
+
+    private suspend fun awaitSavedChapters(episodeId: String) = withTimeoutOrNull(SAVED_CHAPTERS_TIMEOUT) {
+        chapterManager.observerChaptersForEpisode(episodeId).first { it.isNotEmpty() }
+    } != null
 
     val uiState = mode.uiStateFlow().stateIn(viewModelScope, SharingStarted.Lazily, UiState())
 
@@ -106,10 +145,21 @@ class ChaptersViewModel @AssistedInject constructor(
         playbackManager.playbackStateFlow,
         episodeManager.findEpisodeByUuidFlow(episodeId),
         chapterManager.observerChaptersForEpisode(episodeId),
-        settings.cachedSubscription.flow,
+        combine(settings.cachedSubscription.flow, generatedChaptersStatusFlow(episodeId), ::Pair),
         isTogglingChapters,
         ::createUiState,
     )
+
+    private fun generatedChaptersStatusFlow(episodeId: String) = combine(
+        settings.showGeneratedChapters.flow,
+        generatedChaptersLoad,
+    ) { isEnabled, load ->
+        when {
+            !isEnabled -> GeneratedChaptersStatus.NotEnabled
+            load?.episodeId == episodeId && load.isEnabled && load.isFinished -> GeneratedChaptersStatus.Loaded
+            else -> GeneratedChaptersStatus.Loading
+        }
+    }
 
     private var playChapterJob: Job? = null
 
@@ -158,6 +208,27 @@ class ChaptersViewModel @AssistedInject constructor(
         }
     }
 
+    fun turnOffGeneratedChapters() {
+        setShowGeneratedChapters(false, GeneratedChaptersToggleSourceType.ChaptersMenu)
+    }
+
+    fun turnOnGeneratedChapters() {
+        setShowGeneratedChapters(true, GeneratedChaptersToggleSourceType.ChaptersOffState)
+    }
+
+    fun undoTurnOffGeneratedChapters() {
+        setShowGeneratedChapters(true, GeneratedChaptersToggleSourceType.Undo)
+    }
+
+    fun generateChapters() {
+        setShowGeneratedChapters(true, GeneratedChaptersToggleSourceType.ChaptersGenerateButton)
+    }
+
+    private fun setShowGeneratedChapters(show: Boolean, source: GeneratedChaptersToggleSourceType) {
+        eventHorizon.track(SettingsGeneralGeneratedChaptersToggledEvent(enabled = show, source = source))
+        settings.showGeneratedChapters.set(show, updateModifiedAt = true)
+    }
+
     fun selectChapter(select: Boolean, chapter: Chapter) {
         viewModelScope.launch(ioDispatcher) {
             val episodeId = when (mode) {
@@ -178,6 +249,8 @@ class ChaptersViewModel @AssistedInject constructor(
         viewModelScope.launch { _scrollToChapter.emit(chapter) }
     }
 
+    private val trackedPrompts = ConcurrentHashMap.newKeySet<Pair<String, GeneratedChaptersPromptType>>()
+
     fun trackChaptersShown(source: ChaptersShownSource) {
         viewModelScope.launch(ioDispatcher) {
             val episodeId = when (mode) {
@@ -187,7 +260,20 @@ class ChaptersViewModel @AssistedInject constructor(
 
             val episode = episodeManager.findEpisodeByUuid(episodeId) ?: return@launch
             val chapters = chapterManager.observerChaptersForEpisode(episodeId).first()
-            if (chapters.isEmpty()) return@launch
+            if (chapters.isEmpty()) {
+                val prompt = createUiStateFlow(episodeId).first().generatedChaptersPrompt
+                if (prompt != null && trackedPrompts.add(episodeId to prompt)) {
+                    eventHorizon.track(
+                        GeneratedChaptersPromptShownEvent(
+                            episodeUuid = episodeId,
+                            podcastUuid = episode.podcastOrSubstituteUuid,
+                            prompt = prompt,
+                            source = source,
+                        ),
+                    )
+                }
+                return@launch
+            }
             eventHorizon.track(
                 ChaptersShownEvent(
                     episodeUuid = episodeId,
@@ -223,16 +309,25 @@ class ChaptersViewModel @AssistedInject constructor(
         playbackState: PlaybackState,
         episode: BaseEpisode,
         chapters: Chapters,
-        subscription: Subscription?,
+        subscriptionAndStatus: Pair<Subscription?, GeneratedChaptersStatus>,
         isToggling: Boolean,
-    ) = UiState(
-        podcast = playbackState.podcast,
-        allChapters = chapters.toChapterStates(playbackPosition(playbackState, episode)),
-        hasGeneratedChapters = chapters.hasGeneratedChapters,
-        isTogglingChapters = isToggling,
-        canSkipChapters = subscription != null,
-        showHeader = episode is PodcastEpisode,
-    )
+    ): UiState {
+        val (subscription, generatedChaptersStatus) = subscriptionAndStatus
+        val isGeneratedChaptersEpisode = episode is PodcastEpisode && FeatureFlag.isEnabled(Feature.GENERATED_CHAPTERS)
+        return UiState(
+            episodeUuid = episode.uuid,
+            podcast = playbackState.podcast,
+            allChapters = chapters.toChapterStates(playbackPosition(playbackState, episode)),
+            hasGeneratedChapters = chapters.hasGeneratedChapters,
+            isTogglingChapters = isToggling,
+            canSkipChapters = subscription != null,
+            showHeader = episode is PodcastEpisode,
+            isGeneratedChaptersOff = chapters.hasHiddenGeneratedChapters,
+            showUpsell = subscription == null && chapters.isEmpty() && isGeneratedChaptersEpisode,
+            canGenerateChapters = subscription != null && isGeneratedChaptersEpisode,
+            generatedChaptersStatus = generatedChaptersStatus,
+        )
+    }
 
     private fun playbackPosition(playbackState: PlaybackState, episode: BaseEpisode) = when (mode) {
         is Mode.Episode -> if (playbackState.episodeUuid == mode.episodeId) {
@@ -283,18 +378,63 @@ class ChaptersViewModel @AssistedInject constructor(
     }
 
     data class UiState(
+        val episodeUuid: String? = null,
         val podcast: Podcast? = null,
         private val allChapters: List<ChapterState> = emptyList(),
         val hasGeneratedChapters: Boolean = false,
         val isTogglingChapters: Boolean = false,
         val canSkipChapters: Boolean = false,
         val showHeader: Boolean = false,
+        val isGeneratedChaptersOff: Boolean = false,
+        val showUpsell: Boolean = false,
+        val canGenerateChapters: Boolean = false,
+        val generatedChaptersStatus: GeneratedChaptersStatus = GeneratedChaptersStatus.NotEnabled,
     ) {
         val chaptersCount = allChapters.size
+        val generatedChaptersPrompt get() = when {
+            showUpsell -> GeneratedChaptersPromptType.PlusUpsell
+            emptyState == EmptyState.NoChaptersYet -> GeneratedChaptersPromptType.NoChaptersYet
+            emptyState == EmptyState.GeneratedChaptersOff -> GeneratedChaptersPromptType.GeneratedChaptersOff
+            else -> null
+        }
+        val emptyState get() = when {
+            chaptersCount > 0 -> null
+
+            isGeneratedChaptersOff -> EmptyState.GeneratedChaptersOff
+
+            !canGenerateChapters -> null
+
+            else -> when (generatedChaptersStatus) {
+                GeneratedChaptersStatus.NotEnabled -> EmptyState.NoChaptersYet
+                GeneratedChaptersStatus.Loading -> EmptyState.GeneratingChapters
+                GeneratedChaptersStatus.Loaded -> EmptyState.NoGeneratedChapters
+            }
+        }
+        val showChaptersTab get() = chaptersCount > 0 || emptyState != null || showUpsell
         val deselectedChaptersCount get() = allChapters.count { !it.chapter.selected }
         val chapters get() = if (isTogglingChapters) allChapters else allChapters.filter { it.chapter.selected }
         val showSubscriptionIcon get() = !isTogglingChapters && !canSkipChapters
     }
+
+    enum class GeneratedChaptersStatus {
+        NotEnabled,
+        Loading,
+        Loaded,
+    }
+
+    enum class EmptyState {
+        GeneratedChaptersOff,
+        NoChaptersYet,
+        GeneratingChapters,
+        NoGeneratedChapters,
+    }
+
+    private data class GeneratedChaptersLoad(
+        val episodeId: String,
+        val isEnabled: Boolean,
+        val hasGeneratedTranscript: Boolean,
+        val isFinished: Boolean = false,
+    )
 
     sealed interface ChapterState {
         val chapter: Chapter
@@ -312,5 +452,11 @@ class ChaptersViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(mode: Mode): ChaptersViewModel
+    }
+
+    private companion object {
+        val SAVED_CHAPTERS_TIMEOUT = 1.seconds
+        val RETRY_DELAYS = listOf(5.seconds, 10.seconds, 15.seconds, 40.seconds, 80.seconds)
+        const val QUIET_RETRIES_START = 3
     }
 }

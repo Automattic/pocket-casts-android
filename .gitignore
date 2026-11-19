@@ -74,3 +74,6 @@ developer.properties
 
 # Local scratch / working notes (not tracked)
 scratch/
+
+# Local secrets for device testing
+.env

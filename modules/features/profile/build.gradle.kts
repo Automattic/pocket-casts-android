@@ -13,6 +13,11 @@ android {
         viewBinding = true
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -53,12 +58,12 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
-    implementation(libs.coroutines.rx2)
+    implementation(libs.coroutines.reactive)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.config)
     implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.media3.datasource)
     implementation(libs.media3.extractor)
@@ -77,10 +82,14 @@ dependencies {
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)
 
+    debugImplementation(libs.compose.ui.test.manifest)
+
+    testImplementation(libs.compose.ui.test.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.robolectric)
     testImplementation(libs.turbine)
 
     testImplementation(projects.modules.services.sharedtest)

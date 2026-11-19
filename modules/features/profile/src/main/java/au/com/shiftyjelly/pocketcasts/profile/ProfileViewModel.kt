@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.endofyear.playback2026.Playback2026
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -133,6 +134,17 @@ class ProfileViewModel @Inject constructor(
         initialValue = false,
     )
 
+    internal val isPlayback2026Available = flow {
+        while (true) {
+            emit(endOfYearManager.isEligibleForEndOfYear(Playback2026.YEAR))
+            delay(10_000)
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = false,
+    )
+
     internal val isFreeAccountBannerVisible = combine(
         signInState.map { it.isSignedIn },
         settings.isFreeAccountProfileBannerDismissed.flow,
@@ -183,6 +195,14 @@ class ProfileViewModel @Inject constructor(
                 currentYear = EndOfYearManager.YEAR_TO_SYNC.value.toLong(),
             ),
         )
+    }
+
+    internal fun onPlayback2026BannerShown() {
+        eventHorizon.track(EndOfYearProfileCardShownEvent(currentYear = Playback2026.YEAR.value.toLong()))
+    }
+
+    internal fun onPlayback2026BannerClick() {
+        eventHorizon.track(EndOfYearProfileCardTappedEvent(currentYear = Playback2026.YEAR.value.toLong()))
     }
 
     internal fun onPlaybackClick() {

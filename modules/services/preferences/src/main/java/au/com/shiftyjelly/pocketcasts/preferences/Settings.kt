@@ -412,6 +412,7 @@ interface Settings {
 
     val podcastBadgeType: UserSetting<BadgeType>
     val podcastGridLayout: UserSetting<PodcastGridLayoutType>
+    val hidePlayedPodcasts: UserSetting<Boolean>
 
     fun getNotificationLastSeen(): Date?
     fun setNotificationLastSeen(lastSeen: Date?)
@@ -620,6 +621,11 @@ interface Settings {
     val showReferralWelcome: UserSetting<Boolean>
 
     val lastEoySyncTimestamp: UserSetting<Instant>
+
+    val lastEoySyncYear: UserSetting<Int>
+
+    /** Whether the Playback 2026 announcement sheet has been shown. It is shown once. */
+    val playback2026SheetShown: UserSetting<Boolean>
 
     val useRealTimeForPlaybackRemaingTime: UserSetting<Boolean>
 

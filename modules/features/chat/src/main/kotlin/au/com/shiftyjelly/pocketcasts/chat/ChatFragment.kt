@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.repositories.chat.ChatAnswerRating
+import au.com.shiftyjelly.pocketcasts.repositories.chat.formatChatTimestamp
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
@@ -153,8 +154,11 @@ class ChatFragment : BaseDialogFragment() {
             viewModel.toasts.collectLatest { toast ->
                 try {
                     snackbarHostState.currentSnackbarData?.dismiss()
+                    if (toast == ChatToast.QuoteJumpCancelled) return@collectLatest
                     shownToast = toast
-                    val result = if (toast.isUndoable) {
+                    val result = if (toast is ChatToast.QuoteJumping) {
+                        snackbarHostState.showSnackbar(message = toast.message(resources), duration = SnackbarDuration.Indefinite)
+                    } else if (toast.isUndoable) {
                         coroutineScope {
                             val expiry = launch {
                                 delay(undoToastTimeoutMs)
@@ -175,7 +179,7 @@ class ChatFragment : BaseDialogFragment() {
                             ChatToast.ChatCleared -> viewModel.undoClearChat()
                             ChatToast.ChatDeleted -> viewModel.undoDeleteChat()
                             is ChatToast.QuotePlaying -> viewModel.undoQuotePlay()
-                            ChatToast.FeedbackThanks, ChatToast.QuotePlayFailed -> Unit
+                            ChatToast.FeedbackThanks, ChatToast.QuotePlayFailed, is ChatToast.QuoteJumping, ChatToast.QuoteJumpCancelled -> Unit
                         }
                     }
                 } finally {
@@ -208,11 +212,14 @@ class ChatFragment : BaseDialogFragment() {
                     onOpenHistoryChat = viewModel::openHistoryChat,
                     onDeleteHistoryChat = viewModel::deleteHistoryChat,
                     onClickPlayPause = viewModel::onPlayPauseClick,
+                    onSeek = viewModel::onSeek,
                     onInputTextChange = viewModel::onInputTextChange,
                     onSend = viewModel::onSend,
+                    onStopAnswer = viewModel::onStopAnswer,
                     onClickSuggestion = viewModel::onSuggestionClick,
                     onRetry = viewModel::retry,
                     onPlayQuote = viewModel::playQuote,
+                    onPlayAnswerTimestamp = viewModel::playAnswerTimestamp,
                     onRateAnswer = ::rateAnswer,
                     snackbarHostState = snackbarHostState,
                     onDismissBetaSheet = viewModel::dismissBetaSheet,
@@ -234,6 +241,7 @@ class ChatFragment : BaseDialogFragment() {
             podcastColors = viewModel.uiState.value.podcastColors,
             trigger = ChatFeedbackFragment.Trigger.ResponseRating,
             messageIndex = viewModel.answerMessageIndex(answerUuid),
+            answerUuid = answerUuid,
         )
     }
 
@@ -308,14 +316,25 @@ class ChatFragment : BaseDialogFragment() {
             else -> playingPodcast?.let(::PodcastColors) ?: args.podcastColors
         }
 
-    private val ChatToast.isUndoable get() = this != ChatToast.FeedbackThanks && this != ChatToast.QuotePlayFailed
+    private val ChatToast.isUndoable get() = this is ChatToast.ChatCleared || this is ChatToast.ChatDeleted || this is ChatToast.QuotePlaying
 
     private fun ChatToast.message(resources: Resources) = when (this) {
         ChatToast.FeedbackThanks -> resources.getString(LR.string.chat_feedback_thank_you)
+
         ChatToast.ChatCleared -> resources.getString(LR.string.chat_cleared)
+
         ChatToast.ChatDeleted -> resources.getString(LR.string.chat_deleted)
-        is ChatToast.QuotePlaying -> resources.getString(LR.string.chat_now_playing_episode, episodeTitle)
+
+        is ChatToast.QuotePlaying ->
+            jumpedToMs
+                ?.let { resources.getString(LR.string.chat_jumped_to_time, formatChatTimestamp(it)) }
+                ?: resources.getString(LR.string.chat_now_playing_episode, episodeTitle)
+
         ChatToast.QuotePlayFailed -> resources.getString(LR.string.chat_quote_play_failed)
+
+        is ChatToast.QuoteJumping -> resources.getString(LR.string.chat_jumping_to_time, formatChatTimestamp(startMs))
+
+        ChatToast.QuoteJumpCancelled -> ""
     }
 
     @Parcelize

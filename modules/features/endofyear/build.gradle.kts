@@ -19,10 +19,8 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
 
-    api(libs.automattic.crashlogging)
     api(libs.dagger.hilt.android)
 
-    api(projects.modules.services.analytics)
     api(projects.modules.services.coroutines)
     api(projects.modules.services.model)
     api(projects.modules.services.preferences)
@@ -39,15 +37,16 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.capturable)
     implementation(libs.compose.activity)
-    implementation(libs.compose.constraintlayout)
     implementation(libs.compose.material)
     implementation(libs.compose.material.icons.core)
+    implementation(libs.compose.material3.adaptive)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
     implementation(libs.timber)
     implementation(libs.lottie.compose)
     implementation(libs.media3.ui.compose)
+    implementation(libs.pocketcasts.playback)
 
     implementation(projects.modules.features.account)
     implementation(projects.modules.features.settings)

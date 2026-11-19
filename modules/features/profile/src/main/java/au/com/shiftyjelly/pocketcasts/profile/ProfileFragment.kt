@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
+import au.com.shiftyjelly.pocketcasts.endofyear.playback2026.Playback2026
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.profile.blogs.BlogsFragment
@@ -65,6 +66,7 @@ class ProfileFragment :
             isWhatsNewVisible = FeatureFlag.isEnabled(Feature.WHATS_NEW_FEED),
             hasWhatsNewDot = hasWhatsNewDot,
             isPlaybackEnabled = profileViewModel.isPlaybackAvailable.collectAsState().value,
+            isPlayback2026BannerVisible = profileViewModel.isPlayback2026Available.collectAsState().value,
             isFreeAccountBannerVisible = profileViewModel.isFreeAccountBannerVisible.collectAsState().value,
             isUpgradeBannerVisible = profileViewModel.showUpgradeBanner.collectAsState(false).value,
             miniPlayerPadding = profileViewModel.miniPlayerInset.collectAsState().value.pxToDp(requireContext()).dp,
@@ -125,6 +127,13 @@ class ProfileFragment :
             onPlaybackClick = {
                 profileViewModel.onPlaybackClick()
                 (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.key)
+            },
+            onPlayback2026Show = {
+                profileViewModel.onPlayback2026BannerShown()
+            },
+            onPlayback2026Click = {
+                profileViewModel.onPlayback2026BannerClick()
+                (activity as? FragmentHostListener)?.showPlayback2026OrAccount(Playback2026.Source.Profile.name)
             },
             onClaimReferralsClick = {
                 fragmentHostListener.showBottomSheet(ReferralsGuestPassFragment.newInstance(ReferralsPageType.Claim))

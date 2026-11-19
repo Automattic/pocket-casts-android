@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -114,7 +115,7 @@ fun UnavailableEpisodeRow(
 @Composable
 private fun UnavailableStatus(colors: EpisodeRowColors) {
     Row(
-        verticalAlignment = TruncatedCenterVertically,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.graphicsLayer { alpha = UNAVAILABLE_ALPHA },
     ) {
         FitCenterDrawableIcon(

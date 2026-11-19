@@ -1,13 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.player.view.chapters
 
 import android.os.Build
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,11 +16,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -34,10 +31,78 @@ fun ChaptersPage(
     onChapterClick: (Chapter) -> Unit,
     onUrlClick: (Chapter) -> Unit,
     onSkipChaptersClick: (Boolean) -> Unit,
+    onTurnOffGeneratedClick: () -> Unit,
+    emptyState: ChaptersViewModel.EmptyState?,
+    episodeUuid: String?,
+    onTurnOnGeneratedClick: () -> Unit,
+    onGenerateClick: () -> Unit,
     isTogglingChapters: Boolean,
     showSubscriptionIcon: Boolean,
     modifier: Modifier = Modifier,
     resolvingChapterIndex: Int? = null,
+) {
+    Crossfade(
+        targetState = emptyState,
+        label = "chaptersContent",
+    ) { state ->
+        when (state) {
+            ChaptersViewModel.EmptyState.GeneratedChaptersOff -> ChaptersOffState(
+                onTurnOnClick = onTurnOnGeneratedClick,
+                modifier = modifier,
+            )
+
+            ChaptersViewModel.EmptyState.NoChaptersYet -> ChaptersNoChaptersYet(
+                onGenerateClick = onGenerateClick,
+                modifier = modifier,
+            )
+
+            ChaptersViewModel.EmptyState.GeneratingChapters -> ChaptersGenerating(
+                episodeUuid = episodeUuid,
+                onTurnOffGeneratedClick = onTurnOffGeneratedClick,
+                modifier = modifier,
+            )
+
+            ChaptersViewModel.EmptyState.NoGeneratedChapters -> ChaptersNoGeneratedChapters(
+                modifier = modifier,
+            )
+
+            null -> ChaptersList(
+                lazyListState = lazyListState,
+                chapters = chapters,
+                showHeader = showHeader,
+                hasGeneratedChapters = hasGeneratedChapters,
+                totalChaptersCount = totalChaptersCount,
+                onSelectionChange = onSelectionChange,
+                onChapterClick = onChapterClick,
+                onUrlClick = onUrlClick,
+                onSkipChaptersClick = onSkipChaptersClick,
+                onTurnOffGeneratedClick = onTurnOffGeneratedClick,
+                isTogglingChapters = isTogglingChapters,
+                showSubscriptionIcon = showSubscriptionIcon,
+                resolvingChapterIndex = resolvingChapterIndex,
+                modifier = modifier,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ChaptersList(
+    lazyListState: LazyListState,
+    chapters: List<ChaptersViewModel.ChapterState>,
+    showHeader: Boolean,
+    hasGeneratedChapters: Boolean,
+    totalChaptersCount: Int,
+    onSelectionChange: (Boolean, Chapter) -> Unit,
+    onChapterClick: (Chapter) -> Unit,
+    onUrlClick: (Chapter) -> Unit,
+    onSkipChaptersClick: (Boolean) -> Unit,
+    onTurnOffGeneratedClick: () -> Unit,
+    isTogglingChapters: Boolean,
+    showSubscriptionIcon: Boolean,
+    resolvingChapterIndex: Int?,
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         state = lazyListState,
@@ -60,17 +125,8 @@ fun ChaptersPage(
                     onSkipChaptersClick = onSkipChaptersClick,
                     isTogglingChapters = isTogglingChapters,
                     showSubscriptionIcon = showSubscriptionIcon,
-                )
-            }
-        }
-        if (hasGeneratedChapters) {
-            item {
-                TextP50(
-                    text = stringResource(LR.string.chapters_generated_disclaimer),
-                    color = LocalChaptersTheme.current.headerTitle,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                    isGenerated = hasGeneratedChapters,
+                    onTurnOffGeneratedClick = onTurnOffGeneratedClick,
                 )
             }
         }

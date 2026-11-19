@@ -10,6 +10,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListCreateActivit
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import com.automattic.eventhorizon.EventHorizon
 import com.automattic.eventhorizon.PodcastListModalOptionType
@@ -28,6 +30,7 @@ class PodcastsOptionsDialog(
     private var showDialog: OptionsDialog? = null
     private var sortDialog: OptionsDialog? = null
     private var badgeDialog: OptionsDialog? = null
+    private var playedPodcastsDialog: OptionsDialog? = null
     private val fragmentManager: FragmentManager?
         get() = fragment.activity?.supportFragmentManager
 
@@ -85,6 +88,16 @@ class PodcastsOptionsDialog(
                     trackTapOnModalOption(ModalOption.BADGE)
                 },
             )
+            .apply {
+                if (FeatureFlag.isEnabled(Feature.HIDE_PLAYED_PODCASTS)) {
+                    addTextOption(
+                        titleId = LR.string.podcasts_menu_played_podcasts,
+                        imageId = R.drawable.ic_eyeball,
+                        valueId = playedPodcastsLabelId(settings.hidePlayedPodcasts.value),
+                        click = { openPlayedPodcastsOptions() },
+                    )
+                }
+            }
             .addTextOption(
                 titleId = LR.string.podcasts_menu_share_podcasts,
                 imageId = R.drawable.ic_share_option,
@@ -162,10 +175,35 @@ class PodcastsOptionsDialog(
         }
     }
 
+    private fun openPlayedPodcastsOptions() {
+        val hidePlayedPodcasts = settings.hidePlayedPodcasts.value
+        val dialog = OptionsDialog()
+            .setTitle(fragment.getString(LR.string.podcasts_menu_played_podcasts))
+            .setDescription(fragment.getString(LR.string.podcasts_played_podcasts_description))
+        for (hide in listOf(false, true)) {
+            dialog.addCheckedOption(
+                titleId = playedPodcastsLabelId(hide),
+                checked = hide == hidePlayedPodcasts,
+                click = { settings.hidePlayedPodcasts.set(hide, updateModifiedAt = false) },
+            )
+        }
+        fragmentManager?.let {
+            dialog.show(it, "podcasts_played_podcasts")
+            playedPodcastsDialog = dialog
+        }
+    }
+
+    private fun playedPodcastsLabelId(hide: Boolean) = if (hide) {
+        LR.string.podcasts_played_podcasts_hide
+    } else {
+        LR.string.podcasts_played_podcasts_show
+    }
+
     fun dismiss() {
         showDialog?.dismiss()
         sortDialog?.dismiss()
         badgeDialog?.dismiss()
+        playedPodcastsDialog?.dismiss()
     }
 
     private fun trackTapOnModalOption(option: ModalOption) {

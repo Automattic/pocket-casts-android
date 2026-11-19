@@ -2,32 +2,26 @@ package au.com.shiftyjelly.pocketcasts.discover.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.discover.databinding.FragmentRegionSelectBinding
-import au.com.shiftyjelly.pocketcasts.discover.databinding.RowRegionBinding
-import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
 import au.com.shiftyjelly.pocketcasts.utils.extensions.findParcelableList
-import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
-import coil3.load
-import coil3.request.allowHardware
 import com.automattic.eventhorizon.DiscoverRegionChangedEvent
 import com.automattic.eventhorizon.EventHorizon
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.launch
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private const val ARG_REGION_LIST = "regionlist"
 private const val ARG_SELECTED_REGION = "selectedregion"
@@ -60,75 +54,33 @@ class RegionSelectFragment : BaseFragment() {
 
     var listener: Listener? = null
 
-    private var binding: FragmentRegionSelectBinding? = null
-
     @Inject lateinit var eventHorizon: EventHorizon
 
     @Inject lateinit var settings: Settings
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentRegionSelectBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val binding = binding ?: return
-
-        binding.toolbar.setup(title = getString(LR.string.discover_select_a_region), navigationIcon = BackArrow, activity = activity, theme = theme)
-
-        binding.recyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        val adapter = RegionAdapter(regionList.sortedBy { it.name }) {
-            listener?.onRegionSelected(it)
-            eventHorizon.track(
-                DiscoverRegionChangedEvent(
-                    region = it.code,
-                ),
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
+        val bottomInsetPx by settings.bottomInset.collectAsStateWithLifecycle(0)
+        val bottomInset = with(LocalDensity.current) { bottomInsetPx.toDp() }
+        AppTheme(theme.activeTheme) {
+            RegionSelectPage(
+                regions = remember { regionList.sortedBy { it.name } },
+                selectedRegionCode = remember { arguments?.getString(ARG_SELECTED_REGION) },
+                bottomInset = PaddingValues(bottom = bottomInset),
+                onRegionClick = ::onRegionClick,
+                onNavigationClick = { requireActivity().onBackPressedDispatcher.onBackPressed() },
+                toolbarModifier = Modifier.pointerInput(Unit) {
+                    detectTapGestures(onLongPress = { theme.toggleDarkLightThemeActivity(requireActivity() as AppCompatActivity) })
+                },
             )
         }
-        adapter.selectedRegionCode = arguments?.getString(ARG_SELECTED_REGION)
-
-        binding.recyclerView.adapter = adapter
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settings.bottomInset.collect {
-                    binding.recyclerView.updatePadding(bottom = it)
-                }
-            }
-        }
-    }
-}
-
-private class RegionAdapter(val regionList: List<DiscoverRegion>, val onRegionClicked: (DiscoverRegion) -> Unit) : RecyclerView.Adapter<RegionAdapter.RegionViewHolder>() {
-
-    class RegionViewHolder(val binding: RowRegionBinding) : RecyclerView.ViewHolder(binding.root)
-
-    var selectedRegionCode: String? = null
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RegionViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = RowRegionBinding.inflate(inflater, parent, false)
-        return RegionViewHolder(binding)
     }
 
-    override fun getItemCount(): Int {
-        return regionList.size
-    }
-
-    override fun onBindViewHolder(holder: RegionViewHolder, position: Int) {
-        val region = regionList[position]
-        holder.binding.imageView.load(region.flag) {
-            allowHardware(false)
-        }
-        holder.binding.lblTitle.text = region.name.tryToLocalise(holder.itemView.resources)
-        holder.itemView.setOnClickListener { onRegionClicked(region) }
-        holder.binding.imgSelected.isVisible = region.code == selectedRegionCode
+    private fun onRegionClick(region: DiscoverRegion) {
+        listener?.onRegionSelected(region)
+        eventHorizon.track(
+            DiscoverRegionChangedEvent(
+                region = region.code,
+            ),
+        )
     }
 }

@@ -32,6 +32,7 @@ class OptionsDialog : BottomSheetDialogFragment() {
     @Inject lateinit var theme: Theme
 
     private var title: String? = null
+    private var description: String? = null
     private var iconColor: Int? = null
     private val options = mutableListOf<OptionsDialogOption>()
     private var onDismiss: (() -> Unit)? = null
@@ -53,6 +54,11 @@ class OptionsDialog : BottomSheetDialogFragment() {
 
     fun setTitle(title: String): OptionsDialog {
         this.title = title
+        return this
+    }
+
+    fun setDescription(description: String): OptionsDialog {
+        this.description = description
         return this
     }
 
@@ -99,7 +105,7 @@ class OptionsDialog : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         AppTheme(if (forceDarkTheme) Theme.ThemeType.DARK else theme.activeTheme) {
-            OptionsDialogComponent(title = title, iconColor = iconColor, options = options)
+            OptionsDialogComponent(title = title, description = description, iconColor = iconColor, options = options)
         }
     }
 

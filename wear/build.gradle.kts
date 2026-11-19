@@ -89,7 +89,11 @@ dependencies {
     implementation(libs.coroutines.rx2)
     implementation(libs.dagger.hilt.android)
     implementation(libs.dagger.hilt.core)
-    implementation(libs.datastore)?.because("Force using the latest datastore version to stop the app crashing with Glance widgets. Glance and Horologist libraries both include this library. Pull request https://github.com/Automattic/pocket-casts-android/pull/4031.")
+    constraints {
+        implementation(libs.datastore) {
+            because("Force using the latest datastore version to stop the app crashing with Glance widgets. Glance and Horologist libraries both include this library. Pull request https://github.com/Automattic/pocket-casts-android/pull/4031.")
+        }
+    }
     implementation(libs.encryptedlogging)
     implementation(libs.firebase.config)
     implementation(libs.guava)
@@ -112,7 +116,6 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.lottie)
     implementation(libs.lottie.compose)
-    implementation(libs.media3.extractor)
     implementation(libs.moshi)
     implementation(libs.navigation.compose)
     implementation(libs.navigation.runtime)
@@ -166,6 +169,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.robolectric)
     testImplementation(libs.turbine)
 
     testImplementation(projects.modules.services.sharedtest)

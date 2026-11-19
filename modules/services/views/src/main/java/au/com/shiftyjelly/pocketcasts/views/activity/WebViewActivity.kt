@@ -5,17 +5,18 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.view.MenuItem
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.preferences.BuildConfig
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.views.databinding.ActivityWebViewBinding
-import au.com.shiftyjelly.pocketcasts.views.extensions.includeStatusBarPadding
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -34,7 +35,7 @@ class WebViewActivity :
 
     @Inject lateinit var settings: Settings
 
-    private lateinit var binding: ActivityWebViewBinding
+    private var isLoading by mutableStateOf(false)
 
     private val extraUrl: String?
         get() = intent.extras?.getString(EXTRA_URL)
@@ -54,68 +55,53 @@ class WebViewActivity :
         }
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityWebViewBinding.inflate(layoutInflater)
-
-        setContentView(binding.root)
-
-        binding.toolbar.title = intent.extras?.getString(EXTRA_TITLE)
-        binding.toolbar.includeStatusBarPadding()
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        onBackPressedDispatcher.addCallback(
-            this,
-            object : OnBackPressedCallback(false) {
-                override fun handleOnBackPressed() {
-                    if (binding.webview.canGoBack()) {
-                        binding.webview.goBack()
-                    } else {
-                        onBackPressedDispatcher.onBackPressed()
-                    }
-                }
-            },
-        )
-
-        binding.webview.webViewClient = object : WebViewClient() {
-            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                super.onPageStarted(view, url, favicon)
-                binding.loading.isVisible = true
-            }
-
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
-                binding.loading.isVisible = false
-            }
-
-            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                val uri = request.url
-                return when {
-                    uri.host == BuildConfig.WEB_BASE_HOST -> false
-                    uri.toString() == extraUrl -> false
-                    else -> runCatching { startActivity(Intent(Intent.ACTION_VIEW, uri)) }.isSuccess
+        val initialUrl = if (savedInstanceState == null) extraUrl else null
+        val composeView = ComposeView(this).apply {
+            setContent {
+                AppTheme(Theme.ThemeType.DARK) {
+                    WebViewPage(
+                        title = intent.extras?.getString(EXTRA_TITLE).orEmpty(),
+                        isLoading = isLoading,
+                        onNavigationClick = ::finish,
+                        onCreateWebView = { context -> createWebView(context, initialUrl) },
+                    )
                 }
             }
         }
-
-        binding.webview.settings.javaScriptEnabled = true
-        binding.webview.settings.domStorageEnabled = true
-
-        if (savedInstanceState == null) {
-            extraUrl?.let { url ->
-                binding.webview.loadUrl(url)
-            }
-        }
+        setContentView(composeView)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            finish()
-            return true
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun createWebView(context: Context, initialUrl: String?): WebView {
+        return WebView(context).apply {
+            webViewClient = object : WebViewClient() {
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
+                    isLoading = true
+                }
+
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    super.onPageFinished(view, url)
+                    isLoading = false
+                }
+
+                override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                    val uri = request.url
+                    return when {
+                        uri.host == BuildConfig.WEB_BASE_HOST -> false
+                        uri.toString() == extraUrl -> false
+                        else -> runCatching { startActivity(Intent(Intent.ACTION_VIEW, uri)) }.isSuccess
+                    }
+                }
+            }
+
+            settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
+
+            initialUrl?.let(::loadUrl)
         }
-        return super.onOptionsItemSelected(item)
     }
 }

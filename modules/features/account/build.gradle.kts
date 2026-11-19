@@ -13,6 +13,11 @@ android {
         viewBinding = true
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -45,8 +50,6 @@ dependencies {
     implementation(platform(libs.compose.bom))
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.preference.ktx)
-    implementation(libs.coil)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.compose.activity)
@@ -57,11 +60,10 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.ui.util)
     implementation(libs.coroutines.core)
-    implementation(libs.coroutines.play.services)
     implementation(libs.coroutines.rx2)
     implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.lifecycle.viewmodel.compose)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
@@ -73,7 +75,6 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.rx2.android)
     implementation(libs.rx2.java)
-    implementation(libs.rx2.kotlin)
     implementation(libs.rx2.relay)
     implementation(libs.timber)
     implementation(libs.credentials)
@@ -89,10 +90,14 @@ dependencies {
 
     debugProdImplementation(libs.compose.ui.tooling)
 
+    debugImplementation(libs.compose.ui.test.manifest)
+
+    testImplementation(libs.compose.ui.test.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.robolectric)
     testImplementation(libs.turbine)
 
     testImplementation(projects.modules.services.sharedtest)

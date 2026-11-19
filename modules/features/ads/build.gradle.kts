@@ -29,7 +29,6 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.compose.ui)
-    implementation(libs.timber)
 
     implementation(projects.modules.features.settings)
     implementation(projects.modules.services.compose)

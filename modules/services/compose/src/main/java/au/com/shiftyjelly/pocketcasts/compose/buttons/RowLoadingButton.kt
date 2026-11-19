@@ -11,7 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -28,6 +30,7 @@ fun RowLoadingButton(
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     textColor: Color = MaterialTheme.theme.colors.primaryInteractive02,
     elevation: ButtonElevation? = ButtonDefaults.elevation(),
+    fontSize: TextUnit = 16.sp,
 ) {
     BaseRowButton(
         text = text,
@@ -38,6 +41,7 @@ fun RowLoadingButton(
         colors = colors,
         textColor = textColor,
         elevation = elevation,
+        fontSize = fontSize,
         leadingIcon = if (isLoading) {
             {
                 CircularProgressIndicator(

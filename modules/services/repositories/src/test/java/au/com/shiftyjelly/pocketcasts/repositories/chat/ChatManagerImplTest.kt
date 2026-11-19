@@ -16,10 +16,15 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import com.squareup.moshi.Moshi
 import java.io.IOException
 import java.util.Date
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -28,11 +33,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ChatManagerImplTest {
     private val episodeChatDao = TestEpisodeChatDao()
     private val podcastCacheServiceManager = mock<PodcastCacheServiceManager>()
@@ -41,6 +48,7 @@ class ChatManagerImplTest {
         episodeChatDao = episodeChatDao,
         podcastCacheServiceManager = podcastCacheServiceManager,
         tokenHandler = tokenHandler,
+        scope = CoroutineScope(UnconfinedTestDispatcher()),
         moshi = Moshi.Builder().build(),
     )
 
@@ -323,6 +331,62 @@ class ChatManagerImplTest {
     }
 
     @Test
+    fun `starter questions share a request in flight`() = runTest {
+        val response = CompletableDeferred<EpisodeChatStarterQuestionsResponse>()
+        whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())) doSuspendableAnswer { response.await() }
+
+        val first = async { manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID) }
+        val reopened = async { manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID) }
+        testScheduler.runCurrent()
+        response.complete(EpisodeChatStarterQuestionsResponse(suggestedQuestions = listOf("Who is the guest?")))
+
+        assertEquals(listOf("Who is the guest?"), first.await())
+        assertEquals(listOf("Who is the guest?"), reopened.await())
+        verify(podcastCacheServiceManager, times(1)).episodeChatStarterQuestions(any(), any())
+    }
+
+    @Test
+    fun `starter questions keep loading when the caller is cancelled`() = runTest {
+        val response = CompletableDeferred<EpisodeChatStarterQuestionsResponse>()
+        whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())) doSuspendableAnswer { response.await() }
+
+        val cancelled = async { manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID) }
+        testScheduler.runCurrent()
+        cancelled.cancel()
+        response.complete(EpisodeChatStarterQuestionsResponse(suggestedQuestions = listOf("Who is the guest?")))
+
+        assertEquals(listOf("Who is the guest?"), manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID))
+        verify(podcastCacheServiceManager, times(1)).episodeChatStarterQuestions(any(), any())
+    }
+
+    @Test
+    fun `starter questions are retried when the request fails after the caller is cancelled`() = runTest {
+        val response = CompletableDeferred<EpisodeChatStarterQuestionsResponse>()
+        whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())) doSuspendableAnswer { response.await() }
+
+        val cancelled = async { manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID) }
+        testScheduler.runCurrent()
+        cancelled.cancel()
+        response.completeExceptionally(IOException())
+        whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())).thenReturn(
+            EpisodeChatStarterQuestionsResponse(suggestedQuestions = listOf("Who is the guest?")),
+        )
+
+        assertEquals(listOf("Who is the guest?"), manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID))
+    }
+
+    @Test
+    fun `starter questions are retried after an empty response`() = runTest {
+        whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())).thenReturn(
+            EpisodeChatStarterQuestionsResponse(suggestedQuestions = emptyList()),
+            EpisodeChatStarterQuestionsResponse(suggestedQuestions = listOf("Who is the guest?")),
+        )
+
+        assertEquals(emptyList<String>(), manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID))
+        assertEquals(listOf("Who is the guest?"), manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID))
+    }
+
+    @Test
     fun `starter questions are empty and retried when the request fails`() = runTest {
         whenever(podcastCacheServiceManager.episodeChatStarterQuestions(any(), any())).thenAnswer { throw IOException() }
 
@@ -330,6 +394,68 @@ class ChatManagerImplTest {
         assertEquals(emptyList<String>(), manager.getStarterQuestions(EPISODE_UUID, PODCAST_UUID))
 
         verify(podcastCacheServiceManager, times(2)).episodeChatStarterQuestions(any(), any())
+    }
+
+    @Test
+    fun `stopping a question keeps it as stopped in its place`() = runTest {
+        val createdAt = Date(1_000)
+        episodeChatDao.messages += createMessage(uuid = "user-uuid", episodeUuid = EPISODE_UUID, text = "Question")
+            .copy(role = ChatRole.User.value, createdAt = createdAt)
+
+        manager.stopMessage(EPISODE_UUID, ChatMessage.User(text = "Question", inputType = ChatInputType.SummaryPrompt, uuid = "user-uuid"))
+
+        assertEquals(
+            listOf(ChatMessage.User(text = "Question", inputType = ChatInputType.SummaryPrompt, isStopped = true, uuid = "user-uuid")),
+            storedQuestions(),
+        )
+        assertEquals(createdAt, episodeChatDao.messages.single().createdAt)
+    }
+
+    @Test
+    fun `stopping a question that was not stored yet stores it`() = runTest {
+        val isStopped = manager.stopMessage(EPISODE_UUID, ChatMessage.User(text = "Question", uuid = "user-uuid"))
+
+        assertTrue(isStopped)
+        assertEquals(listOf(ChatMessage.User(text = "Question", isStopped = true, uuid = "user-uuid")), storedQuestions())
+    }
+
+    @Test
+    fun `stopping a question that was already answered leaves it`() = runTest {
+        episodeChatDao.messages += createMessage(uuid = "user-uuid", episodeUuid = EPISODE_UUID, text = "Question")
+            .copy(role = ChatRole.User.value, createdAt = Date(1_000))
+        episodeChatDao.messages += createMessage(uuid = "answer-uuid", episodeUuid = EPISODE_UUID, text = "Answer")
+            .copy(createdAt = Date(2_000))
+
+        val isStopped = manager.stopMessage(EPISODE_UUID, ChatMessage.User(text = "Question", uuid = "user-uuid"))
+
+        assertFalse(isStopped)
+        assertEquals(listOf(ChatMessage.User(text = "Question", uuid = "user-uuid")), storedQuestions())
+    }
+
+    @Test
+    fun `stopped questions are left out of the conversation history`() = runTest {
+        whenever(podcastCacheServiceManager.episodeChat(any(), any())).thenReturn(EpisodeChatResponse(reply = "Reply", quote = null))
+
+        manager.sendMessage(
+            episodeUuid = EPISODE_UUID,
+            podcastUuid = PODCAST_UUID,
+            message = ChatMessage.User(text = "Second question", uuid = "second-uuid"),
+            allMessages = listOf(
+                ChatMessage.User(text = "Earlier question", uuid = "earlier-uuid"),
+                ChatMessage.Assistant(text = "Earlier answer", uuid = "earlier-answer-uuid"),
+                ChatMessage.User(text = "Stopped question", isStopped = true, uuid = "stopped-uuid"),
+            ),
+        )
+
+        val requestCaptor = argumentCaptor<EpisodeChatRequest>()
+        verify(podcastCacheServiceManager).episodeChat(any(), requestCaptor.capture())
+        assertEquals(
+            listOf(
+                ConversationMessage(role = "user", content = "Earlier question"),
+                ConversationMessage(role = "assistant", content = "Earlier answer"),
+            ),
+            requestCaptor.firstValue.conversationHistory,
+        )
     }
 
     @Test

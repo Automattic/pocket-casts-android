@@ -15,6 +15,11 @@ android {
         viewBinding = true
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -23,13 +28,9 @@ dependencies {
     ksp(libs.moshi.kotlin.codegen)
 
     api(libs.androidx.appcompat)
-    api(libs.androidx.cardview)
-    api(libs.androidx.constraintlayout)
     api(libs.androidx.preference.ktx)
-    api(libs.androidx.recyclerview)
     api(libs.automattic.crashlogging)
     api(libs.dagger.hilt.android)
-    api(libs.material)
 
     api(projects.modules.services.analytics)
     api(projects.modules.services.compose)
@@ -49,6 +50,7 @@ dependencies {
     implementation(libs.aboutlibraries.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.compose.animation)
+    implementation(libs.compose.livedata)
     implementation(libs.compose.material)
     implementation(libs.compose.material.icons.extended)
     implementation(libs.compose.rxjava2)
@@ -56,21 +58,19 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.webview)
     implementation(libs.coroutines.core)
-    implementation(libs.coroutines.rx2)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.config)
     implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.lifecycle.viewmodel.compose)
+    implementation(libs.navigation.compose)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.material.dialogs)
     implementation(libs.okhttp)
     implementation(libs.play.cast)
-    implementation(libs.rx2.android)
     implementation(libs.rx2.java)
-    implementation(libs.rx2.kotlin)
     implementation(libs.rx2.relay)
     implementation(libs.timber)
 
@@ -81,11 +81,15 @@ dependencies {
 
     debugProdImplementation(libs.compose.ui.tooling)
 
+    debugImplementation(libs.compose.ui.test.manifest)
+
     testImplementation(libs.androidx.arch.core)
+    testImplementation(libs.compose.ui.test.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.robolectric)
     testImplementation(libs.turbine)
 
     testImplementation(projects.modules.services.sharedtest)

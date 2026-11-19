@@ -1,11 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-10-20 16:56:40+0000
+Translation-Revision-Date: 2026-11-11 08:54:37+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="chat_jumping_to_time">Переход к %1$s…</string>
+    <string name="chat_jumped_to_time">Перейти к %1$s</string>
+    <string name="playback_2026_sheet_button">Просмотреть мою историю прослушиваний за 2026 год</string>
+    <string name="playback_2026_sheet_description">Что вы слушали. Подкасты, которые вам понравились. И то, что отличает вас как слушателя. Вы провели с Pocket Casts целый год.</string>
+    <string name="playback_2026_banner_description">Просмотрите свою статистику прослушивания, узнайте, что отличает вас как слушателя, и многое другое.</string>
+    <string name="playback_2026_banner_title">История прослушиваний за 2026 год уже здесь!</string>
+    <string name="chapters_generated_none_message">Не удалось создать главы для этого выпуска.</string>
+    <string name="chapters_generated_none_title">В этом выпуске нет глав</string>
+    <string name="chapters_generated_generating_note">Для более длинных выпусков может понадобиться некоторое время. Главы будут показаны на плеере, когда они будут готовы.</string>
+    <string name="chapters_generated_generating">Создание глав…</string>
+    <string name="chapters_generated_ai_note">Главы создаются с помощью ИИ и могут быть не совсем точными.</string>
+    <string name="chapters_generated_generate">Создать главы</string>
+    <string name="chapters_generated_none_yet_message">Создавайте главы и сразу переходите к нужной вам части.</string>
+    <string name="chapters_generated_none_yet_title">Глав пока нет</string>
+    <string name="chat_playback_position">Позиция воспроизведения</string>
+    <string name="settings_generated_chapters_summary">Если выпуск не разделён на главы, Pocket Casts автоматически создаст их для вас.</string>
+    <string name="podcasts_played_podcasts_show">Показать</string>
+    <string name="podcasts_played_podcasts_hide">Скрыть</string>
+    <string name="podcasts_played_podcasts_description">Скрывает подкасты, которые вы прослушали полностью. Они появляются снова с выходом нового выпуска.</string>
+    <string name="podcasts_menu_played_podcasts">Прослушанные подкасты</string>
+    <string name="chapters_generated_upsell_button">Получить сгенерированные главы</string>
+    <string name="chapters_generated_upsell_message">С Pocket Casts Plus вам больше не потребуется быстрая перемотка. Переходите прямо к нужной части.</string>
+    <string name="chapters_generated_upsell_title">Автоматически созданные главы</string>
+    <string name="chapters_generated_turn_on">Включить</string>
+    <string name="chapters_generated_off_message">Включите их, чтобы перейти прямо к нужной части.</string>
+    <string name="chapters_generated_off_title">Сгенерированные главы отключены</string>
+    <string name="chapters_generated_undo">Отмена</string>
+    <string name="chapters_generated_turned_off">Отключённые сгенерированные главы</string>
+    <string name="chapters_generated_turn_off">Отключить сгенерированные главы</string>
+    <string name="chat_loading_still_working">Продолжаем работу…</string>
+    <string name="chat_loading_writing_answer">Напишите ответ</string>
+    <string name="chat_loading_finding_moments">Поиск нужных моментов</string>
+    <string name="chat_loading_reading_transcript">Чтение расшифровки</string>
+    <string name="automotive_nothing_playing_title">Выберите выпуск для воспроизведения</string>
+    <string name="chat_quote_finding_moment">Поиск нужного момента…</string>
+    <string name="chat_quote_play_failed">Не удалось воспроизвести эту часть выпуска</string>
+    <string name="chat_history_empty_body">Спросите о выпуске, и история чата появится здесь.</string>
+    <string name="chat_history_empty_title">Чатов пока нет</string>
     <string name="chat_about_episode">Пообщаться о %1$s</string>
     <string name="chat_now_playing_episode">Сейчас воспроизводится %1$s</string>
     <string name="chat_undo">Отмена</string>
@@ -18,8 +56,6 @@ Language: ru
     <string name="chat_answering">Готовится ответ</string>
     <string name="chat_error_server_on_our_end">Произошла ошибка на нашей стороне.</string>
     <string name="chat_not_sent_tap_to_retry">Не отправлено. Нажмите, чтобы попробовать ещё раз.</string>
-    <string name="chat_feedback_send_failed">Не удалось отправить отзыв. Проверьте подключение.</string>
-    <string name="chat_feedback_sending">Отправка отзыва…</string>
     <string name="chat_feedback_what_went_wrong">Что пошло не так</string>
     <string name="chat_beta_sheet_sign_in">Войдите, чтобы попробовать</string>
     <string name="episode_chat_needs_transcript_message">Чтобы задать вопрос об этом выпуске, требуется расшифровка. В этом выпуске её нет.</string>
@@ -213,8 +249,7 @@ Language: ru
     <string name="settings_audio_only_summary">Если этот параметр включён, видеовыпуски будут воспроизводиться только в аудиоформате, чтобы сэкономить трафик.</string>
     <string name="settings_audio_only">Только аудио</string>
     <string name="profile_try_duration_for_free">Попробуйте %1$s бесплатно</string>
-    <string name="settings_generated_chapters_summary">Показывать автоматически сгенерированное оглавление, если оно имеется.</string>
-    <string name="settings_generated_chapters">Автоматическое оглавление</string>
+    <string name="settings_generated_chapters">Создать главы автоматически</string>
     <string name="profile_stats_listening_activity_info_summary">Оценка времени прослушивания на основе истории прослушиваний. Если вы прослушаете выпуск за несколько дней, он будет отображаться в последний день.</string>
     <string name="profile_stats_listening_activity_info_title">Прослушивание</string>
     <string name="profile_stats_listening_activity_info_help">Информация</string>
@@ -256,7 +291,6 @@ Language: ru
     <string name="blogs_found_headline">Чтение блога вслух</string>
     <string name="blogs_found_followed_badge">ПОДПИСКИ НА ПОДКАСТ</string>
     <string name="blogs_found_feed_detected">Лента найдена</string>
-    <string name="chapters_generated_disclaimer">Эти главы сгенерированы автоматически и могут быть не совсем точными.</string>
     <string name="chat_play_quote">Воспроизвести цитату</string>
     <string name="chat_clear">Очистить чат</string>
     <string name="chat_send">Отправить</string>
@@ -2480,6 +2514,16 @@ Language: ru
         <item quantity="one">глава</item>
         <item quantity="few">главы</item>
         <item quantity="many">главы</item>
+    </plurals>
+    <plurals name="chapters_generated_count">
+        <item quantity="one">Сгенерировано глав: %d</item>
+        <item quantity="few">Сгенерировано глав: %d</item>
+        <item quantity="many">Сгенерировано глав: %d</item>
+    </plurals>
+    <plurals name="chapters_generated_count_with_hidden">
+        <item quantity="one">Сгенерировано глав: %1$d • Скрыто: %2$d</item>
+        <item quantity="few">Сгенерировано глав: %1$d • Скрыто: %2$d</item>
+        <item quantity="many">Сгенерировано глав: %1$d • Скрыто: %2$d</item>
     </plurals>
     <plurals name="day">
         <item quantity="one">д</item>
