@@ -84,6 +84,7 @@ Language: sv_SE
     <string name="chat_welcome">Fråga om vad som helst i detta avsnitt. Eller börja här.</string>
     <string name="episode_chat_beta_badge">Beta</string>
     <string name="episode_chat_shelf_title">Fråga om detta avsnitt</string>
+    <string name="episode_chat_tooltip_message">Eller fråga vad som helst om det.</string>
     <string name="chat_beta_note">Fråga om detta avsnitt är i beta</string>
     <string name="chat_beta_sheet_body">Gratis för alla medan vi testar det. Det kommer att bli en Plus-funktion senare.</string>
     <string name="chat_beta_sheet_title">Fråga om detta avsnitt är i beta</string>

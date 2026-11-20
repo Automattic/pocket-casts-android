@@ -87,6 +87,7 @@ Language: ar
     <string name="chat_beta_sheet_title">تتوفر خاصية \"طرح أسئلة حول هذه الحلقة\" في الإصدار التجريبي</string>
     <string name="episode_chat_beta_badge">الإصدار التجريبي</string>
     <string name="episode_chat_shelf_title">طرح أسئلة حول هذه الحلقة</string>
+    <string name="episode_chat_tooltip_message">أو اطرح أي سؤال عنها.</string>
     <string name="manual_playlist_no_content_body_alternative">اختر حلقات من حلقات البث الصوتي التي تتابعها. أو اسحب إلى اليسار على أي حلقة لإضافتها أثناء التنقل.</string>
     <string name="manual_playlist_no_content_body">اعثر على بث صوتي ينال إعجابك، ثم مرر لليسار على أي حلقة لإضافته.</string>
     <string name="settings_general_whats_new_unread_dot_summary">اعرض نقطة تشير إلى وجود عناصر غير مقروءة على \"الملف الشخصي\" عند وجود رسائل جديدة في \"ما الجديد\".</string>
