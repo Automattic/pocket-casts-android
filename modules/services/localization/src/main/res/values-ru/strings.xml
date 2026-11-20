@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-05 10:54:24+0000
+Translation-Revision-Date: 2026-11-11 08:54:37+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="chat_jumping_to_time">Переход к %1$s…</string>
+    <string name="chat_jumped_to_time">Перейти к %1$s</string>
+    <string name="playback_2026_sheet_button">Просмотреть мою историю прослушиваний за 2026 год</string>
+    <string name="playback_2026_sheet_description">Что вы слушали. Подкасты, которые вам понравились. И то, что отличает вас как слушателя. Вы провели с Pocket Casts целый год.</string>
+    <string name="playback_2026_banner_description">Просмотрите свою статистику прослушивания, узнайте, что отличает вас как слушателя, и многое другое.</string>
+    <string name="playback_2026_banner_title">История прослушиваний за 2026 год уже здесь!</string>
+    <string name="chapters_generated_none_message">Не удалось создать главы для этого выпуска.</string>
+    <string name="chapters_generated_none_title">В этом выпуске нет глав</string>
+    <string name="chapters_generated_generating_note">Для более длинных выпусков может понадобиться некоторое время. Главы будут показаны на плеере, когда они будут готовы.</string>
+    <string name="chapters_generated_generating">Создание глав…</string>
+    <string name="chapters_generated_ai_note">Главы создаются с помощью ИИ и могут быть не совсем точными.</string>
+    <string name="chapters_generated_generate">Создать главы</string>
+    <string name="chapters_generated_none_yet_message">Создавайте главы и сразу переходите к нужной вам части.</string>
+    <string name="chapters_generated_none_yet_title">Глав пока нет</string>
+    <string name="chat_playback_position">Позиция воспроизведения</string>
     <string name="settings_generated_chapters_summary">Если выпуск не разделён на главы, Pocket Casts автоматически создаст их для вас.</string>
     <string name="podcasts_played_podcasts_show">Показать</string>
     <string name="podcasts_played_podcasts_hide">Скрыть</string>
@@ -70,9 +85,9 @@ Language: ru
     <string name="chat_beta_note">Спросить об этом выпуске в бета-версии</string>
     <string name="chat_beta_sheet_body">Бесплатно для всех, пока мы тестируем эту функцию. Позже она станет функцией Plus.</string>
     <string name="chat_beta_sheet_title">Спросить об этом выпуске в бета-версии</string>
-    <string name="episode_chat_tooltip_body">Спросите что угодно. Он тоже слушал.</string>
     <string name="episode_chat_beta_badge">Бета-версия</string>
     <string name="episode_chat_shelf_title">Спросить об этом выпуске</string>
+    <string name="episode_chat_tooltip_message">Или задайте любой вопрос о нём.</string>
     <string name="manual_playlist_no_content_body_alternative">Выберите выпуски из подкастов, на которые вы подписаны. Также можно смахнуть влево любой выпуск, чтобы сразу добавить его.</string>
     <string name="manual_playlist_no_content_body">Найдите понравившийся подкаст, а затем смахните влево любой выпуск, чтобы добавить его.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Показывать индикатор непрочитанного в профиле при появлении новых сообщений в разделе «Что нового».</string>

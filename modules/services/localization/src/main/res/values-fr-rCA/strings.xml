@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-05 10:55:36+0000
+Translation-Revision-Date: 2026-11-10 16:56:22+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="chat_jumping_to_time">Passage à %1$s…</string>
+    <string name="chat_jumped_to_time">Passé à %1$s</string>
+    <string name="playback_2026_sheet_button">Voir ma rétrospective 2026</string>
+    <string name="playback_2026_sheet_description">Ce que vous avez écouté. Les podcasts que vous avez adorés. Et ce qui fait votre particularité sur notre plateforme. Revenez sur votre année dans Pocket Casts.</string>
+    <string name="playback_2026_banner_description">Découvrez vos statistiques d’écoute, qui vous êtes sur notre plateforme et plus encore.</string>
+    <string name="playback_2026_banner_title">La rétrospective 2026 est arrivée !</string>
+    <string name="chapters_generated_none_message">Nous n’avons pas pu générer de chapitres pour cet élément.</string>
+    <string name="chapters_generated_none_title">Aucun chapitre pour cet épisode</string>
+    <string name="chapters_generated_generating_note">Pour les épisodes longs, le processus peut prendre quelques instants. Les chapitres s’afficheront sur le lecteur dès qu’ils seront prêts.</string>
+    <string name="chapters_generated_generating">Génération des chapitres…</string>
+    <string name="chapters_generated_ai_note">Les chapitres sont générés à l’aide de l’IA et peuvent présenter des erreurs.</string>
+    <string name="chapters_generated_generate">Générer des chapitres</string>
+    <string name="chapters_generated_none_yet_message">Générez des chapitres et passez directement à la partie qui vous intéresse.</string>
+    <string name="chapters_generated_none_yet_title">Aucun chapitre pour le moment</string>
+    <string name="chat_playback_position">Position dans la rétrospective</string>
     <string name="settings_generated_chapters_summary">Lorsqu’un épisode n’a pas de chapitres, Pocket Casts les génère automatiquement pour vous.</string>
     <string name="podcasts_played_podcasts_hide">Masquer</string>
     <string name="podcasts_played_podcasts_description">Masque les podcasts que vous avez entièrement écoutés. Ils réapparaissent lorsqu’un nouvel épisode arrive.</string>
@@ -70,9 +85,9 @@ Language: fr
     <string name="chat_beta_note">Poser des questions sur cet épisode est en version bêta</string>
     <string name="chat_beta_sheet_body">Gratuit pour tous pendant la phase de test. Elle deviendra ensuite une fonctionnalité Plus.</string>
     <string name="chat_beta_sheet_title">Poser des questions sur cet épisode est en version bêta</string>
-    <string name="episode_chat_tooltip_body">Posez-lui toutes vos questions. Il écoutait aussi.</string>
     <string name="episode_chat_beta_badge">Bêta</string>
     <string name="episode_chat_shelf_title">Poser une question sur cet épisode</string>
+    <string name="episode_chat_tooltip_message">Ou posez toutes vos questions à son sujet.</string>
     <string name="manual_playlist_no_content_body">Trouvez un podcast que vous aimez, puis balayez vers la gauche sur n’importe quel épisode pour l’ajouter.</string>
     <string name="manual_playlist_no_content_body_alternative">Choisissez des épisodes parmi les podcasts que vous suivez. Autrement, balayez vers la gauche sur n’importe quel épisode pour l’ajouter au fur et à mesure.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Affichez un point d’état non lu sur le profil lorsque des messages de nouveautés sont disponibles.</string>

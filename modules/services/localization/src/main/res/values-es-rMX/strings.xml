@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-05 09:57:52+0000
+Translation-Revision-Date: 2026-11-10 14:58:59+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="chat_jumping_to_time">Saltando a las %1$s…</string>
+    <string name="chat_jumped_to_time">Ha saltado a las %1$s</string>
+    <string name="playback_2026_sheet_button">Ver mi reproducción de 2026</string>
+    <string name="playback_2026_sheet_description">Lo que has escuchado. Los pódcasts que te han encantado. Y lo que te distingue como oyente. Tu año en Pocket Casts ya está aquí.</string>
+    <string name="playback_2026_banner_description">Descubre tus estadísticas de escucha, qué tipo de oyente eres y mucho más.</string>
+    <string name="playback_2026_banner_title">¡Playback ya está aquí!</string>
+    <string name="chapters_generated_none_message">No hemos podido generar capítulos para este episodio.</string>
+    <string name="chapters_generated_none_title">No hay capítulos para este episodio</string>
+    <string name="chapters_generated_generating_note">Esto puede tardar un minuto en los episodios más largos. Los capítulos aparecerán en el reproductor cuando estén listos.</string>
+    <string name="chapters_generated_generating">Generando capítulos…</string>
+    <string name="chapters_generated_ai_note">Los capítulos se generan mediante IA y es posible que no sean del todo precisos.</string>
+    <string name="chapters_generated_generate">Generar capítulos</string>
+    <string name="chapters_generated_none_yet_message">Genera capítulos y ve directamente a la parte que quieras.</string>
+    <string name="chapters_generated_none_yet_title">Aún no hay capítulos</string>
+    <string name="chat_playback_position">Posición de reproducción</string>
     <string name="settings_generated_chapters_summary">Cuando un episodio no tiene capítulos propios, Pocket Casts los generará automáticamente por ti.</string>
     <string name="podcasts_played_podcasts_show">Mostrar</string>
     <string name="podcasts_played_podcasts_hide">Ocultar</string>
@@ -71,8 +86,8 @@ Language: es
     <string name="chat_beta_note">La función Preguntar sobre este episodio está en fase beta</string>
     <string name="chat_beta_sheet_body">Es gratuita para todos mientras esté en pruebas. Se convertirá en una función Plus más adelante.</string>
     <string name="chat_beta_sheet_title">La función Preguntar sobre este episodio está en fase beta</string>
-    <string name="episode_chat_tooltip_body">Pregunta lo que quieras. También estaba escuchando.</string>
     <string name="episode_chat_shelf_title">Preguntar sobre este episodio</string>
+    <string name="episode_chat_tooltip_message">O pregunta lo que quieras sobre él.</string>
     <string name="manual_playlist_no_content_body_alternative">Elige episodios de los podcasts que sigues. O desliza hacia la izquierda en cualquier episodio para añadirlo sobre la marcha.</string>
     <string name="manual_playlist_no_content_body">Busca un podcast que te guste y desliza hacia la izquierda en cualquier episodio para añadirlo.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Muestra un punto de mensaje sin leer en el perfil cuando haya nuevos mensajes de novedades.</string>

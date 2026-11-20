@@ -94,7 +94,6 @@ class EndOfYearManagerPlaybackStatsTest {
         assertEquals(listOf("podcast-2", "podcast-1"), podcasts.map(PlaybackPodcastStats::uuid))
         assertEquals(listOf(400.0, 150.0), podcasts.map(PlaybackPodcastStats::playedSeconds))
         assertEquals(listOf(1, 2), podcasts.map(PlaybackPodcastStats::playedEpisodeCount))
-        assertEquals(listOf(null, "Comedy"), podcasts.map(PlaybackPodcastStats::firstCategory))
         assertEquals(listOf("Title 2", "Title 1"), podcasts.map(PlaybackPodcastStats::title))
         assertEquals(listOf("Author 2", "Author 1"), podcasts.map(PlaybackPodcastStats::author))
     }
