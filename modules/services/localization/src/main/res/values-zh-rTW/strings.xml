@@ -85,9 +85,9 @@ Language: zh_TW
     <string name="chat_beta_note">詢問單集內容的功能為測試版</string>
     <string name="chat_beta_sheet_body">測試期間，人人免費。 之後會成為 Plus 功能。</string>
     <string name="chat_beta_sheet_title">詢問單集內容的功能為測試版</string>
-    <string name="episode_chat_tooltip_body">請隨意問問， 正在等你說話。</string>
     <string name="episode_chat_beta_badge">測試版</string>
     <string name="episode_chat_shelf_title">詢問本集內容</string>
+    <string name="episode_chat_tooltip_message">或者詢問任何相關問題。</string>
     <string name="manual_playlist_no_content_body_alternative">從追蹤的 Podcast 節目中挑選單集。 也可以直接在任意單集上向左滑動，隨時新增。</string>
     <string name="manual_playlist_no_content_body">先找到你喜歡的 Podcast 節目，然後向左滑動，即可隨時新增單集。</string>
     <string name="settings_general_whats_new_unread_dot_summary">如果有新的「最新內容」訊息，個人檔案上會顯示未讀圓點。</string>
