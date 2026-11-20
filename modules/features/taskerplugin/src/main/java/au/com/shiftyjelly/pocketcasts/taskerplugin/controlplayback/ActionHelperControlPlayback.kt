@@ -35,6 +35,7 @@ class ActionHelperControlPlayback(config: TaskerPluginConfig<InputControlPlaybac
             InputControlPlayback.PlaybackCommand.PlayNextInQueue,
             InputControlPlayback.PlaybackCommand.SkipToNextChapter,
             InputControlPlayback.PlaybackCommand.SkipToPreviousChapter,
+            InputControlPlayback.PlaybackCommand.ArchiveCurrentEpisode,
             -> blurbBuilder.append(commandEnum.getDescription(context)) // these don't have extra arguments so just write the command name
         }
     }
