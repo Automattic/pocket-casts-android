@@ -17,6 +17,7 @@ class InputControlPlayback @JvmOverloads constructor(
     @field:TaskerInputField("playbackSpeed") var playbackSpeed: String? = null,
     @field:TaskerInputField("trimSilenceMode") var trimSilenceMode: String? = null,
     @field:TaskerInputField("volumeBoostEnabled") var volumeBoostEnabled: String? = null,
+    @field:TaskerInputField("sleepTimerMinutes") var sleepTimerMinutes: String? = null,
 ) {
 
     val commandEnum get() = tryOrNull { command?.let { PlaybackCommand.valueOf(it) } }
@@ -33,6 +34,8 @@ class InputControlPlayback @JvmOverloads constructor(
         SetPlaybackSpeed(R.string.set_playback_speed),
         SetTrimSilenceMode(R.string.set_trim_silence_mode),
         SetVolumeBoost(R.string.set_volume_boost),
+        SetSleepTimer(R.string.set_sleep_timer),
+        CancelSleepTimer(R.string.cancel_sleep_timer),
         ;
 
         fun getDescription(context: Context) = context.getString(descriptionResId)
