@@ -85,9 +85,9 @@ Language: de
     <string name="chat_beta_note">„Fragen zu dieser Folge“ ist in der Beta-Phase</string>
     <string name="chat_beta_sheet_body">In der Testphase für alle kostenlos. Später wird es zu einer Plus-Funktion.</string>
     <string name="chat_beta_sheet_title">„Fragen zu dieser Folge“ ist in der Beta-Phase</string>
-    <string name="episode_chat_tooltip_body">Frag alles. Es hat auch zugehört.</string>
     <string name="episode_chat_beta_badge">Beta</string>
     <string name="episode_chat_shelf_title">Fragen zu dieser Folge</string>
+    <string name="episode_chat_tooltip_message">Oder frag alles dazu.</string>
     <string name="manual_playlist_no_content_body_alternative">Wähle Folgen aus den Podcasts, denen du folgst. Oder wische bei jeder Folge nach links, um sie hinzuzufügen.</string>
     <string name="manual_playlist_no_content_body">Finde einen Podcast, der dir gefällt, und wische dann bei jeder Folge nach links, um sie hinzuzufügen.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Einen „Ungelesen“-Punkt im Profil anzeigen, wenn es neue Nachrichten zu Neuigkeiten gibt.</string>
