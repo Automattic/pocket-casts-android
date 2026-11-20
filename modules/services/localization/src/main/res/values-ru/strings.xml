@@ -85,9 +85,9 @@ Language: ru
     <string name="chat_beta_note">Спросить об этом выпуске в бета-версии</string>
     <string name="chat_beta_sheet_body">Бесплатно для всех, пока мы тестируем эту функцию. Позже она станет функцией Plus.</string>
     <string name="chat_beta_sheet_title">Спросить об этом выпуске в бета-версии</string>
+    <string name="episode_chat_tooltip_body">Спросите что угодно. Он тоже слушал.</string>
     <string name="episode_chat_beta_badge">Бета-версия</string>
     <string name="episode_chat_shelf_title">Спросить об этом выпуске</string>
-    <string name="episode_chat_tooltip_message">Или задайте любой вопрос о нём.</string>
     <string name="manual_playlist_no_content_body_alternative">Выберите выпуски из подкастов, на которые вы подписаны. Также можно смахнуть влево любой выпуск, чтобы сразу добавить его.</string>
     <string name="manual_playlist_no_content_body">Найдите понравившийся подкаст, а затем смахните влево любой выпуск, чтобы добавить его.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Показывать индикатор непрочитанного в профиле при появлении новых сообщений в разделе «Что нового».</string>

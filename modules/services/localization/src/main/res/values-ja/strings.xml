@@ -85,9 +85,9 @@ Language: ja_JP
     <string name="chat_beta_note">「このエピソードについて尋ねる」はベータ版です</string>
     <string name="chat_beta_sheet_body">テスト中は全ユーザーに対して無料です。 後ほど Plus 機能になる予定です。</string>
     <string name="chat_beta_sheet_title">「このエピソードについて尋ねる」はベータ版です</string>
+    <string name="episode_chat_tooltip_body">何かお尋ねください。 聴き取っていました。</string>
     <string name="episode_chat_beta_badge">ベータ</string>
     <string name="episode_chat_shelf_title">このエピソードについて尋ねる</string>
-    <string name="episode_chat_tooltip_message">または、内容について何でも質問できます。</string>
     <string name="manual_playlist_no_content_body_alternative">フォローしているポッドキャストからエピソードを選択します。 または、エピソードを左にスワイプして、その都度追加することもできます。</string>
     <string name="manual_playlist_no_content_body">気に入ったポッドキャストを見つけて、エピソードを左にスワイプすると追加できます。</string>
     <string name="settings_general_whats_new_unread_dot_summary">新しい新着情報メッセージがある場合、プロフィールに未読のドットが表示されます。</string>

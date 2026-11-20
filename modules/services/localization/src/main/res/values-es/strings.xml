@@ -86,8 +86,8 @@ Language: es
     <string name="chat_beta_note">La función Preguntar sobre este episodio está en fase beta</string>
     <string name="chat_beta_sheet_body">Es gratuita para todos mientras esté en pruebas. Se convertirá en una función Plus más adelante.</string>
     <string name="chat_beta_sheet_title">La función Preguntar sobre este episodio está en fase beta</string>
+    <string name="episode_chat_tooltip_body">Pregunta lo que quieras. También estaba escuchando.</string>
     <string name="episode_chat_shelf_title">Preguntar sobre este episodio</string>
-    <string name="episode_chat_tooltip_message">O pregunta lo que quieras sobre él.</string>
     <string name="manual_playlist_no_content_body_alternative">Elige episodios de los podcasts que sigues. O desliza hacia la izquierda en cualquier episodio para añadirlo sobre la marcha.</string>
     <string name="manual_playlist_no_content_body">Busca un podcast que te guste y desliza hacia la izquierda en cualquier episodio para añadirlo.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Muestra un punto de mensaje sin leer en el perfil cuando haya nuevos mensajes de novedades.</string>

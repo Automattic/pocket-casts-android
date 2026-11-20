@@ -85,9 +85,9 @@ Language: zh_CN
     <string name="chat_beta_note">“关于此剧集的提问”功能处于测试阶段</string>
     <string name="chat_beta_sheet_body">在测试期间，所有人都可以免费使用。 该功能稍后将作为 Plus 功能推出。</string>
     <string name="chat_beta_sheet_title">“关于此剧集的提问”功能处于测试阶段</string>
+    <string name="episode_chat_tooltip_body">有什么问题尽管问。 它也在听呢。</string>
     <string name="episode_chat_beta_badge">测试版</string>
     <string name="episode_chat_shelf_title">“关于此剧集的提问”功能</string>
-    <string name="episode_chat_tooltip_message">或者提出任何相关问题。</string>
     <string name="manual_playlist_no_content_body_alternative">从您关注的播客中选择剧集。 或者在任意剧集上向左滑动，即可边浏览边添加。</string>
     <string name="manual_playlist_no_content_body">找到您喜欢的播客，然后在任意剧集上向左滑动即可添加。</string>
     <string name="settings_general_whats_new_unread_dot_summary">当有新的“最新动态”消息时，在个人资料上显示未读标记。</string>
