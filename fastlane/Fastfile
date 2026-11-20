@@ -636,7 +636,7 @@ platform :android do
     android_firebase_test(
       project_id: firebase_secret(name: 'project_id'),
       key_file: GOOGLE_FIREBASE_SECRETS_PATH,
-      model: 'Pixel2.arm',
+      model: 'MediumPhone.arm',
       version: 30,
       test_apk_path: File.join(apk_dir, 'androidTest', 'debug', 'app-debug-androidTest.apk'),
       apk_path: File.join(apk_dir, 'debug', 'app-debug.apk'),
