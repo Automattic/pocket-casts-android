@@ -1,5 +1,8 @@
 8.26
 -----
+*   Bug Fixes
+    *   Allow the Wear OS app to be installed on watches without WiFi or Bluetooth
+        ([#6435](https://github.com/Automattic/pocket-casts-android/pull/6435))
 
 8.25
 -----
