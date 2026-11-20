@@ -85,7 +85,6 @@ Language: fr
     <string name="chat_beta_note">Poser des questions sur cet épisode est en version bêta</string>
     <string name="chat_beta_sheet_body">Gratuit pour tous pendant la phase de test. Elle deviendra ensuite une fonctionnalité Plus.</string>
     <string name="chat_beta_sheet_title">Poser des questions sur cet épisode est en version bêta</string>
-    <string name="episode_chat_tooltip_body">Posez-lui toutes vos questions. Il écoutait aussi.</string>
     <string name="episode_chat_beta_badge">Bêta</string>
     <string name="episode_chat_shelf_title">Poser une question sur cet épisode</string>
     <string name="manual_playlist_no_content_body">Trouvez un podcast que vous aimez, puis balayez vers la gauche sur n’importe quel épisode pour l’ajouter.</string>

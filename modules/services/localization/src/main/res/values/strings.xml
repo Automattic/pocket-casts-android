@@ -140,7 +140,7 @@
     <string name="episode_chat_beta_badge">Beta</string>
     <string name="episode_chat_needs_transcript_message">Ask about this episode needs a transcript. This episode doesn’t have one.</string>
     <string name="episode_chat_tooltip_title">Summarize this episode</string>
-    <string name="episode_chat_tooltip_body">Or ask anything about it.</string>
+    <string name="episode_chat_tooltip_message">Or ask anything about it.</string>
     <string name="transcript">Transcript</string>
     <string name="episode_description">Episode Description</string>
     <string name="unstar">Unstar</string>

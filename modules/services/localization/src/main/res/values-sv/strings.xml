@@ -87,7 +87,6 @@ Language: sv_SE
     <string name="chat_beta_note">Fråga om detta avsnitt är i beta</string>
     <string name="chat_beta_sheet_body">Gratis för alla medan vi testar det. Det kommer att bli en Plus-funktion senare.</string>
     <string name="chat_beta_sheet_title">Fråga om detta avsnitt är i beta</string>
-    <string name="episode_chat_tooltip_body">Fråga vad som helst. Den lyssnade också.</string>
     <string name="manual_playlist_no_content_body">Hitta en podcast du gillar och svep sedan åt vänster på ett avsnitt för att lägga till det.</string>
     <string name="manual_playlist_no_content_body_alternative">Välj avsnitt från de podcaster du följer. Eller svep åt vänster på ett avsnitt för att lägga till det allteftersom.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Visa en oläst punkt på Profil när det finns nya \"Vad är nytt\"-meddelanden.</string>

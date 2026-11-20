@@ -337,7 +337,7 @@ private fun PlayerShelfContent(
                 AppTheme(Theme.ThemeType.LIGHT) {
                     TooltipPopup(
                         title = stringResource(LR.string.episode_chat_tooltip_title),
-                        body = stringResource(LR.string.episode_chat_tooltip_body),
+                        body = stringResource(LR.string.episode_chat_tooltip_message),
                         tipPosition = TipPosition.BottomEnd,
                         maxWidth = 300.dp,
                         anchorOffset = DpOffset(0.dp, (-4).dp),

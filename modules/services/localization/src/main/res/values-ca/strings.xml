@@ -85,7 +85,6 @@ Language: ca
     <string name="chat_beta_note">«Pregunta sobre aquest episodi» està en fase beta</string>
     <string name="chat_beta_sheet_body">És gratuït per a tothom mentre el provem. Més endavant serà una funció de Plus.</string>
     <string name="chat_beta_sheet_title">«Pregunta sobre aquest episodi» està en fase beta</string>
-    <string name="episode_chat_tooltip_body">Pregunta-li qualsevol cosa. També estava escoltant.</string>
     <string name="episode_chat_beta_badge">Beta</string>
     <string name="episode_chat_shelf_title">Pregunta sobre aquest episodi</string>
     <string name="manual_playlist_no_content_body_alternative">Tria episodis dels pòdcasts que segueixes. O llisca cap a l\'esquerra sobre qualsevol episodi per afegir-lo sobre la marxa.</string>
