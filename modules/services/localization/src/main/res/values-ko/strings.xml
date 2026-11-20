@@ -85,9 +85,9 @@ Language: ko_KR
     <string name="chat_beta_note">이 에피소드에 대해 물어보기는 현재 베타 버전입니다.</string>
     <string name="chat_beta_sheet_body">테스트하는 동안 모두에게 무료로 제공됩니다. 나중에 Plus 기능이 될 예정입니다.</string>
     <string name="chat_beta_sheet_title">이 에피소드에 대해 물어보기는 현재 베타 버전입니다.</string>
-    <string name="episode_chat_tooltip_body">무엇이든 물어보세요. 그쪽에서도 듣고 있었어요.</string>
     <string name="episode_chat_beta_badge">베타</string>
     <string name="episode_chat_shelf_title">이 에피소드에 대해 물어보기</string>
+    <string name="episode_chat_tooltip_message">또는 에피소드에 대해 무엇이든 물어보세요.</string>
     <string name="manual_playlist_no_content_body_alternative">팔로우하는 팟캐스트에서 에피소드를 선택하세요. 또는 에피소드에서 왼쪽으로 살짝 밀어서 원하는 대로 추가할 수 있습니다.</string>
     <string name="manual_playlist_no_content_body">좋아하는 팟캐스트를 찾은 다음에 에피소드에서 왼쪽으로 살짝 밀어서 추가하세요.</string>
     <string name="settings_general_whats_new_unread_dot_summary">새 소식의 새 메시지가 있을 때 프로필에 읽지 않은 dot이 표시됩니다.</string>
