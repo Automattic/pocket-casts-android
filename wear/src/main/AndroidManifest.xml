@@ -28,9 +28,18 @@
 
     <uses-feature android:name="android.hardware.type.watch" />
 
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="false" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="false" />
+
     <application
         android:name=".wear.PocketCastsWearApplication"
         android:allowBackup="true"
+        android:appCategory="audio"
         android:icon="${appIcon}"
         android:label="@string/app_name"
         android:supportsRtl="true"

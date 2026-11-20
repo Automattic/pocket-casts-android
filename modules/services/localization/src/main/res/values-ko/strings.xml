@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-04 09:58:42+0000
+Translation-Revision-Date: 2026-11-10 09:54:44+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="chat_jumping_to_time">%1$s(으)로 이동 중…</string>
+    <string name="chat_jumped_to_time">%1$s(으)로 이동했습니다</string>
+    <string name="playback_2026_sheet_button">2026년 나의 청취한 목록 보기</string>
+    <string name="playback_2026_sheet_description">청취한 내용. 좋아했던 팟캐스트. 그리고 청취자로서 당신을 차별화하는 것. Pocket Casts에서의 한 해가 도착했습니다.</string>
+    <string name="playback_2026_banner_description">청취 통계, 어떤 유형의 청취자인지, 그리고 더 많은 것을 확인해 보세요.</string>
+    <string name="playback_2026_banner_title">2026년 청취한 목록이 도착했습니다!</string>
+    <string name="chapters_generated_none_message">이 에피소드의 챕터를 생성할 수 없습니다.</string>
+    <string name="chapters_generated_none_title">이 에피소드의 챕터 없음</string>
+    <string name="chapters_generated_generating_note">긴 에피소드의 경우 1분 정도 걸릴 수 있습니다. 챕터가 준비되면 플레이어에 표시됩니다.</string>
+    <string name="chapters_generated_generating">챕터 생성 중…</string>
+    <string name="chapters_generated_ai_note">챕터는 AI로 생성되므로 정확하지 않을 수 있습니다.</string>
+    <string name="chapters_generated_generate">챕터 생성</string>
+    <string name="chapters_generated_none_yet_message">챕터를 생성하고 원하는 부분으로 바로 건너뛰세요.</string>
+    <string name="chapters_generated_none_yet_title">아직 챕터 없음</string>
+    <string name="chat_playback_position">재생 위치</string>
     <string name="settings_generated_chapters_summary">에피소드에 자체 챕터가 없으면 Pocket Casts에서 자동으로 챕터를 생성합니다.</string>
     <string name="podcasts_played_podcasts_show">표시</string>
     <string name="podcasts_played_podcasts_hide">숨기기</string>
@@ -70,9 +85,9 @@ Language: ko_KR
     <string name="chat_beta_note">이 에피소드에 대해 물어보기는 현재 베타 버전입니다.</string>
     <string name="chat_beta_sheet_body">테스트하는 동안 모두에게 무료로 제공됩니다. 나중에 Plus 기능이 될 예정입니다.</string>
     <string name="chat_beta_sheet_title">이 에피소드에 대해 물어보기는 현재 베타 버전입니다.</string>
-    <string name="episode_chat_tooltip_body">무엇이든 물어보세요. 그쪽에서도 듣고 있었어요.</string>
     <string name="episode_chat_beta_badge">베타</string>
     <string name="episode_chat_shelf_title">이 에피소드에 대해 물어보기</string>
+    <string name="episode_chat_tooltip_message">또는 에피소드에 대해 무엇이든 물어보세요.</string>
     <string name="manual_playlist_no_content_body_alternative">팔로우하는 팟캐스트에서 에피소드를 선택하세요. 또는 에피소드에서 왼쪽으로 살짝 밀어서 원하는 대로 추가할 수 있습니다.</string>
     <string name="manual_playlist_no_content_body">좋아하는 팟캐스트를 찾은 다음에 에피소드에서 왼쪽으로 살짝 밀어서 추가하세요.</string>
     <string name="settings_general_whats_new_unread_dot_summary">새 소식의 새 메시지가 있을 때 프로필에 읽지 않은 dot이 표시됩니다.</string>

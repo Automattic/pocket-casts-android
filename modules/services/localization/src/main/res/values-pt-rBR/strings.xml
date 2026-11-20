@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-05 09:55:33+0000
+Translation-Revision-Date: 2026-11-10 16:54:49+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="chat_jumping_to_time">Pulando para %1$s…</string>
+    <string name="chat_jumped_to_time">Pulou para %1$s</string>
+    <string name="playback_2026_sheet_button">Ver minha retrospectiva de 2026</string>
+    <string name="playback_2026_sheet_description">O que você ouviu. Os podcasts que você amou. E o seu diferencial como ouvinte. Confira seu ano no Pocket Casts.</string>
+    <string name="playback_2026_banner_description">Confira suas estatísticas de reprodução, que tipo de ouvinte você é e muito mais.</string>
+    <string name="playback_2026_banner_title">Chegou a retrospectiva de 2026!</string>
+    <string name="chapters_generated_none_message">Não foi possível gerar capítulos para isto.</string>
+    <string name="chapters_generated_none_title">Nenhum capítulo para este episódio</string>
+    <string name="chapters_generated_generating_note">Isso pode levar um minuto para episódios mais longos. Os capítulos aparecerão no reprodutor quando estiverem prontos.</string>
+    <string name="chapters_generated_generating">Gerando capítulos…</string>
+    <string name="chapters_generated_ai_note">Capítulos são gerados usando IA e podem não ser precisos.</string>
+    <string name="chapters_generated_generate">Gerar capítulos</string>
+    <string name="chapters_generated_none_yet_message">Gere capítulos e pule direto para a parte desejada.</string>
+    <string name="chapters_generated_none_yet_title">Nenhum capítulo ainda</string>
+    <string name="chat_playback_position">Posição da reprodução</string>
     <string name="settings_generated_chapters_summary">Quando um episódio não possui capítulos próprios, o Pocket Casts os gera automaticamente para você.</string>
     <string name="podcasts_played_podcasts_hide">Ocultar</string>
     <string name="chapters_generated_upsell_button">Obter capítulos gerados</string>
@@ -70,9 +85,9 @@ Language: pt_BR
     <string name="chat_beta_note">\"Perguntar sobre este episódio\" está na versão beta</string>
     <string name="chat_beta_sheet_body">Gratuito para todos enquanto testamos. Isso se tornará uma funcionalidade do Plus futuramente.</string>
     <string name="chat_beta_sheet_title">\"Perguntar sobre este episódio\" está na versão beta</string>
-    <string name="episode_chat_tooltip_body">Pergunte o que quiser. Ele também estava escutando.</string>
     <string name="episode_chat_beta_badge">Beta</string>
     <string name="episode_chat_shelf_title">Perguntar sobre este episódio</string>
+    <string name="episode_chat_tooltip_message">Ou pergunte o que quiser sobre ele.</string>
     <string name="manual_playlist_no_content_body_alternative">Escolha episódios dos podcasts que você segue. Ou deslize para a esquerda em um episódio para adicioná-lo conforme assiste.</string>
     <string name="manual_playlist_no_content_body">Encontre um podcast que você goste e deslize para a esquerda em um episódio para adicioná-lo.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Mostre um ponto no perfil quando houver novas mensagens de novidades não lidas.</string>

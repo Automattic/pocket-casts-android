@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-04 11:57:44+0000
+Translation-Revision-Date: 2026-11-10 09:56:34+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="chat_jumping_to_time">正在跳转至 %1$s…</string>
+    <string name="chat_jumped_to_time">已跳转至 %1$s</string>
+    <string name="playback_2026_sheet_button">查看我的 2026 年播放记录</string>
+    <string name="playback_2026_sheet_description">您收听过的内容。 您喜爱的播客。 以及您作为听众的与众不同之处。 您的 Pocket Casts 年度回顾已上线。</string>
+    <string name="playback_2026_banner_description">欢迎查看您的收听统计数据、了解您所属的听众类型，并探索更多内容。</string>
+    <string name="playback_2026_banner_title">2026 年播放记录现已上线！</string>
+    <string name="chapters_generated_none_message">我们无法为此剧集生成章节。</string>
+    <string name="chapters_generated_none_title">此剧集无章节</string>
+    <string name="chapters_generated_generating_note">对于较长的剧集，这可能需要一分钟的时间。 章节准备就绪后将显示在播放器上。</string>
+    <string name="chapters_generated_generating">正在生成章节…</string>
+    <string name="chapters_generated_ai_note">章节使用 AI 生成，可能不完全准确。</string>
+    <string name="chapters_generated_generate">生成章节</string>
+    <string name="chapters_generated_none_yet_message">生成章节，并直接跳转至您感兴趣的部分。</string>
+    <string name="chapters_generated_none_yet_title">尚无章节</string>
+    <string name="chat_playback_position">播放位置</string>
     <string name="settings_generated_chapters_summary">如果某剧集本身没有章节，Pocket Casts 会自动为您生成章节。</string>
     <string name="podcasts_played_podcasts_show">显示</string>
     <string name="podcasts_played_podcasts_hide">隐藏</string>
@@ -70,9 +85,9 @@ Language: zh_CN
     <string name="chat_beta_note">“关于此剧集的提问”功能处于测试阶段</string>
     <string name="chat_beta_sheet_body">在测试期间，所有人都可以免费使用。 该功能稍后将作为 Plus 功能推出。</string>
     <string name="chat_beta_sheet_title">“关于此剧集的提问”功能处于测试阶段</string>
-    <string name="episode_chat_tooltip_body">有什么问题尽管问。 它也在听呢。</string>
     <string name="episode_chat_beta_badge">测试版</string>
     <string name="episode_chat_shelf_title">“关于此剧集的提问”功能</string>
+    <string name="episode_chat_tooltip_message">或者提出任何相关问题。</string>
     <string name="manual_playlist_no_content_body_alternative">从您关注的播客中选择剧集。 或者在任意剧集上向左滑动，即可边浏览边添加。</string>
     <string name="manual_playlist_no_content_body">找到您喜欢的播客，然后在任意剧集上向左滑动即可添加。</string>
     <string name="settings_general_whats_new_unread_dot_summary">当有新的“最新动态”消息时，在个人资料上显示未读标记。</string>

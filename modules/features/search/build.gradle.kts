@@ -35,15 +35,12 @@ dependencies {
 
     implementation(platform(libs.compose.bom))
 
-    implementation(libs.androidx.core.ktx)
     implementation(libs.compose.material)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.reactive)
-    implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
-    implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.rx2.android)
     implementation(libs.rx2.java)
@@ -53,7 +50,7 @@ dependencies {
     implementation(libs.timber)
 
     implementation(projects.modules.services.compose)
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.lifecycle.viewmodel.compose)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)

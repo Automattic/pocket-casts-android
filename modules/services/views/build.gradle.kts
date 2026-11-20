@@ -25,7 +25,6 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     api(libs.androidx.appcompat)
-    api(libs.androidx.constraintlayout)
     api(libs.androidx.mediarouter)
     api(libs.androidx.preference.ktx)
     api(libs.androidx.recyclerview)
@@ -34,11 +33,8 @@ dependencies {
     api(libs.dagger.hilt.android)
     api(libs.lottie)
     api(libs.material)
-    api(libs.navigation.runtime)
     api(libs.play.cast)
     api(libs.play.review)
-    api(libs.rx2.java)
-    api(libs.rx2.relay)
 
     api(projects.modules.services.analytics)
     api(projects.modules.services.compose)
@@ -52,7 +48,6 @@ dependencies {
 
     implementation(platform(libs.compose.bom))
 
-    implementation(libs.androidx.cardview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.viewpager)
     implementation(libs.androidx.webkit)
@@ -60,13 +55,9 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
-    implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
-    implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.okhttp)
-    implementation(libs.rx2.android)
-    implementation(libs.rx2.kotlin)
     implementation(libs.timber)
 
     debugImplementation(libs.compose.ui.test.manifest)

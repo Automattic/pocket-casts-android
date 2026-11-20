@@ -1,15 +1,18 @@
 8.26
 -----
 *   Bug Fixes
+    *   Allow the Wear OS app to be installed on watches without WiFi or Bluetooth
+        ([#6435](https://github.com/Automattic/pocket-casts-android/pull/6435))
     *   Fix Auto Restart Sleep Timer not restarting the timer when playback resumes within 5 minutes, including after adding time
         ([#6406](https://github.com/Automattic/pocket-casts-android/pull/6406))
-
 
 8.25
 -----
 *   New Features
     *   Add an option to hide played podcasts from the Podcasts tab, in the "…" menu
         ([#6203](https://github.com/Automattic/pocket-casts-android/pull/6203))
+    *   Ask about this episode 
+        ([#6426](https://github.com/Automattic/pocket-casts-android/pull/6426))
 *   Bug Fixes
     *   Fix Wear OS episode downloads not switching to WiFi
         ([#6100](https://github.com/Automattic/pocket-casts-android/pull/6100))

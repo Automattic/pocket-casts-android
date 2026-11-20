@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-04 09:58:06+0000
+Translation-Revision-Date: 2026-11-10 09:55:19+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="chat_jumping_to_time">%1$sに移動中…</string>
+    <string name="chat_jumped_to_time">%1$sに移動しました</string>
+    <string name="playback_2026_sheet_button">マイプレイバック2026を表示</string>
+    <string name="playback_2026_sheet_description">聴取した内容。 お気に入りのポッドキャスト。 あなたならではのリスニングスタイル。 Pocket Casts でのあなたの1年間はこちら。</string>
+    <string name="playback_2026_banner_description">リスニング統計や、あなたがどんなリスナーかを確認できます。</string>
+    <string name="playback_2026_banner_title">プレイバック2026が登場 !</string>
+    <string name="chapters_generated_none_message">このエピソードのチャプターを生成できませんでした。</string>
+    <string name="chapters_generated_none_title">このエピソードのチャプターはありません</string>
+    <string name="chapters_generated_generating_note">エピソードが長い場合は、1分ほどかかる場合があります。 チャプターは準備が整うとプレイヤーに表示されます。</string>
+    <string name="chapters_generated_generating">チャプターを生成中…</string>
+    <string name="chapters_generated_ai_note">チャプターは AI を使用して生成され、完全に正確ではない可能性があります。</string>
+    <string name="chapters_generated_generate">チャプターを生成</string>
+    <string name="chapters_generated_none_yet_message">チャプターを生成し、目的の部分までスキップできます。</string>
+    <string name="chapters_generated_none_yet_title">チャプターはまだありません</string>
+    <string name="chat_playback_position">再生位置</string>
     <string name="settings_generated_chapters_summary">エピソードに独自のチャプターがない場合、Pocket Casts が自動的にチャプターを生成します。</string>
     <string name="podcasts_played_podcasts_show">表示</string>
     <string name="podcasts_played_podcasts_hide">非表示</string>
@@ -70,9 +85,9 @@ Language: ja_JP
     <string name="chat_beta_note">「このエピソードについて尋ねる」はベータ版です</string>
     <string name="chat_beta_sheet_body">テスト中は全ユーザーに対して無料です。 後ほど Plus 機能になる予定です。</string>
     <string name="chat_beta_sheet_title">「このエピソードについて尋ねる」はベータ版です</string>
-    <string name="episode_chat_tooltip_body">何かお尋ねください。 聴き取っていました。</string>
     <string name="episode_chat_beta_badge">ベータ</string>
     <string name="episode_chat_shelf_title">このエピソードについて尋ねる</string>
+    <string name="episode_chat_tooltip_message">または、内容について何でも質問できます。</string>
     <string name="manual_playlist_no_content_body_alternative">フォローしているポッドキャストからエピソードを選択します。 または、エピソードを左にスワイプして、その都度追加することもできます。</string>
     <string name="manual_playlist_no_content_body">気に入ったポッドキャストを見つけて、エピソードを左にスワイプすると追加できます。</string>
     <string name="settings_general_whats_new_unread_dot_summary">新しい新着情報メッセージがある場合、プロフィールに未読のドットが表示されます。</string>
