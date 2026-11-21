@@ -26,6 +26,8 @@ import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
+import java.util.concurrent.ConcurrentHashMap
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -51,6 +53,23 @@ internal class Media3LibrarySessionCallback(
 ) : MediaLibraryService.MediaLibrarySession.Callback {
 
     private val scope: CoroutineScope get() = scopeProvider()
+
+    // Media3 tracks subscriptions per parent but can't list the parents, so remember the ones we have seen.
+    private val subscribedParentIds: MutableSet<String> = ConcurrentHashMap.newKeySet()
+
+    /**
+     * Asks every browser to reload the lists it is subscribed to. Use this when a setting changes
+     * how all items render. Parents that no longer have a subscriber are forgotten.
+     */
+    fun notifySubscribedChildrenChanged(session: MediaLibraryService.MediaLibrarySession) {
+        subscribedParentIds.toList().forEach { parentId ->
+            if (session.getSubscribedControllers(parentId).isEmpty()) {
+                subscribedParentIds.remove(parentId)
+            } else {
+                session.notifyChildrenChanged(parentId, Int.MAX_VALUE, null)
+            }
+        }
+    }
 
     override fun onConnect(
         session: MediaSession,
@@ -211,6 +230,19 @@ internal class Media3LibrarySessionCallback(
             } catch (e: Exception) {
                 Timber.e(e, "Failed to load children for: $parentId")
                 future.set(LibraryResult.ofError(SessionError.ERROR_UNKNOWN))
+                return@launch
+            }
+            // Fetched once the list has loaded, because loading the list is what saves a podcast opened from search.
+            if (Util.isAutomotive(contextProvider())) {
+                try {
+                    if (browseTreeProvider.fetchEpisodeArtwork(parentId)) {
+                        session.notifyChildrenChanged(parentId, Int.MAX_VALUE, null)
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to fetch episode artwork for: $parentId")
+                }
             }
         }
         return future
@@ -225,6 +257,7 @@ internal class Media3LibrarySessionCallback(
         if (!Util.isAutomotive(contextProvider())) {
             return super.onSubscribe(session, browser, parentId, params)
         }
+        subscribedParentIds.add(parentId)
         if (browser.controllerVersion != MediaSession.ControllerInfo.LEGACY_CONTROLLER_VERSION) {
             session.notifyChildrenChanged(browser, parentId, Int.MAX_VALUE, params)
         }

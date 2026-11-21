@@ -19,8 +19,10 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import com.google.common.collect.ImmutableList
 import java.util.Date
 import java.util.concurrent.ExecutionException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -34,6 +36,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -424,6 +427,96 @@ class Media3LibrarySessionCallbackTest {
         val result = callback.onSubscribe(mockSession, mockController, "playlist-uuid", null).get()
 
         assertEquals(SessionError.ERROR_NOT_SUPPORTED, result.resultCode)
+    }
+
+    @Test
+    fun `notifySubscribedChildrenChanged reloads lists that still have subscribers`() {
+        val automotiveCallback = createAutomotiveCallback()
+        whenever(mockController.controllerVersion).thenReturn(MediaSession.ControllerInfo.LEGACY_CONTROLLER_VERSION)
+        automotiveCallback.onSubscribe(mockSession, mockController, "podcast-uuid", null)
+        automotiveCallback.onSubscribe(mockSession, mockController, "closed-list", null)
+        whenever(mockSession.getSubscribedControllers("podcast-uuid")).thenReturn(ImmutableList.of(mockController))
+        whenever(mockSession.getSubscribedControllers("closed-list")).thenReturn(ImmutableList.of())
+
+        automotiveCallback.notifySubscribedChildrenChanged(mockSession)
+
+        verify(mockSession).notifyChildrenChanged("podcast-uuid", Int.MAX_VALUE, null)
+        verify(mockSession, never()).notifyChildrenChanged(eq("closed-list"), any(), anyOrNull())
+    }
+
+    @Test
+    fun `notifySubscribedChildrenChanged forgets lists without subscribers`() {
+        val automotiveCallback = createAutomotiveCallback()
+        whenever(mockController.controllerVersion).thenReturn(MediaSession.ControllerInfo.LEGACY_CONTROLLER_VERSION)
+        automotiveCallback.onSubscribe(mockSession, mockController, "closed-list", null)
+        whenever(mockSession.getSubscribedControllers("closed-list")).thenReturn(ImmutableList.of())
+        automotiveCallback.notifySubscribedChildrenChanged(mockSession)
+
+        whenever(mockSession.getSubscribedControllers("closed-list")).thenReturn(ImmutableList.of(mockController))
+        automotiveCallback.notifySubscribedChildrenChanged(mockSession)
+
+        verify(mockSession, never()).notifyChildrenChanged(eq("closed-list"), any(), anyOrNull())
+    }
+
+    @Test
+    fun `onGetChildren on automotive reloads the list after fetching episode artwork`() = runTest {
+        val automotiveCallback = createAutomotiveCallback()
+        whenever(browseTreeProvider.loadChildren(eq("podcast-uuid"), any())).thenReturn(emptyList())
+        whenever(browseTreeProvider.fetchEpisodeArtwork("podcast-uuid")).thenReturn(true)
+
+        automotiveCallback.onGetChildren(mockSession, mockController, "podcast-uuid", 0, Int.MAX_VALUE, null).get()
+
+        verify(mockSession).notifyChildrenChanged("podcast-uuid", Int.MAX_VALUE, null)
+    }
+
+    @Test
+    fun `onGetChildren on automotive leaves the list alone when no artwork changed`() = runTest {
+        val automotiveCallback = createAutomotiveCallback()
+        whenever(browseTreeProvider.loadChildren(eq("podcast-uuid"), any())).thenReturn(emptyList())
+        whenever(browseTreeProvider.fetchEpisodeArtwork("podcast-uuid")).thenReturn(false)
+
+        automotiveCallback.onGetChildren(mockSession, mockController, "podcast-uuid", 0, Int.MAX_VALUE, null).get()
+
+        verify(mockSession, never()).notifyChildrenChanged(any<String>(), any(), anyOrNull())
+    }
+
+    @Test
+    fun `onGetChildren on automotive fetches episode artwork once the list has loaded`() = runTest {
+        val automotiveCallback = createAutomotiveCallback()
+        val loadedItems = CompletableDeferred<List<MediaItem>>()
+        whenever(browseTreeProvider.loadChildren(eq("podcast-uuid"), any())).doSuspendableAnswer { loadedItems.await() }
+        whenever(browseTreeProvider.fetchEpisodeArtwork("podcast-uuid")).thenReturn(false)
+
+        val result = automotiveCallback
+            .onGetChildren(mockSession, mockController, "podcast-uuid", 0, Int.MAX_VALUE, null)
+        verify(browseTreeProvider, never()).fetchEpisodeArtwork(any())
+
+        loadedItems.complete(emptyList())
+        result.get()
+        verify(browseTreeProvider).fetchEpisodeArtwork("podcast-uuid")
+    }
+
+    @Test
+    fun `onGetChildren on automotive skips the artwork fetch when the list fails to load`() = runTest {
+        val automotiveCallback = createAutomotiveCallback()
+        whenever(browseTreeProvider.loadChildren(eq("podcast-uuid"), any()))
+            .thenThrow(IllegalStateException("Database closed"))
+
+        val result = automotiveCallback
+            .onGetChildren(mockSession, mockController, "podcast-uuid", 0, Int.MAX_VALUE, null)
+            .get()
+
+        assertEquals(SessionError.ERROR_UNKNOWN, result.resultCode)
+        verify(browseTreeProvider, never()).fetchEpisodeArtwork(any())
+    }
+
+    @Test
+    fun `onGetChildren off automotive does not fetch episode artwork`() = runTest {
+        whenever(browseTreeProvider.loadChildren(eq("podcast-uuid"), any())).thenReturn(emptyList())
+
+        callback.onGetChildren(mockSession, mockController, "podcast-uuid", 0, Int.MAX_VALUE, null).get()
+
+        verify(browseTreeProvider, never()).fetchEpisodeArtwork(any())
     }
 
     @Test

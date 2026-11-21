@@ -1,5 +1,8 @@
 8.26
 -----
+*   New Features
+    *   Add a "Use episode artwork" setting to Android Automotive, so episodes with their own artwork show it in the car
+        ([#6305](https://github.com/Automattic/pocket-casts-android/issues/6305))
 *   Bug Fixes
     *   Allow the Wear OS app to be installed on watches without WiFi or Bluetooth
         ([#6435](https://github.com/Automattic/pocket-casts-android/pull/6435))

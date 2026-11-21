@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.coroutines.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.repositories.BuildConfig
 import au.com.shiftyjelly.pocketcasts.servers.ShowNotesServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.podcast.ShowNotesResponse
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import javax.inject.Inject
@@ -69,4 +70,17 @@ class ShowNotesManager @Inject constructor(
             }
         },
     )
+
+    /**
+     * Downloads a podcast's show notes and stores only its episodes' image URLs, returning once they are saved.
+     * Returns true when any episode's image URL changed.
+     */
+    suspend fun updateEpisodeImageUrls(podcastUuid: String): Boolean {
+        var response: ShowNotesResponse? = null
+        showNotesServiceManager.downloadToCacheShowNotes(
+            podcastUuid = podcastUuid,
+            processShowNotes = { showNotes -> response = showNotes },
+        )
+        return response?.let { showNotesProcessor.updateImageUrls(it) } ?: false
+    }
 }

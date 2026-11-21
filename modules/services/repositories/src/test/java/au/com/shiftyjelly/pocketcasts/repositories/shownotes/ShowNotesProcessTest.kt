@@ -22,6 +22,7 @@ import kotlinx.coroutines.test.runTest
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
@@ -35,7 +36,9 @@ class ShowNotesProcessTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val episodeManager = mock<EpisodeManager>()
+    private val episodeManager = mock<EpisodeManager> {
+        on { updateImageUrls(any()) } doReturn false
+    }
     private val chapterManager = mock<ChapterManager>()
     private val transcriptDao = mock<TranscriptDao>()
     private val service = mock<PodcastCacheService>()
