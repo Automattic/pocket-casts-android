@@ -197,7 +197,7 @@ private fun SubscriptionPlanRow(
                     if (isSelected) {
                         Modifier.border(
                             width = 2.dp,
-                            color = MaterialTheme.theme.colors.primaryField03Active,
+                            color = MaterialTheme.theme.colors.primaryInteractive01,
                             shape = RoundedCornerShape(8.dp),
                         )
                     } else {
@@ -270,7 +270,7 @@ private fun SubscriptionPlanRow(
                         },
                         y = (-10).dp,
                     )
-                    .background(MaterialTheme.theme.colors.primaryField03Active, CircleShape)
+                    .background(MaterialTheme.theme.colors.primaryInteractive01, CircleShape)
                     .padding(horizontal = 12.dp, vertical = 2.dp),
             ) {
                 TextH50(
@@ -317,7 +317,7 @@ private fun CheckMark(
         Box(
             contentAlignment = Alignment.Center,
             modifier = modifier.background(
-                color = MaterialTheme.theme.colors.primaryField03Active,
+                color = MaterialTheme.theme.colors.primaryInteractive01,
                 shape = CircleShape,
             ),
         ) {

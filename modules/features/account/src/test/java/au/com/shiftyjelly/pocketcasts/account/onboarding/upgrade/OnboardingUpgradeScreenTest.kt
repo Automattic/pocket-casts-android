@@ -45,13 +45,14 @@ class OnboardingUpgradeScreenTest {
     }
 
     @Test
-    fun `selecting monthly during the intro offer keeps the tag but restores the button`() {
+    fun `selecting monthly during the intro offer restores the regular header, button and footer`() {
         FeatureFlag.setEnabled(Feature.INTRO_PLUS_OFFER_ENABLED, true)
 
         setScreen(billingCycle = BillingCycle.Monthly, source = OnboardingUpgradeSource.ACCOUNT_DETAILS)
 
-        composeTestRule.onNodeWithText("Limited time offer").assertExists()
-        composeTestRule.onNodeWithText("50% off Plus for\none year").assertExists()
+        composeTestRule.onNodeWithText("Limited time offer").assertDoesNotExist()
+        composeTestRule.onNodeWithText("50% off Plus for\none year").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Superpowers for your podcasts").assertExists()
         composeTestRule.onNodeWithText("Subscribe to Plus").assertExists()
         composeTestRule.onNodeWithText("Claim", substring = true).assertDoesNotExist()
         composeTestRule.onNodeWithText("Recurring payments at", substring = true).assertDoesNotExist()

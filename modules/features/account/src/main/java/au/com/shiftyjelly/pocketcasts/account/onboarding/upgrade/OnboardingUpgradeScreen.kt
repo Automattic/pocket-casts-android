@@ -389,6 +389,7 @@ private fun UpgradeHeader(
     onClosePress: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val selectedIntroOfferPricing = introOfferPricing?.takeIf { selectedPlan.key.offer == SubscriptionOffer.IntroOffer }
     Column(modifier = modifier) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -410,7 +411,7 @@ private fun UpgradeHeader(
                         .wrapContentWidth()
                         .wrapContentHeight(),
                 )
-                if (introOfferPricing != null) {
+                if (selectedIntroOfferPricing != null) {
                     LimitedTimeOfferTag()
                 }
             }
@@ -435,8 +436,8 @@ private fun UpgradeHeader(
         Spacer(modifier = Modifier.height(8.dp))
         val titleRes = selectedPlan.customFeatureTitle(source)
         // Feature paywalls keep their own headline during the offer
-        val title = if (introOfferPricing != null && titleRes == LR.string.onboarding_upgrade_generic_title) {
-            stringResource(LR.string.onboarding_upgrade_intro_offer_title, introOfferPricing.discountPercent)
+        val title = if (selectedIntroOfferPricing != null && titleRes == LR.string.onboarding_upgrade_generic_title) {
+            stringResource(LR.string.onboarding_upgrade_intro_offer_title, selectedIntroOfferPricing.discountPercent)
         } else {
             stringResource(titleRes)
         }
