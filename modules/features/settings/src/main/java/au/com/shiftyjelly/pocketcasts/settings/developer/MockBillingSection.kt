@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.semantics.Role
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
@@ -23,6 +24,8 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.mock.MockBillingConfig
 import au.com.shiftyjelly.pocketcasts.payment.mock.MockPurchaseOutcome
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 
 data class MockBillingState(
     val config: MockBillingConfig,
@@ -149,9 +152,10 @@ private fun OfferEligibilityRow(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isIntroOfferPlusEnabled by FeatureFlag.isEnabledFlow(Feature.INTRO_PLUS_OFFER_ENABLED).collectAsStateWithLifecycle()
     SettingRow(
         primaryText = "Eligible for ${offer.label}",
-        secondaryText = if (offer == SubscriptionOffer.IntroOffer) {
+        secondaryText = if (offer == SubscriptionOffer.IntroOffer && !isIntroOfferPlusEnabled) {
             "Also turn on Intro Offer Plus in Beta features to see the 50% offer"
         } else {
             null
