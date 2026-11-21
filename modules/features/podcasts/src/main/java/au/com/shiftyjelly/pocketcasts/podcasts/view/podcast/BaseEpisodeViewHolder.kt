@@ -129,6 +129,13 @@ abstract class BaseEpisodeViewHolder<T : Any>(
         bindTitle()
         bindDate()
         bindStatus(downloadProgress = 0)
+        if (shouldObserveRowData) {
+            // Recycled rows still carry the previous episode's queued/bookmark icons, and the
+            // video icon depends on data not loaded yet. Hide them until the row data arrives.
+            binding.imgUpNext.isVisible = false
+            binding.imgBookmark.isVisible = false
+            binding.video.isVisible = false
+        }
         bindContentDescription(isInUpNext = false)
         bindColors()
         bindSwipeActions()
@@ -178,6 +185,7 @@ abstract class BaseEpisodeViewHolder<T : Any>(
 
                 if (data.playbackState.episodeUuid == episode.uuid && data.playbackState.isBuffering) {
                     bindStatus(text = context.getString(LR.string.episode_row_buffering))
+                    binding.video.isVisible = episode.showsVideoIcon(hasHlsAlternateEnclosure)
                     binding.progressBar.isVisible = true
                 } else {
                     bindStatus(downloadProgress = data.downloadProgress)
