@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
 import android.app.Activity
+import au.com.shiftyjelly.pocketcasts.payment.mock.MockPaymentDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -23,7 +24,12 @@ internal class SwitchablePaymentDataSource(
 
     override suspend fun launchBillingFlow(key: SubscriptionPlan.Key, activity: Activity) = activeDataSource.launchBillingFlow(key, activity)
 
-    override suspend fun acknowledgePurchase(purchase: Purchase) = activeDataSource.acknowledgePurchase(purchase)
+    // Follows the purchase's origin so a toggle mid-approval cannot skip acknowledging a real purchase
+    override suspend fun acknowledgePurchase(purchase: Purchase) = if (purchase.token == MockPaymentDataSource.MOCK_PURCHASE_TOKEN) {
+        mockDataSource.acknowledgePurchase(purchase)
+    } else {
+        realDataSource.value.acknowledgePurchase(purchase)
+    }
 
     override suspend fun showInAppMessages(activity: Activity) = activeDataSource.showInAppMessages(activity)
 }

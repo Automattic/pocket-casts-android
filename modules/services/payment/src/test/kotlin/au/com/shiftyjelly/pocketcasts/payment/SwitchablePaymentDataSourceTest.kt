@@ -56,6 +56,19 @@ class SwitchablePaymentDataSourceTest {
     }
 
     @Test
+    fun `acknowledges real purchases with the real data source even when mocks are on`() = runTest {
+        val realPurchase = FakePaymentDataSource.DefaultPurchasedProduct
+        val mockPurchase = realPurchase.copy(token = MockPaymentDataSource.MOCK_PURCHASE_TOKEN)
+        isMockEnabled = true
+
+        dataSource.acknowledgePurchase(realPurchase)
+        dataSource.acknowledgePurchase(mockPurchase)
+
+        assertEquals(listOf(realPurchase), realDataSource.receivedPurchases)
+        assertEquals(listOf(mockPurchase), mockDataSource.receivedPurchases)
+    }
+
+    @Test
     fun `does not create the real data source while mocks are on`() = runTest {
         isMockEnabled = true
 

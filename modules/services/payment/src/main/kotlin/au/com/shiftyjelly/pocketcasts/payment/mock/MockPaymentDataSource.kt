@@ -37,7 +37,7 @@ class MockPaymentDataSource(
         return PaymentResult.Success(products)
     }
 
-    // Matches the old debug fake, so flows that check for an existing Google Play subscription keep working
+    // Reports an existing Google Play subscription so flows that check for one keep working
     override suspend fun loadPurchases(): PaymentResult<List<Purchase>> {
         return PaymentResult.Success(listOf(FakePaymentDataSource.DefaultLoadedPurchase))
     }
