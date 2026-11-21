@@ -2227,9 +2227,7 @@ open class PlaybackManager @Inject constructor(
         val sameEpisode = currentPlayer != null && episode.uuid == currentPlayer.episodeUuid
 
         // completed episodes should play from the start
-        if (episode.isFinished) {
-            episodeManager.markAsNotPlayedBlocking(episode)
-        }
+        prepareFinishedEpisodeForLoad(episode, play, episodeManager)
 
         // make sure we have the latest episode url
         when (episode) {
@@ -2586,6 +2584,9 @@ open class PlaybackManager @Inject constructor(
         if (!hasAudioFocus) {
             return
         }
+
+        // a finished episode that was loaded without playing is marked as not played once it starts
+        resetFinishedEpisodeOnPlay(episode, episodeManager)
 
         // Set before the relay emits playing
         lastPlaybackSource = sourceView
@@ -3173,6 +3174,45 @@ internal enum class CastSessionFailureAction {
     Ignore,
     ShowToast,
     ShowToastAndError,
+}
+
+/**
+ * Only starting playback marks a finished episode as not played. Loading it paused, for example when a sync
+ * removes the current Up Next episode and a finished one becomes current, just starts the player from the
+ * beginning, so the device doesn't sync a not played status over a completion from another device. If the
+ * user then plays it, [resetFinishedEpisodeOnPlay] marks it as not played.
+ */
+internal fun prepareFinishedEpisodeForLoad(
+    episode: BaseEpisode,
+    play: Boolean,
+    episodeManager: EpisodeManager,
+) {
+    if (!episode.isFinished) {
+        return
+    }
+    if (play) {
+        episodeManager.markAsNotPlayedBlocking(episode)
+    } else {
+        episode.playedUpTo = 0.0
+    }
+}
+
+/**
+ * Marks a finished episode as not played when playback starts. The database copy is reset, so unarchiving goes by
+ * its current archived state, and [episode], the Up Next copy play() takes the start position from, is moved to the
+ * beginning too. A Cast player loads at the position it is given, so a stale end position would complete it at once.
+ */
+internal suspend fun resetFinishedEpisodeOnPlay(
+    episode: BaseEpisode,
+    episodeManager: EpisodeManager,
+) {
+    val latestEpisode = episodeManager.findEpisodeByUuid(episode.uuid) ?: return
+    if (!latestEpisode.isFinished) {
+        return
+    }
+    episodeManager.markAsNotPlayedBlocking(latestEpisode)
+    episode.playedUpTo = 0.0
+    episode.playingStatus = EpisodePlayingStatus.NOT_PLAYED
 }
 
 internal fun castPlayerSwitchRequired(
