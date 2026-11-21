@@ -16,9 +16,9 @@ import com.automattic.eventhorizon.WearMainListNowPlayingTappedEvent
 import com.automattic.eventhorizon.WearMainListPodcastsTappedEvent
 import com.automattic.eventhorizon.WearMainListSettingsTappedEvent
 import com.automattic.eventhorizon.WearMainListStarredTappedEvent
-import io.reactivex.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -62,8 +62,8 @@ class WatchListScreenViewModelTest {
         MockitoAnnotations.openMocks(this)
         whenever(settings.refreshStateFlow).thenReturn(refreshStateFlow)
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
-        whenever(upNextQueue.getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager))
-            .thenReturn(Observable.never())
+        whenever(upNextQueue.getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager))
+            .thenReturn(emptyFlow())
         viewModel = WatchListScreenViewModel(
             eventHorizon = EventHorizon(eventSink),
             settings = settings,
