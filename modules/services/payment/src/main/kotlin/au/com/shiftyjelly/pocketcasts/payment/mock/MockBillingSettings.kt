@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.payment.mock
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import au.com.shiftyjelly.pocketcasts.payment.BuildConfig
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -34,7 +35,7 @@ class MockBillingSettings internal constructor(
 
     fun setMockEnabled(isEnabled: Boolean) {
         if (!canToggleMock) return
-        preferences.edit().putBoolean(KEY_MOCK_ENABLED, isEnabled).apply()
+        preferences.edit { putBoolean(KEY_MOCK_ENABLED, isEnabled) }
         _config.value = readConfig()
     }
 
@@ -44,17 +45,17 @@ class MockBillingSettings internal constructor(
         } else {
             config.value.eligibleOffers - offer
         }
-        preferences.edit().putStringSet(KEY_ELIGIBLE_OFFERS, eligibleOffers.mapTo(mutableSetOf()) { it.name }).apply()
+        preferences.edit { putStringSet(KEY_ELIGIBLE_OFFERS, eligibleOffers.mapTo(mutableSetOf()) { it.name }) }
         _config.value = readConfig()
     }
 
     fun setFailProductsLoading(shouldFail: Boolean) {
-        preferences.edit().putBoolean(KEY_FAIL_PRODUCTS_LOADING, shouldFail).apply()
+        preferences.edit { putBoolean(KEY_FAIL_PRODUCTS_LOADING, shouldFail) }
         _config.value = readConfig()
     }
 
     fun setPurchaseOutcome(outcome: MockPurchaseOutcome) {
-        preferences.edit().putString(KEY_PURCHASE_OUTCOME, outcome.name).apply()
+        preferences.edit { putString(KEY_PURCHASE_OUTCOME, outcome.name) }
         _config.value = readConfig()
     }
 
