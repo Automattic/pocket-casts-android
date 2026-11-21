@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadEpisodeWorker
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
+import au.com.shiftyjelly.pocketcasts.repositories.notification.newEpisodeNotificationsBlockedReason
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -266,6 +267,8 @@ class Support @Inject constructor(
                         .append(" Boost: ").append(if (effects.isVolumeBoosted) "on" else "off")
                         .append(eol)
                     podcastsOutput.append("Auto download? ").append(podcast.isAutoDownloadNewEpisodes).append(eol)
+                    podcastsOutput.append("Notifications? ").append(podcast.isShowNotifications).append(eol)
+                    podcastsOutput.append("Added date: ").append(podcast.addedDate).append(eol)
                     podcastsOutput.append("Custom auto archive: ").append(podcast.overrideGlobalArchive.toString()).append(eol)
                     if (podcast.overrideGlobalArchive) {
                         podcastsOutput.append("Episode limit: ").append(podcast.autoArchiveEpisodeLimit).append(eol)
@@ -396,6 +399,8 @@ class Support @Inject constructor(
                 output.append("Notifications").append(eol)
                 output.append("Play over notifications? ").append(settings.playOverNotification.value.analyticsValue).append(eol)
                 output.append("Hide notification on pause? ").append(if (settings.hideNotificationOnPause.value) "yes" else "no").append(eol)
+                output.append("New episode notifications blocked? ").append(context.newEpisodeNotificationsBlockedReason() ?: "no").append(eol)
+                output.append("New episode notifications last seen: ").append(settings.getNotificationLastSeen()).append(eol)
                 output.append(eol)
 
                 val effects = settings.globalPlaybackEffects.value
