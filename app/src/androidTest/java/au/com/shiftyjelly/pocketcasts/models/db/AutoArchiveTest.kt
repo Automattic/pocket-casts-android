@@ -505,6 +505,32 @@ class AutoArchiveTest {
     }
 
     @Test
+    fun testEpisodeLimitKeepsInProgressEpisodes() = runTest {
+        val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlaying.Never, AutoArchiveInactive.Never, testDispatcher = testDispatcher)
+        val podcast = Podcast(UUID.randomUUID().toString(), rawAutoArchiveEpisodeLimit = AutoArchiveLimit.One, overrideGlobalArchive = true)
+        val podcastManager = podcastManagerThatReturns(podcast)
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DATE, -2)
+        val date = calendar.time
+        val inProgressUuid = UUID.randomUUID().toString()
+        val unplayedUuid = UUID.randomUUID().toString()
+        val newestUuid = UUID.randomUUID().toString()
+        val inProgressEpisode = PodcastEpisode(title = "In progress", uuid = inProgressUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.IN_PROGRESS, playedUpTo = 30.0)
+        val unplayedEpisode = PodcastEpisode(title = "Unplayed", uuid = unplayedUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = date, playingStatus = EpisodePlayingStatus.NOT_PLAYED)
+        val newestEpisode = PodcastEpisode(title = "Newest", uuid = newestUuid, podcastUuid = podcast.uuid, isArchived = false, publishedDate = Date(), playingStatus = EpisodePlayingStatus.NOT_PLAYED)
+
+        episodeDao.insertBlocking(inProgressEpisode)
+        episodeDao.insertBlocking(unplayedEpisode)
+        episodeDao.insertBlocking(newestEpisode)
+
+        episodeManager.checkForEpisodesToAutoArchiveBlocking(null, podcastManager)
+
+        assertTrue("In progress episode should not be archived", !episodeDao.findByUuid(inProgressUuid)!!.isArchived)
+        assertTrue("Unplayed episode outside the limit should be archived", episodeDao.findByUuid(unplayedUuid)!!.isArchived)
+        assertTrue("Newest episode should not be archived", !episodeDao.findByUuid(newestUuid)!!.isArchived)
+    }
+
+    @Test
     fun testAddingInactiveEpisodeToUpNext() = runTest {
         val episodeManager = episodeManagerFor(testDb, AutoArchiveAfterPlaying.Never, AutoArchiveInactive.Weeks1, includeStarred = true, testDispatcher = testDispatcher)
         val upNext = upNextQueueFor(testDb, episodeManager)
