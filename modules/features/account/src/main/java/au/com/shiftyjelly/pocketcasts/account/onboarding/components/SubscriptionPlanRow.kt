@@ -30,6 +30,12 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -43,8 +49,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import java.text.NumberFormat
 import java.util.Currency
@@ -75,6 +84,22 @@ fun UpgradePlanRow(
     modifier: Modifier = Modifier,
     priceComparisonPlan: SubscriptionPlan? = null,
 ) {
+    val introOfferPricing = plan.introOfferPricing
+    if (introOfferPricing != null) {
+        SubscriptionPlanRow(
+            plan = plan,
+            isSelected = isSelected,
+            onClick = onClick,
+            modifier = modifier,
+            rowConfig = RowConfig.upgradePlansConfig(calculatedSavingPercent = null).copy(
+                badgeText = BadgeText.CalculatedText {
+                    stringResource(LR.string.onboarding_upgrade_intro_offer_badge, introOfferPricing.discountPercent)
+                },
+            ),
+        )
+        return
+    }
+
     val calculatedSavingPercent = if (plan.isInstallment && plan.offer == null) {
         null
     } else {
@@ -204,12 +229,17 @@ private fun SubscriptionPlanRow(
                     text = plan.displayName(),
                     fontSize = rowConfig.mainTextSize,
                 )
-                TextP40(
-                    text = plan.price(),
-                    lineHeight = 16.sp,
-                    color = MaterialTheme.theme.colors.primaryText02,
-                    fontSize = 15.sp,
-                )
+                val introOfferPricing = plan.introOfferPricing
+                if (introOfferPricing != null) {
+                    IntroOfferPrice(pricing = introOfferPricing)
+                } else {
+                    TextP40(
+                        text = plan.price(),
+                        lineHeight = 16.sp,
+                        color = MaterialTheme.theme.colors.primaryText02,
+                        fontSize = 15.sp,
+                    )
+                }
             }
             plan.pricePerPeriod(rowConfig)?.let {
                 TextP40(
@@ -251,6 +281,31 @@ private fun SubscriptionPlanRow(
             }
         }
     }
+}
+
+@Composable
+private fun IntroOfferPrice(
+    pricing: IntroOfferPricing,
+    modifier: Modifier = Modifier,
+) {
+    val introText = stringResource(LR.string.onboarding_upgrade_intro_offer_price, pricing.introPrice.formattedPrice)
+    val regularPriceDescription = stringResource(LR.string.onboarding_upgrade_regular_price, pricing.regularPrice.formattedPrice)
+    val text = buildAnnotatedString {
+        withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough)) {
+            append(pricing.regularPrice.formattedPrice)
+        }
+        append(" ")
+        append(introText)
+    }
+    TextP40(
+        text = text,
+        lineHeight = 16.sp,
+        color = MaterialTheme.theme.colors.primaryText02,
+        fontSize = 15.sp,
+        modifier = modifier.clearAndSetSemantics {
+            contentDescription = "$introText, $regularPriceDescription"
+        },
+    )
 }
 
 @Composable
@@ -340,6 +395,8 @@ private fun SubscriptionPlan.formattedTotalYearlyPrice(): String {
 
 @Composable
 private fun SubscriptionPlan.pricePerPeriod(config: RowConfig): String? {
+    // A per-period price would only hold for the discounted first year
+    if (introOfferPricing != null) return null
     if (isInstallment) {
         return when (this) {
             is SubscriptionPlan.WithOffer -> when (config.pricePerPeriod) {
@@ -465,6 +522,35 @@ private fun PreviewUpgradePlanSelectors(
             UpgradePlanRow(
                 plan = SubscriptionPlan.PlusMonthlyPreview,
                 isSelected = true,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {},
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewUpgradePlanSelectorsWithIntroOffer(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+) {
+    AppThemeWithBackground(theme) {
+        Column(
+            modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            UpgradePlanRow(
+                plan = SubscriptionPlans.Preview
+                    .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.IntroOffer)
+                    .getOrNull()!!,
+                isSelected = true,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {},
+                priceComparisonPlan = SubscriptionPlan.PlusMonthlyPreview,
+            )
+            UpgradePlanRow(
+                plan = SubscriptionPlan.PlusMonthlyPreview,
+                isSelected = false,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {},
             )
