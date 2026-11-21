@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.common.collect.ImmutableList
@@ -126,13 +127,30 @@ internal class Media3LibrarySessionCallback(
     ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
         val future = SettableFuture.create<MediaSession.MediaItemsWithStartPosition>()
         val context = contextProvider()
-        if (Util.isAutomotive(context)) {
+        val isAutomotive = Util.isAutomotive(context)
+        if (isAutomotive) {
             settings.setAutomotiveConnectedToMediaSession(true)
+            // Diagnostic for the Automotive start-up sync issue (PCDROID-536): records whether the car
+            // asked us to resume before it had a network, and what the last refresh looked like.
+            LogBuffer.i(
+                LogBuffer.TAG_PLAYBACK,
+                "Automotive resumption requested by ${controller.packageName}: " +
+                    "playbackHasBeenResumed=$playbackHasBeenResumed, " +
+                    "networkConnected=${Network.isConnected(context)}, " +
+                    "refreshState=${settings.getRefreshState()}, " +
+                    "lastRefresh=${settings.getLastRefreshDate()}",
+            )
             podcastManager.refreshPodcastsIfRequired(fromLog = "Automotive resumption")
         }
         scope.launch {
             try {
                 val episode = playbackManager.getCurrentEpisode()
+                if (isAutomotive) {
+                    LogBuffer.i(
+                        LogBuffer.TAG_PLAYBACK,
+                        "Automotive resumption resolved: episode=${episode?.uuid}, playedUpToMs=${episode?.playedUpToMs}",
+                    )
+                }
                 if (episode != null) {
                     val podcast = (episode as? PodcastEpisode)?.let {
                         podcastManager.findPodcastByUuid(it.podcastUuid)
