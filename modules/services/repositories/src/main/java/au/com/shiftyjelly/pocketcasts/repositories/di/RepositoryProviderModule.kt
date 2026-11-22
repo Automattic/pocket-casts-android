@@ -6,6 +6,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentDataSource
+import au.com.shiftyjelly.pocketcasts.payment.mock.MockBillingSettings
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.payment.AnalyticsPaymentListener
 import au.com.shiftyjelly.pocketcasts.repositories.payment.LoggingPaymentListener
@@ -58,12 +59,9 @@ class RepositoryProviderModule {
     fun providePaymentDataSource(
         @ApplicationContext context: Context,
         listeners: Set<@JvmSuppressWildcards PaymentClient.Listener>,
+        mockBillingSettings: MockBillingSettings,
     ): PaymentDataSource {
-        return if (context.packageName == "au.com.shiftyjelly.pocketcasts") {
-            PaymentDataSource.billing(context, listeners)
-        } else {
-            PaymentDataSource.fake()
-        }
+        return PaymentDataSource.switchable(context, listeners, mockBillingSettings)
     }
 
     @Provides

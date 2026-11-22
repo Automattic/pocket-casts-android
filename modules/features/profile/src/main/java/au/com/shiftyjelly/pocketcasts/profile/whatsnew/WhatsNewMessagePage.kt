@@ -439,6 +439,7 @@ private fun WhatsNewMessageText(
         if (description != null) {
             TextP40(
                 text = description,
+                color = MaterialTheme.theme.colors.primaryText02,
                 fontSize = 15.sp,
                 lineHeight = 20.sp,
             )

@@ -78,7 +78,7 @@ class PaymentClient @Inject constructor(
             .also { forEachListener { onInAppMessagesShown(it) } }
     }
 
-    private suspend fun listenToPurchaseUpdates(): Nothing {
+    private suspend fun listenToPurchaseUpdates() {
         dataSource.purchaseResults.collect { result ->
             val recoveredResult = result.recover { code, message ->
                 when (code) {

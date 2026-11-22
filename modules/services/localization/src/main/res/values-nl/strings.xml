@@ -83,11 +83,11 @@ Language: nl
     <string name="chat_survey_title">Vind je het leuk om vragen te stellen over deze aflevering?</string>
     <string name="chat_welcome">Vraag stellen over iets in deze aflevering. Of start hier.</string>
     <string name="chat_beta_sheet_body">Gratis voor iedereen terwijl we het testen. Het wordt later een Plus-functie.</string>
-    <string name="episode_chat_tooltip_body">Vraag het wat je wilt. Hij luisterde ook.</string>
     <string name="episode_chat_beta_badge">Bèta</string>
     <string name="chat_beta_note">Vraag stellen over deze aflevering is in bèta</string>
     <string name="chat_beta_sheet_title">Vraag stellen over deze aflevering is in bèta</string>
     <string name="episode_chat_shelf_title">Vraag stellen over deze aflevering</string>
+    <string name="episode_chat_tooltip_message">Of vraag er alles over.</string>
     <string name="manual_playlist_no_content_body_alternative">Kies afleveringen uit de podcasts die je volgt. Of veeg naar links bij elke aflevering om het toe te voegen terwijl je gaat.</string>
     <string name="manual_playlist_no_content_body">Zoek een podcast die je leuk vindt en veeg vervolgens naar links bij elke aflevering om deze toe te voegen.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Toon een ongelezen punt op profiel wanneer er nieuwe Wat is nieuwe berichten zijn.</string>
