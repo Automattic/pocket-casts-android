@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.components
 
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.Price
+import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
@@ -23,6 +24,22 @@ class IntroOfferPricingTest {
         assertEquals(plan.pricingPhases.first().price, pricing.introPrice)
         assertEquals(plan.pricingPhases.last().price, pricing.regularPrice)
         assertEquals(50, pricing.discountPercent)
+    }
+
+    @Test
+    fun `intro offer that does not last exactly one year has no intro pricing`() {
+        val plan = plans.findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.IntroOffer).getOrNull()!!
+        val introPhase = plan.pricingPhases.first()
+        val otherSchedules = listOf(
+            introPhase.schedule.copy(recurrenceMode = PricingSchedule.RecurrenceMode.Recurring(2)),
+            introPhase.schedule.copy(period = PricingSchedule.Period.Monthly, recurrenceMode = PricingSchedule.RecurrenceMode.Recurring(6)),
+            introPhase.schedule.copy(periodCount = 2),
+        )
+
+        otherSchedules.forEach { schedule ->
+            val otherPlan = plan.copy(pricingPhases = listOf(introPhase.copy(schedule = schedule), plan.pricingPhases.last()))
+            assertNull("$schedule", otherPlan.introOfferPricing)
+        }
     }
 
     @Test

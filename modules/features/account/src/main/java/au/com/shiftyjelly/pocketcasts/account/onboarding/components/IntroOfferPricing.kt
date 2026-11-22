@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.components
 
 import au.com.shiftyjelly.pocketcasts.payment.Price
+import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule
 import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule.RecurrenceMode
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
@@ -19,15 +20,17 @@ internal data class IntroOfferPricing(
         }
 }
 
-// Matches the shape OnboardingSubscriptionPlan accepts: one discounted recurring phase, then the regular price forever
+// The paywall copy and renewal date assume one discounted year, then the regular price forever
 internal val SubscriptionPlan.introOfferPricing: IntroOfferPricing?
     get() {
         if (this !is SubscriptionPlan.WithOffer || offer != SubscriptionOffer.IntroOffer || isInstallment) return null
         val (introPhase, regularPhase) = pricingPhases.takeIf { it.size == 2 } ?: return null
-        if (introPhase.schedule.recurrenceMode !is RecurrenceMode.Recurring) return null
+        if (introPhase.schedule != OneYearSchedule) return null
         if (regularPhase.schedule.recurrenceMode != RecurrenceMode.Infinite) return null
         return IntroOfferPricing(introPrice = introPhase.price, regularPrice = regularPhase.price)
     }
 
 internal val List<SubscriptionPlan>.introOfferPricing: IntroOfferPricing?
     get() = firstNotNullOfOrNull { plan -> plan.introOfferPricing }
+
+private val OneYearSchedule = PricingSchedule(RecurrenceMode.Recurring(1), PricingSchedule.Period.Yearly, periodCount = 1)
