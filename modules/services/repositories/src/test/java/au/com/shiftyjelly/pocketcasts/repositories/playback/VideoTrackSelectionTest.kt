@@ -123,7 +123,7 @@ class VideoTrackSelectionTest {
     }
 
     @Test
-    fun `hasIndependentAudioTrack returns true when an independent audio rendition is supported`() {
+    fun `hasIndependentAudioTrack returns true when an independent audio rendition is selected`() {
         val videoGroup = Tracks.Group(
             TrackGroup(
                 "main",
@@ -149,8 +149,8 @@ class VideoTrackSelectionTest {
     }
 
     @Test
-    fun `hasIndependentAudioTrack returns true when an independent audio track exceeds capabilities`() {
-        val independentAudioGroup = Tracks.Group(
+    fun `hasIndependentAudioTrack returns false when independent audio is not selected`() {
+        val unselectedAudioGroup = Tracks.Group(
             TrackGroup(
                 "audio:English",
                 Format.Builder()
@@ -158,32 +158,44 @@ class VideoTrackSelectionTest {
                     .build(),
             ),
             false,
-            intArrayOf(C.FORMAT_EXCEEDS_CAPABILITIES),
+            intArrayOf(C.FORMAT_HANDLED),
             booleanArrayOf(false),
         )
 
-        assertTrue(hasIndependentAudioTrack(Tracks(listOf(independentAudioGroup))))
+        assertFalse(hasIndependentAudioTrack(Tracks(listOf(unselectedAudioGroup))))
     }
 
     @Test
-    fun `hasIndependentAudioTrack returns false when independent audio is unsupported`() {
-        val unsupportedAudioGroup = Tracks.Group(
+    fun `hasIndependentAudioTrack returns false when muxed audio is selected alongside an unselected independent rendition`() {
+        val muxedAudioGroup = Tracks.Group(
             TrackGroup(
-                "audio:English",
+                "main:muxed:0",
                 Format.Builder()
-                    .setSampleMimeType(MimeTypes.AUDIO_AC3)
+                    .setSampleMimeType(MimeTypes.AUDIO_AAC)
+                    .setPrimaryTrackGroupId("main")
                     .build(),
             ),
             false,
-            intArrayOf(C.FORMAT_UNSUPPORTED_SUBTYPE),
+            intArrayOf(C.FORMAT_HANDLED),
+            booleanArrayOf(true),
+        )
+        val alternateLanguageGroup = Tracks.Group(
+            TrackGroup(
+                "audio:Spanish",
+                Format.Builder()
+                    .setSampleMimeType(MimeTypes.AUDIO_AAC)
+                    .build(),
+            ),
+            false,
+            intArrayOf(C.FORMAT_HANDLED),
             booleanArrayOf(false),
         )
 
-        assertFalse(hasIndependentAudioTrack(Tracks(listOf(unsupportedAudioGroup))))
+        assertFalse(hasIndependentAudioTrack(Tracks(listOf(muxedAudioGroup, alternateLanguageGroup))))
     }
 
     @Test
-    fun `hasIndependentAudioTrack returns true when both muxed and independent audio exist`() {
+    fun `hasIndependentAudioTrack returns true when independent audio is selected alongside unselected muxed audio`() {
         val muxedAudioGroup = Tracks.Group(
             TrackGroup(
                 "main:muxed:0",

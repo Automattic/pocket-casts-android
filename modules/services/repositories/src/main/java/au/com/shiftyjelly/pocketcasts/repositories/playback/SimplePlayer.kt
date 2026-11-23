@@ -272,8 +272,14 @@ class SimplePlayer(
                 episodeMetadata.read(tracks, settings.artworkConfiguration.value.useEpisodeArtwork, context)
                 onMetadataAvailable(episodeMetadata)
                 updateVideoState()
-                if (!hasVideoSurface && episodeLocation.isHlsStream && videoTrackDisableRunnable == null) {
-                    applyVideoTrackSelection(tracks = tracks)
+                if (
+                    !hasVideoSurface &&
+                    episodeLocation.isHlsStream &&
+                    videoTrackDisableRunnable == null &&
+                    trackSelector.parameters.disabledTrackTypes.contains(C.TRACK_TYPE_VIDEO).not() &&
+                    hasIndependentAudioTrack(tracks)
+                ) {
+                    scheduleVideoTrackDisable()
                 }
             }
 
@@ -512,8 +518,9 @@ internal fun hasIndependentAudioTrack(tracks: Tracks?): Boolean {
     if (tracks == null) return false
     return tracks.groups.any { group ->
         group.type == C.TRACK_TYPE_AUDIO &&
+            group.isSelected &&
             (0 until group.length).any { index ->
-                group.isTrackSupported(index, true) &&
+                group.isTrackSelected(index) &&
                     group.getTrackFormat(index).primaryTrackGroupId == null
             }
     }
