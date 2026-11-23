@@ -20,6 +20,7 @@ dependencies {
     api(libs.dagger.hilt.android)
     api(libs.eventhorizon)
 
+    implementation(libs.androidx.core.ktx)
     implementation(libs.billing.ktx)
 
     testImplementation(libs.coroutines.test)

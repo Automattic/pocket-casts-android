@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.settings.developer
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
@@ -11,6 +12,9 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.notificationstesting.NotificationsTestingFragment
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -32,6 +36,7 @@ class DeveloperFragment : BaseFragment() {
     ) = contentWithoutConsumedInsets {
         AppThemeWithBackground(theme.activeTheme) {
             val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
+            val mockBillingState by viewModel.mockBillingState.collectAsStateWithLifecycle()
             DeveloperPage(
                 onBackPress = ::onBackPress,
                 onForceRefreshClick = viewModel::forceRefresh,
@@ -56,6 +61,14 @@ class DeveloperFragment : BaseFragment() {
                 onResetEpisodeChatSurvey = viewModel::resetEpisodeChatSurvey,
                 onTriggerPlaybackError = viewModel::triggerPlaybackError,
                 onTriggerConnectionError = viewModel::triggerConnectionError,
+                mockBillingState = mockBillingState,
+                mockBillingActions = MockBillingActions(
+                    onMockEnabledChange = viewModel::setMockBillingEnabled,
+                    onOfferEligibilityChange = viewModel::setMockOfferEligible,
+                    onFailProductsLoadingChange = viewModel::setMockFailProductsLoading,
+                    onPurchaseOutcomeChange = viewModel::setMockPurchaseOutcome,
+                    onOpenPaywallClick = ::onOpenPaywallClick,
+                ),
             )
         }
     }
@@ -66,6 +79,11 @@ class DeveloperFragment : BaseFragment() {
 
     private fun onShowWhatsNewClick() {
         (activity as? FragmentHostListener)?.showBottomSheet(fragment = WhatsNewFragment())
+    }
+
+    private fun onOpenPaywallClick(source: OnboardingUpgradeSource) {
+        val activity = activity ?: return
+        OnboardingLauncher.openOnboardingFlow(activity, OnboardingFlow.Upsell(source))
     }
 
     private fun onShowNotificationsTestingClick() {

@@ -2967,6 +2967,13 @@
     <string name="onboarding_upgrade_billing_cycle_monthly">Monthly plan</string>
     <string name="onboarding_upgrade_billing_cycle_yearly">Yearly plan</string>
     <string name="onboarding_upgrade_save_percent">Save %1$d\%%</string>
+    <string name="onboarding_upgrade_intro_offer_badge">%1$d\%% off</string>
+    <string name="onboarding_upgrade_intro_offer_price">%1$s first year</string>
+    <string name="onboarding_upgrade_intro_offer_tag">Limited time offer</string>
+    <string name="onboarding_upgrade_intro_offer_title">%1$d\%% off Plus for\none year</string>
+    <string name="onboarding_upgrade_intro_offer_claim">Claim %1$d\%% off</string>
+    <string name="onboarding_upgrade_intro_offer_renewal">Recurring payments at %1$s after 1 year (%2$s).</string>
+    <string name="onboarding_upgrade_regular_price">Regular price %1$s</string>
     <string name="onboarding_upgrade_patron_title">Believe in what we do and wanna show your support?</string>
     <string name="onboarding_upgrade_patron_plus_features">All the features in Plus</string>
     <string name="onboarding_upgrade_patron_early_access">Early access to new features</string>

@@ -104,6 +104,8 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
                 if (state == BottomSheetBehavior.STATE_EXPANDED) {
                     callback.onSlide(this@PlayerBottomSheet, 1f)
                     listener?.onPlayerBottomSheetSlide(this@PlayerBottomSheet, 1f)
+                    // A sheet restored as expanded never gets onStateChanged, so the open state is applied here.
+                    applyExpandedState()
                 }
             }
         }
@@ -237,9 +239,13 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
     }
 
     private fun onExpanded() {
+        applyExpandedState()
+        eventHorizon.track(PlayerShownEvent)
+    }
+
+    private fun applyExpandedState() {
         listener?.onPlayerOpen()
         animations?.forEach { it.onExpanded() }
-        eventHorizon.track(PlayerShownEvent)
 
         binding.player.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
         binding.miniPlayer.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS

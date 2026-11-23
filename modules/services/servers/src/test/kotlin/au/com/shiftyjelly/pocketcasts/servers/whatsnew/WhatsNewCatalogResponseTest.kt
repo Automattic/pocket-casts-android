@@ -235,6 +235,21 @@ class WhatsNewCatalogResponseTest {
     }
 
     @Test
+    fun `decodes a message tap action without a label`() {
+        val catalog = decode(catalogOf(message(body = """"tapAction": { "type": "open_upsell" }, "pages": [{ "heading": "h", "description": "d" }]""")))
+
+        assertEquals(WhatsNewTapAction(type = "open_upsell", url = null), catalog.messages.single().tapAction)
+    }
+
+    @Test
+    fun `drops a tap action linking to an insecure url but keeps the message`() {
+        val tapAction = """{ "type": "open_link", "arguments": { "url": "http://example.com" } }"""
+        val catalog = decode(catalogOf(message(body = """"tapAction": $tapAction, "pages": [{ "heading": "h", "description": "d" }]""")))
+
+        assertNull(catalog.messages.single().tapAction)
+    }
+
+    @Test
     fun `decodes an action published with a type`() {
         val action = decodeAction("""{ "type": "create_playlist", "label": "Create a playlist" }""")
 
