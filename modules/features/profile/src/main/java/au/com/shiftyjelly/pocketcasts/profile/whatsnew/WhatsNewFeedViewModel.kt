@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.WhatsNewActionTappedEvent
 import com.automattic.eventhorizon.WhatsNewFeedShownEvent
 import com.automattic.eventhorizon.WhatsNewReadAllTappedEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,6 +47,8 @@ class WhatsNewFeedViewModel @Inject constructor(
                     title = message.title,
                     publishedAt = message.publishedAt,
                     isUnread = !readState.isRead(message),
+                    tapEvent = message.tapAction?.let { WhatsNewActionEvent.fromKey(it.type) },
+                    tapUrl = message.tapAction?.url,
                 )
             },
             loadState = if (catalog != null) LoadState.Loaded else loadState,
@@ -85,6 +88,11 @@ class WhatsNewFeedViewModel @Inject constructor(
 
     fun onMessageClick(id: String) {
         manager.markAsRead(listOf(id))
+        val item = uiState.value.items.firstOrNull { it.id == id } ?: return
+        val action = item.tapEvent?.analyticsValue ?: return
+        eventHorizon.track(
+            WhatsNewActionTappedEvent(messageUuid = id, messageType = item.type.analyticsValue, action = action),
+        )
     }
 
     fun onToggleReadClick(id: String) {
@@ -139,4 +147,6 @@ internal data class WhatsNewFeedItem(
     val title: String,
     val publishedAt: Instant,
     val isUnread: Boolean,
+    val tapEvent: WhatsNewActionEvent? = null,
+    val tapUrl: String? = null,
 )
