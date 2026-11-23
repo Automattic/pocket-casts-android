@@ -26,6 +26,13 @@ data class Subscription(
     val expiresIn: Duration?
         get() = expiryDate.toDurationFromNow().takeIf { isExpiring && it.isPositive() }
 
+    /**
+     * Paid subscriptions made on iOS or the web cannot be changed or replaced through Google Play.
+     * Gift and unknown platforms are not billed elsewhere, so they are intentionally excluded.
+     */
+    val isManagedOnAnotherPlatform
+        get() = platform == SubscriptionPlatform.iOS || platform == SubscriptionPlatform.Web
+
     val isChampion
         get() = platform == SubscriptionPlatform.Gift && giftDays > CHAMPION_GIFT_LOWER_BOUND
 

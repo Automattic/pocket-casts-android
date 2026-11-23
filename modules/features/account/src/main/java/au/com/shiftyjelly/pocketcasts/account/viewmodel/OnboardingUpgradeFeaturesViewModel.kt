@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubsc
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
+import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
@@ -17,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getYearlyPlanWithFeatureFlag
@@ -41,8 +43,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 
 @HiltViewModel(assistedFactory = OnboardingUpgradeFeaturesViewModel.Factory::class)
 class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
@@ -50,6 +54,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     private val eventHorizon: EventHorizon,
     private val notificationManager: NotificationManager,
     private val experimentProvider: ExperimentProvider,
+    private val userManager: UserManager,
     @Assisted private val flow: OnboardingFlow,
 ) : ViewModel() {
     private val _state = MutableStateFlow<OnboardingUpgradeFeaturesState>(OnboardingUpgradeFeaturesState.Loading)
@@ -140,6 +145,13 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             val planKey = loadedState.selectedPlan.key
             trackPaymentFrequencyButtonTapped(planKey, source)
             viewModelScope.launch {
+                // Defense in depth: a subscription managed on iOS or the web cannot be replaced
+                // through Google Play, so buying here would create a duplicate subscription.
+                val signInState = userManager.getSignInState().asFlow().first()
+                if ((signInState as? SignInState.SignedIn)?.subscription?.isManagedOnAnotherPlatform == true) {
+                    _state.update { value -> (value as? OnboardingUpgradeFeaturesState.Loaded)?.copy(purchaseFailed = true) ?: value }
+                    return@launch
+                }
                 val purchaseResult = paymentClient.purchaseSubscriptionPlan(
                     key = planKey,
                     purchaseSource = source.analyticsValue.toString(),

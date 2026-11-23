@@ -40,7 +40,6 @@ import au.com.shiftyjelly.pocketcasts.component.TvModal
 import au.com.shiftyjelly.pocketcasts.component.TvModalButton
 import au.com.shiftyjelly.pocketcasts.component.TvModalSurface
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -276,9 +275,6 @@ private fun TvSubscriptionInfoModal(
         )
     }
 }
-
-private val Subscription.isManagedOnAnotherPlatform: Boolean
-    get() = platform == SubscriptionPlatform.iOS || platform == SubscriptionPlatform.Web
 
 @Composable
 private fun TvSettingsInfoRow(label: String, value: String) {
