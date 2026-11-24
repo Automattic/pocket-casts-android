@@ -6,6 +6,7 @@
 # Only webhook PR builds skip jobs. POCKET_CASTS_CI_FULL_BUILD=1 forces a full run.
 
 run_job() { echo false; exit 0; }
+skip_job() { echo "$1"; exit 0; }
 
 [[ $# -eq 2 && "$1" == --job-type ]] || exit 15
 job="$2"
@@ -64,8 +65,6 @@ export GIT_CONFIG_COUNT=$((config_index + 1))
 export "GIT_CONFIG_KEY_${config_index}=diff.renames" "GIT_CONFIG_VALUE_${config_index}=false"
 
 # Empty diffs, errors and unknown paths run the job: skipping requires success.
-if pr_changed_files --all-match "${SKIP_PATTERNS[@]}"; then
-  echo "No relevant files changed"
-else
-  run_job
-fi
+# Stdout is the skip decision, so keep any `pr_changed_files` output out of it.
+pr_changed_files --all-match "${SKIP_PATTERNS[@]}" >&2 || run_job
+skip_job "No relevant files changed"
