@@ -19,6 +19,7 @@ import timber.log.Timber
 
 @Singleton
 class FirebaseRemoteFeatureProvider @Inject constructor(
+    private val settings: RemoteConfigFetchSettings,
     private val firebaseRemoteConfig: FirebaseRemoteConfig,
     @ApplicationScope private val scope: CoroutineScope,
 ) : FeatureProvider {
@@ -28,10 +29,15 @@ class FirebaseRemoteFeatureProvider @Inject constructor(
 
     init {
         scope.launch {
-            firebaseRemoteConfig.fetchSuspending()
+            // Skip the fetch throttle after an upgrade so build number conditions are evaluated for this version.
+            val versionCode = settings.getVersionCode()
+            val isFirstFetchForVersion = settings.getRemoteConfigFetchedVersionCode() != versionCode
+            val minimumFetchIntervalInSeconds = if (isFirstFetchForVersion) 0L else null
+            firebaseRemoteConfig.fetchSuspending(minimumFetchIntervalInSeconds)
                 .map { firebaseRemoteConfig.activateSuspending().getOrThrow() }
                 .onSuccess {
                     Timber.i("Firebase feature flag refreshed")
+                    settings.setRemoteConfigFetchedVersionCode(versionCode)
                     FeatureFlag.updateFeatureFlowValues()
                     initialFetchComplete.complete(true)
                 }
@@ -63,8 +69,11 @@ class FirebaseRemoteFeatureProvider @Inject constructor(
     override suspend fun awaitInitialization() = initialFetchComplete.await()
 }
 
-private suspend fun FirebaseRemoteConfig.fetchSuspending() = suspendCoroutine<Result<Unit>> { continuation ->
-    fetch().addOnCompleteListener { task ->
+private suspend fun FirebaseRemoteConfig.fetchSuspending(
+    minimumFetchIntervalInSeconds: Long?,
+) = suspendCoroutine<Result<Unit>> { continuation ->
+    val fetchTask = if (minimumFetchIntervalInSeconds == null) fetch() else fetch(minimumFetchIntervalInSeconds)
+    fetchTask.addOnCompleteListener { task ->
         val exception = task.exception
         continuation.resume(
             if (exception == null) {
