@@ -89,6 +89,7 @@ class SettingsImpl @Inject constructor(
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
         private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
         private const val MIGRATED_VERSION_CODE_KEY = "MIGRATED_VERSION_CODE"
+        private const val REMOTE_CONFIG_FETCHED_VERSION_CODE_KEY = "RemoteConfigFetchedVersionCode"
         private const val NEEDS_LOGIN_PROMPT_AFTER_RESTORE_KEY = "NeedsLoginPromptAfterRestore"
         private val newShelfItemPositions = mapOf(
             ShelfItem.Transcript to 3,
@@ -810,6 +811,14 @@ class SettingsImpl @Inject constructor(
 
     override fun setMigratedVersionCode(versionCode: Int) {
         setInt(MIGRATED_VERSION_CODE_KEY, versionCode)
+    }
+
+    override fun getRemoteConfigFetchedVersionCode(): Int {
+        return getInt(REMOTE_CONFIG_FETCHED_VERSION_CODE_KEY, 0)
+    }
+
+    override fun setRemoteConfigFetchedVersionCode(versionCode: Int) {
+        setInt(REMOTE_CONFIG_FETCHED_VERSION_CODE_KEY, versionCode)
     }
 
     override val podcastBadgeType = UserSetting.PrefFromInt<BadgeType>(

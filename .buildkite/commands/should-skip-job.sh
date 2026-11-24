@@ -75,11 +75,6 @@ case "$job" in
   lint) ;;
 esac
 
-# Include both sides of renames without changing the checkout's Git config.
-config_index=${GIT_CONFIG_COUNT:-0}
-export GIT_CONFIG_COUNT=$((config_index + 1))
-export "GIT_CONFIG_KEY_${config_index}=diff.renames" "GIT_CONFIG_VALUE_${config_index}=false"
-
 # Empty diffs, errors and unknown paths run the job: skipping requires success.
 # Stdout is the skip decision, so keep any output of the helper out of it.
 "${changed_files[@]}" --all-match "${SKIP_PATTERNS[@]}" >&2 || run_job
