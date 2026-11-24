@@ -96,6 +96,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserSettingsCrashReportPermission
 import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManagerImpl
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.RemoteConfigFetchSettings
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.squareup.moshi.Moshi
@@ -120,6 +121,9 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun providesSettings(settingsImpl: SettingsImpl): Settings
+
+    @Binds
+    abstract fun provideRemoteConfigFetchSettings(settings: Settings): RemoteConfigFetchSettings
 
     @Binds
     @Singleton

@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.preferences.model.SelectedPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.RemoteConfigFetchSettings
 import com.automattic.eventhorizon.UpNextSwipeActionType
 import com.automattic.eventhorizon.UploadedFilesSortType
 import java.time.Instant
@@ -38,7 +39,7 @@ import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-interface Settings {
+interface Settings : RemoteConfigFetchSettings {
 
     companion object {
         const val SERVER_MAIN_URL = BuildConfig.SERVER_MAIN_URL
@@ -309,7 +310,7 @@ interface Settings {
     val upNextShuffle: UserSetting<Boolean>
 
     fun getVersion(): String
-    fun getVersionCode(): Int
+    override fun getVersionCode(): Int
 
     val skipForwardInSecs: UserSetting<Int>
     val skipBackInSecs: UserSetting<Int>
