@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-# Usage: should-skip-job.sh --job-type <job>
+# Usage: should-skip-job.sh <job>
 # Prints the reason to skip the job, or `false` to run it. Exits 0 either way, and 15 for invalid arguments.
 # `shared-pipeline-vars` exports the result as SKIP_<JOB TYPE>, used as the step's `skip:` (`false` runs the step).
 # Only webhook PR builds skip jobs. POCKET_CASTS_CI_FULL_BUILD=1 forces a full run.
@@ -8,8 +8,7 @@
 run_job() { echo false; exit 0; }
 skip_job() { echo "$1"; exit 0; }
 
-[[ $# -eq 2 && "$1" == --job-type ]] || exit 15
-job="$2"
+job="${1:-}"
 case "$job" in
   validation|unit-tests|instrumented-tests|lint|app-build|automotive-build|wear-build|tv-build) ;;
   *) echo "Unknown job type: $job" >&2; exit 15 ;;

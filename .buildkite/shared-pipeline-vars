@@ -10,7 +10,7 @@ export CI_TOOLKIT="automattic/a8c-ci-toolkit#8.0.1"
 # This file is also sourced with `sh` (release-toolkit's `buildkite_pipeline_upload`), so keep it POSIX. Any error runs the job.
 for job_type in validation lint unit-tests instrumented-tests app-build automotive-build wear-build tv-build; do
   skip_var="SKIP_$(echo "$job_type" | tr 'a-z-' 'A-Z_')"
-  skip_reason=$(.buildkite/commands/should-skip-job.sh --job-type "$job_type") || skip_reason=false
+  skip_reason=$(.buildkite/commands/should-skip-job.sh "$job_type") || skip_reason=false
   export "$skip_var=$skip_reason"
   echo "$skip_var=$skip_reason"
 done
