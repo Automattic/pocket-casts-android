@@ -42,7 +42,13 @@ class WhatsNewFeedFragment : BaseFragment() {
                 onBackPress = { activity?.onBackPressedDispatcher?.onBackPressed() },
                 onMessageClick = { id ->
                     viewModel.onMessageClick(id)
-                    (activity as? FragmentHostListener)?.addFragment(WhatsNewMessageFragment.newInstance(id))
+                    val item = state.items.firstOrNull { it.id == id }
+                    val tapEvent = item?.tapEvent
+                    if (tapEvent != null) {
+                        performWhatsNewAction(tapEvent, item.tapUrl)
+                    } else {
+                        (activity as? FragmentHostListener)?.addFragment(WhatsNewMessageFragment.newInstance(id))
+                    }
                 },
                 onReadAllClick = viewModel::onReadAllClick,
                 onRefresh = viewModel::refresh,

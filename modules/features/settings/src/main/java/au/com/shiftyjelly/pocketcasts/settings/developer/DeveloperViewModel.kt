@@ -5,6 +5,9 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
+import au.com.shiftyjelly.pocketcasts.payment.mock.MockBillingSettings
+import au.com.shiftyjelly.pocketcasts.payment.mock.MockPurchaseOutcome
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManagerImpl
@@ -24,8 +27,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -44,8 +50,25 @@ class DeveloperViewModel
     private val crashLogging: CrashLogging,
     private val appReviewManagerImpl: AppReviewManagerImpl,
     private val whatsNewManager: WhatsNewManager,
+    private val mockBillingSettings: MockBillingSettings,
 ) : ViewModel() {
     private val reviewManager = FakeReviewManager(context)
+
+    val mockBillingState = mockBillingSettings.config
+        .map { config -> MockBillingState(config, mockBillingSettings.canToggleMock) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = MockBillingState(mockBillingSettings.config.value, mockBillingSettings.canToggleMock),
+        )
+
+    fun setMockBillingEnabled(isEnabled: Boolean) = mockBillingSettings.setMockEnabled(isEnabled)
+
+    fun setMockOfferEligible(offer: SubscriptionOffer, isEligible: Boolean) = mockBillingSettings.setOfferEligible(offer, isEligible)
+
+    fun setMockFailProductsLoading(shouldFail: Boolean) = mockBillingSettings.setFailProductsLoading(shouldFail)
+
+    fun setMockPurchaseOutcome(outcome: MockPurchaseOutcome) = mockBillingSettings.setPurchaseOutcome(outcome)
 
     fun forceRefresh() {
         podcastManager.refreshPodcasts(fromLog = "dev")

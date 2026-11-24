@@ -85,9 +85,9 @@ Language: it
     <string name="chat_beta_note">Chiedi informazioni su questo episodio è in versione beta</string>
     <string name="chat_beta_sheet_body">Gratuito per tutti mentre lo testiamo. Diventerà una funzionalità Plus in un secondo momento.</string>
     <string name="chat_beta_sheet_title">Chiedi informazioni su questo episodio è in versione beta</string>
-    <string name="episode_chat_tooltip_body">Chiedigli qualsiasi cosa. Stava anche ascoltando.</string>
     <string name="episode_chat_beta_badge">Beta</string>
     <string name="episode_chat_shelf_title">Chiedi informazioni su questo episodio</string>
+    <string name="episode_chat_tooltip_message">Oppure chiedi qualsiasi cosa al riguardo.</string>
     <string name="manual_playlist_no_content_body">Trova un podcast che ti piace, quindi scorri verso sinistra su qualsiasi episodio per aggiungerlo.</string>
     <string name="manual_playlist_no_content_body_alternative">Scegli gli episodi dai podcast che segui. Oppure scorri verso sinistra su qualsiasi episodio per aggiungerlo man mano.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Mostra un puntino \"non letto\" su Profilo quando ci sono nuovi messaggi in Novità.</string>
