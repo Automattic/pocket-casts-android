@@ -25,6 +25,7 @@ import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -59,10 +60,12 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.IntroOfferPricing
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradePlanRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeTrialItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeTrialTimeline
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.introOfferPricing
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PrivacyPolicy
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.BlogsUpsellHeader
@@ -74,6 +77,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.Shuf
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -170,6 +174,7 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
                 horizontal = 24.dp,
             ),
             selectedPlan = state.selectedPlan,
+            introOfferPricing = state.availableBasePlans.introOfferPricing,
             source = source,
             onClosePress = onClosePress,
         )
@@ -254,6 +259,7 @@ private fun RegularUpgradeScreen(
                 horizontal = 24.dp,
             ),
             selectedPlan = state.selectedPlan,
+            introOfferPricing = state.availableBasePlans.introOfferPricing,
             source = source,
             onClosePress = onClosePress,
         )
@@ -322,9 +328,15 @@ private fun UpgradeFooter(
                 Spacer(modifier = Modifier.height(10.dp))
             }
         }
+        val introOfferPricing = plans.introOfferPricing
+        val isIntroOfferSelected = introOfferPricing != null && selectedOnboardingPlan.key.offer == SubscriptionOffer.IntroOffer
         Spacer(modifier = Modifier.height(16.dp))
         UpgradeRowButton(
-            primaryText = selectedOnboardingPlan.ctaButtonText(isRenewingSubscription = false),
+            primaryText = if (isIntroOfferSelected) {
+                stringResource(LR.string.onboarding_upgrade_intro_offer_claim, introOfferPricing.discountPercent)
+            } else {
+                selectedOnboardingPlan.ctaButtonText(isRenewingSubscription = false)
+            },
             backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
             textColor = MaterialTheme.theme.colors.primaryInteractive02,
             fontWeight = FontWeight.W500,
@@ -335,45 +347,74 @@ private fun UpgradeFooter(
                 .heightIn(min = 48.dp),
         )
         Spacer(modifier = Modifier.height(12.dp))
-        PrivacyPolicy(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .padding(bottom = 12.dp),
-            color = MaterialTheme.theme.colors.secondaryText02,
-            textAlign = TextAlign.Center,
-            onPrivacyPolicyClick = onPrivacyPolicyClick,
-            onTermsAndConditionsClick = onTermsAndConditionsClick,
-            fontSize = 11.sp,
-            lineHeight = 12.sp,
-            fontWeight = FontWeight.W600,
-        )
+        if (isIntroOfferSelected) {
+            PrivacyPolicy(
+                leadingText = introOfferPricing.renewalText(),
+                // Non-breaking spaces keep the link on one line, like the default terms text
+                termsAndConditionsText = stringResource(LR.string.profile_terms_of_use_title).replace(' ', '\u00A0'),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 12.dp),
+                color = MaterialTheme.theme.colors.secondaryText02,
+                textAlign = TextAlign.Center,
+                onPrivacyPolicyClick = onPrivacyPolicyClick,
+                onTermsAndConditionsClick = onTermsAndConditionsClick,
+                fontSize = 12.sp,
+                lineHeight = 16.sp,
+            )
+        } else {
+            PrivacyPolicy(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+                    .padding(bottom = 12.dp),
+                color = MaterialTheme.theme.colors.secondaryText02,
+                textAlign = TextAlign.Center,
+                onPrivacyPolicyClick = onPrivacyPolicyClick,
+                onTermsAndConditionsClick = onTermsAndConditionsClick,
+                fontSize = 11.sp,
+                lineHeight = 12.sp,
+                fontWeight = FontWeight.W600,
+            )
+        }
     }
 }
 
 @Composable
 private fun UpgradeHeader(
     selectedPlan: OnboardingSubscriptionPlan,
+    introOfferPricing: IntroOfferPricing?,
     source: OnboardingUpgradeSource,
     onClosePress: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val selectedIntroOfferPricing = introOfferPricing?.takeIf { selectedPlan.key.offer == SubscriptionOffer.IntroOffer }
     Column(modifier = modifier) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            SubscriptionBadge(
-                iconRes = selectedPlan.badgeIconRes,
-                shortNameRes = selectedPlan.shortNameRes,
-                contentDescriptionRes = selectedPlan.badgeContentDescriptionRes,
-                backgroundColor = Color.Black,
-                textColor = Color.White,
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .wrapContentHeight(),
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f, fill = false),
+            ) {
+                SubscriptionBadge(
+                    iconRes = selectedPlan.badgeIconRes,
+                    shortNameRes = selectedPlan.shortNameRes,
+                    contentDescriptionRes = selectedPlan.badgeContentDescriptionRes,
+                    backgroundColor = Color.Black,
+                    textColor = Color.White,
+                    modifier = Modifier
+                        .wrapContentWidth()
+                        .wrapContentHeight(),
+                )
+                if (selectedIntroOfferPricing != null) {
+                    LimitedTimeOfferTag()
+                }
+            }
             IconButton(
                 onClick = onClosePress,
             ) {
@@ -393,11 +434,41 @@ private fun UpgradeHeader(
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
+        val titleRes = selectedPlan.customFeatureTitle(source)
+        // Feature paywalls keep their own headline during the offer
+        val title = if (selectedIntroOfferPricing != null && titleRes == LR.string.onboarding_upgrade_generic_title) {
+            stringResource(LR.string.onboarding_upgrade_intro_offer_title, selectedIntroOfferPricing.discountPercent)
+        } else {
+            stringResource(titleRes)
+        }
         TextH10(
-            text = stringResource(selectedPlan.customFeatureTitle(source)),
+            text = title,
             color = MaterialTheme.theme.colors.primaryText01,
         )
     }
+}
+
+@Composable
+private fun IntroOfferPricing.renewalText(): String {
+    val renewalDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).format(ZonedDateTime.now().plusYears(1))
+    return stringResource(LR.string.onboarding_upgrade_intro_offer_renewal, regularPrice.formattedPrice, renewalDate)
+}
+
+@Composable
+private fun LimitedTimeOfferTag(
+    modifier: Modifier = Modifier,
+) {
+    TextH50(
+        text = stringResource(LR.string.onboarding_upgrade_intro_offer_tag),
+        color = MaterialTheme.theme.colors.primaryText01,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.W600,
+        lineHeight = 16.sp,
+        maxLines = 1,
+        modifier = modifier
+            .background(color = MaterialTheme.theme.colors.primaryUi02Selected, shape = RoundedCornerShape(percent = 50))
+            .padding(horizontal = 10.dp, vertical = 3.dp),
+    )
 }
 
 @Composable
