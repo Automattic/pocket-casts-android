@@ -37,7 +37,7 @@ dependencyResolutionManagement {
         maven {
             // Prebuilt Pocket Casts client libraries, such as Playback (https://github.com/Automattic/pocket-casts-client-dependencies).
             // Pinned to the commit that published the version in libs.versions.toml, so the artifacts can't change underneath us.
-            setUrl("https://raw.githubusercontent.com/Automattic/pocket-casts-client-dependencies/f7b21471e09e74b84b8fa7e7fbaa9623794cbcf8/android/maven")
+            setUrl("https://raw.githubusercontent.com/Automattic/pocket-casts-client-dependencies/485bf043704696b8b90ad509fc7ef3d58fc471e6/android/maven")
             content {
                 includeGroup("com.automattic.pocketcasts")
             }

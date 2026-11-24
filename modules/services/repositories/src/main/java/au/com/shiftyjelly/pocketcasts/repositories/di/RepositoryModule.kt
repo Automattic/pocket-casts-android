@@ -71,7 +71,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryMa
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.stats.PersistentPlaybackStatsCollector
 import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsCollector
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ServerPurchaseApprover
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.MockAwarePurchaseApprover
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.AccountManagerStatusInfo
@@ -240,7 +240,7 @@ abstract class RepositoryModule {
     abstract fun provideUpNextHistoryManager(upNextHistoryManagerImpl: UpNextHistoryManagerImpl): UpNextHistoryManager
 
     @Binds
-    abstract fun providePurchaseApprover(approver: ServerPurchaseApprover): PurchaseApprover
+    abstract fun providePurchaseApprover(approver: MockAwarePurchaseApprover): PurchaseApprover
 
     @Binds
     abstract fun provideNotificationManager(notificationManagerImpl: NotificationManagerImpl): NotificationManager

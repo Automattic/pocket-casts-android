@@ -1,12 +1,22 @@
-8.26
+8.27
 -----
 
+
+8.26
+-----
+*   Bug Fixes
+    *   Fix the back gesture closing the app instead of minimising the full screen player after the app is restored
+        ([#6428](https://github.com/Automattic/pocket-casts-android/pull/6428))
+    *   Allow the Wear OS app to be installed on watches without WiFi or Bluetooth
+        ([#6435](https://github.com/Automattic/pocket-casts-android/pull/6435))
 
 8.25
 -----
 *   New Features
     *   Add an option to hide played podcasts from the Podcasts tab, in the "…" menu
         ([#6203](https://github.com/Automattic/pocket-casts-android/pull/6203))
+    *   Ask about this episode 
+        ([#6426](https://github.com/Automattic/pocket-casts-android/pull/6426))
 *   Bug Fixes
     *   Fix Wear OS episode downloads not switching to WiFi
         ([#6100](https://github.com/Automattic/pocket-casts-android/pull/6100))

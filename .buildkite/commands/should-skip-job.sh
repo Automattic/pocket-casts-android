@@ -1,15 +1,15 @@
 #!/bin/bash -eu
 
-# Usage: should-skip-job.sh --job-type <job>
+# Usage: should-skip-job.sh <job>
 # Prints the reason to skip the job, or `false` to run it. Exits 0 either way, and 15 for invalid arguments.
 # `shared-pipeline-vars` exports the result as SKIP_<JOB TYPE>, used as the step's `skip:` (`false` runs the step).
 # Webhook PR and main builds can skip jobs. POCKET_CASTS_CI_FULL_BUILD=1 forces a full run.
 # main compares HEAD to its first parent; CI_CHANGED_FILES_BASE supplies a wider range.
 
 run_job() { echo false; exit 0; }
+skip_job() { echo "$1"; exit 0; }
 
-[[ $# -eq 2 && "$1" == --job-type ]] || exit 15
-job="$2"
+job="${1:-}"
 case "$job" in
   validation|unit-tests|instrumented-tests|lint|app-build|automotive-build|wear-build|tv-build) ;;
   *) echo "Unknown job type: $job" >&2; exit 15 ;;
@@ -22,9 +22,7 @@ fi
 if [[ "${BUILDKITE_PULL_REQUEST-false}" =~ ^[0-9]+$ ]]; then
   changed_files=(pr_changed_files)
 elif [[ "${BUILDKITE_PULL_REQUEST-false}" == false && "${BUILDKITE_BRANCH:-}" == main ]]; then
-  # This runs in the shared upload step, whose toolkit may not have commit_changed_files yet: main then runs fully.
-  command -v commit_changed_files >/dev/null 2>&1 || run_job
-  changed_files=(commit_changed_files)
+  changed_files=(check_changed_files)
   if [[ -n "${CI_CHANGED_FILES_BASE:-}" ]]; then
     changed_files+=(--base "$CI_CHANGED_FILES_BASE")
   else
@@ -83,8 +81,6 @@ export GIT_CONFIG_COUNT=$((config_index + 1))
 export "GIT_CONFIG_KEY_${config_index}=diff.renames" "GIT_CONFIG_VALUE_${config_index}=false"
 
 # Empty diffs, errors and unknown paths run the job: skipping requires success.
-if "${changed_files[@]}" --all-match "${SKIP_PATTERNS[@]}"; then
-  echo "No relevant files changed"
-else
-  run_job
-fi
+# Stdout is the skip decision, so keep any output of the helper out of it.
+"${changed_files[@]}" --all-match "${SKIP_PATTERNS[@]}" >&2 || run_job
+skip_job "No relevant files changed"

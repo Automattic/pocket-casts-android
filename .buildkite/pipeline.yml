@@ -3,5 +3,5 @@ steps:
   - label: "Verify trunk skip/upload: {{matrix}}"
     command: "bash .buildkite/commands/verify-trunk-skips.sh {{matrix}}"
     agents: { queue: upload }
-    plugins: [automattic/a8c-ci-toolkit#8.0.1]
+    plugins: [automattic/a8c-ci-toolkit#8.1.0]
     matrix: [docs, code]
