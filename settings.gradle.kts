@@ -102,13 +102,14 @@ include(":modules:services:views")
 include(":modules:services:sharedtest")
 
 val developerProperties = loadPropertiesFromFile(File("${rootDir.path}/developer.properties"))
-val decryptedSecretsDir = File(System.getProperty("user.home"), ".configure/pocket-casts-android/secrets")
-val secretsFile = File(decryptedSecretsDir, "secret.properties")
+// Mirrors `a8c-secrets which`, without spawning the command
+val a8cSecretsDir = File(System.getProperty("user.home"), ".a8c-secrets/${File(rootDir, ".a8c-secrets/repo-id").readText().trim()}")
+val secretsFile = File(a8cSecretsDir, "secret.properties")
 val secretProperties = loadPropertiesFromFile(secretsFile)
 val useRemoteBuildCacheLocally = "use_remote_build_cache_locally"
 
 gradle.extra["isCi"] = System.getenv("CI")?.toBoolean() ?: false
-gradle.extra["decryptedSecretsDir"] = decryptedSecretsDir
+gradle.extra["a8cSecretsDir"] = a8cSecretsDir
 gradle.extra["develocityToken"] = secretProperties.getProperty("develocityToken")
 gradle.extra["measureBuildsEnabled"] = secretProperties.getProperty("measureBuildsEnabled")
 
@@ -150,7 +151,7 @@ private fun checkForRemoteBuildCacheOptimizedExperience() {
 
 private fun assertSecretsApplied() {
     if (!secretsFile.exists()) {
-        throw GradleException("The build requested remote build cache, but secrets file is not found. Please run `bundle exec fastlane run configure_apply` to apply secrets.")
+        throw GradleException("The build requested remote build cache, but secrets file is not found. Please run `a8c-secrets decrypt` to apply secrets.")
     }
 }
 

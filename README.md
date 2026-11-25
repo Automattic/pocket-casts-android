@@ -79,6 +79,6 @@ Read our [Contributing Guide](CONTRIBUTING.md) to learn about reporting issues, 
 
 ## Signing a Release
 
-Release builds are signed with the upload key, which `bundle exec fastlane run configure_apply` decrypts to `~/.configure/pocket-casts-android/secrets/upload.jks`.
-Its credentials are read from `secret.properties`, which `configure_apply` decrypts to the same directory, as `signingKeyStorePassword`, `signingKeyAlias`, and `signingKeyPassword`.
+Release builds are signed with the upload key, which `a8c-secrets decrypt` decrypts to `~/.a8c-secrets/<repo-id>/upload.jks`, where `<repo-id>` is the content of `.a8c-secrets/repo-id`.
+Its credentials are read from `secret.properties`, which `a8c-secrets decrypt` decrypts to the same directory, as `signingKeyStorePassword`, `signingKeyAlias`, and `signingKeyPassword`.
 Without them, release packaging fails rather than producing an unsigned build.
