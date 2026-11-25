@@ -4,11 +4,6 @@
   "pinned_hash": "12c7a2c1ffc0b6d593a0dcc32c41383755b2662e",
   "files_to_copy": [
     {
-      "file": "android/pocket-casts/secret.properties",
-      "destination": "~/.configure/pocket-casts-android/secrets/secret.properties",
-      "encrypt": true
-    },
-    {
       "file": "android/pocket-casts/google-services.json",
       "destination": "~/.configure/pocket-casts-android/secrets/google-services.json",
       "encrypt": true
