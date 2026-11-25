@@ -506,6 +506,7 @@ private class ShareLinkNativeAdapter : DeepLinkAdapter {
             "discover",
             "features",
             "developer_options",
+            "profile",
         )
     }
 }
@@ -637,6 +638,7 @@ private class OpmlAdapter(
             "signup",
             "features",
             "developer_options",
+            "profile",
         )
     }
 }
