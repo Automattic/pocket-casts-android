@@ -104,7 +104,7 @@ include(":modules:services:sharedtest")
 val developerProperties = loadPropertiesFromFile(File("${rootDir.path}/developer.properties"))
 // Mirrors `a8c-secrets which`, without spawning the command
 val a8cSecretsDir = File(System.getProperty("user.home"), ".a8c-secrets/${File(rootDir, ".a8c-secrets/repo-id").readText().trim()}")
-val secretsFile = File(a8cSecretsDir, "secret.properties")
+val secretsFile = File(a8cSecretsDir, "secrets.properties")
 val secretProperties = loadPropertiesFromFile(secretsFile)
 val useRemoteBuildCacheLocally = "use_remote_build_cache_locally"
 

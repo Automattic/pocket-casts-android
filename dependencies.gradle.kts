@@ -4,7 +4,7 @@ val versionCodeDifferenceBetweenAppAndAutomotive = 50000
 val versionCodeDifferenceBetweenAppAndWear = 50000 + versionCodeDifferenceBetweenAppAndAutomotive
 val versionCodeDifferenceBetweenAppAndTv = 50000 + versionCodeDifferenceBetweenAppAndWear
 
-val secretProperties = loadPropertiesFromFile(File(gradle.extra["a8cSecretsDir"] as File, "secret.properties"))
+val secretProperties = loadPropertiesFromFile(File(gradle.extra["a8cSecretsDir"] as File, "secrets.properties"))
 val versionProperties = loadPropertiesFromFile(file("version.properties"))
 
 fun loadPropertiesFromFile(file: File): Properties {
