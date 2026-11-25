@@ -47,6 +47,7 @@ secret.properties
 google-services.json
 google-upload-credentials.json
 firebase.secrets.json
+.configure-files/
 
 # secrets
 *.keystore

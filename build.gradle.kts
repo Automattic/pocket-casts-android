@@ -466,7 +466,7 @@ subprojects {
                 if (!canSignRelease) {
                     throw GradleException(
                         "The upload keystore or its credentials are missing, so this release build would not be signed. " +
-                            "Please run `bundle exec fastlane run configure_apply` to apply secrets.",
+                            "Please run `a8c-secrets decrypt` to apply secrets.",
                     )
                 }
             }
@@ -494,7 +494,7 @@ subprojects {
 }
 
 fun Project.applyReleaseGoogleServicesJson() {
-    val decryptedGoogleServicesJson = File(gradle.extra["decryptedSecretsDir"] as File, "google-services.json")
+    val decryptedGoogleServicesJson = File(gradle.extra["a8cSecretsDir"] as File, "google-services.json")
     val staleGoogleServicesJson = file("google-services.json")
 
     if (staleGoogleServicesJson.exists()) {
@@ -522,7 +522,7 @@ fun Project.applyReleaseGoogleServicesJson() {
                     if (!decryptedGoogleServicesJson.exists()) {
                         throw GradleException(
                             "$decryptedGoogleServicesJson is missing. " +
-                                "Please run `bundle exec fastlane run configure_apply` to apply secrets.",
+                                "Please run `a8c-secrets decrypt` to apply secrets.",
                         )
                     }
                 }

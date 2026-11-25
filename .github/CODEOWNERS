@@ -16,5 +16,4 @@ Dangerfile* @Automattic/apps-infra-tooling
 .java-version @Automattic/apps-infra-tooling
 
 # Secrets
-.configure-files/     @Automattic/apps-infra-tooling
 .a8c-secrets/         @Automattic/apps-infra-tooling
