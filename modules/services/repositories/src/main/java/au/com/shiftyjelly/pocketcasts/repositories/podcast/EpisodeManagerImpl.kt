@@ -809,6 +809,7 @@ class EpisodeManagerImpl @Inject constructor(
                     .filter { !it.isArchived }
                     .filter { (settings.autoArchiveIncludesStarred.value && it.isStarred) || !it.isStarred }
                     .filter { playbackManager?.getCurrentEpisode()?.uuid != it.uuid }
+                    .filter { !it.isInProgress }
                 if (episodesToRemove.isNotEmpty()) {
                     runBlocking {
                         archiveAllInList(episodesToRemove, playbackManager)
