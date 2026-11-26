@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-10 09:58:11+0000
+Translation-Revision-Date: 2026-11-24 14:54:13+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="onboarding_upgrade_regular_price">原價：%1$s</string>
+    <string name="onboarding_upgrade_intro_offer_renewal">第一年 (%2$s) 後，於 %1$s開始定期付款。</string>
+    <string name="onboarding_upgrade_intro_offer_claim">領取 %1$d%% 折扣</string>
+    <string name="onboarding_upgrade_intro_offer_title">Plus 方案可享 %1$d%% 折扣\n一年</string>
+    <string name="onboarding_upgrade_intro_offer_tag">限時優惠</string>
+    <string name="onboarding_upgrade_intro_offer_price">首年 %1$s</string>
+    <string name="onboarding_upgrade_intro_offer_badge">可享 %1$d%% 折扣</string>
+    <string name="episode_chat_tooltip_message">詢問任何相關問題。</string>
     <string name="chat_jumping_to_time">正在跳至 %1$s …</string>
     <string name="chat_jumped_to_time">已跳至 %1$s</string>
     <string name="playback_2026_sheet_button">檢視我的 2026 年度播放回顧</string>
@@ -87,7 +95,6 @@ Language: zh_TW
     <string name="chat_beta_sheet_title">詢問單集內容的功能為測試版</string>
     <string name="episode_chat_beta_badge">測試版</string>
     <string name="episode_chat_shelf_title">詢問本集內容</string>
-    <string name="episode_chat_tooltip_message">或者詢問任何相關問題。</string>
     <string name="manual_playlist_no_content_body_alternative">從追蹤的 Podcast 節目中挑選單集。 也可以直接在任意單集上向左滑動，隨時新增。</string>
     <string name="manual_playlist_no_content_body">先找到你喜歡的 Podcast 節目，然後向左滑動，即可隨時新增單集。</string>
     <string name="settings_general_whats_new_unread_dot_summary">如果有新的「最新內容」訊息，個人檔案上會顯示未讀圓點。</string>

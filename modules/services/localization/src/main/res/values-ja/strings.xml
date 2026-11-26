@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-10 09:55:19+0000
+Translation-Revision-Date: 2026-11-24 09:54:54+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="onboarding_upgrade_regular_price">標準価格 %1$s</string>
+    <string name="onboarding_upgrade_intro_offer_renewal">初年 (%2$s) 後、%1$sの定期支払い</string>
+    <string name="onboarding_upgrade_intro_offer_claim">%1$d%% オフを取得</string>
+    <string name="onboarding_upgrade_intro_offer_title">%1$d%% オフの Plus を\n1年間</string>
+    <string name="onboarding_upgrade_intro_offer_tag">時間限定オファー</string>
+    <string name="onboarding_upgrade_intro_offer_price">%1$s (最初の1年)</string>
+    <string name="onboarding_upgrade_intro_offer_badge">%1$d%% オフ</string>
+    <string name="episode_chat_tooltip_message">または、それについて尋ねます。</string>
     <string name="chat_jumping_to_time">%1$sに移動中…</string>
     <string name="chat_jumped_to_time">%1$sに移動しました</string>
     <string name="playback_2026_sheet_button">マイプレイバック2026を表示</string>
@@ -87,7 +95,6 @@ Language: ja_JP
     <string name="chat_beta_sheet_title">「このエピソードについて尋ねる」はベータ版です</string>
     <string name="episode_chat_beta_badge">ベータ</string>
     <string name="episode_chat_shelf_title">このエピソードについて尋ねる</string>
-    <string name="episode_chat_tooltip_message">または、内容について何でも質問できます。</string>
     <string name="manual_playlist_no_content_body_alternative">フォローしているポッドキャストからエピソードを選択します。 または、エピソードを左にスワイプして、その都度追加することもできます。</string>
     <string name="manual_playlist_no_content_body">気に入ったポッドキャストを見つけて、エピソードを左にスワイプすると追加できます。</string>
     <string name="settings_general_whats_new_unread_dot_summary">新しい新着情報メッセージがある場合、プロフィールに未読のドットが表示されます。</string>

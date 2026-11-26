@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-10 16:54:49+0000
+Translation-Revision-Date: 2026-11-23 21:55:21+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="onboarding_upgrade_regular_price">Preço normal: %1$s</string>
+    <string name="onboarding_upgrade_intro_offer_renewal">Pagamento recorrente de %1$s depois do primeiro ano (%2$s).</string>
+    <string name="onboarding_upgrade_intro_offer_claim">Resgatar desconto de %1$d%%</string>
+    <string name="onboarding_upgrade_intro_offer_title">%1$d%% de desconto no Plus por\num ano</string>
+    <string name="onboarding_upgrade_intro_offer_tag">Oferta por tempo limitado</string>
+    <string name="onboarding_upgrade_intro_offer_price">%1$s no primeiro ano</string>
+    <string name="onboarding_upgrade_intro_offer_badge">%1$d%% de desconto</string>
+    <string name="episode_chat_tooltip_message">Ou faça uma pergunta sobre isso.</string>
     <string name="chat_jumping_to_time">Pulando para %1$s…</string>
     <string name="chat_jumped_to_time">Pulou para %1$s</string>
     <string name="playback_2026_sheet_button">Ver minha retrospectiva de 2026</string>
@@ -87,7 +95,6 @@ Language: pt_BR
     <string name="chat_beta_sheet_title">\"Perguntar sobre este episódio\" está na versão beta</string>
     <string name="episode_chat_beta_badge">Beta</string>
     <string name="episode_chat_shelf_title">Perguntar sobre este episódio</string>
-    <string name="episode_chat_tooltip_message">Ou pergunte o que quiser sobre ele.</string>
     <string name="manual_playlist_no_content_body_alternative">Escolha episódios dos podcasts que você segue. Ou deslize para a esquerda em um episódio para adicioná-lo conforme assiste.</string>
     <string name="manual_playlist_no_content_body">Encontre um podcast que você goste e deslize para a esquerda em um episódio para adicioná-lo.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Mostre um ponto no perfil quando houver novas mensagens de novidades não lidas.</string>

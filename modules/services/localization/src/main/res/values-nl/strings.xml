@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-10 14:54:39+0000
+Translation-Revision-Date: 2026-11-23 16:56:19+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="onboarding_upgrade_regular_price">Reguliere prijs %1$s</string>
+    <string name="onboarding_upgrade_intro_offer_renewal">Herhaaldelijke betalingen op %1$s na één jaar (%2$s)</string>
+    <string name="onboarding_upgrade_intro_offer_claim">Claim %1$d%% korting</string>
+    <string name="onboarding_upgrade_intro_offer_title">%1$d%% korting op Plus voor\neen jaar</string>
+    <string name="onboarding_upgrade_intro_offer_tag">Tijdelijke aanbieding</string>
+    <string name="onboarding_upgrade_intro_offer_price">%1$s het eerste jaar</string>
+    <string name="onboarding_upgrade_intro_offer_badge">%1$d%% korting</string>
+    <string name="episode_chat_tooltip_message">Of vraag er iets over.</string>
     <string name="chat_jumping_to_time">Springen naar %1$s…</string>
     <string name="chat_jumped_to_time">Gesprongen naar %1$s</string>
     <string name="playback_2026_sheet_button">Mijn Playback 2026 bekijken</string>
@@ -87,7 +95,6 @@ Language: nl
     <string name="chat_beta_note">Vraag stellen over deze aflevering is in bèta</string>
     <string name="chat_beta_sheet_title">Vraag stellen over deze aflevering is in bèta</string>
     <string name="episode_chat_shelf_title">Vraag stellen over deze aflevering</string>
-    <string name="episode_chat_tooltip_message">Of vraag er alles over.</string>
     <string name="manual_playlist_no_content_body_alternative">Kies afleveringen uit de podcasts die je volgt. Of veeg naar links bij elke aflevering om het toe te voegen terwijl je gaat.</string>
     <string name="manual_playlist_no_content_body">Zoek een podcast die je leuk vindt en veeg vervolgens naar links bij elke aflevering om deze toe te voegen.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Toon een ongelezen punt op profiel wanneer er nieuwe Wat is nieuwe berichten zijn.</string>

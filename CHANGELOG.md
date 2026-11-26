@@ -4,6 +4,9 @@
 
 8.26
 -----
+*   New Features
+    *   Add Playback 2026, your year in podcasts, with a Podcasts sheet and a Profile banner
+        ([#6357](https://github.com/Automattic/pocket-casts-android/pull/6357))
 *   Bug Fixes
     *   Fix the back gesture closing the app instead of minimising the full screen player after the app is restored
         ([#6428](https://github.com/Automattic/pocket-casts-android/pull/6428))
