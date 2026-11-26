@@ -303,7 +303,25 @@ class Media3LibrarySessionCallbackTest {
         assertTrue(playerCommands.contains(Player.COMMAND_PLAY_PAUSE))
         assertTrue(playerCommands.contains(Player.COMMAND_STOP))
         assertTrue(playerCommands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
+        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
         // Should NOT delegate to sessionCallback (which adds full session commands)
+        verify(sessionCallback, never()).onConnect(any(), any())
+    }
+
+    @Test
+    fun `onConnect gives unknown automotive caller directional skip commands`() {
+        val packageValidator: PackageValidator = mock()
+        whenever(mockController.packageName).thenReturn("com.unknown.app")
+        whenever(mockController.uid).thenReturn(12345)
+        whenever(packageValidator.isKnownCaller("com.unknown.app", 12345)).thenReturn(false)
+
+        val result = createAutomotiveCallback(packageValidator).onConnect(mockSession, mockController)
+
+        assertEquals(SessionCommands.EMPTY, result.availableSessionCommands)
+        val playerCommands = result.availablePlayerCommands
+        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
         verify(sessionCallback, never()).onConnect(any(), any())
     }
 
@@ -539,7 +557,7 @@ class Media3LibrarySessionCallbackTest {
             .build()
     }
 
-    private fun createAutomotiveCallback(): Media3LibrarySessionCallback {
+    private fun createAutomotiveCallback(packageValidator: PackageValidator? = null): Media3LibrarySessionCallback {
         val automotiveContext: Context = mock()
         val automotivePackageManager: PackageManager = mock()
         val metaData = Bundle().apply { putBoolean("pocketcasts_automotive", true) }
@@ -555,7 +573,7 @@ class Media3LibrarySessionCallbackTest {
             episodeManager = episodeManager,
             podcastManager = podcastManager,
             settings = mockSettings,
-            packageValidator = null,
+            packageValidator = packageValidator,
             scopeProvider = { testScope },
             contextProvider = { automotiveContext },
         )

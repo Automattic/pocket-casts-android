@@ -113,7 +113,7 @@ internal class Media3SessionCallback(
             .add(SessionCommand(SessionCommand.COMMAND_CODE_SESSION_SET_RATING))
             .build()
 
-        return MediaSession.ConnectionResult.accept(sessionCommands, TRANSPORT_PLAYER_COMMANDS)
+        return MediaSession.ConnectionResult.accept(sessionCommands, transportPlayerCommands(isAutomotive))
     }
 
     override fun onCustomCommand(
@@ -254,19 +254,13 @@ internal class Media3SessionCallback(
             }
 
             // PiP skip buttons and remote fast-forward/rewind keys always skip forward/back,
-            // bypassing headphone control settings.
+            // bypassing headphone control settings. A held key repeats ACTION_DOWN, so only
+            // the first event skips.
             KeyEvent.KEYCODE_MEDIA_SKIP_FORWARD,
             KeyEvent.KEYCODE_MEDIA_FAST_FORWARD,
             -> {
-                scope.launch {
-                    try {
-                        playbackManager.skipForwardSuspend(
-                            sourceView = buttonSource,
-                            jumpAmountSeconds = settings.skipForwardInSecs.value,
-                        )
-                    } catch (e: Exception) {
-                        Timber.e(e, "Skip forward failed")
-                    }
+                if (keyEvent.repeatCount == 0) {
+                    launchSkipForward(buttonSource)
                 }
                 return true
             }
@@ -274,17 +268,33 @@ internal class Media3SessionCallback(
             KeyEvent.KEYCODE_MEDIA_SKIP_BACKWARD,
             KeyEvent.KEYCODE_MEDIA_REWIND,
             -> {
-                scope.launch {
-                    try {
-                        playbackManager.skipBackwardSuspend(
-                            sourceView = buttonSource,
-                            jumpAmountSeconds = settings.skipBackInSecs.value,
-                        )
-                    } catch (e: Exception) {
-                        Timber.e(e, "Skip backward failed")
-                    }
+                if (keyEvent.repeatCount == 0) {
+                    launchSkipBackward(buttonSource)
                 }
                 return true
+            }
+        }
+
+        // On Android Automotive OS, NEXT/PREVIOUS come from hardware buttons (e.g. the steering
+        // wheel) that send one key event per press. Multi-tap detection only adds a delay there,
+        // so route them straight to skip forward/back. These are transport buttons, not headphone
+        // gestures, so headphone action settings are deliberately ignored and the play/pause
+        // state is preserved.
+        if (isAutomotive) {
+            when (keyEvent.keyCode) {
+                KeyEvent.KEYCODE_MEDIA_NEXT -> {
+                    if (keyEvent.repeatCount == 0) {
+                        launchSkipForward(buttonSource)
+                    }
+                    return true
+                }
+
+                KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+                    if (keyEvent.repeatCount == 0) {
+                        launchSkipBackward(buttonSource)
+                    }
+                    return true
+                }
             }
         }
 
@@ -301,6 +311,32 @@ internal class Media3SessionCallback(
 
     private fun handleMediaButtonTripleTap() {
         handleMediaButtonAction(settings.headphoneControlsPreviousAction.value)
+    }
+
+    private fun launchSkipForward(sourceView: SourceView) {
+        scope.launch {
+            try {
+                playbackManager.skipForwardSuspend(
+                    sourceView = sourceView,
+                    jumpAmountSeconds = settings.skipForwardInSecs.value,
+                )
+            } catch (e: Exception) {
+                Timber.e(e, "Skip forward failed")
+            }
+        }
+    }
+
+    private fun launchSkipBackward(sourceView: SourceView) {
+        scope.launch {
+            try {
+                playbackManager.skipBackwardSuspend(
+                    sourceView = sourceView,
+                    jumpAmountSeconds = settings.skipBackInSecs.value,
+                )
+            } catch (e: Exception) {
+                Timber.e(e, "Skip backward failed")
+            }
+        }
     }
 
     private fun MediaSession.ControllerInfo.toSource(default: SourceView = source): SourceView {
@@ -392,7 +428,7 @@ internal class Media3SessionCallback(
 }
 
 /**
- * Player commands granted to all connected controllers (known and unknown).
+ * Player commands granted to connected controllers (known and unknown) on phone, Wear OS and TV.
  * Covers basic transport controls: play/pause, stop, seek, and metadata retrieval.
  */
 @OptIn(UnstableApi::class)
@@ -407,6 +443,25 @@ internal val TRANSPORT_PLAYER_COMMANDS: Player.Commands = Player.Commands.Builde
         Player.COMMAND_GET_METADATA,
     )
     .build()
+
+@OptIn(UnstableApi::class)
+@Suppress("UnsafeOptInUsageError")
+private val AUTOMOTIVE_TRANSPORT_PLAYER_COMMANDS: Player.Commands = TRANSPORT_PLAYER_COMMANDS.buildUpon()
+    .addAll(
+        Player.COMMAND_SEEK_TO_NEXT,
+        Player.COMMAND_SEEK_TO_PREVIOUS,
+    )
+    .build()
+
+/**
+ * Player commands granted to connected controllers. Automotive also gets the directional skip
+ * commands, so vehicle media services see next/previous as supported instead of falling back to
+ * an ambiguous STOP key. They stay Automotive-only because other surfaces (e.g. Wear OS) render
+ * them as an extra previous/next pair next to the app's own skip buttons.
+ */
+internal fun transportPlayerCommands(isAutomotive: Boolean): Player.Commands {
+    return if (isAutomotive) AUTOMOTIVE_TRANSPORT_PLAYER_COMMANDS else TRANSPORT_PLAYER_COMMANDS
+}
 
 internal fun resolveArtworkUri(episode: BaseEpisode, podcast: Podcast?): Uri? {
     return when (episode) {
