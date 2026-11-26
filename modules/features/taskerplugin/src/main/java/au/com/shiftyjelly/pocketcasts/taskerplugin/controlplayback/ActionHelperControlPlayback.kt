@@ -32,9 +32,12 @@ class ActionHelperControlPlayback(config: TaskerPluginConfig<InputControlPlaybac
 
             InputControlPlayback.PlaybackCommand.SetVolumeBoost -> addField(R.string.set_volume_boost, inputControlPlayback.volumeBoostEnabled)
 
+            InputControlPlayback.PlaybackCommand.SetSleepTimer -> addField(R.string.set_sleep_timer, inputControlPlayback.sleepTimerMinutes)
+
             InputControlPlayback.PlaybackCommand.PlayNextInQueue,
             InputControlPlayback.PlaybackCommand.SkipToNextChapter,
             InputControlPlayback.PlaybackCommand.SkipToPreviousChapter,
+            InputControlPlayback.PlaybackCommand.CancelSleepTimer,
             -> blurbBuilder.append(commandEnum.getDescription(context)) // these don't have extra arguments so just write the command name
         }
     }
