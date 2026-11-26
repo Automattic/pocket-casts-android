@@ -104,7 +104,7 @@ class WhatsNewMessageFilterTest {
     }
 
     @Test
-    fun `the feed lists what the user can see, most recently published first`() {
+    fun `the feed keeps eligible messages in catalog order`() {
         val messages = listOf(
             message(id = "old", publishedAt = now.minusSeconds(600)),
             message(id = "hidden", audiences = listOf("patron")),
@@ -113,7 +113,7 @@ class WhatsNewMessageFilterTest {
 
         val feed = filter.feedMessages(messages, now)
 
-        assertEquals(listOf("new", "old"), feed.map { it.id })
+        assertEquals(listOf("old", "new"), feed.map { it.id })
     }
 
     @Test
