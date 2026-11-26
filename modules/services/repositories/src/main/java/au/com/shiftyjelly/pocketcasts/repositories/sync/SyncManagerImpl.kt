@@ -284,8 +284,10 @@ class SyncManagerImpl @Inject constructor(
             val response = loginFunction()
             val result = handleTokenResponse(loginIdentity = loginIdentity, response = response)
             LoginResult.Success(result)
+        } catch (ex: CancellationException) {
+            throw ex
         } catch (ex: Exception) {
-            Timber.e(ex, "Failed to sign in with Pocket Casts")
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, ex, "Failed to sign in (identity: ${loginIdentity.key})")
             exceptionToAuthResult(exception = ex, fallbackMessage = LR.string.error_login_failed)
         }
 
