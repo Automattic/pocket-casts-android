@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-10 19:58:47+0000
+Translation-Revision-Date: 2026-11-24 16:55:22+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="onboarding_upgrade_regular_price">السعر الأصلي ⁦%1$s⁩</string>
+    <string name="onboarding_upgrade_intro_offer_renewal">مدفوعات متكررة بقيمة ⁦%1$s⁩ بعد عام واحد (⁦%2$s⁩).</string>
+    <string name="onboarding_upgrade_intro_offer_claim">احصل على خصم بقيمة ⁦%1$d⁩%%</string>
+    <string name="onboarding_upgrade_intro_offer_title">احصل على خصم بقيمة %1$d%% عند الاشتراك في Plus لمدة\nعام واحد</string>
+    <string name="onboarding_upgrade_intro_offer_tag">عرض لفترة محدودة</string>
+    <string name="onboarding_upgrade_intro_offer_price">⁦%1$s⁩ للعام الأول</string>
+    <string name="onboarding_upgrade_intro_offer_badge">خصم بقيمة ⁦%1$d⁩%%</string>
+    <string name="episode_chat_tooltip_message">أو اسأل عن أي شيء يتعلق بهذا الموضوع.</string>
     <string name="chat_jumping_to_time">جارٍ الانتقال إلى ⁦%1$s⁩…</string>
     <string name="chat_jumped_to_time">انتقل إلى ⁦%1$s⁩</string>
     <string name="playback_2026_sheet_button">عرض التشغيل الخاص بي في 2026</string>
@@ -87,7 +95,6 @@ Language: ar
     <string name="chat_beta_sheet_title">تتوفر خاصية \"طرح أسئلة حول هذه الحلقة\" في الإصدار التجريبي</string>
     <string name="episode_chat_beta_badge">الإصدار التجريبي</string>
     <string name="episode_chat_shelf_title">طرح أسئلة حول هذه الحلقة</string>
-    <string name="episode_chat_tooltip_message">أو اطرح أي سؤال عنها.</string>
     <string name="manual_playlist_no_content_body_alternative">اختر حلقات من حلقات البث الصوتي التي تتابعها. أو اسحب إلى اليسار على أي حلقة لإضافتها أثناء التنقل.</string>
     <string name="manual_playlist_no_content_body">اعثر على بث صوتي ينال إعجابك، ثم مرر لليسار على أي حلقة لإضافته.</string>
     <string name="settings_general_whats_new_unread_dot_summary">اعرض نقطة تشير إلى وجود عناصر غير مقروءة على \"الملف الشخصي\" عند وجود رسائل جديدة في \"ما الجديد\".</string>
