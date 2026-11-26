@@ -168,17 +168,6 @@ enum class UpNextSource(
     ),
 }
 
-fun Observable<UpNextQueue.State>.containsUuid(uuid: String): Observable<Boolean> {
-    return this.switchMap { state ->
-        if (state is UpNextQueue.State.Loaded) {
-            val inUpNext = state.queue.map { it.uuid }.contains(uuid) || state.episode.uuid == uuid
-            Observable.just(inUpNext)
-        } else {
-            Observable.just(false)
-        }
-    }
-}
-
 fun Flow<UpNextQueue.State>.containsUuid(uuid: String): Flow<Boolean> {
     return map { state ->
         state is UpNextQueue.State.Loaded && (state.queue.any { it.uuid == uuid } || state.episode.uuid == uuid)

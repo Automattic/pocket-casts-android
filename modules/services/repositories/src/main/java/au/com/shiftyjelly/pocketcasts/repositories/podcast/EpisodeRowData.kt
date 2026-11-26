@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.rx2.asFlow
 
 data class EpisodeRowData(
     val downloadProgress: Int,
@@ -132,8 +131,7 @@ class EpisodeRowDataProvider @Inject constructor(
     }
 
     private fun isInUpNextFlow(episodeUuid: String): Flow<Boolean> {
-        return upNextQueue.changesObservable
-            .asFlow()
+        return upNextQueue.changesFlow
             .containsUuid(episodeUuid)
             .onStart { emit(false) }
             .distinctUntilChanged()
