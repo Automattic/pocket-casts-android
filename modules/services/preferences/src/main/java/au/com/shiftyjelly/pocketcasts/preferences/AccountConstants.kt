@@ -11,6 +11,10 @@ object AccountConstants {
     const val SIGN_IN_TYPE_KEY = "sign_in"
     const val LOGIN_IDENTITY = "login_identity"
 
+    // The refresh token is kept in user data rather than as the account password. Every AccountManager.setPassword call
+    // broadcasts LOGIN_ACCOUNTS_CHANGED to every app on the device, and the refresh token is rewritten on every refresh.
+    const val REFRESH_TOKEN_KEY = "refresh_token"
+
     // Legacy key value
     const val ANON_ID_KEY = "nosara_tracks_anon_id"
 
