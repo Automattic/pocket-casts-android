@@ -12,6 +12,8 @@
         ([#6428](https://github.com/Automattic/pocket-casts-android/pull/6428))
     *   Allow the Wear OS app to be installed on watches without WiFi or Bluetooth
         ([#6435](https://github.com/Automattic/pocket-casts-android/pull/6435))
+    *   Keep pinned messages at the top of What’s New
+        ([#6457](https://github.com/Automattic/pocket-casts-android/pull/6457))
 
 8.25
 -----
