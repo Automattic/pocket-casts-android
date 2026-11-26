@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import java.util.Date
 import java.util.concurrent.ExecutionException
@@ -48,7 +47,6 @@ class Media3LibrarySessionCallbackTest {
     private lateinit var sessionCallback: Media3SessionCallback
     private lateinit var browseTreeProvider: BrowseTreeProvider
     private lateinit var playbackManager: PlaybackManager
-    private lateinit var episodeManager: EpisodeManager
     private lateinit var podcastManager: PodcastManager
     private lateinit var mockSettings: Settings
     private lateinit var callback: Media3LibrarySessionCallback
@@ -62,7 +60,6 @@ class Media3LibrarySessionCallbackTest {
         sessionCallback = mock()
         browseTreeProvider = mock()
         playbackManager = mock()
-        episodeManager = mock()
         podcastManager = mock()
         mockSettings = mock()
         mockSession = mock()
@@ -80,7 +77,6 @@ class Media3LibrarySessionCallbackTest {
             sessionCallback = sessionCallback,
             browseTreeProvider = browseTreeProvider,
             playbackManager = playbackManager,
-            episodeManager = episodeManager,
             podcastManager = podcastManager,
             settings = mockSettings,
             packageValidator = null,
@@ -286,7 +282,6 @@ class Media3LibrarySessionCallbackTest {
             sessionCallback = sessionCallback,
             browseTreeProvider = browseTreeProvider,
             playbackManager = playbackManager,
-            episodeManager = episodeManager,
             podcastManager = podcastManager,
             settings = mockSettings,
             packageValidator = packageValidator,
@@ -324,7 +319,6 @@ class Media3LibrarySessionCallbackTest {
             sessionCallback = sessionCallback,
             browseTreeProvider = browseTreeProvider,
             playbackManager = playbackManager,
-            episodeManager = episodeManager,
             podcastManager = podcastManager,
             settings = mockSettings,
             packageValidator = packageValidator,
@@ -552,7 +546,6 @@ class Media3LibrarySessionCallbackTest {
             sessionCallback = sessionCallback,
             browseTreeProvider = browseTreeProvider,
             playbackManager = playbackManager,
-            episodeManager = episodeManager,
             podcastManager = podcastManager,
             settings = mockSettings,
             packageValidator = null,

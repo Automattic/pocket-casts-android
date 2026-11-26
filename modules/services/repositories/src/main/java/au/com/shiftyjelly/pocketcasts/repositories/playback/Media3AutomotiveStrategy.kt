@@ -33,7 +33,7 @@ internal class Media3AutomotiveStrategy(
                     .setSessionCommand(SessionCommand(APP_ACTION_SKIP_BACK, Bundle.EMPTY))
                     .setDisplayName(context.getString(LR.string.skip_back))
                     .setCustomIconResId(IR.drawable.media_skipback)
-                    .setSlots(CommandButton.SLOT_BACK)
+                    .setSlots(CommandButton.SLOT_BACK, CommandButton.SLOT_OVERFLOW)
                     .build(),
             )
             buttons.add(
@@ -41,7 +41,7 @@ internal class Media3AutomotiveStrategy(
                     .setSessionCommand(SessionCommand(APP_ACTION_SKIP_FWD, Bundle.EMPTY))
                     .setDisplayName(context.getString(LR.string.skip_forward))
                     .setCustomIconResId(IR.drawable.media_skipforward)
-                    .setSlots(CommandButton.SLOT_FORWARD)
+                    .setSlots(CommandButton.SLOT_FORWARD, CommandButton.SLOT_OVERFLOW)
                     .build(),
             )
         }
