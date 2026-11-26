@@ -1,6 +1,8 @@
 8.27
 -----
-
+*   New Features
+    *   Add a "Use episode artwork" setting to Android Automotive, so episodes with their own artwork show it in the car
+        ([#6305](https://github.com/Automattic/pocket-casts-android/issues/6305))
 
 8.26
 -----

@@ -55,11 +55,11 @@ class ShowNotesProcessor @AssistedInject constructor(
         )
     }
 
-    private suspend fun updateImageUrls(showNotes: ShowNotesResponse) {
+    internal suspend fun updateImageUrls(showNotes: ShowNotesResponse): Boolean {
         val imageUrlUpdates = showNotes.podcast?.episodes?.mapNotNull { episodeShowNotes ->
             episodeShowNotes.image?.let { image -> ImageUrlUpdate(episodeShowNotes.uuid, image) }
         }
-        imageUrlUpdates?.let { episodeManager.updateImageUrls(it) }
+        return imageUrlUpdates?.let { episodeManager.updateImageUrls(it) } ?: false
     }
 
     private suspend fun updateChapters(episodeUuid: String, showNotes: ShowNotesResponse) {

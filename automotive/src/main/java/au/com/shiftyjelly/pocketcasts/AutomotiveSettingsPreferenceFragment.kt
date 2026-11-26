@@ -14,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.extensions.setInputAsSeconds
+import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.SettingsAppearanceUseEpisodeArtworkToggledEvent
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 import javax.inject.Inject
@@ -33,9 +35,12 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
 
     @Inject lateinit var podcastManager: PodcastManager
 
+    @Inject lateinit var eventHorizon: EventHorizon
+
     private lateinit var preferenceAutoPlay: SwitchPreference
     private lateinit var preferenceAutoSubscribeToPlayed: SwitchPreference
     private lateinit var preferenceAutoShowPlayed: SwitchPreference
+    private lateinit var preferenceEpisodeArtwork: SwitchPreference
     private lateinit var preferenceSkipForward: EditTextPreference
     private lateinit var preferenceSkipBackward: EditTextPreference
     private lateinit var preferenceRefreshNow: Preference
@@ -47,6 +52,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
         preferenceAutoPlay = findPreference("autoUpNextEmpty")!!
         preferenceAutoSubscribeToPlayed = findPreference("autoSubscribeToPlayed")!!
         preferenceAutoShowPlayed = findPreference("autoShowPlayed")!!
+        preferenceEpisodeArtwork = findPreference("episodeArtwork")!!
         preferenceRefreshNow = findPreference("refresh_now")!!
         preferenceSkipForward = findPreference(Settings.PREFERENCE_SKIP_FORWARD)!!
         preferenceSkipBackward = findPreference(Settings.PREFERENCE_SKIP_BACKWARD)!!
@@ -55,6 +61,7 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
         setupAutoPlay()
         setupAutoSubscribeToPlayed()
         setupAutoShowPlayed()
+        setupEpisodeArtwork()
         setupSkipForward()
         setupSkipBackward()
         setupRefreshNow()
@@ -88,6 +95,19 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
         }
         settings.autoShowPlayed.flow
             .onEach { preferenceAutoShowPlayed.isChecked = it }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun setupEpisodeArtwork() {
+        preferenceEpisodeArtwork.setOnPreferenceChangeListener { _, newValue ->
+            val enabled = newValue as Boolean
+            val configuration = settings.artworkConfiguration.value
+            settings.artworkConfiguration.set(configuration.copy(useEpisodeArtwork = enabled), updateModifiedAt = true)
+            eventHorizon.track(SettingsAppearanceUseEpisodeArtworkToggledEvent(enabled = enabled))
+            true
+        }
+        settings.artworkConfiguration.flow
+            .onEach { preferenceEpisodeArtwork.isChecked = it.useEpisodeArtwork }
             .launchIn(lifecycleScope)
     }
 
