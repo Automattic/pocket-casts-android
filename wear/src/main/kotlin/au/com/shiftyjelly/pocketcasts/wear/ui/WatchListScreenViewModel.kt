@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class WatchListScreenViewModel @Inject constructor(
@@ -48,8 +47,7 @@ class WatchListScreenViewModel @Inject constructor(
         viewModelScope.launch {
             playbackManager
                 .upNextQueue
-                .getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
-                .asFlow()
+                .getChangesFlowWithLiveCurrentEpisode(episodeManager, podcastManager)
                 .stateIn(viewModelScope, SharingStarted.Eagerly, null)
                 .collect { upNextQueue ->
                     _state.update {
