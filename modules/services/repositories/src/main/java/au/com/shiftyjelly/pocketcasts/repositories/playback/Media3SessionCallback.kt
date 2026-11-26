@@ -113,7 +113,7 @@ internal class Media3SessionCallback(
             .add(SessionCommand(SessionCommand.COMMAND_CODE_SESSION_SET_RATING))
             .build()
 
-        return MediaSession.ConnectionResult.accept(sessionCommands, TRANSPORT_PLAYER_COMMANDS)
+        return MediaSession.ConnectionResult.accept(sessionCommands, transportPlayerCommands(isAutomotive))
     }
 
     override fun onCustomCommand(
@@ -391,21 +391,22 @@ internal class Media3SessionCallback(
     }
 }
 
-/**
- * Player commands granted to all connected controllers (known and unknown).
- * Covers basic transport controls: play/pause, stop, seek, and metadata retrieval.
- */
+/** Player commands granted to all connected controllers; next/previous skip on Automotive only, where steering wheels send them. */
 @OptIn(UnstableApi::class)
 @Suppress("UnsafeOptInUsageError")
-internal val TRANSPORT_PLAYER_COMMANDS: Player.Commands = Player.Commands.Builder()
+internal fun transportPlayerCommands(isAutomotive: Boolean): Player.Commands = Player.Commands.Builder()
     .addAll(
         Player.COMMAND_PLAY_PAUSE,
         Player.COMMAND_SET_MEDIA_ITEM,
         Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
+        Player.COMMAND_SEEK_BACK,
+        Player.COMMAND_SEEK_FORWARD,
         Player.COMMAND_STOP,
         Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
         Player.COMMAND_GET_METADATA,
     )
+    .addIf(Player.COMMAND_SEEK_TO_NEXT, isAutomotive)
+    .addIf(Player.COMMAND_SEEK_TO_PREVIOUS, isAutomotive)
     .build()
 
 internal fun resolveArtworkUri(episode: BaseEpisode, podcast: Podcast?): Uri? {

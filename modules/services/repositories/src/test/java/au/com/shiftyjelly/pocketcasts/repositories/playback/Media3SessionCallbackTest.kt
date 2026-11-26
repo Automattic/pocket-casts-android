@@ -98,13 +98,21 @@ class Media3SessionCallbackTest {
         assertTrue(playerCommands.contains(Player.COMMAND_PLAY_PAUSE))
         assertTrue(playerCommands.contains(Player.COMMAND_SET_MEDIA_ITEM))
         assertTrue(playerCommands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
-        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_FORWARD))
-        assertFalse(playerCommands.contains(Player.COMMAND_SEEK_BACK))
+        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_FORWARD))
+        assertTrue(playerCommands.contains(Player.COMMAND_SEEK_BACK))
         assertFalse(playerCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
         assertFalse(playerCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
         assertTrue(playerCommands.contains(Player.COMMAND_STOP))
         assertTrue(playerCommands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
         assertTrue(playerCommands.contains(Player.COMMAND_GET_METADATA))
+    }
+
+    @Test
+    fun `onConnect grants next and previous on automotive`() {
+        val result = createCallback(isAutomotive = true).onConnect(mockSession, mockController)
+
+        assertTrue(result.availablePlayerCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertTrue(result.availablePlayerCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
     }
 
     @Test

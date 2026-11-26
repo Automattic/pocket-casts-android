@@ -170,11 +170,11 @@ class PocketCastsForwardingPlayerTest {
         assertTrue(commands.contains(Player.COMMAND_PLAY_PAUSE))
         assertTrue(commands.contains(Player.COMMAND_SET_MEDIA_ITEM))
         assertTrue(commands.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM))
+        assertTrue(commands.contains(Player.COMMAND_SEEK_FORWARD))
+        assertTrue(commands.contains(Player.COMMAND_SEEK_BACK))
         assertTrue(commands.contains(Player.COMMAND_STOP))
         assertTrue(commands.contains(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
         assertTrue(commands.contains(Player.COMMAND_GET_METADATA))
-        assertFalse(commands.contains(Player.COMMAND_SEEK_FORWARD))
-        assertFalse(commands.contains(Player.COMMAND_SEEK_BACK))
         assertFalse(commands.contains(Player.COMMAND_SEEK_TO_NEXT))
         assertFalse(commands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
     }
@@ -215,6 +215,37 @@ class PocketCastsForwardingPlayerTest {
         assertTrue(forwarding.isCommandAvailable(Player.COMMAND_GET_METADATA))
         assertTrue(forwarding.isCommandAvailable(Player.COMMAND_GET_CURRENT_MEDIA_ITEM))
         assertFalse(forwarding.isCommandAvailable(Player.COMMAND_PLAY_PAUSE))
+    }
+
+    @Test
+    fun `automotive player with media offers next and previous even when the wrapped player does not`() {
+        val nonEmptyTimeline = mock<Timeline> { on { windowCount } doReturn 1 }
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn nonEmptyTimeline
+            on { isCommandAvailable(any()) } doReturn false
+        }
+        val forwarding = PocketCastsForwardingPlayer(player, isAutomotive = true)
+
+        assertTrue(forwarding.availableCommands.contains(Player.COMMAND_SEEK_TO_NEXT))
+        assertTrue(forwarding.availableCommands.contains(Player.COMMAND_SEEK_TO_PREVIOUS))
+        assertTrue(forwarding.isCommandAvailable(Player.COMMAND_SEEK_TO_NEXT))
+        assertTrue(forwarding.isCommandAvailable(Player.COMMAND_SEEK_TO_PREVIOUS))
+        assertTrue(forwarding.isCommandAvailable(Player.COMMAND_SEEK_FORWARD))
+        assertTrue(forwarding.isCommandAvailable(Player.COMMAND_SEEK_BACK))
+    }
+
+    @Test
+    fun `non-automotive player does not offer next and previous even when the wrapped player does`() {
+        val player = mock<Player> {
+            on { applicationLooper } doReturn Looper.getMainLooper()
+            on { currentTimeline } doReturn Timeline.EMPTY
+            on { isCommandAvailable(any()) } doReturn true
+        }
+        val forwarding = PocketCastsForwardingPlayer(player, isAutomotive = false)
+
+        assertFalse(forwarding.isCommandAvailable(Player.COMMAND_SEEK_TO_NEXT))
+        assertFalse(forwarding.isCommandAvailable(Player.COMMAND_SEEK_TO_PREVIOUS))
     }
 
     @Test
@@ -376,6 +407,48 @@ class PocketCastsForwardingPlayerTest {
         player.seekToPrevious()
 
         assertTrue(skipBackCalled)
+    }
+
+    @Test
+    fun `seekForward delegates to skip forward lambda when provided`() {
+        var skipForwardCalled = false
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSkipForward = { skipForwardCalled = true },
+        )
+
+        player.seekForward()
+
+        assertTrue(skipForwardCalled)
+        verify(mockPlayer, never()).seekForward()
+    }
+
+    @Test
+    fun `seekBack delegates to skip back lambda when provided`() {
+        var skipBackCalled = false
+        val player = PocketCastsForwardingPlayer(
+            wrappedPlayer = mockPlayer,
+            onSkipBack = { skipBackCalled = true },
+        )
+
+        player.seekBack()
+
+        assertTrue(skipBackCalled)
+        verify(mockPlayer, never()).seekBack()
+    }
+
+    @Test
+    fun `seekForward falls back to super when no lambda`() {
+        forwardingPlayer.seekForward()
+
+        verify(mockPlayer).seekForward()
+    }
+
+    @Test
+    fun `seekBack falls back to super when no lambda`() {
+        forwardingPlayer.seekBack()
+
+        verify(mockPlayer).seekBack()
     }
 
     @Test
