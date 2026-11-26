@@ -12,10 +12,8 @@ import com.diffplug.gradle.spotless.SpotlessTask
 import com.google.devtools.ksp.gradle.KspExtension
 import com.google.devtools.ksp.gradle.KspGradleSubplugin
 import com.google.gms.googleservices.GoogleServicesTask
-import io.sentry.android.gradle.extensions.InstrumentationFeature
 import io.sentry.android.gradle.extensions.SentryPluginExtension
 import io.sentry.android.gradle.tasks.SentryCliExecTask
-import java.util.EnumSet
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
@@ -542,9 +540,7 @@ fun Project.applyCommonSentryConfiguration() {
         includeProguardMapping = shouldUploadDebugFiles
         includeSourceContext = shouldUploadDebugFiles
 
-        tracingInstrumentation {
-            features.set(EnumSet.allOf(InstrumentationFeature::class.java) - InstrumentationFeature.OKHTTP)
-        }
+        tracingInstrumentation.enabled = false
         autoInstallation.enabled = false
         includeDependenciesReport = false
         ignoredBuildTypes = setOf("debug", "debugProd", "prototype")
