@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -174,6 +175,7 @@ class OnboardingUpgradeFeaturesViewModelTest {
             eventHorizon = EventHorizon(TestEventSink()),
             notificationManager = notificationManager,
             experimentProvider = experimentProvider,
+            userManager = mock<UserManager>(),
             flow = flow,
         )
     }

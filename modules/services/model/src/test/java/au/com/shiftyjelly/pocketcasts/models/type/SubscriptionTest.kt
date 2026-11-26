@@ -6,6 +6,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -53,10 +54,32 @@ class SubscriptionTest {
         assertNull(subscription.expiresIn)
     }
 
-    private fun subscription(isAutoRenewing: Boolean, expiresInDays: Long) = Subscription(
+    @Test
+    fun `subscription is managed on another platform only for iOS and Web`() {
+        val results = SubscriptionPlatform.entries.associateWith { platform ->
+            subscription(isAutoRenewing = true, expiresInDays = 10, platform = platform).isManagedOnAnotherPlatform
+        }
+
+        assertEquals(
+            mapOf(
+                SubscriptionPlatform.Android to false,
+                SubscriptionPlatform.iOS to true,
+                SubscriptionPlatform.Web to true,
+                SubscriptionPlatform.Gift to false,
+                SubscriptionPlatform.Unknown to false,
+            ),
+            results,
+        )
+    }
+
+    private fun subscription(
+        isAutoRenewing: Boolean,
+        expiresInDays: Long,
+        platform: SubscriptionPlatform = SubscriptionPlatform.Android,
+    ) = Subscription(
         tier = SubscriptionTier.Plus,
         billingCycle = BillingCycle.Monthly,
-        platform = SubscriptionPlatform.Android,
+        platform = platform,
         expiryDate = Instant.now().plus(expiresInDays, ChronoUnit.DAYS),
         isAutoRenewing = isAutoRenewing,
         giftDays = 0,
