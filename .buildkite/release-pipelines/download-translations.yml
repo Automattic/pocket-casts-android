@@ -14,8 +14,7 @@ steps:
       echo '--- :ruby: Setup Ruby Tools'
       install_gems
 
-      echo '--- 🔐 Access Secrets'
-      bundle exec fastlane run configure_apply
+      .buildkite/commands/install-secrets.sh
 
       echo '--- 🚀 Download Translations'
       bundle exec fastlane download_translations

@@ -16,8 +16,7 @@ steps:
       echo '--- :ruby: Setup Ruby Tools'
       install_gems
 
-      echo '--- 🔐 Access Secrets'
-      bundle exec fastlane run configure_apply
+      .buildkite/commands/install-secrets.sh
 
       echo '--- 🚀 New Beta Release'
       bundle exec fastlane new_beta_release skip_confirm:true
