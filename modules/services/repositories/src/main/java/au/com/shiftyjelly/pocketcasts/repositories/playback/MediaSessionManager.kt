@@ -23,6 +23,7 @@ import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
 import androidx.media.utils.MediaConstants.PLAYBACK_STATE_EXTRAS_KEY_MEDIA_ID
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaLibraryService
@@ -59,6 +60,7 @@ import com.automattic.eventhorizon.PlaybackServiceType
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
@@ -228,6 +230,8 @@ class MediaSessionManager(
     @Volatile
     private var forwardingPlayer: PocketCastsForwardingPlayer? = null
 
+    private var upNextQueueDisposable: Disposable? = null
+
     private val _isServiceForeground = MutableStateFlow(false)
     val isServiceForeground: StateFlow<Boolean> = _isServiceForeground.asStateFlow()
 
@@ -378,6 +382,7 @@ class MediaSessionManager(
                     }
                 }
             },
+            onSkipToQueueItem = ::skipToQueueItem,
             playGuard = {
                 if (Util.isAutomotive(context) && !settings.automotiveConnectedToMediaSession()) {
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Auto start playback ignored just after automotive app restart.")
@@ -432,6 +437,7 @@ class MediaSessionManager(
             }
             .build()
         Timber.i("Media3 session created")
+        observeUpNextQueue()
 
         updateMedia3CustomLayout()
         pendingPlayer?.let { player ->
@@ -495,6 +501,18 @@ class MediaSessionManager(
         media3Session?.player = swapped
         placeholderPlayer?.release()
         placeholderPlayer = seed
+    }
+
+    private fun skipToQueueItem(episodeUuid: String) {
+        val sourceView = media3RequestSource()
+        scope.launch {
+            commandMutex.withLock {
+                val episode = playbackManager.upNextQueue.queueEpisodes.find { it.uuid == episodeUuid }
+                if (episode != null) {
+                    playbackManager.playNowSuspend(episode = episode, sourceView = sourceView)
+                }
+            }
+        }
     }
 
     /**
@@ -569,12 +587,11 @@ class MediaSessionManager(
                 val sourceView = media3RequestSource(default = SourceView.UNKNOWN)
                 scope.launch { commandMutex.withLock { playbackManager.skipBackwardSuspend(sourceView = sourceView) } }
             },
+            onSkipToQueueItem = ::skipToQueueItem,
             playGuard = currentPlayer.playGuard,
             isAutomotive = isAutomotive,
         ).also {
-            it.currentMediaItem = currentPlayer.currentMediaItem
-            it.previousMediaId = currentPlayer.previousMediaId
-            it.isTransientLoss = currentPlayer.isTransientLoss
+            it.copyStateFrom(currentPlayer)
         }
         forwardingPlayer = swapped
         media3Session?.player = swapped
@@ -855,6 +872,64 @@ class MediaSessionManager(
             .addTo(disposables)
     }
 
+    private fun observeUpNextQueue() {
+        if (isAutomotive) return
+        upNextQueueDisposable?.dispose()
+        upNextQueueDisposable = Observables.combineLatest(
+            playbackManager.upNextQueue.changesObservable,
+            settings.artworkConfiguration.flow.asObservable(),
+            settings.showArtworkOnLockScreen.flow.asObservable(),
+        ) { state, config, showArtwork -> Triple(state, config.useEpisodeArtwork, showArtwork) }
+            .observeOn(Schedulers.io())
+            .concatMap { (state, useEpisodeArtwork, showArtwork) ->
+                Observable.fromCallable { buildUpNextMediaItems(state, useEpisodeArtwork, showArtwork) }
+                    .doOnError { Timber.e(it, "Failed to build Up Next media items") }
+                    .onErrorResumeNext(Observable.empty())
+            }
+            .distinctUntilChanged()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { (current, upNext) -> forwardingPlayer?.updateQueue(current, upNext) },
+                onError = { Timber.e(it, "Error observing Up Next queue") },
+            )
+    }
+
+    private fun buildUpNextMediaItems(
+        state: UpNextQueue.State,
+        useEpisodeArtwork: Boolean,
+        showArtwork: Boolean,
+    ): Pair<MediaItem?, List<MediaItem>> {
+        if (state !is UpNextQueue.State.Loaded) return null to emptyList()
+        val podcasts = (listOf(state.episode) + state.queue)
+            .mapNotNullTo(mutableSetOf()) { (it as? PodcastEpisode)?.podcastUuid }
+            .associateWith { podcastManager.findPodcastByUuidBlocking(it) }
+
+        fun BaseEpisode.toMediaItem(): MediaItem {
+            val podcast = (this as? PodcastEpisode)?.let { podcasts[it.podcastUuid] }
+            val artworkUri = if (showArtwork) {
+                AutoConverter.getPodcastArtworkUri(podcast, this, context, useEpisodeArtwork)
+            } else {
+                null
+            }
+            return MediaItem.Builder()
+                .setMediaId(uuid)
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setTitle(title)
+                        .setArtist(displaySubtitle(podcast))
+                        .setArtworkUri(artworkUri)
+                        .setDurationMs(durationMs.toLong())
+                        .setIsBrowsable(false)
+                        .setIsPlayable(true)
+                        .setMediaType(MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE)
+                        .build(),
+                )
+                .build()
+        }
+
+        return state.episode.toMediaItem() to state.queue.map { it.toMediaItem() }
+    }
+
     @OptIn(UnstableApi::class)
     @VisibleForTesting
     internal suspend fun notifyPlaylistsChanged(session: MediaLibraryService.MediaLibrarySession) {
@@ -1029,6 +1104,7 @@ class MediaSessionManager(
 
     fun release() {
         disposables.clear()
+        upNextQueueDisposable?.dispose()
         scope.cancel()
         if (needsMedia3Session) {
             lastCustomLayout = emptyList()
