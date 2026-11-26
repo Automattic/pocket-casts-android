@@ -33,6 +33,7 @@ class InputControlPlayback @JvmOverloads constructor(
         SetPlaybackSpeed(R.string.set_playback_speed),
         SetTrimSilenceMode(R.string.set_trim_silence_mode),
         SetVolumeBoost(R.string.set_volume_boost),
+        ArchiveCurrentEpisode(R.string.archive_current_episode),
         ;
 
         fun getDescription(context: Context) = context.getString(descriptionResId)
