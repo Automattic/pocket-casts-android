@@ -1,6 +1,8 @@
 8.27
 -----
-
+*   Bug Fixes
+    *   Always show the skip buttons on Android Automotive's playing screen and let steering wheel buttons skip
+        ([#6462](https://github.com/Automattic/pocket-casts-android/pull/6462))
 
 8.26
 -----

@@ -18,7 +18,6 @@ import androidx.media3.session.SessionResult
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -42,7 +41,6 @@ internal class Media3LibrarySessionCallback(
     private val sessionCallback: Media3SessionCallback,
     private val browseTreeProvider: BrowseTreeProvider,
     private val playbackManager: PlaybackManager,
-    private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
     private val packageValidator: PackageValidator?,
@@ -65,7 +63,7 @@ internal class Media3LibrarySessionCallback(
                 LogBuffer.TAG_PLAYBACK,
                 "Unknown caller connected with transport-only access: ${controller.packageName} uid=${controller.uid}",
             )
-            return MediaSession.ConnectionResult.accept(SessionCommands.EMPTY, TRANSPORT_PLAYER_COMMANDS)
+            return MediaSession.ConnectionResult.accept(SessionCommands.EMPTY, transportPlayerCommands(Util.isAutomotive(contextProvider())))
         }
         if (!controller.packageName.contains("au.com.shiftyjelly.pocketcasts")) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Client: ${controller.packageName} connected to media session")

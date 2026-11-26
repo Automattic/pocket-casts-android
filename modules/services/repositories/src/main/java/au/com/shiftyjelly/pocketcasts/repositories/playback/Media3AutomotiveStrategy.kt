@@ -23,10 +23,7 @@ internal class Media3AutomotiveStrategy(
         buildCustomActionButton: (MediaNotificationControls, BaseEpisode?) -> CommandButton?,
     ): AutomotiveSessionStrategy.ButtonLayout {
         val currentEpisode = playbackManager.getCurrentEpisode()
-
-        if (currentEpisode == null) {
-            return AutomotiveSessionStrategy.ButtonLayout(primaryButtons = emptyList(), overflowButtons = emptyList())
-        }
+            ?: return AutomotiveSessionStrategy.ButtonLayout(primaryButtons = emptyList(), overflowButtons = emptyList())
 
         val buttons = mutableListOf<CommandButton>()
 
@@ -36,6 +33,7 @@ internal class Media3AutomotiveStrategy(
                     .setSessionCommand(SessionCommand(APP_ACTION_SKIP_BACK, Bundle.EMPTY))
                     .setDisplayName(context.getString(LR.string.skip_back))
                     .setCustomIconResId(IR.drawable.media_skipback)
+                    .setSlots(CommandButton.SLOT_BACK, CommandButton.SLOT_OVERFLOW)
                     .build(),
             )
             buttons.add(
@@ -43,6 +41,7 @@ internal class Media3AutomotiveStrategy(
                     .setSessionCommand(SessionCommand(APP_ACTION_SKIP_FWD, Bundle.EMPTY))
                     .setDisplayName(context.getString(LR.string.skip_forward))
                     .setCustomIconResId(IR.drawable.media_skipforward)
+                    .setSlots(CommandButton.SLOT_FORWARD, CommandButton.SLOT_OVERFLOW)
                     .build(),
             )
         }

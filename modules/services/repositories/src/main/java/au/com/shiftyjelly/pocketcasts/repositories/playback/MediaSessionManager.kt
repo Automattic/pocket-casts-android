@@ -220,7 +220,7 @@ class MediaSessionManager(
     @Volatile
     private var media3Session: MediaLibraryService.MediaLibrarySession? = null
 
-    private var lastCustomLayout: List<CommandButton> = emptyList()
+    private var lastAutomotiveButtons: List<CommandButton> = emptyList()
 
     @Volatile
     private var media3Service: MediaLibraryService? = null
@@ -406,7 +406,6 @@ class MediaSessionManager(
             sessionCallback = media3Callback!!,
             browseTreeProvider = browseTreeProvider,
             playbackManager = playbackManager,
-            episodeManager = episodeManager,
             podcastManager = podcastManager,
             settings = settings,
             packageValidator = if (!BuildConfig.DEBUG) {
@@ -892,11 +891,12 @@ class MediaSessionManager(
         val currentEpisode = playbackManager.getCurrentEpisode()
 
         if (isAutomotive) {
-            val layout = automotiveStrategy!!.buildLayout(playbackManager, settings, context, ::buildCustomActionButton)
+            val layout = automotiveStrategy!!.buildLayout(playbackManager, settings, context, ::buildAutomotiveCustomActionButton)
             val allButtons = layout.primaryButtons + layout.overflowButtons
-            if (allButtons != lastCustomLayout) {
-                lastCustomLayout = allButtons
-                session.setCustomLayout(allButtons)
+            if (allButtons != lastAutomotiveButtons) {
+                lastAutomotiveButtons = allButtons
+                // Media button preferences, unlike a custom layout, let the slotted skip buttons hide next/previous
+                session.setMediaButtonPreferences(allButtons)
             }
             return
         } else {
@@ -929,27 +929,34 @@ class MediaSessionManager(
     }
 
     private fun buildCustomActionButton(mediaControl: MediaNotificationControls, currentEpisode: BaseEpisode?): CommandButton? {
+        return customActionButtonBuilder(mediaControl, currentEpisode)?.build()
+    }
+
+    // Pinned to overflow so a button like Play next (ICON_NEXT) can't claim the forward slot
+    @OptIn(UnstableApi::class)
+    private fun buildAutomotiveCustomActionButton(mediaControl: MediaNotificationControls, currentEpisode: BaseEpisode?): CommandButton? {
+        return customActionButtonBuilder(mediaControl, currentEpisode)?.setSlots(CommandButton.SLOT_OVERFLOW)?.build()
+    }
+
+    private fun customActionButtonBuilder(mediaControl: MediaNotificationControls, currentEpisode: BaseEpisode?): CommandButton.Builder? {
         return when (mediaControl) {
             MediaNotificationControls.Archive ->
                 CommandButton.Builder(CommandButton.ICON_UNDEFINED)
                     .setSessionCommand(SessionCommand(APP_ACTION_ARCHIVE, Bundle.EMPTY))
                     .setDisplayName(context.getString(LR.string.archive))
                     .setCustomIconResId(IR.drawable.ic_archive)
-                    .build()
 
             MediaNotificationControls.MarkAsPlayed ->
                 CommandButton.Builder(CommandButton.ICON_UNDEFINED)
                     .setSessionCommand(SessionCommand(APP_ACTION_MARK_AS_PLAYED, Bundle.EMPTY))
                     .setDisplayName(context.getString(LR.string.mark_as_played))
                     .setCustomIconResId(IR.drawable.auto_markasplayed)
-                    .build()
 
             MediaNotificationControls.PlayNext ->
                 CommandButton.Builder(CommandButton.ICON_NEXT)
                     .setSessionCommand(SessionCommand(APP_ACTION_PLAY_NEXT, Bundle.EMPTY))
                     .setDisplayName(context.getString(LR.string.play_next))
                     .setCustomIconResId(com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next)
-                    .build()
 
             MediaNotificationControls.PlaybackSpeed -> {
                 if (playbackManager.isAudioEffectsAvailable()) {
@@ -957,7 +964,6 @@ class MediaSessionManager(
                         .setSessionCommand(SessionCommand(APP_ACTION_CHANGE_SPEED, Bundle.EMPTY))
                         .setDisplayName(context.getString(LR.string.playback_speed))
                         .setCustomIconResId(speedToDrawable(playbackManager.getPlaybackSpeed()))
-                        .build()
                 } else {
                     null
                 }
@@ -970,33 +976,17 @@ class MediaSessionManager(
                             .setSessionCommand(SessionCommand(APP_ACTION_UNSTAR, Bundle.EMPTY))
                             .setDisplayName(context.getString(LR.string.unstar))
                             .setCustomIconResId(IR.drawable.auto_starred)
-                            .build()
                     } else {
                         CommandButton.Builder(CommandButton.ICON_UNDEFINED)
                             .setSessionCommand(SessionCommand(APP_ACTION_STAR, Bundle.EMPTY))
                             .setDisplayName(context.getString(LR.string.star))
                             .setCustomIconResId(IR.drawable.auto_star)
-                            .build()
                     }
                 } else {
                     null
                 }
             }
         }
-    }
-
-    private fun skipBackIconForDuration(seconds: Int): @CommandButton.Icon Int = when (seconds) {
-        in Int.MIN_VALUE..7 -> CommandButton.ICON_SKIP_BACK_5
-        in 8..12 -> CommandButton.ICON_SKIP_BACK_10
-        in 13..22 -> CommandButton.ICON_SKIP_BACK_15
-        else -> CommandButton.ICON_SKIP_BACK_30
-    }
-
-    private fun skipForwardIconForDuration(seconds: Int): @CommandButton.Icon Int = when (seconds) {
-        in Int.MIN_VALUE..7 -> CommandButton.ICON_SKIP_FORWARD_5
-        in 8..12 -> CommandButton.ICON_SKIP_FORWARD_10
-        in 13..22 -> CommandButton.ICON_SKIP_FORWARD_15
-        else -> CommandButton.ICON_SKIP_FORWARD_30
     }
 
     /**
@@ -1031,7 +1021,7 @@ class MediaSessionManager(
         disposables.clear()
         scope.cancel()
         if (needsMedia3Session) {
-            lastCustomLayout = emptyList()
+            lastAutomotiveButtons = emptyList()
             media3Session?.release()
             media3Session = null
             media3Service = null

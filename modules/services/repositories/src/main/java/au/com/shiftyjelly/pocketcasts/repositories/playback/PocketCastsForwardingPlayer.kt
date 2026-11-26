@@ -164,7 +164,8 @@ class PocketCastsForwardingPlayer(
     override fun getMediaMetadata(): MediaMetadata = currentMediaItem.mediaMetadata
 
     override fun isCommandAvailable(command: Int): Boolean {
-        return if (isEmptyState) availableCommands.contains(command) else super.isCommandAvailable(command)
+        val isSkipCommand = command in SKIP_COMMANDS
+        return if (isEmptyState || isSkipCommand) availableCommands.contains(command) else super.isCommandAvailable(command)
     }
 
     override fun getAvailableCommands(): Player.Commands {
@@ -182,10 +183,15 @@ class PocketCastsForwardingPlayer(
                 Player.COMMAND_PLAY_PAUSE,
                 Player.COMMAND_SET_MEDIA_ITEM,
                 Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM,
+                Player.COMMAND_SEEK_BACK,
+                Player.COMMAND_SEEK_FORWARD,
                 Player.COMMAND_STOP,
                 Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
                 Player.COMMAND_GET_METADATA,
             )
+            // Some cars steering wheels send next/previous, the slotted skip buttons hide the car's own buttons
+            .addIf(Player.COMMAND_SEEK_TO_NEXT, isAutomotive)
+            .addIf(Player.COMMAND_SEEK_TO_PREVIOUS, isAutomotive)
             .build()
     }
 
@@ -205,6 +211,14 @@ class PocketCastsForwardingPlayer(
 
     override fun seekToPrevious() {
         onSkipBack?.invoke() ?: super.seekToPrevious()
+    }
+
+    override fun seekForward() {
+        onSkipForward?.invoke() ?: super.seekForward()
+    }
+
+    override fun seekBack() {
+        onSkipBack?.invoke() ?: super.seekBack()
     }
 
     override fun stop() {
@@ -367,3 +381,10 @@ class PocketCastsForwardingPlayer(
         }
     }
 }
+
+private val SKIP_COMMANDS = setOf(
+    Player.COMMAND_SEEK_BACK,
+    Player.COMMAND_SEEK_FORWARD,
+    Player.COMMAND_SEEK_TO_NEXT,
+    Player.COMMAND_SEEK_TO_PREVIOUS,
+)
