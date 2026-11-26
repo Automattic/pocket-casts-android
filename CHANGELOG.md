@@ -1,6 +1,8 @@
 8.27
 -----
-
+*   Bug Fixes
+    *   Keep pinned messages at the top of What’s New
+        ([#6457](https://github.com/Automattic/pocket-casts-android/pull/6457))
 
 8.26
 -----
