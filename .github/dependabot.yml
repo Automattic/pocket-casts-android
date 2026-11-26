@@ -12,6 +12,8 @@ updates:
       # These dependencies cannot be updated beyond v2 for non-Enterpise clients
       - dependency-name: "gradle-build-action"
       - dependency-name: "wrapper-validation-action"
+      # Pinned to an unreleased commit for the auto-merge trial; drop once it moves to a release tag.
+      - dependency-name: "Automattic/dangermattic"
   - package-ecosystem: "gradle"
     open-pull-requests-limit: 8
     directory: "/"
