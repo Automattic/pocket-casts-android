@@ -71,7 +71,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryMa
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.stats.PersistentPlaybackStatsCollector
 import au.com.shiftyjelly.pocketcasts.repositories.stats.PlaybackStatsCollector
-import au.com.shiftyjelly.pocketcasts.repositories.subscription.ServerPurchaseApprover
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.MockAwarePurchaseApprover
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.sync.AccountManagerStatusInfo
@@ -96,6 +96,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserSettingsCrashReportPermission
 import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManager
 import au.com.shiftyjelly.pocketcasts.repositories.whatsnew.WhatsNewManagerImpl
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.RemoteConfigFetchSettings
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.squareup.moshi.Moshi
@@ -120,6 +121,9 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun providesSettings(settingsImpl: SettingsImpl): Settings
+
+    @Binds
+    abstract fun provideRemoteConfigFetchSettings(settings: Settings): RemoteConfigFetchSettings
 
     @Binds
     @Singleton
@@ -240,7 +244,7 @@ abstract class RepositoryModule {
     abstract fun provideUpNextHistoryManager(upNextHistoryManagerImpl: UpNextHistoryManagerImpl): UpNextHistoryManager
 
     @Binds
-    abstract fun providePurchaseApprover(approver: ServerPurchaseApprover): PurchaseApprover
+    abstract fun providePurchaseApprover(approver: MockAwarePurchaseApprover): PurchaseApprover
 
     @Binds
     abstract fun provideNotificationManager(notificationManagerImpl: NotificationManagerImpl): NotificationManager

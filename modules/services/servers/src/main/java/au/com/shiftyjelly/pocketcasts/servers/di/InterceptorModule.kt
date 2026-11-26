@@ -15,9 +15,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.getAccessTokenBlocking
 import au.com.shiftyjelly.pocketcasts.servers.toClientInterceptor
 import au.com.shiftyjelly.pocketcasts.servers.toNetworkInterceptor
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import com.automattic.android.tracks.crashlogging.CrashLoggingOkHttpInterceptorProvider
-import com.automattic.android.tracks.crashlogging.FormattedUrl
-import com.automattic.android.tracks.crashlogging.RequestFormatter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,13 +35,6 @@ object InterceptorModule {
 
     private val fiveMinutes = 5.minutes.inWholeSeconds
     private val cacheControlHeader = "Cache-Control"
-
-    private val crashLoggingInterceptor = CrashLoggingOkHttpInterceptorProvider
-        .createInstance(object : RequestFormatter {
-            override fun formatRequestUrl(request: Request): FormattedUrl {
-                return request.url.host.takeIf { it.contains("pocketcasts") } ?: "filtered"
-            }
-        })
 
     private val publicUserAgentInterceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()
@@ -89,9 +79,6 @@ object InterceptorModule {
         // Remove our custom i18n headers.
         InternationalizationInterceptor.APP_LANGUAGE_HEADER,
         InternationalizationInterceptor.USER_REGION_HEADER,
-        // Remove Sentry stuff from requests as well to make it more pure.
-        "sentry-trace",
-        "baggage",
     )
 
     private val downloadsCleanAndRetryInterceptor = mediaCleanAndRetryInterceptor(LogBuffer.TAG_DOWNLOAD)
@@ -187,7 +174,6 @@ object InterceptorModule {
             add(cacheControlInterceptor.toClientInterceptor())
             add(internalUserAgentInterceptor.toClientInterceptor())
             add(i18nInterceptor.toClientInterceptor())
-            add(crashLoggingInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
                 val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -206,7 +192,6 @@ object InterceptorModule {
         return buildList {
             add(internalUserAgentInterceptor.toClientInterceptor())
             add(i18nInterceptor.toClientInterceptor())
-            add(crashLoggingInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
                 val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -227,7 +212,6 @@ object InterceptorModule {
             add(internalUserAgentInterceptor.toClientInterceptor())
             add(i18nInterceptor.toClientInterceptor())
             add(interceptor.toClientInterceptor())
-            add(crashLoggingInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
                 val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -247,7 +231,6 @@ object InterceptorModule {
         return buildList {
             add(publicUserAgentInterceptor.toClientInterceptor())
             add(i18nInterceptor.toClientInterceptor())
-            add(crashLoggingInterceptor.toClientInterceptor())
             add(basicAuthInterceptor)
             add(downloadsCleanAndRetryInterceptor)
             add(userFileAuthInterceptor.toClientInterceptor())
@@ -270,7 +253,6 @@ object InterceptorModule {
             add(publicUserAgentInterceptor.toClientInterceptor())
             add(i18nInterceptor.toClientInterceptor())
             add(cacheControlTranscriptsInterceptor.toClientInterceptor())
-            add(crashLoggingInterceptor.toClientInterceptor())
 
             if (BuildConfig.DEBUG) {
                 val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -292,7 +274,6 @@ object InterceptorModule {
         return buildList {
             add(publicUserAgentInterceptor.toClientInterceptor())
             add(i18nInterceptor.toClientInterceptor())
-            add(crashLoggingInterceptor.toClientInterceptor())
             add(basicAuthInterceptor)
             add(playerCleanAndRetryInterceptor)
             add(userFileAuthInterceptor.toClientInterceptor())
@@ -314,7 +295,6 @@ object InterceptorModule {
         return buildList {
             add(publicUserAgentInterceptor.toClientInterceptor())
             add(i18nInterceptor.toClientInterceptor())
-            add(crashLoggingInterceptor.toClientInterceptor())
             add(artworkCleanAndRetryInterceptor)
 
             if (BuildConfig.DEBUG) {

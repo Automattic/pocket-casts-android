@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-10 16:56:22+0000
+Translation-Revision-Date: 2026-11-24 11:56:33+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="onboarding_upgrade_regular_price">Tarif standard %1$s</string>
+    <string name="onboarding_upgrade_intro_offer_renewal">Paiement récurrent de %1$s après la première année (%2$s)</string>
+    <string name="onboarding_upgrade_intro_offer_claim">Profiter de %1$d %% de réduction</string>
+    <string name="onboarding_upgrade_intro_offer_title">-%1$d %% sur Plus pendant\nun an</string>
+    <string name="onboarding_upgrade_intro_offer_tag">Offre limitée</string>
+    <string name="onboarding_upgrade_intro_offer_price">%1$s la première année</string>
+    <string name="onboarding_upgrade_intro_offer_badge">%1$d %% de remise</string>
+    <string name="episode_chat_tooltip_message">Ou posez une question sur ça.</string>
     <string name="chat_jumping_to_time">Passage à %1$s…</string>
     <string name="chat_jumped_to_time">Passé à %1$s</string>
     <string name="playback_2026_sheet_button">Voir ma rétrospective 2026</string>
@@ -87,7 +95,6 @@ Language: fr
     <string name="chat_beta_sheet_title">Poser des questions sur cet épisode est en version bêta</string>
     <string name="episode_chat_beta_badge">Bêta</string>
     <string name="episode_chat_shelf_title">Poser une question sur cet épisode</string>
-    <string name="episode_chat_tooltip_message">Ou posez toutes vos questions à son sujet.</string>
     <string name="manual_playlist_no_content_body">Trouvez un podcast que vous aimez, puis balayez vers la gauche sur n’importe quel épisode pour l’ajouter.</string>
     <string name="manual_playlist_no_content_body_alternative">Choisissez des épisodes parmi les podcasts que vous suivez. Autrement, balayez vers la gauche sur n’importe quel épisode pour l’ajouter au fur et à mesure.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Affichez un point d’état non lu sur le profil lorsque des messages de nouveautés sont disponibles.</string>

@@ -37,7 +37,7 @@ dependencyResolutionManagement {
         maven {
             // Prebuilt Pocket Casts client libraries, such as Playback (https://github.com/Automattic/pocket-casts-client-dependencies).
             // Pinned to the commit that published the version in libs.versions.toml, so the artifacts can't change underneath us.
-            setUrl("https://raw.githubusercontent.com/Automattic/pocket-casts-client-dependencies/16567f208a695189062a9dea871b092307780e9f/android/maven")
+            setUrl("https://raw.githubusercontent.com/Automattic/pocket-casts-client-dependencies/08483e6cb80852b84e1330dfd5374e8898be2b30/android/maven")
             content {
                 includeGroup("com.automattic.pocketcasts")
             }
@@ -102,13 +102,14 @@ include(":modules:services:views")
 include(":modules:services:sharedtest")
 
 val developerProperties = loadPropertiesFromFile(File("${rootDir.path}/developer.properties"))
-val decryptedSecretsDir = File(System.getProperty("user.home"), ".configure/pocket-casts-android/secrets")
-val secretsFile = File(decryptedSecretsDir, "secret.properties")
+// Mirrors `a8c-secrets which`, without spawning the command
+val a8cSecretsDir = File(System.getProperty("user.home"), ".a8c-secrets/${File(rootDir, ".a8c-secrets/repo-id").readText().trim()}")
+val secretsFile = File(a8cSecretsDir, "secrets.properties")
 val secretProperties = loadPropertiesFromFile(secretsFile)
 val useRemoteBuildCacheLocally = "use_remote_build_cache_locally"
 
 gradle.extra["isCi"] = System.getenv("CI")?.toBoolean() ?: false
-gradle.extra["decryptedSecretsDir"] = decryptedSecretsDir
+gradle.extra["a8cSecretsDir"] = a8cSecretsDir
 gradle.extra["develocityToken"] = secretProperties.getProperty("develocityToken")
 gradle.extra["measureBuildsEnabled"] = secretProperties.getProperty("measureBuildsEnabled")
 
@@ -150,7 +151,7 @@ private fun checkForRemoteBuildCacheOptimizedExperience() {
 
 private fun assertSecretsApplied() {
     if (!secretsFile.exists()) {
-        throw GradleException("The build requested remote build cache, but secrets file is not found. Please run `bundle exec fastlane run configure_apply` to apply secrets.")
+        throw GradleException("The build requested remote build cache, but secrets file is not found. Please run `a8c-secrets decrypt` to apply secrets.")
     }
 }
 

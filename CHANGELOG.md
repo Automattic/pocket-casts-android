@@ -1,11 +1,21 @@
-8.26
+8.27
 -----
 *   New Features
     *   Add a "Use episode artwork" setting to Android Automotive, so episodes with their own artwork show it in the car
         ([#6305](https://github.com/Automattic/pocket-casts-android/issues/6305))
+
+8.26
+-----
+*   New Features
+    *   Add Playback 2026, your year in podcasts, with a Podcasts sheet and a Profile banner
+        ([#6357](https://github.com/Automattic/pocket-casts-android/pull/6357))
 *   Bug Fixes
+    *   Fix the back gesture closing the app instead of minimising the full screen player after the app is restored
+        ([#6428](https://github.com/Automattic/pocket-casts-android/pull/6428))
     *   Allow the Wear OS app to be installed on watches without WiFi or Bluetooth
         ([#6435](https://github.com/Automattic/pocket-casts-android/pull/6435))
+    *   Keep pinned messages at the top of What’s New
+        ([#6457](https://github.com/Automattic/pocket-casts-android/pull/6457))
 
 8.25
 -----

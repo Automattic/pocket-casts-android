@@ -51,6 +51,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingSectionHeader
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.payment.mock.MockBillingConfig
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -79,6 +80,8 @@ fun DeveloperPage(
     onResetEpisodeChatSurvey: () -> Unit,
     onTriggerPlaybackError: () -> Unit,
     onTriggerConnectionError: () -> Unit,
+    mockBillingState: MockBillingState,
+    mockBillingActions: MockBillingActions,
     modifier: Modifier = Modifier,
 ) {
     var openCrashMessageDialog by remember { mutableStateOf(false) }
@@ -107,6 +110,11 @@ fun DeveloperPage(
         item {
             TriggerUpdateEpisodeDetails(onClick = onTriggerUpdateEpisodeDetails)
         }
+
+        item {
+            SectionHeader(text = "Google Play billing")
+        }
+        mockBillingSection(state = mockBillingState, actions = mockBillingActions)
 
         item {
             SectionHeader(text = "Notifications")
@@ -607,6 +615,14 @@ private fun DeveloperPagePreview() {
         onResetEpisodeChatSurvey = {},
         onTriggerPlaybackError = {},
         onTriggerConnectionError = {},
+        mockBillingState = MockBillingState(config = MockBillingConfig(isEnabled = true), canToggleMock = true),
+        mockBillingActions = MockBillingActions(
+            onMockEnabledChange = {},
+            onOfferEligibilityChange = { _, _ -> },
+            onFailProductsLoadingChange = {},
+            onPurchaseOutcomeChange = {},
+            onOpenPaywallClick = {},
+        ),
     )
 }
 
