@@ -29,10 +29,11 @@ import au.com.shiftyjelly.pocketcasts.views.helper.setEpisodeTimeLeft
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowLayout
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 class UpNextEpisodeViewHolder(
@@ -55,7 +56,8 @@ class UpNextEpisodeViewHolder(
 
     private val dateFormatter = RelativeDateFormatter(context)
 
-    private val disposable = CompositeDisposable()
+    private val holderScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private var episodeJob: Job? = null
 
     private var isMultiSelectEnabled = false
 
@@ -141,18 +143,19 @@ class UpNextEpisodeViewHolder(
     }
 
     fun unbind() {
-        disposable.clear()
+        episodeJob?.cancel()
+        episodeJob = null
     }
 
     private fun observeEpisode() {
-        disposable.clear()
-        disposable += episodeManager
-            .findEpisodeByUuidRxFlowable(episode.uuid)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onNext = { episode ->
+        episodeJob?.cancel()
+        val episodeUuid = episode.uuid
+        episodeJob = holderScope.launch {
+            episodeManager.findEpisodeByUuidFlow(episodeUuid).collect { episode ->
                 bindEpisode(episode)
                 bindSwipeActions()
-            })
+            }
+        }
     }
 
     private fun bindEpisode(episode: BaseEpisode) {
