@@ -15,7 +15,7 @@ data class WhatsNewMessageFilter(
     }
 
     fun feedMessages(messages: List<WhatsNewMessage>, now: Instant = Instant.now()): List<WhatsNewMessage> {
-        return messages.filter { message -> includes(message, now) }.sortedByDescending(WhatsNewMessage::publishedAt)
+        return messages.filter { message -> includes(message, now) }
     }
 
     private fun isSupported(message: WhatsNewMessage): Boolean {
