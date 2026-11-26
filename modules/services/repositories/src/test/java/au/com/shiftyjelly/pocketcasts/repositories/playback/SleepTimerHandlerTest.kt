@@ -3,9 +3,13 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.app.Application
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import kotlin.time.AbstractLongTimeSource
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
@@ -40,7 +44,13 @@ class SleepTimerHandlerTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
-    private val sleepTimer = SleepTimer(settings = mock(), eventHorizon = mock())
+    private val clock = MutableClock()
+    private val autoRestartSetting = mock<UserSetting<Boolean>> { on { value } doReturn true }
+    private val sleepTimer = SleepTimer(
+        settings = mock<Settings> { on { autoSleepTimerRestart } doReturn autoRestartSetting },
+        eventHorizon = mock(),
+        clock = clock,
+    )
     private val playbackManager = mock<PlaybackManager>()
     private val context = spy<Application>(RuntimeEnvironment.getApplication()) {
         doReturn("Sleep timer stopped").whenever(it).getString(R.string.player_sleep_timer_stopped_your_podcast)
@@ -133,6 +143,27 @@ class SleepTimerHandlerTest {
 
         advanceSeconds(2)
         assertEquals(9.seconds, sleepTimer.state.timeLeft)
+    }
+
+    @Test
+    fun `records when the countdown runs out so added time does not shrink the auto restart window`() = runTest {
+        createHandler()
+
+        sleepTimer.sleepAfter(10.seconds)
+        runCurrent()
+        sleepTimer.addExtraTime(5.minutes)
+        runCurrent()
+
+        val countdown = 5.minutes + 10.seconds
+        clock += countdown
+        advanceTimeBy(countdown)
+        runCurrent()
+        verify(playbackManager).pause(sourceView = SourceView.AUTO_PAUSE)
+
+        clock += 1.minutes
+        sleepTimer.restartSleepTimerIfApplies(currentEpisodeUuid = "episode")
+
+        assertTrue(sleepTimer.state.isSleepTimerRunning)
     }
 
     @Test

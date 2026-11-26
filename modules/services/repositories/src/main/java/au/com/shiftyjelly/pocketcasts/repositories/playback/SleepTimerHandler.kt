@@ -106,6 +106,7 @@ internal class SleepTimerHandler(
 
         if (currentTimeLeft <= ZERO) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Paused from sleep timer.")
+            sleepTimer.recordSleepAfterTimeFinished()
             val context = contextProvider()
             scope.launch(Dispatchers.Main) {
                 Toast.makeText(context, context.getString(R.string.player_sleep_timer_stopped_your_podcast), Toast.LENGTH_LONG).show()
