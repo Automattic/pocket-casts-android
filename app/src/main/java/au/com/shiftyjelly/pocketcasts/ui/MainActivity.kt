@@ -102,6 +102,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowDiscoverDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowFiltersDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.ShowPlaybackDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPlaylistDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowPodcastFromUrlDeepLink
@@ -1994,6 +1995,14 @@ class MainActivity :
                 is ThemesDeepLink -> {
                     closePlayer()
                     addFragment(AppearanceSettingsFragment.newInstance())
+                }
+
+                is ShowPlaybackDeepLink -> {
+                    closePlayer()
+                    openTab(VR.id.navigation_profile)
+                    if (FeatureFlag.isEnabled(Feature.PLAYBACK_2026)) {
+                        showPlayback2026OrAccount(Playback2026.Source.Profile.name)
+                    }
                 }
 
                 is DeveloperOptionsDeeplink -> {
