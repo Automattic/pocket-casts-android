@@ -5,6 +5,14 @@ set -euo pipefail
 scenario=${1:?Pass docs or code}
 repo=$PWD
 if [[ "$scenario" == docs ]]; then
+  if [[ "${BUILDKITE:-}" == true && "${BUILDKITE_SOURCE:-}" == webhook ]]; then
+    if ! buildkite-agent meta-data get buildkite:webhook | jq -se \
+        'length == 1 and (.[0].repository.full_name | type == "string")' >/dev/null 2>&1; then
+      echo 'The upload agent could not read its GitHub webhook.' >&2
+      exit 1
+    fi
+    echo 'Confirmed the upload agent can read its GitHub webhook.'
+  fi
   # Check the actual upload-agent checkout before creating a fixture. Missing history or helper errors fail the probe.
   parent_tree=$(git rev-parse --verify 'HEAD^1^{tree}')
   head_tree=$(git rev-parse --verify 'HEAD^{tree}')
