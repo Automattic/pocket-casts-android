@@ -19,6 +19,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -128,6 +129,157 @@ class MediaSessionManagerCallbackTest {
 
         assertEquals(listOf("skip backwards"), queuedCommands)
         verify(playbackManager, never()).playPause(any())
+    }
+
+    @Test
+    fun `legacy KEYCODE_MEDIA_PAUSE pauses when playing`() = runTest {
+        val playbackManager = mock<PlaybackManager>()
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+        val manager = createManager(this, playbackManager, mock())
+        val queuedCommands = mutableListOf<suspend () -> Unit>()
+        val callback = manager.createCallback(
+            scope = this,
+            playbackManager = playbackManager,
+            episodeManager = mock(),
+            enqueueCommand = { _, command -> queuedCommands += command },
+        )
+
+        callback.onMediaButtonEvent(mediaButtonIntent(KeyEvent.KEYCODE_MEDIA_PAUSE))
+        queuedCommands.forEach { it() }
+
+        verify(playbackManager).pauseSuspend(
+            transientLoss = any(),
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+        )
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
+    }
+
+    @Test
+    fun `legacy KEYCODE_MEDIA_PAUSE resumes when paused and car is connected`() = runTest {
+        val playbackManager = mock<PlaybackManager>()
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.isCarConnected()).thenReturn(true)
+        val manager = createManager(this, playbackManager, mock())
+        val queuedCommands = mutableListOf<suspend () -> Unit>()
+        val callback = manager.createCallback(
+            scope = this,
+            playbackManager = playbackManager,
+            episodeManager = mock(),
+            enqueueCommand = { _, command -> queuedCommands += command },
+        )
+
+        callback.onMediaButtonEvent(mediaButtonIntent(KeyEvent.KEYCODE_MEDIA_PAUSE))
+        queuedCommands.forEach { it() }
+
+        verify(playbackManager).playQueueSuspend(
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+            showedStreamWarning = any(),
+        )
+        verify(playbackManager, never()).pauseSuspend(any(), any())
+    }
+
+    @Test
+    fun `legacy KEYCODE_MEDIA_PAUSE pauses when paused and car is not connected`() = runTest {
+        val playbackManager = mock<PlaybackManager>()
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.isCarConnected()).thenReturn(false)
+        val manager = createManager(this, playbackManager, mock())
+        val queuedCommands = mutableListOf<suspend () -> Unit>()
+        val callback = manager.createCallback(
+            scope = this,
+            playbackManager = playbackManager,
+            episodeManager = mock(),
+            enqueueCommand = { _, command -> queuedCommands += command },
+        )
+
+        callback.onMediaButtonEvent(mediaButtonIntent(KeyEvent.KEYCODE_MEDIA_PAUSE))
+        queuedCommands.forEach { it() }
+
+        verify(playbackManager).pauseSuspend(
+            transientLoss = any(),
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+        )
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
+    }
+
+    @Test
+    fun `legacy onPause resumes when paused and car is connected`() = runTest {
+        val playbackManager = mock<PlaybackManager>()
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.isCarConnected()).thenReturn(true)
+        val manager = createManager(this, playbackManager, mock())
+        val queuedCommands = mutableListOf<suspend () -> Unit>()
+        val callback = manager.createCallback(
+            scope = this,
+            playbackManager = playbackManager,
+            episodeManager = mock(),
+            enqueueCommand = { _, command -> queuedCommands += command },
+        )
+
+        callback.onPause()
+        queuedCommands.forEach { it() }
+
+        verify(playbackManager).playQueueSuspend(
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+            showedStreamWarning = any(),
+        )
+        verify(playbackManager, never()).pauseSuspend(any(), any())
+    }
+
+    @Test
+    fun `legacy onPause pauses when paused and car is not connected`() = runTest {
+        val playbackManager = mock<PlaybackManager>()
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.isCarConnected()).thenReturn(false)
+        val manager = createManager(this, playbackManager, mock())
+        val queuedCommands = mutableListOf<suspend () -> Unit>()
+        val callback = manager.createCallback(
+            scope = this,
+            playbackManager = playbackManager,
+            episodeManager = mock(),
+            enqueueCommand = { _, command -> queuedCommands += command },
+        )
+
+        callback.onPause()
+        queuedCommands.forEach { it() }
+
+        verify(playbackManager).pauseSuspend(
+            transientLoss = any(),
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+        )
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
+    }
+
+    @Test
+    fun `legacy onPause evaluates playback state inside queued command`() = runTest {
+        val playbackManager = mock<PlaybackManager>()
+        whenever(playbackManager.isPlaying()).thenReturn(true)
+        whenever(playbackManager.isCarConnected()).thenReturn(true)
+        val manager = createManager(this, playbackManager, mock())
+        val queuedCommands = mutableListOf<suspend () -> Unit>()
+        val callback = manager.createCallback(
+            scope = this,
+            playbackManager = playbackManager,
+            episodeManager = mock(),
+            enqueueCommand = { _, command -> queuedCommands += command },
+        )
+
+        callback.onPause()
+        callback.onPause()
+        assertEquals(2, queuedCommands.size)
+
+        queuedCommands[0]()
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        queuedCommands[1]()
+
+        verify(playbackManager).pauseSuspend(
+            transientLoss = any(),
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+        )
+        verify(playbackManager).playQueueSuspend(
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+            showedStreamWarning = any(),
+        )
     }
 
     private fun createManager(

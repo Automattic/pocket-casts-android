@@ -417,15 +417,46 @@ class Media3SessionCallbackTest {
     }
 
     @Test
-    fun `KEYCODE_MEDIA_PAUSE calls playQueueSuspend when already paused`() = runTest {
+    fun `KEYCODE_MEDIA_PAUSE calls playQueueSuspend when paused and car is connected`() = runTest {
         whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.isCarConnected()).thenReturn(true)
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
         testScope.advanceUntilIdle()
 
         verify(playbackManager).playQueueSuspend(
-            sourceView = any(),
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
             showedStreamWarning = any(),
         )
+        verify(playbackManager, never()).pauseSuspend(any(), any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PAUSE calls playQueueSuspend when paused from Android Auto`() = runTest {
+        whenever(mockController.packageName).thenReturn(ANDROID_AUTO_PACKAGE_NAME)
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.isCarConnected()).thenReturn(false)
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).playQueueSuspend(
+            sourceView = eq(SourceView.ANDROID_AUTO),
+            showedStreamWarning = any(),
+        )
+        verify(playbackManager, never()).pauseSuspend(any(), any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PAUSE calls pauseSuspend when paused and car is not connected`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.isCarConnected()).thenReturn(false)
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).pauseSuspend(
+            transientLoss = any(),
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+        )
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
     }
 
     @Test
