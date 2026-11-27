@@ -34,7 +34,7 @@ git add "$path"
 git commit -qm 'Fixture merge (#999999)'
 export BUILDKITE_SOURCE=webhook BUILDKITE_PULL_REQUEST=false BUILDKITE_BRANCH=main
 export PIPELINE=pipeline.yml
-unset BUILDKITE_TAG CI_CHANGED_FILES_BASE POCKET_CASTS_CI_FULL_BUILD
+unset BUILDKITE_TAG BUILDKITE_GITHUB_EVENT CI_CHANGED_FILES_BASE POCKET_CASTS_CI_FULL_BUILD
 variables=(SKIP_VALIDATION SKIP_LINT SKIP_UNIT_TESTS SKIP_INSTRUMENTED_TESTS SKIP_APP_BUILD SKIP_AUTOMOTIVE_BUILD SKIP_WEAR_BUILD SKIP_TV_BUILD)
 read_vars() {
   # Start with the central uploader's bash -e options and no previous decision.
@@ -88,6 +88,77 @@ expected=("${selected_expected[@]}")
 read_vars
 check_values
 unset CI_CHANGED_FILES_BASE
+
+# A caller can select an explicit ancestor for an API or triggered recovery build. UI and schedules run fully.
+for source in api trigger_job; do
+  export BUILDKITE_SOURCE=$source
+  expected=(0 0 0 0 0 0 0 0)
+  read_vars
+  check_values
+  export CI_CHANGED_FILES_BASE=$base
+  expected=("${selected_expected[@]}")
+  read_vars
+  check_values
+  unset CI_CHANGED_FILES_BASE
+done
+export CI_CHANGED_FILES_BASE=$base
+expected=(0 0 0 0 0 0 0 0)
+for source in ui schedule; do
+  export BUILDKITE_SOURCE=$source
+  read_vars
+  check_values
+done
+unset CI_CHANGED_FILES_BASE
+export BUILDKITE_SOURCE=webhook
+
+# Replay a GitHub push without touching the real webhook or its branch. The real Git diff and pipeline vars run.
+(
+  mkdir "$fixture/probe-bin"
+  cat > "$fixture/probe-bin/buildkite-agent" <<'AGENT'
+#!/bin/sh
+[ "$*" = "meta-data get buildkite:webhook" ] || exit 1
+printf 'read\n' >> "$PROBE_WEBHOOK_READS"
+cat "$PROBE_WEBHOOK"
+AGENT
+  chmod +x "$fixture/probe-bin/buildkite-agent"
+  export PATH="$fixture/probe-bin:$PATH" BUILDKITE_GITHUB_EVENT=push
+  export PROBE_WEBHOOK="$fixture/webhook.json" PROBE_WEBHOOK_READS="$fixture/webhook-reads"
+  push_payload() {
+    jq -n --arg before "$1" --arg after "$(git rev-parse HEAD)" \
+      '{before: $before, after: $after, ref: "refs/heads/main", forced: false}' > "$PROBE_WEBHOOK"
+    : > "$PROBE_WEBHOOK_READS"
+  }
+
+  # The last commit is docs-only. Earlier code in the push must still run every job.
+  mkdir -p docs
+  echo changed > docs/push.md
+  git add docs/push.md
+  git commit -qm 'Docs (#999998)'
+  push_payload "$base"
+  expected=("${selected_expected[@]}")
+  read_vars
+  check_values
+  [[ $(wc -l < "$PROBE_WEBHOOK_READS") -eq 1 ]]
+
+  # Single-commit pushes keep the first-parent decision.
+  push_payload "$(git rev-parse HEAD^1)"
+  expected=(1 1 1 1 1 1 1 1)
+  read_vars
+  check_values
+
+  # An unavailable payload or a base whose own build was skipped must run fully.
+  : > "$PROBE_WEBHOOK"
+  expected=(0 0 0 0 0 0 0 0)
+  read_vars
+  check_values
+  git commit --amend -qm 'Docs (#999998) [skip ci]'
+  previous=$(git rev-parse HEAD)
+  echo changed >> docs/push.md
+  git commit -qam 'Docs follow-up (#999997)'
+  push_payload "$previous"
+  read_vars
+  check_values
+)
 
 # Use the same notifier/upload flow as the central uploader, with a harmless probe job and its own status.
 cat > smoke.yml <<'YAML'
