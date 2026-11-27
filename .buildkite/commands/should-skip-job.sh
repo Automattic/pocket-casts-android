@@ -3,8 +3,8 @@
 # Usage: should-skip-job.sh <job>
 # Prints the reason to skip the job, or `false` to run it. Exits 0 either way, and 15 for invalid arguments.
 # `shared-pipeline-vars` exports the result as SKIP_<JOB TYPE>, used as the step's `skip:` (`false` runs the step).
-# Webhook PR and main builds can skip jobs. POCKET_CASTS_CI_FULL_BUILD=1 forces a full run.
-# main compares HEAD to its first parent; CI_CHANGED_FILES_BASE supplies a wider range.
+# Webhook PR and main builds can skip jobs. API and trigger builds of main can supply CI_CHANGED_FILES_BASE
+# to check all changes since that ancestor. Manual UI, scheduled, tagged and POCKET_CASTS_CI_FULL_BUILD=1 builds run.
 
 run_job() { echo false; exit 0; }
 skip_job() { echo "$1"; exit 0; }
@@ -14,31 +14,37 @@ case "$job" in
   validation|unit-tests|instrumented-tests|lint|app-build|automotive-build|wear-build|tv-build) ;;
   *) echo "Unknown job type: $job" >&2; exit 15 ;;
 esac
-if [[ "${POCKET_CASTS_CI_FULL_BUILD:-}" == 1 || "${BUILDKITE_SOURCE:-}" != webhook ||
-      -n "${BUILDKITE_TAG:-}" ]]; then
+if [[ "${POCKET_CASTS_CI_FULL_BUILD:-}" == 1 || -n "${BUILDKITE_TAG:-}" ]]; then
   run_job
 fi
+case "${BUILDKITE_SOURCE:-}" in
+  webhook) ;;
+  api|trigger_job)
+    [[ "${BUILDKITE_PULL_REQUEST:-}" == false && -n "${CI_CHANGED_FILES_BASE:-}" ]] || run_job
+    ;;
+  *) run_job ;;
+esac
 
-if [[ "${BUILDKITE_PULL_REQUEST-false}" =~ ^[0-9]+$ ]]; then
-  changed_files=(pr_changed_files)
-elif [[ "${BUILDKITE_PULL_REQUEST-false}" == false && "${BUILDKITE_BRANCH:-}" == main ]]; then
-  changed_files=(check_changed_files)
+if [[ "${BUILDKITE_PULL_REQUEST:-}" =~ ^[0-9]+$ ]]; then
+  changed_files_command=(pr_changed_files)
+elif [[ "${BUILDKITE_PULL_REQUEST:-}" == false && "${BUILDKITE_BRANCH:-}" == main ]]; then
+  changed_files_command=(check_changed_files)
   if [[ -n "${CI_CHANGED_FILES_BASE:-}" ]]; then
-    changed_files+=(--base "$CI_CHANGED_FILES_BASE")
+    base=$(git rev-parse --quiet --verify --end-of-options "${CI_CHANGED_FILES_BASE}^{commit}") || run_job
+    git merge-base --is-ancestor "$base" HEAD || run_job
+    changed_files_command+=(--base "$base")
   else
-    # Merge commits and a "(#123)" subject are a heuristic for PR merges, not proof.
-    # First-parent diffs miss earlier commits and skipped builds; use an explicit base for those.
+    # GitHub squash merges usually end in "(#123)". Ordinary pushes without a known range run fully.
     squash_subject='\(#[0-9]+\)$'
-    [[ "$(git rev-list --parents -n 1 HEAD | wc -w)" -gt 2 || "$(git log -1 --format=%s HEAD)" =~ $squash_subject ]] || run_job
+    git rev-parse --verify --quiet HEAD^2 >/dev/null || [[ "$(git log -1 --format=%s HEAD)" =~ $squash_subject ]] || run_job
   fi
 else
   run_job
 fi
 
-# Preserve the existing documentation/tooling exclusions for every job.
+# Gradle configuration, Fastlane and gems are build inputs. The TV app also packages a .txt asset.
 SKIP_PATTERNS=(
-  '*.md' '*.pot' '*.txt' '.gitignore'
-  'config/*' 'fastlane/*' 'Gemfile' 'Gemfile.lock' 'version.properties'
+  '*.md' '*.pot' '.gitignore' 'version.properties'
   'docs/*' 'metadata/*'
 )
 LOCALIZATION_PATTERNS=('*/src/main/res/values*/strings.xml')
@@ -77,5 +83,5 @@ esac
 
 # Empty diffs, errors and unknown paths run the job: skipping requires success.
 # Stdout is the skip decision, so keep any output of the helper out of it.
-"${changed_files[@]}" --all-match "${SKIP_PATTERNS[@]}" >&2 || run_job
+"${changed_files_command[@]}" --all-match "${SKIP_PATTERNS[@]}" >&2 || run_job
 skip_job "No relevant files changed"
