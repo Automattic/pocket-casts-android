@@ -13,7 +13,10 @@ force_full_build=${POCKET_CASTS_CI_FULL_BUILD:-}
 if [ "${BUILDKITE_SOURCE:-}" = webhook ] &&
    [ "${BUILDKITE_PULL_REQUEST:-}" = false ] && [ "${BUILDKITE_BRANCH:-}" = main ] &&
    [ -z "${BUILDKITE_TAG:-}" ] && [ -z "${CI_CHANGED_FILES_BASE:-}" ] && [ "$force_full_build" != 1 ]; then
-  push_base=$(.buildkite/commands/main-push-base.sh) || force_full_build=1
+  if ! push_base=$(.buildkite/commands/main-push-base.sh); then
+    echo "Running all main jobs because the GitHub push range is unavailable, invalid, or follows a CI skip marker." >&2
+    force_full_build=1
+  fi
 fi
 for job_type in validation lint unit-tests instrumented-tests app-build automotive-build wear-build tv-build; do
   skip_var="SKIP_$(echo "$job_type" | tr 'a-z-' 'A-Z_')"
