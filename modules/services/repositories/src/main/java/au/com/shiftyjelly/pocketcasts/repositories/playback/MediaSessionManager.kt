@@ -1178,13 +1178,12 @@ class MediaSessionManager(
                 PlaybackStateCompat.ACTION_REWIND or
                 prepareActions
 
-            val includeSkipActions = !useCustomSkipButtons() || playbackManager.isCarConnected()
-            return if (includeSkipActions) {
+            return if (useCustomSkipButtons()) {
+                actions
+            } else {
                 PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
                     PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
                     actions
-            } else {
-                actions
             }
         }
     }
