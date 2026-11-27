@@ -1,0 +1,153 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+---
+
+# Variables used in this pipeline are defined in `shared-pipeline-vars`, which is `source`'d before calling `buildkite-agent pipeline upload`
+#
+# Steps that can be skipped have `skip: "$SKIP_…"`, decided at upload time by `commands/should-skip-job.sh` (`false` runs the step).
+# Buildkite doesn't notify for skipped steps, but if you need it to do so anyway, you can use the custom `even-if-skipped: true` attribute on a `notify:`. That custom attribute is picked up by the `notify_skipped_steps` script of the `a8c-ci-toolkit` plugin, which the pipeline upload step (defined in `buildkite-ci`) runs on this file. It takes care of detecting those and emitting a success status to GitHub when the step is skipped, so the Required checks of skipped jobs don't wait forever.
+# The Required checks of this repo are Buildkite's per-step statuses (`buildkite/pocket-casts-android/<step label>`), so those steps repeat that context in an explicit `github_commit_status`.
+
+agents:
+  queue: "android"
+
+steps:
+  - label: Gradle Wrapper Validation
+    command: validate_gradle_wrapper
+    agents:
+      queue: linter
+
+  # Wait for Gradle Wrapper to be validated before running any other jobs
+  - wait
+
+  - group: "Linters"
+    steps:
+      - label: ":danger: Danger - PR Check"
+        command: danger
+        key: danger
+        if: "build.pull_request.id != null"
+        retry:
+          manual:
+            permit_on_passed: true
+        agents:
+          queue: "linter"
+
+      - label: 'Lint'
+        command: ".buildkite/commands/lint.sh"
+        skip: "$SKIP_LINT"
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/reports/lint-results*.*"
+        notify:
+          - github_commit_status:
+              context: buildkite/pocket-casts-android/lint
+            even-if-skipped: true
+
+  - label: ":fastlane: fastlane Helper Tests"
+    command: ruby fastlane/test/helpers_test.rb
+    plugins: [ $CI_TOOLKIT ]
+
+  - label: 'Unit tests'
+    command: ".buildkite/commands/run-unit-tests.sh"
+    skip: "$SKIP_UNIT_TESTS"
+    plugins: [ $CI_TOOLKIT ]
+    notify:
+      - github_commit_status:
+          context: buildkite/pocket-casts-android/unit-tests
+        even-if-skipped: true
+
+  - group: "Diff Reports"
+    steps:
+      - label: 'Dependency diff'
+        if: build.pull_request.id != null
+        command: comment_with_dependency_diff 'app' 'releaseRuntimeClasspath'
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/reports/diff/*"
+
+      - label: "Merged Manifest Diff"
+        command: ".buildkite/commands/diff-merged-manifest.sh release"
+        if: build.pull_request.id != null
+        skip: "$SKIP_VALIDATION"
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/reports/diff_manifest/**/**/*"
+
+  - label: 'Spotless formatting check'
+    command: |
+      echo "--- 🔎 Checking formatting with Spotless"
+      ./gradlew spotlessCheck
+    skip: "$SKIP_VALIDATION"
+    plugins: [ $CI_TOOLKIT ]
+
+  - label: "Instrumented tests"
+    command: ".buildkite/commands/run-instrumented-tests.sh"
+    skip: "$SKIP_INSTRUMENTED_TESTS"
+    plugins: [ $CI_TOOLKIT ]
+    artifact_paths:
+      - "**/build/instrumented-tests/**/*"
+    notify:
+      - github_commit_status:
+          context: buildkite/pocket-casts-android/instrumented-tests
+        even-if-skipped: true
+
+  - group: "Assemble release APKs"
+    steps:
+      - label: "Assemble app release APK"
+        command: ".buildkite/commands/assemble-release-apk.sh app"
+        skip: "$SKIP_APP_BUILD"
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/outputs/apk/**/*"
+        notify:
+          - github_commit_status:
+              context: buildkite/pocket-casts-android/assemble-app-release-apk
+            even-if-skipped: true
+
+      - label: "Assemble automotive release APK"
+        command: ".buildkite/commands/assemble-release-apk.sh automotive"
+        skip: "$SKIP_AUTOMOTIVE_BUILD"
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/outputs/apk/**/*"
+        notify:
+          - github_commit_status:
+              context: buildkite/pocket-casts-android/assemble-automotive-release-apk
+            even-if-skipped: true
+
+      - label: "Assemble wear release APK"
+        command: ".buildkite/commands/assemble-release-apk.sh wear"
+        skip: "$SKIP_WEAR_BUILD"
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/outputs/apk/**/*"
+        notify:
+          - github_commit_status:
+              context: buildkite/pocket-casts-android/assemble-wear-release-apk
+            even-if-skipped: true
+
+      - label: "Assemble tv release APK"
+        command: ".buildkite/commands/assemble-release-apk.sh tv"
+        skip: "$SKIP_TV_BUILD"
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/outputs/apk/**/*"
+
+    ##########
+    # Optional Prototype Builds
+    #
+    # Builds all modules, uploads app to FAD and Wear, Automotive and TV to S3
+    ##########
+  - group: Prototype Builds
+    if: "build.pull_request.id != null || build.branch == 'main'"
+    steps:
+      - input: "🚀 Generate Prototype Builds?"
+        prompt: Generate Prototype Builds?
+        key: prototype_builds_triggered
+      - label: ":rocket: Prototype Builds"
+        depends_on: prototype_builds_triggered
+        command: .buildkite/commands/prototype-build.sh
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/outputs/apk/**/*"
+        # No notify node to avoid GitHub checks status being stuck on yellow.
+        # This step being optional, chances are it will never be triggered.
