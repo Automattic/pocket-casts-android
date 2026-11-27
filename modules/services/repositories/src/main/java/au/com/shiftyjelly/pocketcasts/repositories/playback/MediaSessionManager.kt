@@ -369,11 +369,7 @@ class MediaSessionManager(
                 val sourceView = media3RequestSource()
                 scope.launch {
                     commandMutex.withLock {
-                        if (playbackManager.isPlaying()) {
-                            playbackManager.pauseSuspend(sourceView = sourceView)
-                        } else {
-                            playbackManager.playQueueSuspend(sourceView = sourceView)
-                        }
+                        playbackManager.handleMediaSessionPause(sourceView = sourceView)
                     }
                 }
             },
@@ -1406,11 +1402,7 @@ class MediaSessionManager(
             if (keyEvent.action == KeyEvent.ACTION_DOWN) {
                 if (keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
                     val sourceView = currentSource()
-                    if (playbackManager.isPlaying()) {
-                        enqueueCommand("pause") { playbackManager.pauseSuspend(sourceView = sourceView) }
-                    } else {
-                        enqueueCommand("play") { playbackManager.playQueueSuspend(sourceView = sourceView) }
-                    }
+                    enqueueCommand("pause") { playbackManager.handleMediaSessionPause(sourceView = sourceView) }
                     return true
                 }
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: keyCode=${keyEvent.keyCode}")
@@ -1510,11 +1502,7 @@ class MediaSessionManager(
         override fun onPause() {
             logEvent("pause")
             val sourceView = currentSource()
-            if (playbackManager.isPlaying()) {
-                enqueueCommand("pause") { playbackManager.pauseSuspend(sourceView = sourceView) }
-            } else {
-                enqueueCommand("play") { playbackManager.playQueueSuspend(sourceView = sourceView) }
-            }
+            enqueueCommand("pause") { playbackManager.handleMediaSessionPause(sourceView = sourceView) }
         }
 
         override fun onPlayFromSearch(query: String?, extras: Bundle?) {
@@ -1708,6 +1696,15 @@ internal const val APP_ACTION_MARK_AS_PLAYED = "markAsPlayed"
 internal const val APP_ACTION_CHANGE_SPEED = "changeSpeed"
 internal const val APP_ACTION_ARCHIVE = "archive"
 internal const val APP_ACTION_PLAY_NEXT = "playNext"
+
+internal suspend fun PlaybackManager.handleMediaSessionPause(sourceView: SourceView) {
+    val isCarSource = sourceView == SourceView.ANDROID_AUTO || sourceView == SourceView.AUTOMOTIVE
+    if (!isPlaying() && (isCarConnected() || isCarSource)) {
+        playQueueSuspend(sourceView = sourceView)
+    } else {
+        pauseSuspend(sourceView = sourceView)
+    }
+}
 
 private val NOTHING_PLAYING: MediaMetadataCompat = MediaMetadataCompat.Builder()
     .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "")
