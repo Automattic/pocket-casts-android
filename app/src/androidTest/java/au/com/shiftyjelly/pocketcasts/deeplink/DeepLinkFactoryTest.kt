@@ -1204,6 +1204,28 @@ class DeepLinkFactoryTest {
     }
 
     @Test
+    fun showPlayback() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://profile/playback"))
+
+        val deepLink = factory.create(intent)
+
+        assertEquals(ShowPlaybackDeepLink, deepLink)
+    }
+
+    @Test
+    fun showPlaybackWithOtherPath() {
+        val intent = Intent()
+            .setAction(ACTION_VIEW)
+            .setData(Uri.parse("pktc://profile/other"))
+
+        val deepLink = factory.create(intent)
+
+        assertNull(deepLink)
+    }
+
+    @Test
     fun developerOptions() {
         val intent = Intent(ACTION_VIEW)
             .setData(Uri.parse("pktc://developer_options"))

@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-10 09:56:34+0000
+Translation-Revision-Date: 2026-11-24 11:54:25+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="onboarding_upgrade_regular_price">常规售价 %1$s</string>
+    <string name="onboarding_upgrade_intro_offer_renewal">第一年 (%2$s) 后按 %1$s 定期付款。</string>
+    <string name="onboarding_upgrade_intro_offer_claim">领取 %1$d%% 优惠</string>
+    <string name="onboarding_upgrade_intro_offer_title">订阅 Plus 一年，立享 %1$d%% 优惠\n一年</string>
+    <string name="onboarding_upgrade_intro_offer_tag">限时优惠</string>
+    <string name="onboarding_upgrade_intro_offer_price">首年 %1$s</string>
+    <string name="onboarding_upgrade_intro_offer_badge">%1$d%% 优惠</string>
+    <string name="episode_chat_tooltip_message">或者就这方面问任何问题。</string>
     <string name="chat_jumping_to_time">正在跳转至 %1$s…</string>
     <string name="chat_jumped_to_time">已跳转至 %1$s</string>
     <string name="playback_2026_sheet_button">查看我的 2026 年播放记录</string>
@@ -87,7 +95,6 @@ Language: zh_CN
     <string name="chat_beta_sheet_title">“关于此剧集的提问”功能处于测试阶段</string>
     <string name="episode_chat_beta_badge">测试版</string>
     <string name="episode_chat_shelf_title">“关于此剧集的提问”功能</string>
-    <string name="episode_chat_tooltip_message">或者提出任何相关问题。</string>
     <string name="manual_playlist_no_content_body_alternative">从您关注的播客中选择剧集。 或者在任意剧集上向左滑动，即可边浏览边添加。</string>
     <string name="manual_playlist_no_content_body">找到您喜欢的播客，然后在任意剧集上向左滑动即可添加。</string>
     <string name="settings_general_whats_new_unread_dot_summary">当有新的“最新动态”消息时，在个人资料上显示未读标记。</string>

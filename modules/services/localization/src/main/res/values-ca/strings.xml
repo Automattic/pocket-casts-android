@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-12 21:49:08+0000
+Translation-Revision-Date: 2026-11-25 00:30:09+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="onboarding_upgrade_regular_price">Preu habitual: %1$s</string>
+    <string name="onboarding_upgrade_intro_offer_renewal">Pagaments periòdics de %1$s després d\'1 any (%2$s).</string>
+    <string name="onboarding_upgrade_intro_offer_claim">Aconsegueix un %1$d%% de descompte</string>
+    <string name="onboarding_upgrade_intro_offer_title">%1$d%% de descompte en Plus\ndurant un any</string>
+    <string name="onboarding_upgrade_intro_offer_tag">Oferta per temps limitat</string>
+    <string name="onboarding_upgrade_intro_offer_price">%1$s el primer any</string>
+    <string name="onboarding_upgrade_intro_offer_badge">%1$d%% de descompte</string>
+    <string name="episode_chat_tooltip_message">O pregunta el que vulguis sobre l\'episodi.</string>
     <string name="chat_jumping_to_time">S\'està saltant a %1$s…</string>
     <string name="chat_jumped_to_time">S\'ha saltat a %1$s</string>
     <string name="playback_2026_sheet_description">El que has escoltat. Els pòdcasts que t\'han encantat. I el que et fa diferent com a oient. Ja és aquí el teu any a Pocket Casts.</string>
@@ -87,7 +95,6 @@ Language: ca
     <string name="chat_beta_sheet_title">«Pregunta sobre aquest episodi» està en fase beta</string>
     <string name="episode_chat_beta_badge">Beta</string>
     <string name="episode_chat_shelf_title">Pregunta sobre aquest episodi</string>
-    <string name="episode_chat_tooltip_message">O pregunta qualsevol cosa sobre l\'episodi.</string>
     <string name="manual_playlist_no_content_body_alternative">Tria episodis dels pòdcasts que segueixes. O llisca cap a l\'esquerra sobre qualsevol episodi per afegir-lo sobre la marxa.</string>
     <string name="manual_playlist_no_content_body">Cerca un pòdcast que t\'agradi i llisca cap a l\'esquerra sobre qualsevol episodi per afegir-lo.</string>
     <string name="settings_general_whats_new_unread_dot">Marca els missatges nous amb un punt</string>

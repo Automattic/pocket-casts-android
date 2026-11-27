@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-11 08:54:37+0000
+Translation-Revision-Date: 2026-11-24 22:58:08+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="onboarding_upgrade_regular_price">Обычная цена %1$s</string>
+    <string name="onboarding_upgrade_intro_offer_renewal">Регулярные платежи в %1$s по истечении 1 года (%2$s).</string>
+    <string name="onboarding_upgrade_intro_offer_claim">Получить скидку %1$d %%</string>
+    <string name="onboarding_upgrade_intro_offer_title">Скидка %1$d %% на Plus на \nодин год</string>
+    <string name="onboarding_upgrade_intro_offer_tag">Ограниченное по времени предложение</string>
+    <string name="onboarding_upgrade_intro_offer_price">%1$s первый год</string>
+    <string name="onboarding_upgrade_intro_offer_badge">Скидка %1$d %%</string>
+    <string name="episode_chat_tooltip_message">Или задайте любой вопрос об этом.</string>
     <string name="chat_jumping_to_time">Переход к %1$s…</string>
     <string name="chat_jumped_to_time">Перейти к %1$s</string>
     <string name="playback_2026_sheet_button">Просмотреть мою историю прослушиваний за 2026 год</string>
@@ -87,7 +95,6 @@ Language: ru
     <string name="chat_beta_sheet_title">Спросить об этом выпуске в бета-версии</string>
     <string name="episode_chat_beta_badge">Бета-версия</string>
     <string name="episode_chat_shelf_title">Спросить об этом выпуске</string>
-    <string name="episode_chat_tooltip_message">Или задайте любой вопрос о нём.</string>
     <string name="manual_playlist_no_content_body_alternative">Выберите выпуски из подкастов, на которые вы подписаны. Также можно смахнуть влево любой выпуск, чтобы сразу добавить его.</string>
     <string name="manual_playlist_no_content_body">Найдите понравившийся подкаст, а затем смахните влево любой выпуск, чтобы добавить его.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Показывать индикатор непрочитанного в профиле при появлении новых сообщений в разделе «Что нового».</string>
