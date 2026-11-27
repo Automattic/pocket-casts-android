@@ -193,11 +193,11 @@ export BUILDKITE_SOURCE=webhook
   read_vars
   check_values
 
-  # The old main tip already contains the target-only change. Check the merge against parent one.
+  # The old main tip already contains this Gradle change. Comparing to the parents' common ancestor
+  # would count it again and run every job even when the merged branch only changed docs.
   git checkout -qb probe-merge "$base"
-  mkdir -p docs
-  echo target > docs/target-only.md
-  git add docs/target-only.md
+  echo '// Target-only change' > settings.gradle.kts
+  git add settings.gradle.kts
   git commit -qm 'Target-only change'
   previous=$(git rev-parse HEAD)
   git merge -q --no-ff -m 'Merge the fixture branch' "$scenario_commit"
