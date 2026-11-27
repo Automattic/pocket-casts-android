@@ -52,6 +52,30 @@ check_values() {
     [[ "$actual" == "${expected[i]}" ]] || { echo "Unexpected ${variables[i]}=$value" >&2; exit 1; }
   done
 }
+
+# Match the real uploader's push metadata without reading or changing this verification PR's webhook.
+export PROBE_REAL_AGENT
+PROBE_REAL_AGENT=$(command -v buildkite-agent)
+mkdir "$fixture/probe-bin"
+cat > "$fixture/probe-bin/buildkite-agent" <<'AGENT'
+#!/bin/sh
+if [ "$*" = "meta-data get buildkite:webhook" ]; then
+  printf 'read\n' >> "$PROBE_WEBHOOK_READS"
+  cat "$PROBE_WEBHOOK"
+else
+  exec "$PROBE_REAL_AGENT" "$@"
+fi
+AGENT
+chmod +x "$fixture/probe-bin/buildkite-agent"
+export PATH="$fixture/probe-bin:$PATH" BUILDKITE_GITHUB_EVENT=push
+export PROBE_WEBHOOK="$fixture/webhook.json" PROBE_WEBHOOK_READS="$fixture/webhook-reads"
+push_payload() {
+  jq -n --arg before "$1" --arg after "$(git rev-parse HEAD)" \
+    '{before: $before, after: $after, ref: "refs/heads/main", forced: false}' > "$PROBE_WEBHOOK"
+  : > "$PROBE_WEBHOOK_READS"
+}
+push_payload "$base"
+
 read_vars
 check_values
 selected_expected=("${expected[@]}")
@@ -81,6 +105,7 @@ unset CI_CHANGED_FILES_BASE
 
 # A direct push without a PR-merge subject runs fully unless an explicit base is supplied.
 git commit --amend -qm 'Fixture direct push'
+push_payload "$base"
 read_vars
 check_values
 export CI_CHANGED_FILES_BASE=$base
@@ -113,22 +138,6 @@ export BUILDKITE_SOURCE=webhook
 
 # Replay a GitHub push without touching the real webhook or its branch. The real Git diff and pipeline vars run.
 (
-  mkdir "$fixture/probe-bin"
-  cat > "$fixture/probe-bin/buildkite-agent" <<'AGENT'
-#!/bin/sh
-[ "$*" = "meta-data get buildkite:webhook" ] || exit 1
-printf 'read\n' >> "$PROBE_WEBHOOK_READS"
-cat "$PROBE_WEBHOOK"
-AGENT
-  chmod +x "$fixture/probe-bin/buildkite-agent"
-  export PATH="$fixture/probe-bin:$PATH" BUILDKITE_GITHUB_EVENT=push
-  export PROBE_WEBHOOK="$fixture/webhook.json" PROBE_WEBHOOK_READS="$fixture/webhook-reads"
-  push_payload() {
-    jq -n --arg before "$1" --arg after "$(git rev-parse HEAD)" \
-      '{before: $before, after: $after, ref: "refs/heads/main", forced: false}' > "$PROBE_WEBHOOK"
-    : > "$PROBE_WEBHOOK_READS"
-  }
-
   # The last commit is docs-only. Earlier code in the push must still run every job.
   mkdir -p docs
   echo changed > docs/push.md
@@ -145,6 +154,21 @@ AGENT
   expected=(1 1 1 1 1 1 1 1)
   read_vars
   check_values
+
+  # A real push range does not opt an ordinary direct commit into selective skipping.
+  git commit --amend -qm 'Direct docs push'
+  push_payload "$base"
+  expected=(0 0 0 0 0 0 0 0)
+  read_vars
+  check_values
+
+  # A missing event must not silently use the last commit alone.
+  git commit --amend -qm 'Docs (#999998)'
+  push_payload "$base"
+  unset BUILDKITE_GITHUB_EVENT
+  read_vars
+  check_values
+  export BUILDKITE_GITHUB_EVENT=push
 
   # An unavailable payload or a base whose own build was skipped must run fully.
   : > "$PROBE_WEBHOOK"
