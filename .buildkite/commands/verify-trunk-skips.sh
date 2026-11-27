@@ -4,6 +4,15 @@ set -euo pipefail
 # Verification PR only. Uses real helpers against a tiny Git history, without building the app.
 scenario=${1:?Pass docs or code}
 repo=$PWD
+if [[ "$scenario" == docs ]]; then
+  # Check the actual upload-agent checkout before creating a fixture. Missing history or helper errors fail the probe.
+  parent_tree=$(git rev-parse --verify 'HEAD^1^{tree}')
+  head_tree=$(git rev-parse --verify 'HEAD^{tree}')
+  expected_change=false
+  if [[ "$parent_tree" != "$head_tree" ]]; then expected_change=true; fi
+  actual_change=$(check_changed_files --stdout)
+  [[ "$actual_change" == "$expected_change" ]] || { echo "Unexpected checkout diff: $actual_change" >&2; exit 1; }
+fi
 fixture=$(mktemp -d)
 trap 'rm -rf "$fixture"' EXIT
 cp -R .buildkite "$fixture/.buildkite"
@@ -32,6 +41,7 @@ mkdir -p "$(dirname "$path")"
 echo changed > "$path"
 git add "$path"
 git commit -qm 'Fixture merge (#999999)'
+scenario_commit=$(git rev-parse HEAD)
 export BUILDKITE_SOURCE=webhook BUILDKITE_PULL_REQUEST=false BUILDKITE_BRANCH=main
 export PIPELINE=pipeline.yml
 unset BUILDKITE_TAG BUILDKITE_GITHUB_EVENT CI_CHANGED_FILES_BASE POCKET_CASTS_CI_FULL_BUILD
@@ -180,6 +190,19 @@ export BUILDKITE_SOURCE=webhook
   echo changed >> docs/push.md
   git commit -qam 'Docs follow-up (#999997)'
   push_payload "$previous"
+  read_vars
+  check_values
+
+  # The old main tip already contains the target-only change. Check the merge against parent one.
+  git checkout -qb probe-merge "$base"
+  mkdir -p docs
+  echo target > docs/target-only.md
+  git add docs/target-only.md
+  git commit -qm 'Target-only change'
+  previous=$(git rev-parse HEAD)
+  git merge -q --no-ff -m 'Merge the fixture branch' "$scenario_commit"
+  push_payload "$previous"
+  expected=("${selected_expected[@]}")
   read_vars
   check_values
 )
