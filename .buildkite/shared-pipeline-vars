@@ -10,7 +10,7 @@ export CI_TOOLKIT="automattic/a8c-ci-toolkit#8.1.0"
 # This file is also sourced with `sh` (release-toolkit's `buildkite_pipeline_upload`), so keep it POSIX. Any error runs the job.
 push_base=''
 force_full_build=${POCKET_CASTS_CI_FULL_BUILD:-}
-if [ "${BUILDKITE_SOURCE:-}" = webhook ] && [ "${BUILDKITE_GITHUB_EVENT:-}" = push ] &&
+if [ "${BUILDKITE_SOURCE:-}" = webhook ] &&
    [ "${BUILDKITE_PULL_REQUEST:-}" = false ] && [ "${BUILDKITE_BRANCH:-}" = main ] &&
    [ -z "${BUILDKITE_TAG:-}" ] && [ -z "${CI_CHANGED_FILES_BASE:-}" ] && [ "$force_full_build" != 1 ]; then
   push_base=$(.buildkite/commands/main-push-base.sh) || force_full_build=1

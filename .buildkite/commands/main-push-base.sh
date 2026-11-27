@@ -4,6 +4,7 @@ set -euo pipefail
 
 # Print the previous main tip for a multi-commit GitHub push. For a single commit, keep the
 # regular first-parent rule. Failure tells the upload to run every job.
+[[ "${BUILDKITE_GITHUB_EVENT:-}" == push ]]
 head=$(git rev-parse HEAD)
 before=$(buildkite-agent meta-data get buildkite:webhook | jq -er --arg head "$head" '
   select(.ref == "refs/heads/main" and .after == $head and .forced == false)
