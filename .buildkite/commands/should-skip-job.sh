@@ -29,14 +29,16 @@ if [[ "${BUILDKITE_PULL_REQUEST:-}" =~ ^[0-9]+$ ]]; then
   changed_files_command=(pr_changed_files)
 elif [[ "${BUILDKITE_PULL_REQUEST:-}" == false && "${BUILDKITE_BRANCH:-}" == main ]]; then
   changed_files_command=(check_changed_files)
-  if [[ -n "${CI_CHANGED_FILES_BASE:-}" ]]; then
-    base=$(git rev-parse --quiet --verify --end-of-options "${CI_CHANGED_FILES_BASE}^{commit}") || run_job
-    git merge-base --is-ancestor "$base" HEAD || run_job
-    changed_files_command+=(--base "$base")
-  else
-    # GitHub squash merges usually end in "(#123)". Ordinary pushes without a known range run fully.
+  if [[ -z "${CI_CHANGED_FILES_BASE:-}" ]]; then
+    # GitHub squash merges usually end in "(#123)". Only a caller-supplied base opts ordinary pushes in.
     squash_subject='\(#[0-9]+\)$'
     git rev-parse --verify --quiet HEAD^2 >/dev/null || [[ "$(git log -1 --format=%s HEAD)" =~ $squash_subject ]] || run_job
+  fi
+  base=${CI_CHANGED_FILES_BASE:-${CI_MAIN_PUSH_BASE:-}}
+  if [[ -n "$base" ]]; then
+    base=$(git rev-parse --quiet --verify --end-of-options "${base}^{commit}") || run_job
+    git merge-base --is-ancestor "$base" HEAD || run_job
+    changed_files_command+=(--base "$base")
   fi
 else
   run_job
