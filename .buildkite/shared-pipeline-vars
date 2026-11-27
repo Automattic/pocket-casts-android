@@ -8,16 +8,16 @@ export CI_TOOLKIT="automattic/a8c-ci-toolkit#8.1.0"
 # Skip decisions, made here on the upload agent so that skipped jobs never wait for an agent.
 # One variable per job type: `false` runs the step, anything else is the reason to skip it. The pipeline uses them as `skip: "$SKIP_…"`.
 # This file is also sourced with `sh` (release-toolkit's `buildkite_pipeline_upload`), so keep it POSIX. Any error runs the job.
-skip_base=${CI_CHANGED_FILES_BASE:-}
+push_base=''
 force_full_build=${POCKET_CASTS_CI_FULL_BUILD:-}
-if [ "${BUILDKITE_SOURCE:-}" = webhook ] && [ "${BUILDKITE_GITHUB_EVENT:-}" = push ] &&
+if [ "${BUILDKITE_SOURCE:-}" = webhook ] &&
    [ "${BUILDKITE_PULL_REQUEST:-}" = false ] && [ "${BUILDKITE_BRANCH:-}" = main ] &&
-   [ -z "${BUILDKITE_TAG:-}" ] && [ -z "$skip_base" ] && [ "$force_full_build" != 1 ]; then
-  skip_base=$(.buildkite/commands/main-push-base.sh) || force_full_build=1
+   [ -z "${BUILDKITE_TAG:-}" ] && [ -z "${CI_CHANGED_FILES_BASE:-}" ] && [ "$force_full_build" != 1 ]; then
+  push_base=$(.buildkite/commands/main-push-base.sh) || force_full_build=1
 fi
 for job_type in validation lint unit-tests instrumented-tests app-build automotive-build wear-build tv-build; do
   skip_var="SKIP_$(echo "$job_type" | tr 'a-z-' 'A-Z_')"
-  skip_reason=$(CI_CHANGED_FILES_BASE="$skip_base" POCKET_CASTS_CI_FULL_BUILD="$force_full_build" \
+  skip_reason=$(CI_MAIN_PUSH_BASE="$push_base" POCKET_CASTS_CI_FULL_BUILD="$force_full_build" \
     .buildkite/commands/should-skip-job.sh "$job_type") || skip_reason=false
   export "$skip_var=$skip_reason"
   echo "$skip_var=$skip_reason"
