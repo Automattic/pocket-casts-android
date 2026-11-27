@@ -18,10 +18,6 @@ build/
 *.iws
 *.ipr
 
-# Android
-google-services.json
-google-upload-credentials.json
-
 ### fastlane ###
 # fastlane - A streamlined workflow tool for Cocoa deployment
 
@@ -48,10 +44,12 @@ fastlane/README.md
 #
 # See https://linear.app/a8c/issue/AINFRA-3485
 secret.properties
+google-services.json
+google-upload-credentials.json
+firebase.secrets.json
+.configure-files/
 
 # secrets
-.configure-files/firebase.secrets.json
-firebase.secrets.json
 *.keystore
 *.jks
 !debug.keystore

@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2026-11-10 14:58:59+0000
+Translation-Revision-Date: 2026-11-24 14:58:07+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="onboarding_upgrade_regular_price">Precio normal %1$s</string>
+    <string name="onboarding_upgrade_intro_offer_renewal">Pagos recurrentes de %1$s después del primer año (%2$s).</string>
+    <string name="onboarding_upgrade_intro_offer_claim">Obtener un %1$d%% de descuento</string>
+    <string name="onboarding_upgrade_intro_offer_title">%1$d%% de descuento en Plus durante\nun año</string>
+    <string name="onboarding_upgrade_intro_offer_tag">Oferta por tiempo limitado</string>
+    <string name="onboarding_upgrade_intro_offer_price">%1$s primer año</string>
+    <string name="onboarding_upgrade_intro_offer_badge">%1$d%% de descuento</string>
+    <string name="episode_chat_tooltip_message">O pregunta cualquier cosa sobre el episodio.</string>
     <string name="chat_jumping_to_time">Saltando a las %1$s…</string>
     <string name="chat_jumped_to_time">Ha saltado a las %1$s</string>
     <string name="playback_2026_sheet_button">Ver mi reproducción de 2026</string>
@@ -87,7 +95,6 @@ Language: es
     <string name="chat_beta_sheet_body">Es gratuita para todos mientras esté en pruebas. Se convertirá en una función Plus más adelante.</string>
     <string name="chat_beta_sheet_title">La función Preguntar sobre este episodio está en fase beta</string>
     <string name="episode_chat_shelf_title">Preguntar sobre este episodio</string>
-    <string name="episode_chat_tooltip_message">O pregunta lo que quieras sobre él.</string>
     <string name="manual_playlist_no_content_body_alternative">Elige episodios de los podcasts que sigues. O desliza hacia la izquierda en cualquier episodio para añadirlo sobre la marcha.</string>
     <string name="manual_playlist_no_content_body">Busca un podcast que te guste y desliza hacia la izquierda en cualquier episodio para añadirlo.</string>
     <string name="settings_general_whats_new_unread_dot_summary">Muestra un punto de mensaje sin leer en el perfil cuando haya nuevos mensajes de novedades.</string>

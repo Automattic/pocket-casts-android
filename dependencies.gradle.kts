@@ -4,7 +4,7 @@ val versionCodeDifferenceBetweenAppAndAutomotive = 50000
 val versionCodeDifferenceBetweenAppAndWear = 50000 + versionCodeDifferenceBetweenAppAndAutomotive
 val versionCodeDifferenceBetweenAppAndTv = 50000 + versionCodeDifferenceBetweenAppAndWear
 
-val secretProperties = loadPropertiesFromFile(File(gradle.extra["decryptedSecretsDir"] as File, "secret.properties"))
+val secretProperties = loadPropertiesFromFile(File(gradle.extra["a8cSecretsDir"] as File, "secrets.properties"))
 val versionProperties = loadPropertiesFromFile(file("version.properties"))
 
 fun loadPropertiesFromFile(file: File): Properties {
@@ -78,7 +78,7 @@ project.apply {
         set("testInstrumentationRunner", "androidx.test.runner.AndroidJUnitRunner")
 
         // App Signing
-        val uploadKeystore = File(gradle.extra["decryptedSecretsDir"] as File, "upload.jks")
+        val uploadKeystore = File(gradle.extra["a8cSecretsDir"] as File, "upload.jks")
         val uploadStorePassword = secretProperties.getProperty("signingKeyStorePassword")
         val uploadKeyAlias = secretProperties.getProperty("signingKeyAlias")
         val uploadKeyPassword = secretProperties.getProperty("signingKeyPassword")

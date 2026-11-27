@@ -20,8 +20,7 @@ fi
 echo '--- :ruby: Setup Ruby Tools'
 install_gems
 
-echo '--- 🔐 Access Secrets'
-bundle exec fastlane run configure_apply
+"$(dirname "${BASH_SOURCE[0]}")/install-secrets.sh"
 
 echo '--- 🚀 Update Rollouts'
 bundle exec fastlane update_rollouts \

@@ -18,7 +18,7 @@
 [versions]
 # ignore AboutLibraries versions such as -b02 and stick to the stable versions
 aboutlibraries = "15.3.0"
-android-gradle-plugin = "9.5.1"
+android-gradle-plugin = "9.5.2"
 billing = "9.1.0"
 coil = "3.6.3"
 compose = "2026.08.00" # https://developer.android.com/jetpack/compose/bom/bom-mapping
@@ -313,9 +313,9 @@ play-auth = "com.google.android.gms:play-services-auth:21.6.0"
 play-cast = "com.google.android.gms:play-services-cast-framework:23.0.0"
 play-review = "com.google.android.play:review-ktx:2.0.2"
 play-wearable = "com.google.android.gms:play-services-wearable:20.0.1"
-pocketcasts-playback = "com.automattic.pocketcasts:playback:0.4.4"
+pocketcasts-playback = "com.automattic.pocketcasts:playback:0.4.5"
 reorderable = "sh.calvin.reorderable:reorderable:3.1.0"
-robolectric = "org.robolectric:robolectric:4.18"
+robolectric = "org.robolectric:robolectric:4.18.1"
 timber = "com.jakewharton.timber:timber:5.0.1"
 turbine = "app.cash.turbine:turbine:1.2.1"
 unidecode = "net.gcardone.junidecode:junidecode:0.5.2"
@@ -336,5 +336,5 @@ measure-builds = { id = "com.automattic.android.measure-builds", version.ref = "
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 room = { id = "androidx.room", version.ref = "room" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
-spotless = "com.diffplug.spotless:8.11.0"
+spotless = "com.diffplug.spotless:8.12.0"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
