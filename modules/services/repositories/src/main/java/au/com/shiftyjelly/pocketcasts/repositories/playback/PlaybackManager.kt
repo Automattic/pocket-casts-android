@@ -135,6 +135,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
@@ -199,7 +200,8 @@ open class PlaybackManager @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    private val focusManager = FocusManager(
+    @VisibleForTesting
+    internal val focusManager = FocusManager(
         context = application,
         settings = settings,
         focusChangeListener = this,
@@ -244,7 +246,9 @@ open class PlaybackManager @Inject constructor(
     private var updateCount = 0
     private var resettingPlayer = false
     private var episodeLastBufferStatus: EpisodeBufferStatus? = null
-    private var focusWasPlaying: Date? = null
+
+    @VisibleForTesting
+    internal var focusWasPlaying: Date? = null
     private var forcePlayerSwitch = false
     private var updateTimerDisposable: Disposable? = null
     private var bufferUpdateTimerDisposable: Disposable? = null
@@ -260,6 +264,7 @@ open class PlaybackManager @Inject constructor(
 
     private val errorClassifier = PlaybackErrorClassifier()
 
+    @Volatile
     @VisibleForTesting
     internal var isAndroidAutoConnected = false
 
@@ -267,16 +272,21 @@ open class PlaybackManager @Inject constructor(
         return Util.isAutomotive(application) || Util.isCarUiMode(application) || isAndroidAutoConnected
     }
 
+    @VisibleForTesting
+    internal fun onCarConnectionChanged(isConnected: Boolean) {
+        val wasConnected = isAndroidAutoConnected
+        isAndroidAutoConnected = isConnected
+        if (wasConnected && !isConnected && !isPlaying()) {
+            focusManager.giveUpAudioFocus()
+        }
+    }
+
     init {
         try {
             Util.isAndroidAutoConnectedFlow(application)
                 .distinctUntilChanged()
-                .onEach { isConnected ->
-                    isAndroidAutoConnected = isConnected
-                    if (!isConnected && !isPlaying()) {
-                        focusManager.giveUpAudioFocus()
-                    }
-                }
+                .onEach(::onCarConnectionChanged)
+                .catch { Timber.e(it, "Failed to observe CarConnection") }
                 .launchIn(applicationScope)
         } catch (e: Exception) {
             Timber.e(e, "Failed to observe CarConnection")
@@ -1093,6 +1103,9 @@ open class PlaybackManager @Inject constructor(
         if (!transientLoss) {
             if (!isCarConnected()) {
                 focusManager.giveUpAudioFocus()
+            }
+            if (sourceView != SourceView.AUTO_PAUSE) {
+                focusWasPlaying = null
             }
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(transientLoss = false))
@@ -2117,8 +2130,8 @@ open class PlaybackManager @Inject constructor(
             focusWasPlaying = Date()
 
             pause(transientLoss = transientLoss, sourceView = SourceView.AUTO_PAUSE)
-        } else if (focusWasPlaying != null) {
-            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost while already paused from prior focus loss")
+        } else if (transientLoss && focusWasPlaying != null) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Transient focus lost while already paused from prior focus loss")
         } else {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost not playing")
             focusWasPlaying = null
