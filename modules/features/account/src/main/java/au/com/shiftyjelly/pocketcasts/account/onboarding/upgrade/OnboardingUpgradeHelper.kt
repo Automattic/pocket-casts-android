@@ -385,14 +385,16 @@ object OnboardingUpgradeHelper {
         fontWeight: FontWeight = FontWeight.Normal,
         onPrivacyPolicyClick: () -> Unit = {},
         onTermsAndConditionsClick: () -> Unit = {},
+        leadingText: String? = null,
+        termsAndConditionsText: String = stringResource(LR.string.onboarding_upgrade_tnc),
     ) {
         val privacyPolicyText = stringResource(LR.string.onboarding_upgrade_pp)
-        val termsAndConditionsText = stringResource(LR.string.onboarding_upgrade_tnc)
-        val text = stringResource(
+        val agreementText = stringResource(
             LR.string.onboarding_plus_continuing_agrees_to,
             privacyPolicyText,
             termsAndConditionsText,
         )
+        val text = listOfNotNull(leadingText, agreementText).joinToString(separator = "\n")
         val uriHandler = LocalUriHandler.current
         ClickableTextHelper(
             text = text,

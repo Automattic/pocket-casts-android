@@ -576,7 +576,7 @@ class WhatsNewManagerImplTest {
         manager.markAsResponded("another-poll")
 
         manager.feedMessages.test {
-            assertEquals(listOf("poll", "m1"), awaitItem().map { it.id })
+            assertEquals(listOf("m1", "poll"), awaitItem().map { it.id })
         }
     }
 

@@ -1,5 +1,19 @@
+8.27
+-----
+
+
 8.26
 -----
+*   New Features
+    *   Add Playback 2026, your year in podcasts, with a Podcasts sheet and a Profile banner
+        ([#6357](https://github.com/Automattic/pocket-casts-android/pull/6357))
+*   Bug Fixes
+    *   Fix the back gesture closing the app instead of minimising the full screen player after the app is restored
+        ([#6428](https://github.com/Automattic/pocket-casts-android/pull/6428))
+    *   Allow the Wear OS app to be installed on watches without WiFi or Bluetooth
+        ([#6435](https://github.com/Automattic/pocket-casts-android/pull/6435))
+    *   Keep pinned messages at the top of What’s New
+        ([#6457](https://github.com/Automattic/pocket-casts-android/pull/6457))
 
 8.25
 -----

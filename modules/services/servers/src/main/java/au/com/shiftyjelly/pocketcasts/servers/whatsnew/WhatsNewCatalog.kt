@@ -18,6 +18,7 @@ data class WhatsNewMessage(
     val targeting: WhatsNewTargeting,
     val title: String,
     val content: WhatsNewContent,
+    val tapAction: WhatsNewTapAction? = null,
 )
 
 enum class WhatsNewMessageType(val key: String) {
@@ -86,6 +87,11 @@ data class WhatsNewAction(
         const val OPEN_LINK = "open_link"
     }
 }
+
+data class WhatsNewTapAction(
+    val type: String,
+    val url: String?,
+)
 
 data class WhatsNewResearch(
     val description: String?,

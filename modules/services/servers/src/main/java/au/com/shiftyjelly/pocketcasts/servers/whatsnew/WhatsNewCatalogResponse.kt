@@ -37,6 +37,7 @@ data class WhatsNewMessageResponse(
     val pages: List<WhatsNewPageResponse>? = null,
     val description: String? = null,
     val poll: WhatsNewPollResponse? = null,
+    val tapAction: WhatsNewActionResponse? = null,
 ) {
     fun toMessage(): WhatsNewMessage? {
         val id = id.nonBlank() ?: return null
@@ -54,6 +55,7 @@ data class WhatsNewMessageResponse(
             targeting = targeting.toTargeting(),
             title = title,
             content = content,
+            tapAction = tapAction?.toTapAction(),
         )
     }
 
@@ -131,14 +133,19 @@ data class WhatsNewActionResponse(
     val label: String? = null,
 ) {
     fun toAction(): WhatsNewAction? {
+        val tapAction = toTapAction() ?: return null
+        val label = label.nonBlank() ?: return null
+        return WhatsNewAction(type = tapAction.type, label = label, url = tapAction.url)
+    }
+
+    fun toTapAction(): WhatsNewTapAction? {
         val type = (type ?: event).nonBlank() ?: return null
         val url = if (type == WhatsNewAction.OPEN_LINK) {
             arguments?.url.nonBlank()?.takeIf(::isSecureWebUrl) ?: return null
         } else {
             null
         }
-        val label = label.nonBlank() ?: return null
-        return WhatsNewAction(type = type, label = label, url = url)
+        return WhatsNewTapAction(type = type, url = url)
     }
 }
 

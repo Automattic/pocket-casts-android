@@ -1,16 +1,11 @@
 #!/bin/bash -u
 
-if "$(dirname "${BASH_SOURCE[0]}")/should-skip-job.sh" --job-type lint; then
-  exit 0
-fi
-
 "$(dirname "${BASH_SOURCE[0]}")/restore-cache.sh"
 
 echo "--- :rubygems: Setting up Gems"
 install_gems
 
-echo "--- :closed_lock_with_key: Installing Secrets"
-bundle exec fastlane run configure_apply
+"$(dirname "${BASH_SOURCE[0]}")/install-secrets.sh"
 
 echo "--- 🧹 Linting"
 # Run lint on app module first, to make sure that the lint-results-debug.sarif file is always generated

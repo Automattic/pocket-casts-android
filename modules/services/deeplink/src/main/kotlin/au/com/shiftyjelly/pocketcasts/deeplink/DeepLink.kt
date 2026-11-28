@@ -334,6 +334,11 @@ data object SmartFoldersDeepLink : IntentableDeepLink {
         .setData(Uri.parse("pktc://features/suggestedFolders"))
 }
 
+data object ShowPlaybackDeepLink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://profile/playback"))
+}
+
 data object DeveloperOptionsDeeplink : IntentableDeepLink {
 
     override fun toIntent(context: Context) = Intent(ACTION_VIEW)

@@ -10,9 +10,12 @@ import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewContent
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessage
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewMessageType
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewPage
+import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewTapAction
 import au.com.shiftyjelly.pocketcasts.servers.whatsnew.WhatsNewTargeting
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import com.automattic.eventhorizon.EventHorizon
+import com.automattic.eventhorizon.WhatsNewActionTappedEvent
+import com.automattic.eventhorizon.WhatsNewActionType
 import com.automattic.eventhorizon.WhatsNewFeedShownEvent
 import com.automattic.eventhorizon.WhatsNewReadAllTappedEvent
 import java.time.Instant
@@ -27,6 +30,7 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import com.automattic.eventhorizon.WhatsNewMessageType as AnalyticsMessageType
 
 class WhatsNewFeedViewModelTest {
     @get:Rule
@@ -186,6 +190,51 @@ class WhatsNewFeedViewModelTest {
     }
 
     @Test
+    fun `a row carries the tap action this build supports`() = runTest {
+        manager.publish(
+            listOf(
+                message("upsell", WhatsNewTapAction(type = "open_upsell", url = null)),
+                message("link", WhatsNewTapAction(type = "open_link", url = "https://blog.pocketcasts.com")),
+                message("unknown", WhatsNewTapAction(type = "open_time_machine", url = null)),
+                message("none"),
+            ),
+        )
+
+        createViewModel().uiState.test {
+            val items = expectMostRecentItem().items.associate { it.id to (it.tapEvent to it.tapUrl) }
+            assertEquals(
+                mapOf(
+                    "upsell" to (WhatsNewActionEvent.OpenUpsell to null),
+                    "link" to (WhatsNewActionEvent.OpenLink to "https://blog.pocketcasts.com"),
+                    "unknown" to (null to null),
+                    "none" to (null to null),
+                ),
+                items,
+            )
+        }
+    }
+
+    @Test
+    fun `clicking a row with a tap action reports the action`() = runTest {
+        manager.publish(listOf(message("a", WhatsNewTapAction(type = "open_upsell", url = null))))
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            expectMostRecentItem()
+            viewModel.onMessageClick("a")
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(eventHorizon).track(
+            WhatsNewActionTappedEvent(
+                messageUuid = "a",
+                messageType = AnalyticsMessageType.NewFeature,
+                action = WhatsNewActionType.OpenUpsell,
+            ),
+        )
+    }
+
+    @Test
     fun `showing the feed reports it`() = runTest {
         createViewModel().onScreenShown()
 
@@ -267,7 +316,7 @@ class WhatsNewFeedViewModelTest {
         }
     }
 
-    private fun message(id: String) = WhatsNewMessage(
+    private fun message(id: String, tapAction: WhatsNewTapAction? = null) = WhatsNewMessage(
         id = id,
         type = WhatsNewMessageType.NewFeature,
         publishedAt = Instant.parse("2026-09-01T00:00:00Z"),
@@ -277,6 +326,7 @@ class WhatsNewFeedViewModelTest {
         content = WhatsNewContent.Pages(
             listOf(WhatsNewPage(image = null, heading = "Heading", description = "Description", action = null)),
         ),
+        tapAction = tapAction,
     )
 
     private class FakeWhatsNewManager : WhatsNewManager {
