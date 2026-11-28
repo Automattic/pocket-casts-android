@@ -1,6 +1,8 @@
 8.27
 -----
-
+*   Updates
+    *   Stop downloading video for HLS streams with a separate audio track while the video isn't on screen
+        ([#6439](https://github.com/Automattic/pocket-casts-android/pull/6439))
 
 8.26
 -----

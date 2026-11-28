@@ -513,6 +513,11 @@ internal fun shouldDisableVideoTrack(
     return audioOnly || (!hasVideoSurface && (!isHlsStream || hasIndependentAudio))
 }
 
+/**
+ * Whether the selected audio track can be loaded without the video track. Media3 sets
+ * [androidx.media3.common.Format.primaryTrackGroupId] on audio muxed into an HLS video variant, so
+ * a null value means the audio comes from a separate rendition and video can be dropped safely.
+ */
 @OptIn(UnstableApi::class)
 internal fun hasIndependentAudioTrack(tracks: Tracks?): Boolean {
     if (tracks == null) return false
