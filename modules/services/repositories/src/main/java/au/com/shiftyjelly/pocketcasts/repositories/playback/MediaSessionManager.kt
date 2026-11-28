@@ -1400,8 +1400,10 @@ class MediaSessionManager(
             logEvent(keyEvent.toString())
             if (keyEvent.action == KeyEvent.ACTION_DOWN) {
                 if (keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
-                    val sourceView = currentSource()
-                    enqueueCommand("pause") { playbackManager.handleMediaSessionPause(sourceView = sourceView) }
+                    if (keyEvent.repeatCount == 0) {
+                        val sourceView = currentSource()
+                        enqueueCommand("pause") { playbackManager.handleMediaSessionPause(sourceView = sourceView) }
+                    }
                     return true
                 }
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: keyCode=${keyEvent.keyCode}")

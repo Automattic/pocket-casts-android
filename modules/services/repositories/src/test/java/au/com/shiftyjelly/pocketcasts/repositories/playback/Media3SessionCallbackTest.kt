@@ -460,6 +460,18 @@ class Media3SessionCallbackTest {
     }
 
     @Test
+    fun `KEYCODE_MEDIA_PAUSE ignores repeated key events`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.isCarConnected()).thenReturn(true)
+
+        assertTrue(sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE, repeatCount = 1))
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager, never()).pauseSuspend(any(), any())
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
+    }
+
+    @Test
     fun `KEYCODE_MEDIA_PLAY_PAUSE single tap calls playPause while playing`() {
         whenever(playbackManager.isPlaying()).thenReturn(true)
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
@@ -827,12 +839,12 @@ class Media3SessionCallbackTest {
         isAutomotive = isAutomotive,
     )
 
-    private fun sendMediaButtonEvent(keyCode: Int) {
-        val keyEvent = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
+    private fun sendMediaButtonEvent(keyCode: Int, repeatCount: Int = 0): Boolean {
+        val keyEvent = KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, keyCode, repeatCount)
         val intent = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
             putExtra(Intent.EXTRA_KEY_EVENT, keyEvent)
         }
-        callback.onMediaButtonEvent(mockSession, mockController, intent)
+        return callback.onMediaButtonEvent(mockSession, mockController, intent)
     }
 
     private fun mockHeadphoneNextAction(action: HeadphoneAction) {

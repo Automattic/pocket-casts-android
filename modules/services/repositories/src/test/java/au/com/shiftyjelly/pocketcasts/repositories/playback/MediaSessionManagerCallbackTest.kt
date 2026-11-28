@@ -16,6 +16,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -282,6 +283,26 @@ class MediaSessionManagerCallbackTest {
         )
     }
 
+    @Test
+    fun `legacy KEYCODE_MEDIA_PAUSE ignores repeated key events`() = runTest {
+        val playbackManager = mock<PlaybackManager>()
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.isCarConnected()).thenReturn(true)
+        val manager = createManager(this, playbackManager, mock())
+        val queuedCommands = mutableListOf<suspend () -> Unit>()
+        val callback = manager.createCallback(
+            scope = this,
+            playbackManager = playbackManager,
+            episodeManager = mock(),
+            enqueueCommand = { _, command -> queuedCommands += command },
+        )
+
+        assertTrue(callback.onMediaButtonEvent(mediaButtonIntent(KeyEvent.KEYCODE_MEDIA_PAUSE, repeatCount = 1)))
+        assertEquals(0, queuedCommands.size)
+        verify(playbackManager, never()).pauseSuspend(any(), any())
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
+    }
+
     private fun createManager(
         scope: CoroutineScope,
         playbackManager: PlaybackManager,
@@ -313,7 +334,7 @@ class MediaSessionManagerCallbackTest {
         scopeProvider = { scope },
     )
 
-    private fun mediaButtonIntent(keyCode: Int) = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
-        putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
+    private fun mediaButtonIntent(keyCode: Int, repeatCount: Int = 0) = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
+        putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, keyCode, repeatCount))
     }
 }
