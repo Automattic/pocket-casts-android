@@ -119,16 +119,50 @@ class PlaybackManagerCarModeTest {
     }
 
     @Test
-    fun `manual pause clears focusWasPlaying while auto pause preserves it`() = runTest {
+    fun `non-transient auto pause releases audio focus and clears focusWasPlaying in car mode`() = runTest {
         val playbackManager = createPlaybackManager(backgroundScope)
-
+        playbackManager.isAndroidAutoConnected = true
+        assertTrue(playbackManager.focusManager.tryToGetAudioFocus())
         playbackManager.focusWasPlaying = Date()
-        playbackManager.pauseSuspend(transientLoss = false, sourceView = SourceView.PLAYER)
-        assertNull(playbackManager.focusWasPlaying)
 
-        playbackManager.focusWasPlaying = Date()
         playbackManager.pauseSuspend(transientLoss = false, sourceView = SourceView.AUTO_PAUSE)
+
+        assertFalse(playbackManager.focusManager.isFocused)
+        assertNull(playbackManager.focusWasPlaying)
+    }
+
+    @Test
+    fun `transient auto pause preserves audio focus and focusWasPlaying`() = runTest {
+        val playbackManager = createPlaybackManager(backgroundScope)
+        playbackManager.isAndroidAutoConnected = true
+        assertTrue(playbackManager.focusManager.tryToGetAudioFocus())
+        playbackManager.focusWasPlaying = Date()
+
+        playbackManager.pauseSuspend(transientLoss = true, sourceView = SourceView.AUTO_PAUSE)
+
+        assertTrue(playbackManager.focusManager.isFocused)
         assertNotNull(playbackManager.focusWasPlaying)
+    }
+
+    @Test
+    fun `manual pause clears focusWasPlaying`() = runTest {
+        val playbackManager = createPlaybackManager(backgroundScope)
+        playbackManager.focusWasPlaying = Date()
+
+        playbackManager.pauseSuspend(transientLoss = false, sourceView = SourceView.PLAYER)
+
+        assertNull(playbackManager.focusWasPlaying)
+    }
+
+    @Test
+    fun `onFocusLoss clears focusWasPlaying on permanent loss while playing`() = runTest {
+        val playbackManager = createPlaybackManager(backgroundScope)
+        playbackManager.player = mock { on { isRemote } doReturn false }
+        playbackManager.playbackStateRelay.accept(PlaybackState(state = PlaybackState.State.PLAYING))
+
+        playbackManager.onFocusLoss(PlayOverNotificationSetting.NEVER, transientLoss = false)
+
+        assertNull(playbackManager.focusWasPlaying)
     }
 
     @Test

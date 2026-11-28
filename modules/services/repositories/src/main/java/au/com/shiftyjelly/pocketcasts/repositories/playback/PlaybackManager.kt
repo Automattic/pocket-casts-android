@@ -1101,12 +1101,10 @@ open class PlaybackManager @Inject constructor(
 
     suspend fun pauseSuspend(transientLoss: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         if (!transientLoss) {
-            if (!isCarConnected()) {
+            if (!isCarConnected() || sourceView == SourceView.AUTO_PAUSE) {
                 focusManager.giveUpAudioFocus()
             }
-            if (sourceView != SourceView.AUTO_PAUSE) {
-                focusWasPlaying = null
-            }
+            focusWasPlaying = null
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(transientLoss = false))
             }
@@ -2127,7 +2125,7 @@ open class PlaybackManager @Inject constructor(
         val playing = isPlaying()
         if ((playOverNotification == PlayOverNotificationSetting.NEVER) && playing) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost while playing")
-            focusWasPlaying = Date()
+            focusWasPlaying = if (transientLoss) Date() else null
 
             pause(transientLoss = transientLoss, sourceView = SourceView.AUTO_PAUSE)
         } else if (transientLoss && focusWasPlaying != null) {
