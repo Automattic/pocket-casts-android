@@ -367,7 +367,11 @@ class MediaSessionManager(
             },
             onPause = {
                 val sourceView = media3RequestSource()
-                scope.launch { commandMutex.withLock { playbackManager.pauseSuspend(sourceView = sourceView) } }
+                scope.launch {
+                    commandMutex.withLock {
+                        playbackManager.handleMediaSessionPause(sourceView = sourceView)
+                    }
+                }
             },
             onSeekTo = { positionMs ->
                 val sourceView = media3RequestSource()
@@ -1395,6 +1399,13 @@ class MediaSessionManager(
             ) ?: return false
             logEvent(keyEvent.toString())
             if (keyEvent.action == KeyEvent.ACTION_DOWN) {
+                if (keyEvent.keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
+                    if (keyEvent.repeatCount == 0) {
+                        val sourceView = currentSource()
+                        enqueueCommand("pause") { playbackManager.handleMediaSessionPause(sourceView = sourceView) }
+                    }
+                    return true
+                }
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: keyCode=${keyEvent.keyCode}")
                 mediaButtonSource = currentSource()
             }
@@ -1492,7 +1503,7 @@ class MediaSessionManager(
         override fun onPause() {
             logEvent("pause")
             val sourceView = currentSource()
-            enqueueCommand("pause") { playbackManager.pauseSuspend(sourceView = sourceView) }
+            enqueueCommand("pause") { playbackManager.handleMediaSessionPause(sourceView = sourceView) }
         }
 
         override fun onPlayFromSearch(query: String?, extras: Bundle?) {
@@ -1686,6 +1697,15 @@ internal const val APP_ACTION_MARK_AS_PLAYED = "markAsPlayed"
 internal const val APP_ACTION_CHANGE_SPEED = "changeSpeed"
 internal const val APP_ACTION_ARCHIVE = "archive"
 internal const val APP_ACTION_PLAY_NEXT = "playNext"
+
+internal suspend fun PlaybackManager.handleMediaSessionPause(sourceView: SourceView) {
+    val isCarSource = sourceView == SourceView.ANDROID_AUTO || sourceView == SourceView.AUTOMOTIVE
+    if (!isPlaying() && (isCarConnected() || isCarSource)) {
+        playQueueSuspend(sourceView = sourceView)
+    } else {
+        pauseSuspend(sourceView = sourceView)
+    }
+}
 
 private val NOTHING_PLAYING: MediaMetadataCompat = MediaMetadataCompat.Builder()
     .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "")

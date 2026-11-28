@@ -405,7 +405,8 @@ class Media3SessionCallbackTest {
     }
 
     @Test
-    fun `KEYCODE_MEDIA_PAUSE calls pauseSuspend`() = runTest {
+    fun `KEYCODE_MEDIA_PAUSE calls pauseSuspend when playing`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(true)
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
         testScope.advanceUntilIdle()
 
@@ -416,9 +417,63 @@ class Media3SessionCallbackTest {
     }
 
     @Test
+    fun `KEYCODE_MEDIA_PAUSE calls playQueueSuspend when paused and car is connected`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.isCarConnected()).thenReturn(true)
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).playQueueSuspend(
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+            showedStreamWarning = any(),
+        )
+        verify(playbackManager, never()).pauseSuspend(any(), any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PAUSE calls playQueueSuspend when paused from Android Auto`() = runTest {
+        whenever(mockController.packageName).thenReturn(ANDROID_AUTO_PACKAGE_NAME)
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.isCarConnected()).thenReturn(false)
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).playQueueSuspend(
+            sourceView = eq(SourceView.ANDROID_AUTO),
+            showedStreamWarning = any(),
+        )
+        verify(playbackManager, never()).pauseSuspend(any(), any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PAUSE calls pauseSuspend when paused and car is not connected`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.isCarConnected()).thenReturn(false)
+        sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager).pauseSuspend(
+            transientLoss = any(),
+            sourceView = eq(SourceView.MEDIA_BUTTON_BROADCAST_ACTION),
+        )
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
+    }
+
+    @Test
+    fun `KEYCODE_MEDIA_PAUSE ignores repeated key events`() = runTest {
+        whenever(playbackManager.isPlaying()).thenReturn(false)
+        whenever(playbackManager.isCarConnected()).thenReturn(true)
+
+        assertTrue(sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE, repeatCount = 1))
+        testScope.advanceUntilIdle()
+
+        verify(playbackManager, never()).pauseSuspend(any(), any())
+        verify(playbackManager, never()).playQueueSuspend(any(), any())
+    }
+
+    @Test
     fun `KEYCODE_MEDIA_PLAY_PAUSE single tap calls playPause while playing`() {
         whenever(playbackManager.isPlaying()).thenReturn(true)
-
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
         testScope.advanceUntilIdle()
 
@@ -645,6 +700,7 @@ class Media3SessionCallbackTest {
     @Test
     fun `KEYCODE_MEDIA_PAUSE from Android Auto reports Android Auto source`() = runTest {
         whenever(mockController.packageName).thenReturn(ANDROID_AUTO_PACKAGE_NAME)
+        whenever(playbackManager.isPlaying()).thenReturn(true)
 
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
         testScope.advanceUntilIdle()
@@ -658,6 +714,7 @@ class Media3SessionCallbackTest {
     @Test
     fun `KEYCODE_MEDIA_PAUSE from another controller keeps media button source`() = runTest {
         whenever(mockController.packageName).thenReturn("com.example.controller")
+        whenever(playbackManager.isPlaying()).thenReturn(true)
 
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
         testScope.advanceUntilIdle()
@@ -683,6 +740,7 @@ class Media3SessionCallbackTest {
     fun `KEYCODE_MEDIA_PAUSE on Automotive reports Automotive source`() = runTest {
         callback = createCallback(isAutomotive = true)
         whenever(mockController.packageName).thenReturn("com.android.car.media")
+        whenever(playbackManager.isPlaying()).thenReturn(true)
 
         sendMediaButtonEvent(KeyEvent.KEYCODE_MEDIA_PAUSE)
         testScope.advanceUntilIdle()
@@ -781,12 +839,12 @@ class Media3SessionCallbackTest {
         isAutomotive = isAutomotive,
     )
 
-    private fun sendMediaButtonEvent(keyCode: Int) {
-        val keyEvent = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
+    private fun sendMediaButtonEvent(keyCode: Int, repeatCount: Int = 0): Boolean {
+        val keyEvent = KeyEvent(0L, 0L, KeyEvent.ACTION_DOWN, keyCode, repeatCount)
         val intent = Intent(Intent.ACTION_MEDIA_BUTTON).apply {
             putExtra(Intent.EXTRA_KEY_EVENT, keyEvent)
         }
-        callback.onMediaButtonEvent(mockSession, mockController, intent)
+        return callback.onMediaButtonEvent(mockSession, mockController, intent)
     }
 
     private fun mockHeadphoneNextAction(action: HeadphoneAction) {

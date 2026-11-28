@@ -10,6 +10,7 @@ import android.os.Build
 import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.annotation.OptIn
+import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -134,6 +135,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
@@ -198,7 +200,8 @@ open class PlaybackManager @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    private val focusManager = FocusManager(
+    @VisibleForTesting
+    internal val focusManager = FocusManager(
         context = application,
         settings = settings,
         focusChangeListener = this,
@@ -243,7 +246,9 @@ open class PlaybackManager @Inject constructor(
     private var updateCount = 0
     private var resettingPlayer = false
     private var episodeLastBufferStatus: EpisodeBufferStatus? = null
-    private var focusWasPlaying: Date? = null
+
+    @VisibleForTesting
+    internal var focusWasPlaying: Date? = null
     private var forcePlayerSwitch = false
     private var updateTimerDisposable: Disposable? = null
     private var bufferUpdateTimerDisposable: Disposable? = null
@@ -258,6 +263,35 @@ open class PlaybackManager @Inject constructor(
     private val resumptionHelper = ResumptionHelper(settings)
 
     private val errorClassifier = PlaybackErrorClassifier()
+
+    @Volatile
+    @VisibleForTesting
+    internal var isAndroidAutoConnected = false
+
+    fun isCarConnected(): Boolean {
+        return Util.isAutomotive(application) || Util.isCarUiMode(application) || isAndroidAutoConnected
+    }
+
+    @VisibleForTesting
+    internal fun onCarConnectionChanged(isConnected: Boolean) {
+        val wasConnected = isAndroidAutoConnected
+        isAndroidAutoConnected = isConnected
+        if (wasConnected && !isConnected && !isPlaying()) {
+            focusManager.giveUpAudioFocus()
+        }
+    }
+
+    init {
+        try {
+            Util.isAndroidAutoConnectedFlow(application)
+                .distinctUntilChanged()
+                .onEach(::onCarConnectionChanged)
+                .catch { Timber.e(it, "Failed to observe CarConnection") }
+                .launchIn(applicationScope)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to observe CarConnection")
+        }
+    }
 
     var episodeSubscription: Disposable? = null
 
@@ -1067,7 +1101,10 @@ open class PlaybackManager @Inject constructor(
 
     suspend fun pauseSuspend(transientLoss: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         if (!transientLoss) {
-            focusManager.giveUpAudioFocus()
+            if (!isCarConnected() || sourceView == SourceView.AUTO_PAUSE) {
+                focusManager.giveUpAudioFocus()
+            }
+            focusWasPlaying = null
             playbackStateRelay.blockingFirst().let { playbackState ->
                 playbackStateRelay.accept(playbackState.copy(transientLoss = false))
             }
@@ -1126,6 +1163,8 @@ open class PlaybackManager @Inject constructor(
                 player = null
             }
         }
+
+        focusManager.giveUpAudioFocus()
 
         playbackStateRelay.blockingFirst().let {
             playbackStateRelay.accept(
@@ -2086,9 +2125,11 @@ open class PlaybackManager @Inject constructor(
         val playing = isPlaying()
         if ((playOverNotification == PlayOverNotificationSetting.NEVER) && playing) {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost while playing")
-            focusWasPlaying = Date()
+            focusWasPlaying = if (transientLoss) Date() else null
 
             pause(transientLoss = transientLoss, sourceView = SourceView.AUTO_PAUSE)
+        } else if (transientLoss && focusWasPlaying != null) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Transient focus lost while already paused from prior focus loss")
         } else {
             LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Focus lost not playing")
             focusWasPlaying = null
