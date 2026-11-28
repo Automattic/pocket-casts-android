@@ -223,7 +223,7 @@ class SimplePlayer(
         val trackSelector = DefaultTrackSelector(context)
         this.trackSelector = trackSelector
         hasVideoSurface = false
-        applyVideoTrackSelection()
+        applyVideoTrackSelection(tracks = null)
 
         val minBufferMillis = if (isStreaming) bufferTimeMinMillis else DefaultLoadControl.DEFAULT_MIN_BUFFER_MS
         val maxBufferMillis = if (isStreaming) bufferTimeMaxMillis else DefaultLoadControl.DEFAULT_MAX_BUFFER_MS
@@ -272,6 +272,15 @@ class SimplePlayer(
                 episodeMetadata.read(tracks, settings.artworkConfiguration.value.useEpisodeArtwork, context)
                 onMetadataAvailable(episodeMetadata)
                 updateVideoState()
+                if (
+                    !hasVideoSurface &&
+                    episodeLocation.isHlsStream &&
+                    videoTrackDisableRunnable == null &&
+                    trackSelector.parameters.disabledTrackTypes.contains(C.TRACK_TYPE_VIDEO).not() &&
+                    hasIndependentAudioTrack(tracks)
+                ) {
+                    scheduleVideoTrackDisable()
+                }
             }
 
             override fun onIsLoadingChanged(isLoading: Boolean) {
@@ -349,10 +358,19 @@ class SimplePlayer(
     }
 
     @OptIn(UnstableApi::class)
-    private fun applyVideoTrackSelection() {
+    private fun applyVideoTrackSelection(tracks: Tracks? = player?.currentTracks) {
         val trackSelector = trackSelector ?: return
+        val shouldDisable = shouldDisableVideoTrack(
+            audioOnly = settings.audioOnly.value,
+            hasVideoSurface = hasVideoSurface,
+            isHlsStream = episodeLocation.isHlsStream,
+            hasIndependentAudio = hasIndependentAudioTrack(tracks),
+        )
+        if (trackSelector.parameters.disabledTrackTypes.contains(C.TRACK_TYPE_VIDEO) == shouldDisable) {
+            return
+        }
         trackSelector.parameters = trackSelector.buildUponParameters()
-            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, shouldDisableVideoTrack(settings.audioOnly.value, hasVideoSurface, episodeLocation.isHlsStream))
+            .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, shouldDisable)
             .build()
     }
 
@@ -486,8 +504,31 @@ class SimplePlayer(
 
 private const val VIDEO_TRACK_DISABLE_GRACE_MS = 10_000L
 
-internal fun shouldDisableVideoTrack(audioOnly: Boolean, hasVideoSurface: Boolean, isHlsStream: Boolean): Boolean {
-    return audioOnly || (!hasVideoSurface && !isHlsStream)
+internal fun shouldDisableVideoTrack(
+    audioOnly: Boolean,
+    hasVideoSurface: Boolean,
+    isHlsStream: Boolean,
+    hasIndependentAudio: Boolean = false,
+): Boolean {
+    return audioOnly || (!hasVideoSurface && (!isHlsStream || hasIndependentAudio))
+}
+
+/**
+ * Whether the selected audio track can be loaded without the video track. Media3 sets
+ * [androidx.media3.common.Format.primaryTrackGroupId] on audio muxed into an HLS video variant, so
+ * a null value means the audio comes from a separate rendition and video can be dropped safely.
+ */
+@OptIn(UnstableApi::class)
+internal fun hasIndependentAudioTrack(tracks: Tracks?): Boolean {
+    if (tracks == null) return false
+    return tracks.groups.any { group ->
+        group.type == C.TRACK_TYPE_AUDIO &&
+            group.isSelected &&
+            (0 until group.length).any { index ->
+                group.isTrackSelected(index) &&
+                    group.getTrackFormat(index).primaryTrackGroupId == null
+            }
+    }
 }
 
 private class PlayPauseListener(
